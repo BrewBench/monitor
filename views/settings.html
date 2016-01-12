@@ -1,0 +1,9 @@
+<div class="kettles" ng-repeat="kettle in kettles">
+<h3>{{kettle.name}} <sup>A{{$index}}</sup></h3>
+<ul>
+  <li><strong>Temp:</strong> {{kettle.temp}}&deg;F</li>
+  <li><strong>Alert Diff:</strong> {{kettle.diff}}&deg;F</li>
+  <li ng-if="kettle.time"><strong>Time:</strong> {{kettle.time}} minutes</li>
+</ul>
+</div>
+<button type="button" class="btn btn-default btn-save btn-lg btn-block" ng-click="SaveSettings()">Save</button>

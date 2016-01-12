@@ -1,0 +1,27 @@
+body { padding-top: 70px; }
+
+.navbar, .btn-save{
+  background-color: #00979C;
+  color: #ffffff;
+}
+
+.navbar-inverse .navbar-nav>li>a{
+  color: #ffffff;
+}
+
+.navbar-inverse .navbar-nav>.active>a, .navbar-inverse .navbar-nav>.active>a:focus, .navbar-inverse .navbar-nav>.active>a:hover{
+  background-color: #008184;
+  color: #ffffff;
+}
+
+.navbar-inverse .navbar-collapse, .navbar-inverse .navbar-form{
+  border-color: #008184;
+}
+
+.kettles h3{
+    color: #777;
+}
+
+.kettles li{
+  list-style-type: none;
+}
