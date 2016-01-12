@@ -22,6 +22,27 @@ body { padding-top: 70px; }
     color: #777;
 }
 
+.kettles ul{
+  border: 1px solid #777;
+  border-radius: 25px;
+}
+
 .kettles li{
   list-style-type: none;
+  margin: 1em;
+}
+
+.settings input, .kettles .temp{
+  font-size: 22px;
+  color: #777;
+}
+
+.fa-times-circle{
+  color: #d9534f;
+  cursor: pointer;
+}
+
+.fa-check-circle{
+  color: #5cb85c;
+  cursor: pointer;
 }

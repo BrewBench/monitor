@@ -1,9 +1,22 @@
-<div class="kettles" ng-repeat="kettle in kettles">
-<h3>{{kettle.name}} <sup>A{{$index}}</sup></h3>
-<ul>
-  <li><strong>Temp:</strong> {{kettle.temp}}&deg;F</li>
-  <li><strong>Alert Diff:</strong> {{kettle.diff}}&deg;F</li>
-  <li ng-if="kettle.time"><strong>Time:</strong> {{kettle.time}} minutes</li>
-</ul>
+<div class="settings">
+  <div class="panel panel-default">
+    <div class="panel-heading"><h3>Settings</h3></div>
+    <div class="panel-body">
+      Poll every <input type="number" ng-model="pollSeconds" min="5" max="60"> seconds.
+    </div>
+  </div>
+
+  <div class="kettles" ng-repeat="kettle in kettles">
+  <h3>{{kettle.name}} <sup>A{{$index}}</sup></h3>
+  <ul>
+    <li>
+      <strong>Temp:</strong> <span class="temp">{{kettle.temp}}&deg;F</span>
+      <div class="pull-right"><i class="fa fa-4x" ng-click="kettle.active=!kettle.active" ng-class="{'fa-check-circle':kettle.active,'fa-times-circle':!kettle.active}"></i></div>
+    </li>
+    <li><strong>Alert Diff:</strong> <input type="number" ng-model="kettles[$index].diff" min="1" max="10"> &deg;F</li>
+    <li ng-if="kettle.time"><strong>Time:</strong> <input type="number" ng-model="kettles[$index].time" steps="5" min="60" max="200"> minutes</li>
+  </ul>
+  </div>
 </div>
-<button type="button" class="btn btn-default btn-save btn-lg btn-block" ng-click="SaveSettings()">Save</button>
+
+<!-- <button type="button" class="btn btn-default btn-save btn-lg btn-block" ng-click="SaveSettings()">Save</button> -->
