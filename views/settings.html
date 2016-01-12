@@ -8,13 +8,22 @@
 
   <div class="kettles" ng-repeat="kettle in kettles">
   <h3>{{kettle.name}} <sup>A{{$index}}</sup></h3>
+  <div class="alert alert-danger" role="alert" ng-show="kettle.high">Temp is too high</div>
+  <div class="alert alert-info" role="alert" ng-show="kettle.low">Temp is too Low</div>
   <ul>
     <li>
-      <strong>Temp:</strong> <span class="temp">{{kettle.temp}}&deg;F</span>
+      <strong>Current Temp:</strong> <span class="temp">{{kettle.currentTemp}}&deg;F</span>
       <div class="pull-right"><i class="fa fa-4x" ng-click="kettle.active=!kettle.active" ng-class="{'fa-check-circle':kettle.active,'fa-times-circle':!kettle.active}"></i></div>
     </li>
+    <li><strong>Target Temp:</strong> <input type="number" ng-model="kettles[$index].targetTemp" min="1" max="10"> &deg;F</li>
     <li><strong>Alert Diff:</strong> <input type="number" ng-model="kettles[$index].diff" min="1" max="10"> &deg;F</li>
-    <li ng-if="kettle.time"><strong>Time:</strong> <input type="number" ng-model="kettles[$index].time" steps="5" min="60" max="200"> minutes</li>
+    <li ng-if="kettle.timer">
+      <strong>Time:</strong> <input type="number" ng-model="kettles[$index].timer.min" steps="5" min="60" max="200"> minutes
+      <button type="button" class="btn btn-default btn-save" ng-click="timerStart($index)">
+        {{kettles[$index].timer.running?'Stop':'Start'}}
+      </button>
+      <span class="timer">{{kettles[$index].timer.min}}:{{kettles[$index].timer.sec}}</span>
+    </li>
   </ul>
   </div>
 </div>

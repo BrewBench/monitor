@@ -1,9 +1,5 @@
 brewMachine.factory('BMService', function($http, $q, $filter){
 
-  function JSON_CALLBACK(response){
-    console.log(response)
-  }
-
   return {
 
     // endpoint is digital, analog

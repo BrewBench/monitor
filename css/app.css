@@ -18,6 +18,10 @@ body { padding-top: 70px; }
   border-color: #008184;
 }
 
+.navbar-brand img{
+  margin-top: -14px;
+}
+
 .kettles h3{
     color: #777;
 }
@@ -32,9 +36,10 @@ body { padding-top: 70px; }
   margin: 1em;
 }
 
-.settings input, .kettles .temp{
+.settings input, .kettles .temp, .kettles .timer{
   font-size: 22px;
   color: #777;
+  width: 75px;
 }
 
 .fa-times-circle{
