@@ -23,7 +23,7 @@ body { padding-top: 70px; }
 }
 
 .kettles ul{
-  min-width: 350px;
+  padding: 10px;
 }
 
 .kettles h3{
@@ -37,7 +37,7 @@ body { padding-top: 70px; }
 
 .kettles li{
   list-style-type: none;
-  margin: 1em;
+  margin: 10px;
 }
 
 .kettles label{
