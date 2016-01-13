@@ -22,6 +22,10 @@ body { padding-top: 70px; }
   margin-top: -14px;
 }
 
+.kettles ul{
+  min-width: 350px;
+}
+
 .kettles h3{
     color: #777;
 }
@@ -36,18 +40,32 @@ body { padding-top: 70px; }
   margin: 1em;
 }
 
+.kettles label{
+  font-size: 16px;
+}
+
 .settings input, .kettles .temp, .kettles .timer{
   font-size: 22px;
   color: #777;
-  width: 75px;
+  width: 60px;
 }
 
-.fa-times-circle{
+.fa-stop-circle{
   color: #d9534f;
   cursor: pointer;
 }
 
-.fa-check-circle{
+.fa-play-circle{
   color: #5cb85c;
   cursor: pointer;
+}
+
+.fa-plus-circle, .fa-minus-circle {
+  color: #00979C;
+  cursor: pointer;
+}
+
+
+.fa-plus-circle:hover, .fa-minus-circle:hover {
+  color: #008184;
 }
