@@ -10,6 +10,21 @@ int led_rosso = 12;
 String parameters = "";           //String of POST parameters
 String macAddr = "";
 
+// https://learn.adafruit.com/thermistor/using-a-thermistor
+// resistance at 25 degrees C
+#define THERMISTORNOMINAL 10000      
+// temp. for nominal resistance (almost always 25 C)
+#define TEMPERATURENOMINAL 25   
+// how many samples to take and average, more takes longer
+// but is more 'smooth'
+#define NUMSAMPLES 5
+// The beta coefficient of the thermistor (usually 3000-4000)
+#define BCOEFFICIENT 3950
+// the value of the 'other' resistor
+#define SERIESRESISTOR 10000    
+
+int samples[NUMSAMPLES];
+
 BridgeServer server;
 
 void process(BridgeClient client) {
@@ -56,7 +71,7 @@ void digitalCommand(BridgeClient client) {
 
 void analogCommand(BridgeClient client) {
   int pin, value;
-
+  
   pin = client.parseInt();
 
   if (client.read() == '/') {
@@ -71,10 +86,34 @@ void analogCommand(BridgeClient client) {
     Bridge.put(key, String(value));
   }
   else {
-    value = analogRead(pin);
+    uint8_t i;
+    float average;
+    
+    // take N samples in a row, with a slight delay
+    for (i=0; i< NUMSAMPLES; i++) {
+      samples[i] = analogRead(pin);
+      delay(10);
+    }
+    // average all the samples out
+    average = 0;
+    for (i=0; i< NUMSAMPLES; i++) {
+       average += samples[i];
+    }
+    average /= NUMSAMPLES;
+    // convert the value to resistance
+    average = 1023 / average - 1;
+    average = SERIESRESISTOR / average;
 
+    float steinhart;
+    steinhart = average / THERMISTORNOMINAL;     // (R/Ro)
+    steinhart = log(steinhart);                  // ln(R/Ro)
+    steinhart /= BCOEFFICIENT;                   // 1/B * ln(R/Ro)
+    steinhart += 1.0 / (TEMPERATURENOMINAL + 273.15); // + (1/To)
+    steinhart = 1.0 / steinhart;                 // Invert
+    steinhart -= 273.15;  
+  
     // Send JSON response to client
-    client.print("{\"pin\":\"A"+String(pin)+"\",\"value\":\""+String(value)+"\"}");
+    client.print("{\"pin\":\"A"+String(pin)+"\",\"temp\":\""+String(steinhart)+"\",\"average\":\""+String(average)+"\",\"samples\":\""+String(NUMSAMPLES)+"\"}");
 
     String key = "A";
     key += pin;

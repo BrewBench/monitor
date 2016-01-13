@@ -44,7 +44,15 @@ body { padding-top: 70px; }
   font-size: 16px;
 }
 
-.settings input, .kettles .temp, .kettles .timer{
+.settings .panel-heading{
+  height: 70px;
+}
+
+.settings .panel-heading strong{
+  font-size: 16px;
+}
+
+.settings input[type=number], .kettles .temp, .kettles .timer{
   font-size: 22px;
   color: #777;
   width: 60px;
@@ -68,4 +76,31 @@ body { padding-top: 70px; }
 
 .fa-plus-circle:hover, .fa-minus-circle:hover {
   color: #008184;
+}
+
+input[type=radio].with-font {
+    border: 0;
+    clip: rect(0 0 0 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+}
+
+input[type=radio].with-font + label:before {
+    font-family: FontAwesome;
+    display: inline-block;
+    content: "\f1db";
+    letter-spacing: 10px;
+    font-size: 2.2em;
+    color: #535353;
+}
+input[type=radio].with-font:checked + label:before {
+    content: "\f00c";
+    font-size: 2.2em;
+    color: darkgreen;
+    letter-spacing: 5px;
+    width: 35px: 5px;
 }

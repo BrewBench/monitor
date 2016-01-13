@@ -3,6 +3,7 @@ brewMachine.controller('mainCtrl', function($rootScope, $scope, $stateParams, $s
 var processing = null;
 
 $scope.pollSeconds = 10;//seconds
+$scope.unit = 'F';//F or C
 
 //default values
 $scope.kettles = [{
@@ -37,28 +38,38 @@ $scope.kettles = [{
 
   }
 
-  function calcTemp(temp){
-      return temp;
-  }
-
   function updateTemp(response){
-    if(response && response.value){
+    if(response && response.temp){
       var kettle = parseInt(response.pin.replace('A',''));
 
-      $scope.kettles[kettle].currentTemp = calcTemp(response.value);
+      // temp response is in C
+      if($scope.unit=='F')
+        $scope.kettles[kettle].currentTemp = $filter('toFahrenheit')(response.temp);
+      else
+        $scope.kettles[kettle].currentTemp = response.temp;
 
       //is temp too high?
       if($scope.kettles[kettle].currentTemp >= $scope.kettles[kettle].targetTemp+$scope.kettles[kettle].diff){
         $scope.kettles[kettle].high=true;
+        $scope.kettles[kettle].high=null;
         tempAlert($scope.kettles[kettle]);
       } //is temp too low?
       else if($scope.kettles[kettle].currentTemp <= $scope.kettles[kettle].targetTemp-$scope.kettles[kettle].diff){
         $scope.kettles[kettle].low=true;
+        $scope.kettles[kettle].high=null;
         tempAlert($scope.kettles[kettle]);
       } else {
         $scope.kettles[kettle].low=null;
         $scope.kettles[kettle].high=null;
       }
+    }
+  };
+
+  $scope.changeUnits = function(unit){
+    for(k in $scope.kettles){
+      $scope.kettles[k].currentTemp = $filter('formatDegrees')($scope.kettles[k].currentTemp,unit);
+      $scope.kettles[k].targetTemp = $filter('formatDegrees')($scope.kettles[k].targetTemp,unit);
+      $scope.kettles[k].diff = $filter('formatDegrees')($scope.kettles[k].diff,unit);
     }
   };
 
@@ -109,5 +120,4 @@ $scope.kettles = [{
   };
 
   $scope.processTemps();
-
 });

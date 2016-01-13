@@ -4,4 +4,20 @@ brewMachine.filter('moment', function() {
         return '';
       return moment(new Date(date)).fromNow();
     }
+}).filter('formatDegrees', function($filter) {
+  return function(temp,unit) {
+    if(unit=='F')
+      return $filter('toFahrenheit')(temp);
+    else
+      return $filter('toCelsius')(temp);
+  }
+})
+.filter('toFahrenheit', function() {
+  return function(celsius) {
+    return celsius*9/5+32;
+    }
+}).filter('toCelsius', function() {
+  return function(fahrenheit) {
+    return (fahrenheit-32)*5/9;
+    }
 });
