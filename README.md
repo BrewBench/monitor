@@ -8,6 +8,7 @@ Currently will monitor [Thermistor](https://learn.adafruit.com/thermistor/using-
 
 * Connect it to your WiFi
 * Enable the REST API
+* Upload the [Arduino sketch](arduino/BrewMachine/BrewMachine.ino)
 
 
 ## Clone this repo and copy the code to your Arduino
