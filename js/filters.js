@@ -14,10 +14,10 @@ brewMachine.filter('moment', function() {
 })
 .filter('toFahrenheit', function() {
   return function(celsius) {
-    return celsius*9/5+32;
+    return Math.round(celsius*9/5+32);
     }
 }).filter('toCelsius', function() {
   return function(fahrenheit) {
-    return (fahrenheit-32)*5/9;
+    return Math.round((fahrenheit-32)*5/9);
     }
 });

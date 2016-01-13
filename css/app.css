@@ -9,7 +9,10 @@ body { padding-top: 70px; }
   color: #ffffff;
 }
 
-.navbar-inverse .navbar-nav>.active>a, .navbar-inverse .navbar-nav>.active>a:focus, .navbar-inverse .navbar-nav>.active>a:hover{
+.navbar-inverse .navbar-nav>.active>a
+  , .navbar-inverse .navbar-nav>.active>a:focus
+  , .navbar-inverse .navbar-nav>.active>a:hover
+  , .modal-header {
   background-color: #008184;
   color: #ffffff;
 }
@@ -58,6 +61,23 @@ body { padding-top: 70px; }
   width: 60px;
 }
 
+.kettles .temp.high {
+  font-size: 24px;
+  color: #a94442;
+  background-color: #f2dede;
+  border-color: #ebccd1;
+  padding: 5px;
+  border-radius: 10px;
+}
+
+.kettles .temp.low {
+  color: #31708f;
+  background-color: #d9edf7;
+  border-color: #bce8f1;
+  padding: 5px;
+  border-radius: 10px;
+}
+
 .fa-stop-circle{
   color: #d9534f;
   cursor: pointer;
@@ -72,7 +92,6 @@ body { padding-top: 70px; }
   color: #00979C;
   cursor: pointer;
 }
-
 
 .fa-plus-circle:hover, .fa-minus-circle:hover {
   color: #008184;

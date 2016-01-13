@@ -1,13 +1,13 @@
 brewMachine.controller('mainCtrl', function($rootScope, $scope, $stateParams, $state, $filter, $timeout, $interval, $q, BMService){
 
-var processing = null;
-
 $scope.pollSeconds = 10;//seconds
 $scope.unit = 'F';//F or C
 
+$scope.chartOptions = BMService.chartOptions();
+
 //default values
 $scope.kettles = [{
-    name: 'Boil'
+    key: 'Boil'
     ,targetTemp: 200
     ,currentTemp: 0
     ,diff: 5
@@ -15,16 +15,18 @@ $scope.kettles = [{
     ,low: null
     ,high: null
     ,timer: {min:60,sec:0,running:false}
+    ,values: []
   },{
-    name: 'Hot Liquor'
+    key: 'Hot Liquor'
     ,targetTemp: 175
     ,currentTemp: 0
     ,diff: 5
     ,active: false
     ,low: null
     ,high: null
+    ,values: []
   },{
-    name: 'Mash'
+    key: 'Mash'
     ,targetTemp: 150
     ,currentTemp: 0
     ,diff: 2
@@ -32,8 +34,10 @@ $scope.kettles = [{
     ,low: null
     ,high: null
     ,timer: {min:60,sec:0,running:false}
+    ,values: []
   }];
 
+  // TODO add notification
   function tempAlert(kettle){
 
   }
@@ -46,12 +50,16 @@ $scope.kettles = [{
       if($scope.unit=='F')
         $scope.kettles[kettle].currentTemp = $filter('toFahrenheit')(response.temp);
       else
-        $scope.kettles[kettle].currentTemp = response.temp;
+        $scope.kettles[kettle].currentTemp = Math.round(response.temp);
+
+      //chart data
+      var date = new Date();
+      $scope.kettles[kettle].values.push([date.getTime(),$scope.kettles[kettle].currentTemp]);
 
       //is temp too high?
       if($scope.kettles[kettle].currentTemp >= $scope.kettles[kettle].targetTemp+$scope.kettles[kettle].diff){
         $scope.kettles[kettle].high=true;
-        $scope.kettles[kettle].high=null;
+        $scope.kettles[kettle].low=null;
         tempAlert($scope.kettles[kettle]);
       } //is temp too low?
       else if($scope.kettles[kettle].currentTemp <= $scope.kettles[kettle].targetTemp-$scope.kettles[kettle].diff){

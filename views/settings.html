@@ -11,14 +11,11 @@
       Poll every <input type="number" ng-model="pollSeconds" min="5" max="60"> seconds. <i class="fa fa-minus-circle fa-4x" ng-click="pollSeconds=pollSeconds-1"></i> <i class="fa fa-plus-circle fa-4x" ng-click="pollSeconds=pollSeconds+1"></i>
     </div>
   </div>
-
   <div class="kettles" ng-repeat="kettle in kettles">
-  <h3>{{kettle.name}} <sup>A{{$index}}</sup></h3>
-  <div class="alert alert-danger" role="alert" ng-show="kettle.high">Temp is too high</div>
-  <div class="alert alert-info" role="alert" ng-show="kettle.low">Temp is too Low</div>
+  <h3>{{kettle.key}} <sup>A{{$index}}</sup></h3>
   <ul>
     <li>
-      <label>Current Temp:</label> <span class="temp">{{kettle.currentTemp | number:0}}&deg;{{unit}}</span>
+      <label>Current Temp:</label> <span class="temp" ng-class="{'high':kettle.high,'low':kettle.low}">{{kettle.currentTemp}}&deg;{{unit}}</span>
       <div class="pull-right"><i class="fa fa-4x" ng-click="kettle.active=!kettle.active" ng-class="{'fa-stop-circle':kettle.active,'fa-play-circle':!kettle.active}"></i></div>
     </li>
     <li>

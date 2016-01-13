@@ -6,8 +6,8 @@ Currently will monitor [Thermistor](https://learn.adafruit.com/thermistor/using-
 
 ## Setup the Arduino
 
-* Connect it to your WiFi
-* Enable the REST API
+* Connect it to your WiFi (see [ArduinoYun](https://www.arduino.cc/en/Guide/ArduinoYun))
+* Enable the REST API (see [ArduinoYun](https://www.arduino.cc/en/Guide/ArduinoYun))
 * Upload the [Arduino sketch](arduino/BrewMachine/BrewMachine.ino)
 
 
@@ -21,4 +21,6 @@ cd brewmachine
 scp -r ./ root@arduino.local:/www/brewmachine
 ```
 
-[http://arduino.local/brewmachine/](http://arduino.local/brewmachine/)
+## Open a browser
+
+* [http://arduino.local/brewmachine/](http://arduino.local/brewmachine/)
