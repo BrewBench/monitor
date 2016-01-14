@@ -1,5 +1,7 @@
 brewMachine.controller('mainCtrl', function($rootScope, $scope, $stateParams, $state, $filter, $timeout, $interval, $q, BMService){
 
+var notification = null;
+
 $scope.pollSeconds = 10;//seconds
 $scope.unit = 'F';//F or C
 
@@ -37,11 +39,6 @@ $scope.kettles = [{
     ,values: []
   }];
 
-  // TODO add notification
-  function tempAlert(kettle){
-
-  }
-
   function updateTemp(response){
     if(response && response.temp){
       var kettle = parseInt(response.pin.replace('A',''));
@@ -58,17 +55,55 @@ $scope.kettles = [{
 
       //is temp too high?
       if($scope.kettles[kettle].currentTemp >= $scope.kettles[kettle].targetTemp+$scope.kettles[kettle].diff){
-        $scope.kettles[kettle].high=true;
+        $scope.kettles[kettle].high=$scope.kettles[kettle].currentTemp-$scope.kettles[kettle].targetTemp;
         $scope.kettles[kettle].low=null;
-        tempAlert($scope.kettles[kettle]);
+        $scope.tempAlert($scope.kettles[kettle]);
       } //is temp too low?
       else if($scope.kettles[kettle].currentTemp <= $scope.kettles[kettle].targetTemp-$scope.kettles[kettle].diff){
-        $scope.kettles[kettle].low=true;
+        $scope.kettles[kettle].low=$scope.kettles[kettle].targetTemp-$scope.kettles[kettle].currentTemp;
         $scope.kettles[kettle].high=null;
-        tempAlert($scope.kettles[kettle]);
+        $scope.tempAlert($scope.kettles[kettle]);
       } else {
         $scope.kettles[kettle].low=null;
         $scope.kettles[kettle].high=null;
+      }
+    }
+  };
+
+  $scope.tempAlert = function(kettle){
+
+    BMService.blink(13);
+
+    if ("Notification" in window) {
+      var message, icon = 'img/brewmachine-45.png';
+
+      if(kettle && kettle.high)
+        message = 'Your '+kettle.key+' kettle is '+kettle.high+' degrees too high';
+      else if(kettle && kettle.low)
+        message = 'Your '+kettle.key+' kettle is '+kettle.low+' degrees too low';
+      else if(!kettle)
+        message = 'Testing Alerts, you are ready to go, click play on a kettle.';
+
+      //close the previous notification
+      if(notification)
+        notification.close();
+
+      var snd = new Audio("audio/error.mp3"); // buffers automatically when created
+      snd.play();
+
+      if(Notification.permission === "granted"){
+        if(message){
+          notification = new Notification('BrewMachine',{body:message,icon:icon});
+        }
+      } else if(Notification.permission !== 'denied'){
+        Notification.requestPermission(function (permission) {
+          // If the user accepts, let's create a notification
+          if (permission === "granted") {
+            if(message){
+              notification = new Notification('BrewMachine',{body:message,icon:icon});
+            }
+          }
+        });
       }
     }
   };
@@ -128,4 +163,5 @@ $scope.kettles = [{
   };
 
   $scope.processTemps();
+  $scope.tempAlert();
 });

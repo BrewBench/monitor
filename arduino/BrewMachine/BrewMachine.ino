@@ -44,8 +44,8 @@ void process(BridgeClient client) {
   if (command == "analog") {
     analogCommand(client);
   }
-  if (command == "mode") {
-    modeCommand(client);
+  if (command == "blink") {
+    blinkCommand(client);
   }
 }
 
@@ -121,7 +121,7 @@ void analogCommand(BridgeClient client) {
   }
 }
 
-void modeCommand(BridgeClient client) {
+void blinkCommand(BridgeClient client) {
   int pin;
   pin = client.parseInt();
   
@@ -141,6 +141,10 @@ void modeCommand(BridgeClient client) {
 
   if (mode == "output") {
     pinMode(pin, OUTPUT);
+    digitalWrite(pin, HIGH);   // turn the LED on (HIGH is the voltage level)
+    delay(1000);              // wait for a second
+    digitalWrite(pin, LOW);    // turn the LED off by making the voltage LOW
+    delay(1000); 
     // Send JSON response to client
     client.print("{\"pin\":\"D"+String(pin)+"\",\"value\":\""+String(mode)+"\"}");
     return;

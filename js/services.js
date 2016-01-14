@@ -32,11 +32,9 @@ brewMachine.factory('BMService', function($http, $q, $filter){
       return q.promise;
     },
 
-    // inout = input or output
-    // pinMode(pin,inout)
-    pin: function(pin,inout){
+    blink: function(pin){
       var q = $q.defer();
-      $http.get(this.domain()+'/arduino/mode/'+pin+'/'+inout).then(function(response){
+      $http.get(this.domain()+'/arduino/blink/'+pin+'/output').then(function(response){
         q.resolve(response.data);
       },function(err){
         q.reject(err);
