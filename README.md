@@ -19,8 +19,13 @@ Currently will monitor [Thermistor](https://learn.adafruit.com/thermistor/using-
 git clone https://github.com/avantassel/brewmachine
 cd brewmachine
 
-# copy to your arduino
-scp -r ./ root@arduino.local:/www/brewmachine
+# Add rsync to your Arduino
+ssh root@arduino.local
+opkg update
+opkg install rsync
+
+# copy to your Arduino
+rsync -rav -e ssh --delete --exclude '*.git' --exclude 'arduino' --exclude 'screenshot*' ./ root@arduino.local:/www/brewmachine
 ```
 
 ## Open a browser
