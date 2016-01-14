@@ -40,6 +40,10 @@ body { padding-top: 70px; }
 }
 
 .settings label{
+  font-size: 10px;
+}
+
+.settings .kettles label{
   font-size: 16px;
 }
 

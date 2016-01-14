@@ -2,8 +2,12 @@ brewMachine.controller('mainCtrl', function($rootScope, $scope, $stateParams, $s
 
 var notification = null;
 
-$scope.pollSeconds = 10;//seconds
-$scope.unit = 'F';//F or C
+$scope.settings = {
+  pollSeconds:10
+  ,unit:'F'
+  ,sound:true
+  ,notifications:true
+};
 
 $scope.chartOptions = BMService.chartOptions();
 
@@ -44,7 +48,7 @@ $scope.kettles = [{
       var kettle = parseInt(response.pin.replace('A',''));
 
       // temp response is in C
-      if($scope.unit=='F')
+      if($scope.settings.unit=='F')
         $scope.kettles[kettle].currentTemp = $filter('toFahrenheit')(response.temp);
       else
         $scope.kettles[kettle].currentTemp = Math.round(response.temp);
@@ -82,8 +86,14 @@ $scope.kettles = [{
       navigator.vibrate([500, 300, 500]);
     }
 
+    // Sound Notification
+    if($scope.settings.sound===true){
+      var snd = new Audio("audio/error.mp3"); // buffers automatically when created
+      snd.play();
+    }
+
     // Desktop Notification
-    if ("Notification" in window) {
+    if ($scope.settings.notifications && "Notification" in window) {
       var message, icon = 'img/brewmachine-45.png';
 
       if(kettle && kettle.high)
@@ -96,9 +106,6 @@ $scope.kettles = [{
       //close the previous notification
       if(notification)
         notification.close();
-
-      var snd = new Audio("audio/error.mp3"); // buffers automatically when created
-      snd.play();
 
       if(Notification.permission === "granted"){
         if(message){
@@ -167,7 +174,7 @@ $scope.kettles = [{
       //re process on timeout
       $timeout(function(){
           $scope.processTemps();
-      },$scope.pollSeconds*1000);
+      },$scope.settings.pollSeconds*1000);
     });
   };
 
