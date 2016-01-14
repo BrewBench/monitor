@@ -37,3 +37,16 @@ rsync -rav -e ssh --delete --exclude '*.git' --exclude 'arduino' --exclude 'scre
 * [http://arduino.local/brewmachine/](http://arduino.local/brewmachine/)
 
 <img src="img/screenshot-desktop.png?raw=true" alt="BrewMachine logo" title="BrewMachine" align="center" />
+
+## TODO
+* Add sensors A4 and A5
+* Allow add/edit of kettles
+* Save settings to key/value data store on the Arduino
+* Load settings from key/value data store on the Arduino
+* Add option to post readings to a cloud based DB
+* Add option to poll cloud based DB instead of the Arduino
+* Add option to save readings to an SD card
+* Add option to load readings from an SD card
+* Add option to save a brew session
+* Add option to load a brew session
+* Add txt message alert option
