@@ -72,15 +72,24 @@ $scope.kettles = [{
 
   $scope.tempAlert = function(kettle){
 
+    // Txt or Email Notification?
+
+    // Arduino Notification
     BMService.blink(13);
 
+    // Mobile Vibrate Notification
+    if ("vibrate" in navigator) {
+      navigator.vibrate([500, 300, 500]);
+    }
+
+    // Desktop Notification
     if ("Notification" in window) {
       var message, icon = 'img/brewmachine-45.png';
 
       if(kettle && kettle.high)
-        message = 'Your '+kettle.key+' kettle is '+kettle.high+' degrees too high';
+        message = 'Your '+kettle.key+' kettle is '+kettle.high+' degrees too hot';
       else if(kettle && kettle.low)
-        message = 'Your '+kettle.key+' kettle is '+kettle.low+' degrees too low';
+        message = 'Your '+kettle.key+' kettle is '+kettle.low+' degrees too cold';
       else if(!kettle)
         message = 'Testing Alerts, you are ready to go, click play on a kettle.';
 
