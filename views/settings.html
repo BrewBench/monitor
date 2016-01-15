@@ -40,12 +40,12 @@
           </li>
           <li>
             <label>Target Temp:</label> <input type="number" ng-model="kettles[$index].targetTemp"> &deg;{{unit}}
-            <br><i class="fa fa-minus-circle fa-4x" ng-click="kettle.targetTemp=kettle.targetTemp-1"></i> <i class="fa fa-plus-circle fa-4x" ng-click="kettle.targetTemp=kettle.targetTemp+1"></i>
+            <br><i class="fa fa-minus-circle fa-4x" ng-click="changeValue($index,'targetTemp',false)"></i> <i class="fa fa-plus-circle fa-4x" ng-click="changeValue($index,'targetTemp',true)"></i>
           </li>
           <li>
             <label>Alert Diff:</label>
             <input type="number" ng-model="kettles[$index].diff"> &deg;{{unit}}
-            <br><i class="fa fa-minus-circle fa-4x" ng-click="kettle.diff=kettle.diff-1"></i> <i class="fa fa-plus-circle fa-4x" ng-click="kettle.diff=kettle.diff+1"></i>
+            <br><i class="fa fa-minus-circle fa-4x" ng-click="changeValue($index,'diff',false)"></i> <i class="fa fa-plus-circle fa-4x" ng-click="changeValue($index,'diff',true)"></i>
           </li>
           <li ng-if="kettle.timer">
             <label>Time:</label> <input type="number" ng-model="kettles[$index].timer.min" steps="5"> minutes

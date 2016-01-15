@@ -1,6 +1,7 @@
 var brewMachine = angular.module('brewmachine'
 , [
-  'ui.router'
+  'ngCookies'
+  ,'ui.router'
   ,'nvd3'
 ])
 .config(function($stateProvider, $urlRouterProvider, $httpProvider) {

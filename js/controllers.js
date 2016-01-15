@@ -1,18 +1,19 @@
 brewMachine.controller('mainCtrl', function($rootScope, $scope, $stateParams, $state, $filter, $timeout, $interval, $q, BMService){
 
-var notification = null;
+var notification = null
+  ,resetChart = 100;//reset chart after 100 polls
 
-$scope.settings = {
-  pollSeconds:10
-  ,unit:'F'
-  ,sound:true
-  ,notifications:true
+$scope.settings = BMService.settings('settings') || {
+  pollSeconds: 10
+  ,unit: 'F'
+  ,sound: true
+  ,notifications: true
 };
 
 $scope.chartOptions = BMService.chartOptions();
 
 //default values
-$scope.kettles = [{
+$scope.kettles = BMService.settings('kettles') || [{
     key: 'Boil'
     ,targetTemp: 200
     ,currentTemp: 0
@@ -53,6 +54,13 @@ $scope.kettles = [{
       else
         $scope.kettles[kettle].currentTemp = Math.round(response.temp);
 
+      //reset all kettles every 100
+      if($scope.kettles[kettle].values.length > resetChart){
+        $scope.kettles.map(function(k){
+          return k.values=[];
+        });
+      }
+
       //chart data
       var date = new Date();
       $scope.kettles[kettle].values.push([date.getTime(),$scope.kettles[kettle].currentTemp]);
@@ -79,7 +87,14 @@ $scope.kettles = [{
     // Txt or Email Notification?
 
     // Arduino Notification
-    BMService.blink(13);
+    BMService.blink(13).then(function(){
+      //success
+    },function(err){
+      if(err.statusText)
+        alert(err.statusText);
+      else if(err.status===0)
+        alert('We could not connect to your Arduino, make sure you are on the same WiFi');
+    });
 
     // Mobile Vibrate Notification
     if ("vibrate" in navigator) {
@@ -178,6 +193,21 @@ $scope.kettles = [{
     });
   };
 
+  $scope.changeValue = function(kettle,field,up){
+    if(up)
+      $scope.kettles[kettle][field]++;
+    else
+      $scope.kettles[kettle][field]--;
+  };
+
   $scope.processTemps();
   $scope.tempAlert();
+
+  $scope.$watchCollection('settings',function(newValue,oldValue){
+    BMService.settings('settings',newValue);
+  });
+
+  $scope.$watch('kettles',function(newValue,oldValue){
+    BMService.settings('kettles',newValue);
+  },true);
 });
