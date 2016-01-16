@@ -1,0 +1,11 @@
+arduino/
+js/
+css/
+node_modules/
+img/screenshot*
+img/logo_46.png
+gulpfile.js
+package.json
+README.md
+*.git
+.rsyncignore

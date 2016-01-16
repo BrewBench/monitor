@@ -1,4 +1,4 @@
-brewMachine.controller('mainCtrl', function($rootScope, $scope, $stateParams, $state, $filter, $timeout, $interval, $q, BMService){
+brewMachine.controller('mainCtrl', function($scope, $stateParams, $state, $filter, $timeout, $interval, $q, BMService){
 
 var notification = null
   ,resetChart = 100;//reset chart after 100 polls

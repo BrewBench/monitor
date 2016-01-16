@@ -29,7 +29,14 @@ git clone https://github.com/avantassel/brewmachine
 cd brewmachine
 
 # copy to your Arduino
-rsync -rav -e ssh --delete --exclude '*.git' --exclude 'arduino' --exclude 'screenshot*' ./ root@arduino.local:/www/brewmachine
+rsync -rav -e ssh --delete --exclude-from '.rsyncignore' ./ root@arduino.local:/www/brewmachine
+```
+
+## Development
+
+```
+npm install
+gulp
 ```
 
 ## Open a browser
