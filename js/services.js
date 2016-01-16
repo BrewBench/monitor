@@ -7,7 +7,7 @@ brewMachine.factory('BMService', function($http, $q, $filter, $cookies, Base64){
       var authdata = Base64.encode('root:' + password);
       $http.defaults.headers.common['Authorization'] = 'Basic ' + authdata;
     },
-
+    //cookies size 4096 bytes
     settings: function(key,values){
           try {
             if(values)
@@ -20,6 +20,10 @@ brewMachine.factory('BMService', function($http, $q, $filter, $cookies, Base64){
           return values;
     },
 
+    byteCount: function(s) {
+      return encodeURI(s).split(/%..|./).length - 1;
+    },
+
     domain: function(){
       if(document.location.host == 'localhost')
         return 'http://arduino.local';
@@ -30,7 +34,7 @@ brewMachine.factory('BMService', function($http, $q, $filter, $cookies, Base64){
     // analog = analogRead(sensor)
     readSensor: function(endpoint,sensor){
       var q = $q.defer();
-      $http.get(this.domain()+'/arduino/'+endpoint+'/'+sensor).then(function(response){
+      $http.get(this.domain()+'/arduino/'+endpoint+'/'+sensor,{timeout:10000}).then(function(response){
         q.resolve(response.data);
       },function(err){
         q.reject(err);
@@ -42,7 +46,7 @@ brewMachine.factory('BMService', function($http, $q, $filter, $cookies, Base64){
     // analog = analogWrite(sensor,value)
     writeSensor: function(endpoint,sensor,value){
       var q = $q.defer();
-      $http.get(this.domain()+'/arduino/'+endpoint+'/'+sensor+'/'+value).then(function(response){
+      $http.get(this.domain()+'/arduino/'+endpoint+'/'+sensor+'/'+value,{timeout:10000}).then(function(response){
         q.resolve(response.data);
       },function(err){
         q.reject(err);
@@ -52,7 +56,7 @@ brewMachine.factory('BMService', function($http, $q, $filter, $cookies, Base64){
 
     blink: function(pin){
       var q = $q.defer();
-      $http.get(this.domain()+'/arduino/blink/'+pin+'/output').then(function(response){
+      $http.get(this.domain()+'/arduino/blink/'+pin+'/output',{timeout:10000}).then(function(response){
         q.resolve(response.data);
       },function(err){
         q.reject(err);

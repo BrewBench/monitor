@@ -108,9 +108,9 @@ void analogCommand(BridgeClient client) {
     steinhart = average / THERMISTORNOMINAL;     // (R/Ro)
     steinhart = log(steinhart);                  // ln(R/Ro)
     steinhart /= BCOEFFICIENT;                   // 1/B * ln(R/Ro)
-    steinhart += 1.0 / (TEMPERATURENOMINAL + 273.15); // + (1/To)
+    steinhart += 1.0 / (TEMPERATURENOMINAL + 295.15); // + (1/To)
     steinhart = 1.0 / steinhart;                 // Invert
-    steinhart -= 273.15;  
+    steinhart -= 295.15;  
   
     // Send JSON response to client
     client.print("{\"pin\":\"A"+String(pin)+"\",\"temp\":\""+String(steinhart)+"\",\"average\":\""+String(average)+"\",\"samples\":\""+String(NUMSAMPLES)+"\"}");
@@ -204,5 +204,5 @@ void loop() {
     client.stop();
   }
 
-  delay(50); 
+  delay(1000); 
 }

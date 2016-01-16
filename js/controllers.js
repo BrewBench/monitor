@@ -1,7 +1,7 @@
 brewMachine.controller('mainCtrl', function($scope, $stateParams, $state, $filter, $timeout, $interval, $q, BMService){
 
 var notification = null
-  ,resetChart = 100;//reset chart after 100 polls
+  ,resetChart = 25;//reset chart after 100 polls
 
 $scope.settings = BMService.settings('settings') || {
   pollSeconds: 10
@@ -87,14 +87,14 @@ $scope.kettles = BMService.settings('kettles') || [{
     // Txt or Email Notification?
 
     // Arduino Notification
-    BMService.blink(13).then(function(){
-      //success
-    },function(err){
-      if(err.statusText)
-        alert(err.statusText);
-      else if(err.status===0)
-        alert('We could not connect to your Arduino, make sure you are on the same WiFi');
-    });
+    // BMService.blink(13).then(function(){
+    //   //success
+    // },function(err){
+    //   if(err.statusText)
+    //     alert(err.statusText);
+    //   else if(err.status===0)
+    //     alert('We could not connect to your Arduino, make sure you are on the same WiFi');
+    // });
 
     // Mobile Vibrate Notification
     if ("vibrate" in navigator) {
@@ -187,6 +187,10 @@ $scope.kettles = BMService.settings('kettles') || [{
 
     $q.all(allSensors).then(function(values){
       //re process on timeout
+      $timeout(function(){
+          $scope.processTemps();
+      },$scope.settings.pollSeconds*1000);
+    },function(err){
       $timeout(function(){
           $scope.processTemps();
       },$scope.settings.pollSeconds*1000);
