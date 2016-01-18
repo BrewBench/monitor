@@ -2,6 +2,7 @@ var brewBench = angular.module('brewbench', [
   'ngCookies'
   ,'ui.router'
   ,'nvd3'
+  ,'ngTouch'
 ])
 .config(function($stateProvider, $urlRouterProvider, $httpProvider) {
 

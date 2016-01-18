@@ -111,7 +111,6 @@ $scope.kettles = BrewService.settings('kettles') || [{
           ,active: false
           ,low: null
           ,high: null
-          ,timer: {min:60,sec:0,running:false}
           ,values: []
         }
       );
