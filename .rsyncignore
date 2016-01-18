@@ -9,3 +9,4 @@ package.json
 README.md
 *.git
 .rsyncignore
+brewbench-wiredup.jpg
