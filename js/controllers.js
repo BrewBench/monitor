@@ -1,21 +1,22 @@
-brewMachine.controller('mainCtrl', function($scope, $stateParams, $state, $filter, $timeout, $interval, $q, BMService){
+brewBench.controller('mainCtrl', function($scope, $stateParams, $state, $filter, $timeout, $interval, $q, BrewService){
 
 var notification = null
-  ,resetChart = 25;//reset chart after 100 polls
+  ,resetChart = 25;//reset chart after 25 polls
 
-$scope.settings = BMService.settings('settings') || {
+$scope.settings = BrewService.settings('settings') || {
   pollSeconds: 10
   ,unit: 'F'
   ,sound: true
   ,notifications: true
 };
 
-$scope.chartOptions = BMService.chartOptions();
+$scope.chartOptions = BrewService.chartOptions();
 
 //default values
-$scope.kettles = BMService.settings('kettles') || [{
+$scope.kettles = BrewService.settings('kettles') || [{
     key: 'Boil'
     ,targetTemp: 200
+    ,targetHit: null
     ,currentTemp: 0
     ,diff: 5
     ,active: false
@@ -26,6 +27,7 @@ $scope.kettles = BMService.settings('kettles') || [{
   },{
     key: 'Hot Liquor'
     ,targetTemp: 175
+    ,targetHit: null
     ,currentTemp: 0
     ,diff: 5
     ,active: false
@@ -35,6 +37,7 @@ $scope.kettles = BMService.settings('kettles') || [{
   },{
     key: 'Mash'
     ,targetTemp: 150
+    ,targetHit: null
     ,currentTemp: 0
     ,diff: 2
     ,active: false
@@ -44,9 +47,17 @@ $scope.kettles = BMService.settings('kettles') || [{
     ,values: []
   }];
 
+  // Option to add alerts for mash schedule?
+  // $scope.mashTemps = {
+  //   doughIn:
+  //   protein:
+  //   steep:
+  //   boil:
+  // };
+
   function updateTemp(response){
     if(response && response.temp){
-      var kettle = parseInt(response.pin.replace('A',''));
+      var kettle = parseInt(response.pin);
 
       // temp response is in C
       if($scope.settings.unit=='F')
@@ -54,7 +65,7 @@ $scope.kettles = BMService.settings('kettles') || [{
       else
         $scope.kettles[kettle].currentTemp = Math.round(response.temp);
 
-      //reset all kettles every 100
+      //reset all kettles every 25
       if($scope.kettles[kettle].values.length > resetChart){
         $scope.kettles.map(function(k){
           return k.values=[];
@@ -76,6 +87,7 @@ $scope.kettles = BMService.settings('kettles') || [{
         $scope.kettles[kettle].high=null;
         $scope.tempAlert($scope.kettles[kettle]);
       } else {
+        $scope.kettles[kettle].targetHit=new Date();//set the time the target was hit so we can now start alerts
         $scope.kettles[kettle].low=null;
         $scope.kettles[kettle].high=null;
       }
@@ -84,10 +96,14 @@ $scope.kettles = BMService.settings('kettles') || [{
 
   $scope.tempAlert = function(kettle){
 
+    //don't start alerts until we have hit the targetTemp
+    if(kettle && !kettle.targetHit)
+      return;
+
     // Txt or Email Notification?
 
     // Arduino Notification
-    // BMService.blink(13).then(function(){
+    // BrewService.blink(13).then(function(){
     //   //success
     // },function(err){
     //   if(err.statusText)
@@ -181,7 +197,7 @@ $scope.kettles = BMService.settings('kettles') || [{
     //only process active sensors
     for(k in $scope.kettles){
       if($scope.kettles[k].active){
-        allSensors.push(BMService.readSensor('analog',k).then(updateTemp));
+        allSensors.push(BrewService.readSensor('analog',k).then(updateTemp));
       }
     }
 
@@ -204,14 +220,24 @@ $scope.kettles = BMService.settings('kettles') || [{
       $scope.kettles[kettle][field]--;
   };
 
+  // App start logic
   $scope.processTemps();
+
   $scope.tempAlert();
 
+  //timer check
+  for(k in $scope.kettles){
+    if($scope.kettles[k].timer && $scope.kettles[k].timer.running){
+      $scope.timerRun(k);
+    }
+  }
+
+  // scope watch
   $scope.$watchCollection('settings',function(newValue,oldValue){
-    BMService.settings('settings',newValue);
+    BrewService.settings('settings',newValue);
   });
 
   $scope.$watch('kettles',function(newValue,oldValue){
-    BMService.settings('kettles',newValue);
+    BrewService.settings('kettles',newValue);
   },true);
 });

@@ -1,6 +1,6 @@
-# BrewMachine
+# BrewBench
 
-<img src="img/brewmachine.png?raw=true" alt="BrewMachine logo" title="BrewMachine" align="right" />
+<img src="img/brewbench.png?raw=true" alt="BrewBench logo" title="BrewBench" align="right" />
 
 Is an Arduino Yun brew monitor
 
@@ -10,7 +10,7 @@ Currently will monitor [Thermistor](https://learn.adafruit.com/thermistor/using-
 
 * Connect it to your WiFi (see [ArduinoYun](https://www.arduino.cc/en/Guide/ArduinoYun))
 * Enable the REST API (see [ArduinoYun](https://www.arduino.cc/en/Guide/ArduinoYun))
-* Upload the [Arduino sketch](arduino/BrewMachine/BrewMachine.ino)
+* Upload the [Arduino sketch](arduino/BrewBench/BrewBench.ino)
 
 
 ## Clone this repo and copy the code to your Arduino
@@ -25,11 +25,11 @@ exit
 
 ```
 # get the web code
-git clone https://github.com/avantassel/brewmachine
-cd brewmachine
+git clone https://github.com/avantassel/brewbench
+cd brewbench
 
 # copy to your Arduino
-rsync -rav -e ssh --delete --exclude-from '.rsyncignore' ./ root@arduino.local:/www/brewmachine
+rsync -rav -e ssh --delete --exclude-from '.rsyncignore' ./ root@arduino.local:/www/brewbench
 ```
 
 ## Development
@@ -41,9 +41,9 @@ gulp
 
 ## Open a browser
 
-* [http://arduino.local/brewmachine/](http://arduino.local/brewmachine/)
+* [http://arduino.local/brewbench/](http://arduino.local/brewbench/)
 
-<img src="img/screenshot-desktop.png?raw=true" alt="BrewMachine logo" title="BrewMachine" align="center" />
+<img src="img/screenshot-desktop.png?raw=true" alt="BrewBench logo" title="BrewBench" align="center" />
 
 ## TODO
 * Add sensors A4 and A5

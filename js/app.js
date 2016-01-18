@@ -1,10 +1,9 @@
-var brewMachine = angular.module('brewmachine', [
+var brewBench = angular.module('brewbench', [
   'ngCookies'
   ,'ui.router'
   ,'nvd3'
-]);
-
-brewMachine.config(function($stateProvider, $urlRouterProvider, $httpProvider) {
+])
+.config(function($stateProvider, $urlRouterProvider, $httpProvider) {
 
   $httpProvider.defaults.useXDomain = true;
   $httpProvider.defaults.headers.common = 'Content-Type: application/json';

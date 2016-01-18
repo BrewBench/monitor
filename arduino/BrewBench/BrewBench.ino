@@ -5,23 +5,18 @@
 #include <BridgeServer.h>
 #include <BridgeClient.h>
 
-int led_giallo = 13;
-int led_rosso = 12;
-String parameters = "";           //String of POST parameters
-String macAddr = "";
-
 // https://learn.adafruit.com/thermistor/using-a-thermistor
 // resistance at 25 degrees C
-#define THERMISTORNOMINAL 10000      
+#define THERMISTORNOMINAL 10000
 // temp. for nominal resistance (almost always 25 C)
-#define TEMPERATURENOMINAL 25   
+#define TEMPERATURENOMINAL 25
 // how many samples to take and average, more takes longer
 // but is more 'smooth'
 #define NUMSAMPLES 5
 // The beta coefficient of the thermistor (usually 3000-4000)
 #define BCOEFFICIENT 3950
 // the value of the 'other' resistor
-#define SERIESRESISTOR 10000    
+#define SERIESRESISTOR 10000
 
 int samples[NUMSAMPLES];
 
@@ -30,14 +25,14 @@ BridgeServer server;
 void process(BridgeClient client) {
   String command = client.readStringUntil('/');
   command.trim();
-  
+
   client.println("Status: 200");
-  client.println("Access-Control-Allow-Origin: *");   
+  client.println("Access-Control-Allow-Origin: *");
   client.println("Access-Control-Allow-Methods: GET");
   client.println("Content-Type: application/json");
   client.println("Connection: close");
   client.println();
-  
+
   if (command == "digital") {
     digitalCommand(client);
   }
@@ -56,14 +51,14 @@ void digitalCommand(BridgeClient client) {
   if (client.read() == '/') {
     value = client.parseInt();
     digitalWrite(pin, value);
-  } 
+  }
   else {
     value = digitalRead(pin);
   }
 
   // Send JSON response to client
-  client.print("{\"pin\":\"D"+String(pin)+"\",\"value\":\""+String(value)+"\"}");
-  
+  client.print("{\"pin\":\""+String(pin)+"\",\"value\":\""+String(value)+"\"}");
+
   String key = "D";
   key += pin;
   Bridge.put(key, String(value));
@@ -71,7 +66,7 @@ void digitalCommand(BridgeClient client) {
 
 void analogCommand(BridgeClient client) {
   int pin, value;
-  
+
   pin = client.parseInt();
 
   if (client.read() == '/') {
@@ -79,8 +74,8 @@ void analogCommand(BridgeClient client) {
     analogWrite(pin, value);
 
     // Send JSON response to client
-    client.print("{\"pin\":\"D"+String(pin)+"\",\"value\":\""+String(value)+"\"}");
-    
+    client.print("{\"pin\":\""+String(pin)+"\",\"value\":\""+String(value)+"\"}");
+
     String key = "D";
     key += pin;
     Bridge.put(key, String(value));
@@ -88,7 +83,7 @@ void analogCommand(BridgeClient client) {
   else {
     uint8_t i;
     float average;
-    
+
     // take N samples in a row, with a slight delay
     for (i=0; i< NUMSAMPLES; i++) {
       samples[i] = analogRead(pin);
@@ -110,10 +105,10 @@ void analogCommand(BridgeClient client) {
     steinhart /= BCOEFFICIENT;                   // 1/B * ln(R/Ro)
     steinhart += 1.0 / (TEMPERATURENOMINAL + 295.15); // + (1/To)
     steinhart = 1.0 / steinhart;                 // Invert
-    steinhart -= 295.15;  
-  
+    steinhart -= 295.15;
+
     // Send JSON response to client
-    client.print("{\"pin\":\"A"+String(pin)+"\",\"temp\":\""+String(steinhart)+"\",\"average\":\""+String(average)+"\",\"samples\":\""+String(NUMSAMPLES)+"\"}");
+    client.print("{\"pin\":\""+String(pin)+"\",\"temp\":\""+String(steinhart)+"\",\"average\":\""+String(average)+"\",\"samples\":\""+String(NUMSAMPLES)+"\"}");
 
     String key = "A";
     key += pin;
@@ -124,7 +119,7 @@ void analogCommand(BridgeClient client) {
 void blinkCommand(BridgeClient client) {
   int pin;
   pin = client.parseInt();
-  
+
   if (client.read() != '/') {
     client.println(F("error"));
     return;
@@ -135,7 +130,7 @@ void blinkCommand(BridgeClient client) {
   if (mode == "input") {
     pinMode(pin, INPUT);
     // Send JSON response to client
-    client.print("{\"pin\":\"D"+String(pin)+"\",\"value\":\""+String(mode)+"\"}");
+    client.print("{\"pin\":\""+String(pin)+"\",\"value\":\""+String(mode)+"\"}");
     return;
   }
 
@@ -144,9 +139,9 @@ void blinkCommand(BridgeClient client) {
     digitalWrite(pin, HIGH);   // turn the LED on (HIGH is the voltage level)
     delay(1000);              // wait for a second
     digitalWrite(pin, LOW);    // turn the LED off by making the voltage LOW
-    delay(1000); 
+    delay(1000);
     // Send JSON response to client
-    client.print("{\"pin\":\"D"+String(pin)+"\",\"value\":\""+String(mode)+"\"}");
+    client.print("{\"pin\":\""+String(pin)+"\",\"value\":\""+String(mode)+"\"}");
     return;
   }
 
@@ -154,55 +149,22 @@ void blinkCommand(BridgeClient client) {
   client.print(mode);
 }
 
-  
-void setup() {
-  Serial.begin(9600);
-  pinMode(13,OUTPUT);
-  digitalWrite(13, LOW);
-  Bridge.begin();
-  digitalWrite(13, HIGH);
 
+void setup() {
+  
+  Bridge.begin();
   server.listenOnLocalhost();
   server.begin();
-    
-  /*
-  pinMode(led_rosso,OUTPUT);
-  pinMode(led_giallo,OUTPUT);
-  digitalWrite(led_giallo,HIGH);
-  digitalWrite(led_rosso,LOW);
-  delay(2500);
-  digitalWrite(led_giallo,LOW);
-    */                   
-  //get macAddr
-  /*
-  Process wifiCheck;
-  wifiCheck.runShellCommand("/usr/bin/pretty-wifi-info.lua");
-  while (wifiCheck.available() > 0) {
-    char c = wifiCheck.read();
-    Serial.print(c);
-  }
 
-  Serial.println("wifiCheck");
-  */
-  
-  //download config
-  /*HttpClient uClient;
-  uClient.get("http://brewmachine.andrewvantassel.com/user/"+macAddr+"/config.json");
-  while (uClient.available()) {
-    char c = uClient.read();
-    Serial.print(c);
-  }
-  */  
-  
 }
 
 void loop() {
   BridgeClient client = server.accept();
-          
+
   if (client) {
     process(client);
     client.stop();
   }
 
-  delay(1000); 
+  delay(1000);
 }

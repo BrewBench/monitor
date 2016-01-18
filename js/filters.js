@@ -1,4 +1,4 @@
-brewMachine.filter('moment', function() {
+brewBench.filter('moment', function() {
   return function(date) {
       if(!date)
         return '';

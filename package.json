@@ -1,5 +1,5 @@
 {
-  "name": "brewmachine",
+  "name": "brewbench",
   "version": "1.0.0",
   "description": "An Arduino temperature brewing monitor",
   "main": "dist/app.js",
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/avantassel/brewmachine.git"
+    "url": "git+https://github.com/avantassel/brewbench.git"
   },
   "keywords": [
     "Arduino",
@@ -20,9 +20,9 @@
   "author": "Andrew Van Tassel",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/avantassel/brewmachine/issues"
+    "url": "https://github.com/avantassel/brewbench/issues"
   },
-  "homepage": "https://github.com/avantassel/brewmachine#readme",
+  "homepage": "https://github.com/avantassel/brewbench#readme",
   "devDependencies": {
     "gulp": "^3.9.0",
     "gulp-concat": "^2.6.0",
