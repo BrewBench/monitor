@@ -15,6 +15,7 @@ $scope.chartOptions = BrewService.chartOptions();
 //default values
 $scope.kettles = BrewService.settings('kettles') || [{
     key: 'Boil'
+    ,pin: 0
     ,targetTemp: 200
     ,targetHit: null
     ,currentTemp: 0
@@ -26,6 +27,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
     ,values: []
   },{
     key: 'Hot Liquor'
+    ,pin: 1
     ,targetTemp: 175
     ,targetHit: null
     ,currentTemp: 0
@@ -36,6 +38,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
     ,values: []
   },{
     key: 'Mash'
+    ,pin: 2
     ,targetTemp: 150
     ,targetHit: null
     ,currentTemp: 0
@@ -57,16 +60,17 @@ $scope.kettles = BrewService.settings('kettles') || [{
 
   function updateTemp(response){
     if(response && response.temp){
-      var kettle = parseInt(response.pin);
+      // this will fail if two kettles are on the same pin
+      var kettle = $scope.kettles.filter(function(k){return k.pin == parseInt(response.pin);})[0];
 
       // temp response is in C
       if($scope.settings.unit=='F')
-        $scope.kettles[kettle].currentTemp = $filter('toFahrenheit')(response.temp);
+        kettle.currentTemp = $filter('toFahrenheit')(response.temp);
       else
-        $scope.kettles[kettle].currentTemp = Math.round(response.temp);
+        kettle.currentTemp = Math.round(response.temp);
 
       //reset all kettles every 25
-      if($scope.kettles[kettle].values.length > resetChart){
+      if(kettle.values.length > resetChart){
         $scope.kettles.map(function(k){
           return k.values=[];
         });
@@ -74,23 +78,43 @@ $scope.kettles = BrewService.settings('kettles') || [{
 
       //chart data
       var date = new Date();
-      $scope.kettles[kettle].values.push([date.getTime(),$scope.kettles[kettle].currentTemp]);
+      kettle.values.push([date.getTime(),kettle.currentTemp]);
 
       //is temp too high?
-      if($scope.kettles[kettle].currentTemp >= $scope.kettles[kettle].targetTemp+$scope.kettles[kettle].diff){
-        $scope.kettles[kettle].high=$scope.kettles[kettle].currentTemp-$scope.kettles[kettle].targetTemp;
-        $scope.kettles[kettle].low=null;
-        $scope.tempAlert($scope.kettles[kettle]);
+      if(kettle.currentTemp >= kettle.targetTemp+kettle.diff){
+        kettle.high=kettle.currentTemp-kettle.targetTemp;
+        kettle.low=null;
+        $scope.tempAlert(kettle);
       } //is temp too low?
-      else if($scope.kettles[kettle].currentTemp <= $scope.kettles[kettle].targetTemp-$scope.kettles[kettle].diff){
-        $scope.kettles[kettle].low=$scope.kettles[kettle].targetTemp-$scope.kettles[kettle].currentTemp;
-        $scope.kettles[kettle].high=null;
-        $scope.tempAlert($scope.kettles[kettle]);
+      else if(kettle.currentTemp <= kettle.targetTemp-kettle.diff){
+        kettle.low=kettle.targetTemp-kettle.currentTemp;
+        kettle.high=null;
+        $scope.tempAlert(kettle);
       } else {
-        $scope.kettles[kettle].targetHit=new Date();//set the time the target was hit so we can now start alerts
-        $scope.kettles[kettle].low=null;
-        $scope.kettles[kettle].high=null;
+        kettle.targetHit=new Date();//set the time the target was hit so we can now start alerts
+        kettle.low=null;
+        kettle.high=null;
       }
+    }
+  };
+
+  $scope.addKettle = function(){
+    if($scope.kettles.length < 5){
+      $scope.kettles.push(
+        {
+          key: 'New Kettle'
+          ,pin: 5
+          ,targetTemp: 150
+          ,targetHit: null
+          ,currentTemp: 0
+          ,diff: 2
+          ,active: false
+          ,low: null
+          ,high: null
+          ,timer: {min:60,sec:0,running:false}
+          ,values: []
+        }
+      );
     }
   };
 
@@ -197,7 +221,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
     //only process active sensors
     for(k in $scope.kettles){
       if($scope.kettles[k].active){
-        allSensors.push(BrewService.readSensor('analog',k).then(updateTemp));
+        allSensors.push(BrewService.readSensor('analog',$scope.kettles[k].pin).then(updateTemp));
       }
     }
 

@@ -2,16 +2,15 @@
 
 <img src="img/brewbench.png?raw=true" alt="BrewBench logo" title="BrewBench" align="right" />
 
-Is an Arduino Yun brew monitor
+Is an Arduino Yun brew monitor that uses the Arduino REST API to interface with thermistors connected to the analog ports.
 
-Currently will monitor [Thermistor](https://learn.adafruit.com/thermistor/using-a-thermistor) temperature sensors on ports A0, A1, A2
+See [Thermistor](https://learn.adafruit.com/thermistor/using-a-thermistor) for wiring these up on analog ports.
 
 ## Setup the Arduino
 
-* Connect it to your WiFi (see [ArduinoYun](https://www.arduino.cc/en/Guide/ArduinoYun))
-* Enable the REST API (see [ArduinoYun](https://www.arduino.cc/en/Guide/ArduinoYun))
+* Connect it to your WiFi (see [ArduinoYun](https://www.arduino.cc/en/Guide/ArduinoYun#toc14))
+* Enable the REST API (see [ArduinoYun](https://www.arduino.cc/en/Guide/ArduinoYun#toc5))
 * Upload the [Arduino sketch](arduino/BrewBench/BrewBench.ino)
-
 
 ## Clone this repo and copy the code to your Arduino
 
@@ -45,9 +44,9 @@ gulp
 
 <img src="img/screenshot-desktop.png?raw=true" alt="BrewBench logo" title="BrewBench" align="center" />
 
+<img src="img/brewbench-wiredup.jpg?raw=true" alt="BrewBench logo" title="BrewBench" align="center" />
+
 ## TODO
-* Add sensors A4 and A5
-* Allow add/edit of kettles
 * Save settings to key/value data store on the Arduino
 * Load settings from key/value data store on the Arduino
 * Add option to post readings to a cloud based DB

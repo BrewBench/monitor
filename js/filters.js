@@ -20,4 +20,30 @@ brewBench.filter('moment', function() {
   return function(fahrenheit) {
     return Math.round((fahrenheit-32)*5/9);
   };
+}).directive('editable', function() {
+    return {
+        restrict: 'E',
+        scope: {model: '='},
+        replace: false,
+        template:
+'<span>'+
+    '<input type="text" ng-model="model" ng-show="edit" ng-enter="edit=false"></input>'+
+        '<span ng-show="!edit">{{model}}</span>'+
+'</span>',
+        link: function(scope, element, attrs) {
+            scope.edit = false;
+            element.bind('click', function() {
+                scope.$apply(scope.edit = true);
+                // element.find('input').focus();
+            });
+        }
+    };
+}).directive('ngEnter', function() {
+    return function(scope, element, attrs) {
+        element.bind('keypress', function(e) {
+            if (e.charCode === 13 || e.keyCode ===13 ) {
+              scope.$apply(attrs.ngEnter);
+            }
+        });
+    };
 });

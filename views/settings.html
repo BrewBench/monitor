@@ -22,41 +22,13 @@
       </div>
       <ul>
         <li>Poll every <input type="number" ng-model="settings.pollSeconds" min="5" max="60"> seconds.
-          <br><i class="fa fa-minus-circle fa-4x" ng-click="settings.pollSeconds=settings.pollSeconds-1"></i> <i class="fa fa-plus-circle fa-4x" ng-click="settings.pollSeconds=settings.pollSeconds+1"></i></li>
+          <br><i class="fa fa-minus-circle fa-4x" ng-click="settings.pollSeconds=settings.pollSeconds-1"></i> <i class="fa fa-plus-circle fa-4x" ng-click="settings.pollSeconds=settings.pollSeconds+1"></i>
+        </li>
+        <li>
+          <button class="btn btn-primary" ng-click="addKettle()">Add Kettle</button>
+        </li>
       </ul>
     </div>
-  </div>
-  <div class="kettles" ng-repeat="kettle in kettles">
-
-    <div class="panel panel-default">
-      <div class="panel-heading">
-        <h3>{{kettle.key}} <sup>A{{$index}}</sup></h3>
-        <div class="pull-right"><i class="fa fa-4x" ng-click="kettle.active=!kettle.active" ng-class="{'fa-stop-circle':kettle.active,'fa-play-circle':!kettle.active}"></i></div>
-      </div>
-      <div class="panel-body">
-        <ul>
-          <li>
-            <label>Current Temp:</label> <span class="temp" ng-class="{'high':kettle.high,'low':kettle.low}">{{kettle.currentTemp}}&deg;{{unit}}</span>
-          </li>
-          <li>
-            <label>Target Temp:</label> <input type="number" ng-model="kettles[$index].targetTemp"> &deg;{{unit}}
-            <br><i class="fa fa-minus-circle fa-4x" ng-click="changeValue($index,'targetTemp',false)"></i> <i class="fa fa-plus-circle fa-4x" ng-click="changeValue($index,'targetTemp',true)"></i>
-          </li>
-          <li>
-            <label>Alert Diff:</label>
-            <input type="number" ng-model="kettles[$index].diff"> &deg;{{unit}}
-            <br><i class="fa fa-minus-circle fa-4x" ng-click="changeValue($index,'diff',false)"></i> <i class="fa fa-plus-circle fa-4x" ng-click="changeValue($index,'diff',true)"></i>
-          </li>
-          <li ng-if="kettle.timer">
-            <label>Time:</label> <input type="number" ng-model="kettles[$index].timer.min" steps="5"> minutes
-            <i class="fa fa-4x" ng-click="timerStart($index)" ng-class="{'fa-stop-circle':kettle.timer.running,'fa-play-circle':!kettle.timer.running}"></i>
-            <span class="timer">{{kettles[$index].timer.min}}:{{kettles[$index].timer.sec}}</span>
-            <br><i class="fa fa-minus-circle fa-4x" ng-click="kettle.timer.min=kettle.timer.min-1"></i> <i class="fa fa-plus-circle fa-4x" ng-click="kettle.timer.min=kettle.timer.min+1"></i>
-          </li>
-        </ul>
-      </div>
-    </div>
-
   </div>
 </div>
 

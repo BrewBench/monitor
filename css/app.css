@@ -25,16 +25,16 @@ body { padding-top: 70px; }
   margin-top: -14px;
 }
 
-.settings h3{
+.settings h3, .kettles h3{
     color: #777;
     display: inline;
 }
 
-.settings ul{
+.settings ul, .kettles ul{
   padding: 10px;
 }
 
-.settings li{
+.settings ul>li, .kettles ul>li{
   list-style-type: none;
   margin: 10px;
 }
@@ -43,22 +43,37 @@ body { padding-top: 70px; }
   font-size: 10px;
 }
 
-.settings .kettles label{
+.kettles label{
   font-size: 16px;
 }
 
-.settings .panel-heading{
+.panel-heading{
   height: 70px;
 }
 
-.settings .panel-heading strong{
+.panel-heading strong{
   font-size: 16px;
 }
 
-.settings input[type=number], .kettles .temp, .kettles .timer{
+.settings input[type=number], .kettles input[type=number], .kettles .temp, .kettles .timer{
   font-size: 22px;
   color: #777;
   width: 60px;
+}
+
+.kettles ul.dropdown-menu{
+  padding: none;
+}
+
+.kettles ul.dropdown-menu>li{
+  font-size: 18px;
+  margin: none;
+}
+
+.kettles input[type=text]{
+  font-size: 22px;
+  color: #777;
+  width: 150px;
 }
 
 .kettles .temp.high {
