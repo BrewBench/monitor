@@ -1,6 +1,6 @@
 # BrewBench
 
-<img src="img/brewbench.png?raw=true" alt="BrewBench logo" title="BrewBench" align="right" />
+<img src="img/brewbench-logo.png?raw=true" alt="BrewBench logo" title="BrewBench" align="right" />
 
 Is an Arduino Yun brew monitor that uses the Arduino REST API to interface with thermistors connected to the analog ports.
 
