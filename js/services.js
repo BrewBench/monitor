@@ -20,7 +20,11 @@ brewBench.factory('BrewService', function($http, $q, $filter, $cookies){
     },
 
     domain: function(){
-      if(document.location.host == 'localhost')
+      var settings = this.settings('settings');
+
+      if(settings && settings.arduinoUrl)
+        return settings.arduinoUrl;
+      else if(document.location.host == 'localhost')
         return 'http://arduino.local';
       return '';
     },

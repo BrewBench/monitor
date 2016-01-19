@@ -70,10 +70,20 @@ body { padding-top: 70px; }
   margin: none;
 }
 
+.settings input[type=text]{
+  font-size: 22px;
+  color: #777;
+  width: 100%;
+}
+
 .kettles input[type=text]{
   font-size: 22px;
   color: #777;
   width: 150px;
+}
+
+.kettles .remove, .kettles .remove .btn {
+  height: 100%;
 }
 
 .kettles .temp.high {

@@ -3,16 +3,18 @@ brewBench.controller('mainCtrl', function($scope, $stateParams, $state, $filter,
 var notification = null
   ,resetChart = 25;//reset chart after 25 polls
 
+$scope.chartOptions = BrewService.chartOptions();
+
+//default settings values
 $scope.settings = BrewService.settings('settings') || {
   pollSeconds: 10
   ,unit: 'F'
   ,sound: true
   ,notifications: true
+  ,arduinoUrl: 'http://arduino.local'
 };
 
-$scope.chartOptions = BrewService.chartOptions();
-
-//default values
+//default kettle values
 $scope.kettles = BrewService.settings('kettles') || [{
     key: 'Boil'
     ,pin: 0
@@ -100,7 +102,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
 
   $scope.addKettle = function(){
     if($scope.kettles.length < 5){
-      $scope.kettles.push(
+      $scope.kettles.unshift(
         {
           key: 'New Kettle'
           ,pin: 5
