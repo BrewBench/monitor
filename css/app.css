@@ -48,7 +48,19 @@ body { padding-top: 70px; }
 }
 
 .panel-heading{
-  height: 70px;
+  height: 92px;
+}
+
+.panel-heading .left{
+  text-align: left;
+  width: 48%;
+  display: inline-block;
+}
+
+.panel-heading .right{
+  text-align: right;
+  width: 48%;
+  display: inline-block;
 }
 
 .panel-heading strong{
@@ -80,10 +92,6 @@ body { padding-top: 70px; }
   font-size: 22px;
   color: #777;
   width: 150px;
-}
-
-.kettles .remove, .kettles .remove .btn {
-  height: 100%;
 }
 
 .kettles .temp.high {
@@ -120,6 +128,15 @@ body { padding-top: 70px; }
 
 .fa-plus-circle:hover, .fa-minus-circle:hover {
   color: #008184;
+}
+
+.fa-fire.on{
+  color: #ffa556;
+  cursor: pointer;
+}
+.fa-fire.off{
+  color: #777;
+  cursor: pointer;
 }
 
 input[type=radio].with-font {

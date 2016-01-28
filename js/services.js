@@ -28,24 +28,30 @@ brewBench.factory('BrewService', function($http, $q, $filter, $cookies){
         return 'http://arduino.local';
       return '';
     },
-    // endpoint is digital, analog
-    // digital = digitalRead(sensor)
-    // analog = analogRead(sensor)
-    readSensor: function(endpoint,sensor){
+    // read/write thermistors
+    // https://learn.adafruit.com/thermistor/using-a-thermistor
+    temp: function(sensor,value){
       var q = $q.defer();
-      $http.get(this.domain()+'/arduino/'+endpoint+'/'+sensor,{timeout:10000}).then(function(response){
+      var url = this.domain()+'/arduino/analog/'+sensor;
+      if(value)
+        url += '/'+value;
+
+      $http.get(url,{timeout:10000}).then(function(response){
         q.resolve(response.data);
       },function(err){
         q.reject(err);
       });
       return q.promise;
     },
-    // endpoint is digital, analog
-    // digital = digitalWrite(sensor,value)
-    // analog = analogWrite(sensor,value)
-    writeSensor: function(endpoint,sensor,value){
+    // read/write heater
+    // http://arduinotronics.blogspot.com/2013/01/working-with-sainsmart-5v-relay-board.html
+    heat: function(sensor,value){
       var q = $q.defer();
-      $http.get(this.domain()+'/arduino/'+endpoint+'/'+sensor+'/'+value,{timeout:10000}).then(function(response){
+      var url = this.domain()+'/arduino/digital/'+sensor;
+      if(value)
+        url += '/'+value;
+
+      $http.get(url,{timeout:10000}).then(function(response){
         q.resolve(response.data);
       },function(err){
         q.reject(err);
