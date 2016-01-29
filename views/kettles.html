@@ -28,7 +28,7 @@
         </span>
         <i class="fa fa-4x" ng-click="startStopKettle(kettle)" ng-class="{'fa-stop-circle':kettle.active,'fa-play-circle':!kettle.active}"></i>
       </div>
-      <div ng-show="showRemoveKettle" class="remove right"><button class="btn btn-danger" ng-click="kettles.splice($index,1)">Remove Kettle</button></div>
+      <div ng-show="showRemoveKettle" class="remove right"><button class="btn btn-danger" ng-click="showRemoveKettle=false;kettles.splice($index,1)">Remove Kettle</button></div>
     </div>
     <div class="panel-body">
       <ul>

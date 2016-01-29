@@ -49,18 +49,19 @@ body { padding-top: 70px; }
 
 .panel-heading{
   height: 92px;
+  display: flex;
 }
 
 .panel-heading .left{
   text-align: left;
   width: 66%;
-  display: inline-block;
+  display: table-cell;
 }
 
 .panel-heading .right{
   text-align: right;
-  width: 32%;
-  display: inline-block;
+  width: 36%;
+  display: table-cell;
 }
 
 .panel-heading strong{
