@@ -1,6 +1,5 @@
 var brewBench = angular.module('brewbench', [
-  'ngCookies'
-  ,'ui.router'
+  'ui.router'
   ,'nvd3'
   ,'ngTouch'
 ])

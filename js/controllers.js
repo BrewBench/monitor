@@ -1,7 +1,7 @@
 brewBench.controller('mainCtrl', function($scope, $stateParams, $state, $filter, $timeout, $interval, $q, BrewService){
 
 var notification = null
-  ,resetChart = 25;//reset chart after 25 polls
+  ,resetChart = 100;//reset chart after 100 polls
 
 $scope.chartOptions = BrewService.chartOptions();
 
@@ -78,7 +78,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
       else
         kettle.currentTemp = Math.round(response.temp);
 
-      //reset all kettles every 25
+      //reset all kettles every resetChart
       if(kettle.values.length > resetChart){
         $scope.kettles.map(function(k){
           return k.values=[];
@@ -129,15 +129,6 @@ $scope.kettles = BrewService.settings('kettles') || [{
         }
       }
     }
-  };
-
-  $scope.changeStorage = function(){
-      if($scope.settings.storage=='sd')
-        $scope.settings.storage = 'mongolab';
-      else if($scope.settings.storage=='mongolab')
-        $scope.settings.storage = 'database';
-      else if($scope.settings.storage=='database')
-        $scope.settings.storage = 'sd';
   };
 
   $scope.addKettle = function(){

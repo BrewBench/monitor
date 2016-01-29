@@ -1,14 +1,16 @@
-brewBench.factory('BrewService', function($http, $q, $filter, $cookies){
+brewBench.factory('BrewService', function($http, $q, $filter){
 
   return {
 
     //cookies size 4096 bytes
     settings: function(key,values){
+          if(!window.localStorage)
+            return values;
           try {
             if(values)
-              return $cookies.put(key,JSON.stringify(values));
-            else if($cookies.get(key))
-              return JSON.parse($cookies.get(key));
+              return window.localStorage.setItem(key,JSON.stringify(values));
+            else if(window.localStorage.getItem(key))
+              return JSON.parse(window.localStorage.getItem(key));
           } catch(e){
             /*JSON parse error*/
           }
