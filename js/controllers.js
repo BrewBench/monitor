@@ -206,7 +206,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
 
     // Desktop Notification
     if ($scope.settings.notifications && "Notification" in window) {
-      var message, icon = 'img/brewmachine-45.png';
+      var message, icon = 'img/brewbench-logo-45.png';
 
       if(kettle && kettle.high)
         message = 'Your '+kettle.key+' kettle is '+kettle.high+' degrees too hot';
@@ -221,14 +221,14 @@ $scope.kettles = BrewService.settings('kettles') || [{
 
       if(Notification.permission === "granted"){
         if(message){
-          notification = new Notification('BrewMachine',{body:message,icon:icon});
+          notification = new Notification('BrewBench',{body:message,icon:icon});
         }
       } else if(Notification.permission !== 'denied'){
         Notification.requestPermission(function (permission) {
           // If the user accepts, let's create a notification
           if (permission === "granted") {
             if(message){
-              notification = new Notification('BrewMachine',{body:message,icon:icon});
+              notification = new Notification('BrewBench',{body:message,icon:icon});
             }
           }
         });
