@@ -12,6 +12,7 @@ $scope.settings = BrewService.settings('settings') || {
   ,sound: true
   ,notifications: true
   ,arduinoUrl: 'http://arduino.local'
+  ,storage: 'sd'
 };
 
 //default kettle values
@@ -27,6 +28,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
     ,high: null
     ,heater: {pin:2,on:false,running:false}
     ,timer: {min:60,sec:0,running:false}
+    ,volume: 5
     ,values: []
   },{
     key: 'Hot Liquor'
@@ -39,6 +41,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
     ,low: null
     ,high: null
     ,heater: {pin:3,on:false,running:false}
+    ,volume: 5
     ,values: []
   },{
     key: 'Mash'
@@ -52,6 +55,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
     ,high: null
     ,heater: {pin:4,on:false,running:false}
     ,timer: {min:60,sec:0,running:false}
+    ,volume: 5
     ,values: []
   }];
 
@@ -127,6 +131,15 @@ $scope.kettles = BrewService.settings('kettles') || [{
     }
   };
 
+  $scope.changeStorage = function(){
+      if($scope.settings.storage=='sd')
+        $scope.settings.storage = 'mongolab';
+      else if($scope.settings.storage=='mongolab')
+        $scope.settings.storage = 'database';
+      else if($scope.settings.storage=='database')
+        $scope.settings.storage = 'sd';
+  };
+
   $scope.addKettle = function(){
     if($scope.kettles.length < 5){
       $scope.kettles.unshift(
@@ -141,6 +154,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
           ,low: null
           ,high: null
           ,heater: {pin:5,on:null,running:false}
+          ,volume: 5
           ,values: []
         }
       );

@@ -12,7 +12,19 @@ See [Thermistor](https://learn.adafruit.com/thermistor/using-a-thermistor) for w
 * Enable the REST API (see [ArduinoYun](https://www.arduino.cc/en/Guide/ArduinoYun#toc5))
 * Upload the [Arduino sketch](arduino/BrewBench/BrewBench.ino)
 
-## Clone this repo and copy the code to your Arduino
+```
+# get the web code
+git clone https://github.com/avantassel/brewbench
+cd brewbench
+```
+
+## Deployment
+
+There are two options here, you can either run the code on your Arduino or on a webserver.
+
+### 1. Arduino Deployment
+
+The Arduino has a built in webserver running in ```/www/```.
 
 ```
 # Add rsync to your Arduino
@@ -20,27 +32,27 @@ ssh root@arduino.local
 opkg update
 opkg install rsync
 exit
-```
 
-```
-# get the web code
-git clone https://github.com/avantassel/brewbench
-cd brewbench
-
-# copy to your Arduino
+# Copy the code to your Arduino
 rsync -rav -e ssh --delete --exclude-from '.rsyncignore' ./ root@arduino.local:/www/brewbench
 ```
 
+* [http://arduino.local/brewbench/](http://arduino.local/brewbench/)
+
+### 2.  Webserver Deployment
+
+If you have Apache setup copy the code to
+
+* [http://localhost/brewbench/](http://localhost/brewbench/)
+
 ## Development
+
+For development just run ```npm install```, and look at [index.html](index.html) for un-commenting the un-minified files.
 
 ```
 npm install
 gulp
 ```
-
-## Open a browser
-
-* [http://arduino.local/brewbench/](http://arduino.local/brewbench/)
 
 <img src="img/screenshot-desktop.png?raw=true" alt="BrewBench screenshot" align="center" />
 
