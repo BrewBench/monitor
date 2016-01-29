@@ -144,12 +144,35 @@ $scope.kettles = BrewService.settings('kettles') || [{
           ,active: false
           ,low: null
           ,high: null
-          ,heater: {pin:5,on:null,running:false}
+          ,heater: {pin:5,on:false,running:false}
           ,volume: 5
           ,values: []
         }
       );
     }
+  };
+
+  $scope.startStopKettle = function(kettle){
+      kettle.active = !kettle.active;
+      if(!kettle.active && kettle.heater.running){
+        BrewService.heat(kettle.heater.pin,0).then(function(){
+          kettle.heater.running = null;
+          kettle.heater.on = false;
+        },function(err){
+          //failed to stop
+        });
+      }
+  };
+
+  $scope.startStopKettleHeat = function(kettle){
+      kettle.heater.on = !kettle.heater.on;
+      if(!kettle.heater.on && kettle.heater.running){
+        BrewService.heat(kettle.heater.pin,0).then(function(){
+          kettle.heater.running = null;
+        },function(err){
+          //failed to stop
+        });
+      }
   };
 
   $scope.tempAlert = function(kettle){

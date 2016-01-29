@@ -22,8 +22,11 @@
         </div>
       </div>
       <div ng-show="!showRemoveKettle" class="right">
-        <i class="fa fa-4x" ng-click="kettle.heater.on=!kettle.heater.on" ng-class="{'fa-fire on':kettle.heater.on,'fa-fire off':!kettle.heater.on}"></i>
-        <i class="fa fa-4x" ng-click="kettle.active=!kettle.active" ng-class="{'fa-stop-circle':kettle.active,'fa-play-circle':!kettle.active}"></i>
+        <span class="fa-stack fa-2x" ng-click="startStopKettleHeat(kettle)">
+          <i class="fa fa-sun-o fa-stack-2x" ng-class="{'fa-spin':kettle.heater.running}"></i>
+          <i class="fa fa-stack-1x" ng-class="{'fa-fire on':kettle.heater.on,'fa-fire off':!kettle.heater.on}"></i>
+        </span>
+        <i class="fa fa-4x" ng-click="startStopKettle(kettle)" ng-class="{'fa-stop-circle':kettle.active,'fa-play-circle':!kettle.active}"></i>
       </div>
       <div ng-show="showRemoveKettle" class="remove right"><button class="btn btn-danger" ng-click="kettles.splice($index,1)">Remove Kettle</button></div>
     </div>
