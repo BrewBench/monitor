@@ -33,15 +33,15 @@
     <div class="panel-body">
       <ul>
         <li>
-          <label>Current Temp:</label> <span class="temp" ng-class="{'high':kettle.high,'low':kettle.low}">{{kettle.currentTemp}}&deg;{{settings.unit}}</span>
+          <label>Current Temp:</label> <span class="temp" ng-class="{'high':kettle.high,'low':kettle.low}">{{kettle.temp.current}}&deg;{{settings.unit}}</span>
         </li>
         <li>
-          <label>Target Temp:</label> <input type="number" ng-model="kettles[$index].targetTemp"> &deg;{{settings.unit}}
-          <br><i class="fa fa-minus-circle fa-4x" ng-click="changeValue($index,'targetTemp',false)"></i> <i class="fa fa-plus-circle fa-4x" ng-click="changeValue($index,'targetTemp',true)"></i>
+          <label>Target Temp:</label> <input type="number" ng-model="kettles[$index].temp.target"> &deg;{{settings.unit}}
+          <br><i class="fa fa-minus-circle fa-4x" ng-click="changeValue($index,'temp.target',false)"></i> <i class="fa fa-plus-circle fa-4x" ng-click="changeValue($index,'temp.target',true)"></i>
         </li>
         <li>
           <label>Alert Diff:</label>
-          <input type="number" ng-model="kettles[$index].diff"> &deg;{{settings.unit}}
+          <input type="number" ng-model="kettles[$index].temp.diff"> &deg;{{settings.unit}}
           <br><i class="fa fa-minus-circle fa-4x" ng-click="changeValue($index,'diff',false)"></i> <i class="fa fa-plus-circle fa-4x" ng-click="changeValue($index,'diff',true)"></i>
         </li>
         <li ng-if="kettle.timer" ng-swipe-left="showRemoveTimer = true" ng-swipe-right="showRemoveTimer = false">

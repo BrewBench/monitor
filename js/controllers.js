@@ -3,6 +3,8 @@ brewBench.controller('mainCtrl', function($scope, $stateParams, $state, $filter,
 var notification = null
   ,resetChart = 100;//reset chart after 100 polls
 
+// BrewService.clear();
+
 $scope.chartOptions = BrewService.chartOptions();
 
 //default settings values
@@ -19,42 +21,27 @@ $scope.settings = BrewService.settings('settings') || {
 $scope.kettles = BrewService.settings('kettles') || [{
     key: 'Boil'
     ,pin: 0
-    ,targetTemp: 200
-    ,targetHit: null
-    ,currentTemp: 0
-    ,diff: 5
     ,active: false
-    ,low: null
-    ,high: null
     ,heater: {pin:2,on:false,running:false}
     ,timer: {min:60,sec:0,running:false}
+    ,temp: {hit:false,current:0,target:200,diff:5}
     ,volume: 5
     ,values: []
   },{
     key: 'Hot Liquor'
     ,pin: 1
-    ,targetTemp: 175
-    ,targetHit: null
-    ,currentTemp: 0
-    ,diff: 5
     ,active: false
-    ,low: null
-    ,high: null
     ,heater: {pin:3,on:false,running:false}
+    ,temp: {hit:false,current:0,target:200,diff:5}
     ,volume: 5
     ,values: []
   },{
     key: 'Mash'
     ,pin: 2
-    ,targetTemp: 150
-    ,targetHit: null
-    ,currentTemp: 0
-    ,diff: 2
     ,active: false
-    ,low: null
-    ,high: null
     ,heater: {pin:4,on:false,running:false}
     ,timer: {min:60,sec:0,running:false}
+    ,temp: {hit:false,current:0,target:200,diff:5}
     ,volume: 5
     ,values: []
   }];
@@ -74,9 +61,9 @@ $scope.kettles = BrewService.settings('kettles') || [{
 
       // temp response is in C
       if($scope.settings.unit=='F')
-        kettle.currentTemp = $filter('toFahrenheit')(response.temp);
+        kettle.temp.current = $filter('toFahrenheit')(response.temp);
       else
-        kettle.currentTemp = Math.round(response.temp);
+        kettle.temp.current = Math.round(response.temp);
 
       //reset all kettles every resetChart
       if(kettle.values.length > resetChart){
@@ -87,11 +74,11 @@ $scope.kettles = BrewService.settings('kettles') || [{
 
       //chart data
       var date = new Date();
-      kettle.values.push([date.getTime(),kettle.currentTemp]);
+      kettle.values.push([date.getTime(),kettle.temp.current]);
 
       //is temp too high?
-      if(kettle.currentTemp >= kettle.targetTemp+kettle.diff){
-        kettle.high=kettle.currentTemp-kettle.targetTemp;
+      if(kettle.temp.current >= kettle.temp.target+kettle.temp.diff){
+        kettle.high=kettle.temp.current-kettle.temp.target;
         kettle.low=null;
         $scope.tempAlert(kettle);
         //stop the heating element
@@ -103,8 +90,8 @@ $scope.kettles = BrewService.settings('kettles') || [{
           });
         }
       } //is temp too low?
-      else if(kettle.currentTemp <= kettle.targetTemp-kettle.diff){
-        kettle.low=kettle.targetTemp-kettle.currentTemp;
+      else if(kettle.temp.current <= kettle.temp.target-kettle.temp.diff){
+        kettle.low=kettle.temp.target-kettle.temp.current;
         kettle.high=null;
         $scope.tempAlert(kettle);
         //start the heating element
@@ -116,7 +103,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
           });
         }
       } else {
-        kettle.targetHit=new Date();//set the time the target was hit so we can now start alerts
+        kettle.temp.hit=new Date();//set the time the target was hit so we can now start alerts
         kettle.low=null;
         kettle.high=null;
         //stop the heating element
@@ -137,14 +124,9 @@ $scope.kettles = BrewService.settings('kettles') || [{
         {
           key: 'New Kettle'
           ,pin: $scope.kettles.length
-          ,targetTemp: 150
-          ,targetHit: null
-          ,currentTemp: 0
-          ,diff: 2
           ,active: false
-          ,low: null
-          ,high: null
           ,heater: {pin:5,on:false,running:false}
+          ,temp: {hit:false,current:0,target:200,diff:5}
           ,volume: 5
           ,values: []
         }
@@ -177,8 +159,8 @@ $scope.kettles = BrewService.settings('kettles') || [{
 
   $scope.tempAlert = function(kettle){
 
-    //don't start alerts until we have hit the targetTemp
-    if(kettle && !kettle.targetHit)
+    //don't start alerts until we have hit the temp.target
+    if(kettle && !kettle.temp.hit)
       return;
 
     // Txt or Email Notification?
@@ -236,11 +218,15 @@ $scope.kettles = BrewService.settings('kettles') || [{
     }
   };
 
+  $scope.tempCheck = function(kettle){
+
+  };
+
   $scope.changeUnits = function(unit){
     for(k in $scope.kettles){
-      $scope.kettles[k].currentTemp = $filter('formatDegrees')($scope.kettles[k].currentTemp,unit);
-      $scope.kettles[k].targetTemp = $filter('formatDegrees')($scope.kettles[k].targetTemp,unit);
-      $scope.kettles[k].diff = $filter('formatDegrees')($scope.kettles[k].diff,unit);
+      $scope.kettles[k].temp.current = $filter('formatDegrees')($scope.kettles[k].temp.current,unit);
+      $scope.kettles[k].temp.target = $filter('formatDegrees')($scope.kettles[k].temp.target,unit);
+      $scope.kettles[k].temp.diff = $filter('formatDegrees')($scope.kettles[k].temp.diff,unit);
     }
   };
 

@@ -3,6 +3,13 @@ brewBench.factory('BrewService', function($http, $q, $filter){
   return {
 
     //cookies size 4096 bytes
+    clear: function(){
+      if(window.localStorage){
+        window.localStorage.removeItem('settings');
+        window.localStorage.removeItem('kettles');
+      }
+    },
+
     settings: function(key,values){
           if(!window.localStorage)
             return values;
@@ -11,7 +18,7 @@ brewBench.factory('BrewService', function($http, $q, $filter){
               return window.localStorage.setItem(key,JSON.stringify(values));
             }
             else if(window.localStorage.getItem(key)){
-              return JSON.parse(window.localStorage.getItem(key));              
+              return JSON.parse(window.localStorage.getItem(key));
             }
           } catch(e){
             /*JSON parse error*/
