@@ -157,6 +157,10 @@ $scope.kettles = BrewService.settings('kettles') || [{
       }
   };
 
+  $scope.clearKettles = function(){
+      BrewService.clear();
+  };
+
   $scope.tempAlert = function(kettle){
 
     //don't start alerts until we have hit the temp.target
