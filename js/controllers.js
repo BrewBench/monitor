@@ -118,6 +118,10 @@ $scope.kettles = BrewService.settings('kettles') || [{
     }
   };
 
+  $scope.getNavOffset = function(){
+    return 20+angular.element(document.getElementById('navbar'))[0].offsetHeight;
+  };
+
   $scope.addKettle = function(){
     if($scope.kettles.length < 5){
       $scope.kettles.unshift(

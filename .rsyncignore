@@ -4,6 +4,7 @@ css/
 node_modules/
 img/screenshot*
 img/logo_46.png
+img/temperature_thermistor_bb.png
 gulpfile.js
 package.json
 README.md

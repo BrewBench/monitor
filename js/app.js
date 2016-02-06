@@ -2,6 +2,7 @@ var brewBench = angular.module('brewbench', [
   'ui.router'
   ,'nvd3'
   ,'ngTouch'
+  ,'duScroll'
 ])
 .config(function($stateProvider, $urlRouterProvider, $httpProvider) {
 

@@ -1,4 +1,4 @@
-<div class="kettles col-md-{{kettles.length==5?2:12/kettles.length}}" ng-repeat="kettle in kettles track by $index">
+<div class="kettles col-md-{{kettles.length==5?2:12/kettles.length}}" ng-repeat="kettle in kettles track by $index" id="kettle{{$index}}">
 
   <div class="panel panel-default">
     <div class="panel-heading" ng-swipe-left="showRemoveKettle = true" ng-swipe-right="showRemoveKettle = false">
