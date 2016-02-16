@@ -33,24 +33,26 @@ void process(BridgeClient client) {
   client.println("Connection: close");
   client.println();
 
-  if (command == "digital") {
-    digitalCommand(client);
+  if (command == "heat") {
+    heatCommand(client);
   }
-  if (command == "analog") {
-    analogCommand(client);
-  }
-  if (command == "blink") {
-    blinkCommand(client);
-  }
+  if (command == "temp") {
+    tempCommand(client);
+  }  
 }
 
-void digitalCommand(BridgeClient client) {
+void heatCommand(BridgeClient client) {
   int pin, value;
   pin = client.parseInt();
 
   if (client.read() == '/') {
+    //set pin as output
+    pinMode(pin, OUTPUT);
     value = client.parseInt();
-    digitalWrite(pin, value);
+    if(value == 1)
+      digitalWrite(pin, HIGH);//turn on relay
+    else
+      digitalWrite(pin, LOW);//turn off relay  
   }
   else {
     value = digitalRead(pin);
@@ -64,7 +66,7 @@ void digitalCommand(BridgeClient client) {
   Bridge.put(key, String(value));
 }
 
-void analogCommand(BridgeClient client) {
+void tempCommand(BridgeClient client) {
   int pin, value;
 
   pin = client.parseInt();
@@ -115,40 +117,6 @@ void analogCommand(BridgeClient client) {
     Bridge.put(key, String(value));
   }
 }
-
-void blinkCommand(BridgeClient client) {
-  int pin;
-  pin = client.parseInt();
-
-  if (client.read() != '/') {
-    client.println(F("error"));
-    return;
-  }
-
-  String mode = client.readStringUntil('\r');
-
-  if (mode == "input") {
-    pinMode(pin, INPUT);
-    // Send JSON response to client
-    client.print("{\"pin\":\""+String(pin)+"\",\"value\":\""+String(mode)+"\"}");
-    return;
-  }
-
-  if (mode == "output") {
-    pinMode(pin, OUTPUT);
-    digitalWrite(pin, HIGH);   // turn the LED on (HIGH is the voltage level)
-    delay(1000);              // wait for a second
-    digitalWrite(pin, LOW);    // turn the LED off by making the voltage LOW
-    delay(1000);
-    // Send JSON response to client
-    client.print("{\"pin\":\""+String(pin)+"\",\"value\":\""+String(mode)+"\"}");
-    return;
-  }
-
-  client.print(F("error: invalid mode "));
-  client.print(mode);
-}
-
 
 void setup() {
   

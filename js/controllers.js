@@ -83,7 +83,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
         $scope.tempAlert(kettle);
         //stop the heating element
         if(kettle.heater.on===true && kettle.heater.running){
-          BrewService.heat(kettle.heater.pin,0).then(function(){
+          BrewService.heat(kettle.heater.pin,1).then(function(){
             kettle.heater.running = null;
           },function(err){
             //failed to stop
@@ -96,7 +96,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
         $scope.tempAlert(kettle);
         //start the heating element
         if(kettle.heater.on===true && !kettle.heater.running){
-          BrewService.heat(kettle.heater.pin,1).then(function(){
+          BrewService.heat(kettle.heater.pin,0).then(function(){
             kettle.heater.running = new Date();
           },function(err){
             //failed to start
@@ -108,7 +108,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
         kettle.high=null;
         //stop the heating element
         if(kettle.heater.on===true && kettle.heater.running){
-          BrewService.heat(kettle.heater.pin,0).then(function(){
+          BrewService.heat(kettle.heater.pin,1).then(function(){
             kettle.heater.running = null;
           },function(err){
             //failed to stop
@@ -140,8 +140,9 @@ $scope.kettles = BrewService.settings('kettles') || [{
 
   $scope.startStopKettle = function(kettle){
       kettle.active = !kettle.active;
+      //stop the heating element
       if(!kettle.active && kettle.heater.running){
-        BrewService.heat(kettle.heater.pin,0).then(function(){
+        BrewService.heat(kettle.heater.pin,1).then(function(){
           kettle.heater.running = null;
           kettle.heater.on = false;
         },function(err){
@@ -152,8 +153,9 @@ $scope.kettles = BrewService.settings('kettles') || [{
 
   $scope.startStopKettleHeat = function(kettle){
       kettle.heater.on = !kettle.heater.on;
+      //stop the heating element
       if(!kettle.heater.on && kettle.heater.running){
-        BrewService.heat(kettle.heater.pin,0).then(function(){
+        BrewService.heat(kettle.heater.pin,1).then(function(){
           kettle.heater.running = null;
         },function(err){
           //failed to stop

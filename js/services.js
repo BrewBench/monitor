@@ -43,7 +43,7 @@ brewBench.factory('BrewService', function($http, $q, $filter){
     // https://learn.adafruit.com/thermistor/using-a-thermistor
     temp: function(sensor,value){
       var q = $q.defer();
-      var url = this.domain()+'/arduino/analog/'+sensor;
+      var url = this.domain()+'/arduino/temp/'+sensor;
       if(value)
         url += '/'+value;
 
@@ -56,23 +56,12 @@ brewBench.factory('BrewService', function($http, $q, $filter){
     },
     // read/write heater
     // http://arduinotronics.blogspot.com/2013/01/working-with-sainsmart-5v-relay-board.html
+    // http://myhowtosandprojects.blogspot.com/2014/02/sainsmart-2-channel-5v-relay-arduino.html
     heat: function(sensor,value){
       var q = $q.defer();
-      var url = this.domain()+'/arduino/digital/'+sensor;
-      if(value)
-        url += '/'+value;
+      var url = this.domain()+'/arduino/heat/'+sensor+'/'+value;
 
       $http.get(url,{timeout:10000}).then(function(response){
-        q.resolve(response.data);
-      },function(err){
-        q.reject(err);
-      });
-      return q.promise;
-    },
-
-    blink: function(pin){
-      var q = $q.defer();
-      $http.get(this.domain()+'/arduino/blink/'+pin+'/output',{timeout:10000}).then(function(response){
         q.resolve(response.data);
       },function(err){
         q.reject(err);
