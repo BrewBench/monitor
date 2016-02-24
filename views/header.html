@@ -1,14 +1,12 @@
-<nav id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
+<nav class="navbar navbar-inverse navbar-default navbar-fixed-top">
   <div class="container-fluid">
      <div class="navbar-header">
         <a class="navbar-brand" ui-sref="home()">
           <img src="img/brewbench-logo-45.png"/>
-        </a>
-        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#settings" aria-expanded="false" aria-controls="navbar">
-          <i class="fa fa-cog fa-2x"></i>
-        </button>
+        </a>        
     </div>
-      <ul class="nav navbar-nav collapse">
+    <div id="navbar" class="navbar-collapse">
+      <ul class="nav navbar-nav navitem">
         <li class="active"><a href="#" data-toggle="modal" data-target="#aboutModal">BrewBench</a></li>
       </ul>
       <ul class="nav navbar-nav">
@@ -16,8 +14,9 @@
           <a href="#kettle{{$index}}" du-smooth-scroll duration="1000" offset="{{getNavOffset()}}" ng-if="kettle.active">{{kettle.key}} {{kettle.temp.current}}&deg;F</a>
         </li>
       </ul>
-      <ul class="nav navbar-nav navbar-right collapse">
+      <ul class="nav navbar-nav navbar-right navitem">
         <li><a href="#" data-toggle="modal" data-target="#aboutModal">About</a></li>
       </ul>
+  </div>
   </div>
 </nav>
