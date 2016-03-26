@@ -108,14 +108,14 @@ $scope.kettles = BrewService.settings('kettles') || [{
         kettle.high=null;
         $scope.tempAlert(kettle);
         //start the heating element
-        if(kettle.heater.auto && kettle.heater.running){
+        if(kettle.heater.auto && !kettle.heater.running){
           BrewService.digital(kettle.heater.pin,0).then(function(){
             kettle.heater.running = true;
           },function(err){
             //failed to start
           });
         }
-        if(kettle.pump.auto && kettle.pump.running){
+        if(kettle.pump.auto && !kettle.pump.running){
           BrewService.digital(kettle.pump.pin,0).then(function(){
             kettle.pump.running = true;
           },function(err){
