@@ -11,24 +11,32 @@
             <li ng-repeat="p in [0,1,2,3,4,5] track by $index"><a href="#" ng-click="kettle.pin=p" ng-if="p != kettle.pin">A{{p}}</a></li>
           </ul>
         </div>
-        <div class="digital">
-          <strong class="heat" ng-click="toggleKettle('heat',kettle)" ng-class="{'running':kettle.heater.state==2,'on':kettle.heater.state==1}">Heat</strong>
-          <div class="btn-group">
-            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              D{{kettle.heater.pin}} <span class="caret"></span>
-            </button>
-            <ul class="dropdown-menu">
-              <li ng-repeat="p in [2,3,4,5,6,7,8,9,10,11,12,13] track by $index"><a href="#" ng-click="kettle.heater.pin=p" ng-if="p != kettle.heater.pin">D{{p}}</a></li>
-            </ul>
+        <div class="digital row">
+          <div class="item col-md-6 col-xs-6">
+            <strong class="heat">Heat</strong>
+            <span class="label" ng-class="{'label-default':!kettle.heater.running&&!kettle.heater.auto,'label-danger':kettle.heater.running,'label-success':kettle.heater.auto}" ng-click="toggleKettle('heat',kettle)">{{kettle.heater.running ? 'On' : 'Off'}}</span>
+            <span class="label" ng-class="{'label-default':!kettle.heater.auto,'label-success':kettle.heater.auto}" ng-click="kettle.heater.auto=!kettle.heater.auto">Auto</span>
+            <div class="btn-group">
+              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                D{{kettle.heater.pin}} <span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu">
+                <li ng-repeat="p in [2,3,4,5,6,7,8,9,10,11,12,13] track by $index"><a href="#" ng-click="kettle.heater.pin=p" ng-if="p != kettle.heater.pin">D{{p}}</a></li>
+              </ul>
+            </div>
           </div>
-          <strong class="pump" ng-click="toggleKettle('pump',kettle)" ng-class="{'running':kettle.pump.state==2,'on':kettle.pump.state==1}">Pump</strong>
-          <div class="btn-group">
-            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              D{{kettle.pump.pin}} <span class="caret"></span>
-            </button>
-            <ul class="dropdown-menu">
-              <li ng-repeat="p in [2,3,4,5,6,7,8,9,10,11,12,13] track by $index"><a href="#" ng-click="kettle.pump.pin=p" ng-if="p != kettle.pump.pin">D{{p}}</a></li>
-            </ul>
+          <div class="item col-md-6 col-xs-6">
+            <strong class="pump">Pump</strong>
+            <span class="label" ng-class="{'label-default':!kettle.pump.running&&!kettle.pump.auto,'label-danger':kettle.pump.running,'label-success':kettle.pump.auto}" ng-click="toggleKettle('pump',kettle)">{{kettle.pump.running ? 'On' : 'Off'}}</span>
+            <span class="label" ng-class="{'label-default':!kettle.pump.auto,'label-success':kettle.pump.auto}" ng-click="kettle.pump.auto=!kettle.pump.auto">Auto</span>
+            <div class="btn-group">
+              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                D{{kettle.pump.pin}} <span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu">
+                <li ng-repeat="p in [2,3,4,5,6,7,8,9,10,11,12,13] track by $index"><a href="#" ng-click="kettle.pump.pin=p" ng-if="p != kettle.pump.pin">D{{p}}</a></li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>
