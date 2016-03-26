@@ -83,7 +83,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
       kettle.values.push([date.getTime(),kettle.temp.current]);
 
       //is temp too high?
-      if(kettle.temp.current >= kettle.temp.target+kettle.temp.diff){
+      if(kettle.temp.current > kettle.temp.target+kettle.temp.diff){
         kettle.high=kettle.temp.current-kettle.temp.target;
         kettle.low=null;
         $scope.tempAlert(kettle);
@@ -103,7 +103,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
           });
         }
       } //is temp too low?
-      else if(kettle.temp.current <= kettle.temp.target-kettle.temp.diff){
+      else if(kettle.temp.current < kettle.temp.target-kettle.temp.diff){
         kettle.low=kettle.temp.target-kettle.temp.current;
         kettle.high=null;
         $scope.tempAlert(kettle);
