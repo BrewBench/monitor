@@ -339,9 +339,9 @@ $scope.kettles = BrewService.settings('kettles') || [{
 
   $scope.changeValue = function(kettle,field,up){
     if(up)
-      $scope.kettles[kettle][field]++;
+      $scope.kettles[kettle]['temp'][field]++;
     else
-      $scope.kettles[kettle][field]--;
+      $scope.kettles[kettle]['temp'][field]--;
   };
 
   // App start logic
