@@ -22,7 +22,8 @@ $scope.kettles = BrewService.settings('kettles') || [{
     key: 'Boil'
     ,pin: 0
     ,active: false
-    ,heater: {pin:2,on:false,running:false}
+    ,heater: {pin:2,state:0}
+    ,pump: {pin:3,state:0}
     ,timer: {min:60,sec:0,running:false}
     ,temp: {hit:false,current:0,target:200,diff:5}
     ,volume: 5
@@ -31,7 +32,8 @@ $scope.kettles = BrewService.settings('kettles') || [{
     key: 'Hot Liquor'
     ,pin: 1
     ,active: false
-    ,heater: {pin:3,on:false,running:false}
+    ,heater: {pin:4,state:0}
+    ,pump: {pin:5,state:0}
     ,temp: {hit:false,current:0,target:200,diff:5}
     ,volume: 5
     ,values: []
@@ -39,7 +41,8 @@ $scope.kettles = BrewService.settings('kettles') || [{
     key: 'Mash'
     ,pin: 2
     ,active: false
-    ,heater: {pin:4,on:false,running:false}
+    ,heater: {pin:6,state:0}
+    ,pump: {pin:7,state:0}
     ,timer: {min:60,sec:0,running:false}
     ,temp: {hit:false,current:0,target:200,diff:5}
     ,volume: 5
@@ -82,38 +85,38 @@ $scope.kettles = BrewService.settings('kettles') || [{
         kettle.low=null;
         $scope.tempAlert(kettle);
         //stop the heating element
-        if(kettle.heater.on===true && kettle.heater.running){
-          BrewService.heat(kettle.heater.pin,1).then(function(){
-            kettle.heater.running = null;
-          },function(err){
-            //failed to stop
-          });
-        }
+        // if(kettle.heater.on===true && kettle.heater.running){
+        //   BrewService.heat(kettle.heater.pin,1).then(function(){
+        //     kettle.heater.running = null;
+        //   },function(err){
+        //     //failed to stop
+        //   });
+        // }
       } //is temp too low?
       else if(kettle.temp.current <= kettle.temp.target-kettle.temp.diff){
         kettle.low=kettle.temp.target-kettle.temp.current;
         kettle.high=null;
         $scope.tempAlert(kettle);
         //start the heating element
-        if(kettle.heater.on===true && !kettle.heater.running){
-          BrewService.heat(kettle.heater.pin,0).then(function(){
-            kettle.heater.running = new Date();
-          },function(err){
-            //failed to start
-          });
-        }
+        // if(kettle.heater.on===true && !kettle.heater.running){
+        //   BrewService.heat(kettle.heater.pin,0).then(function(){
+        //     kettle.heater.running = new Date();
+        //   },function(err){
+        //     //failed to start
+        //   });
+        // }
       } else {
         kettle.temp.hit=new Date();//set the time the target was hit so we can now start alerts
         kettle.low=null;
         kettle.high=null;
         //stop the heating element
-        if(kettle.heater.on===true && kettle.heater.running){
-          BrewService.heat(kettle.heater.pin,1).then(function(){
-            kettle.heater.running = null;
-          },function(err){
-            //failed to stop
-          });
-        }
+        // if(kettle.heater.on===true && kettle.heater.running){
+        //   BrewService.heat(kettle.heater.pin,1).then(function(){
+        //     kettle.heater.running = null;
+        //   },function(err){
+        //     //failed to stop
+        //   });
+        // }
       }
     }
   };
@@ -129,7 +132,8 @@ $scope.kettles = BrewService.settings('kettles') || [{
           key: 'New Kettle'
           ,pin: $scope.kettles.length
           ,active: false
-          ,heater: {pin:5,on:false,running:false}
+          ,heater: {pin:6,state:0}
+          ,pump: {pin:7,state:0}
           ,temp: {hit:false,current:0,target:200,diff:5}
           ,volume: 5
           ,values: []
@@ -138,10 +142,41 @@ $scope.kettles = BrewService.settings('kettles') || [{
     }
   };
 
+  $scope.toggleKettle = function(item,kettle){
+
+    var k = kettle.heater;
+    if(item == 'pump'){
+      k = kettle.pump;
+    }
+    k.state++;
+
+    if(k.state==3)
+      k.state=0;
+
+    // 0 = off
+    // 1 = active
+    // 2 = running
+
+    //start the digital port
+    if(kettle.active && k.state==2){
+      BrewService.digital(k.pin,0).then(function(){
+        //started
+      },function(err){
+        //failed to start
+      });
+    } else if(k.state==0){
+      BrewService.digital(k.pin,1).then(function(){
+        //stopped
+      },function(err){
+        //failed to stop
+      });
+    }
+  };
+
   $scope.startStopKettle = function(kettle){
       kettle.active = !kettle.active;
       //stop the heating element
-      if(!kettle.active && kettle.heater.running){
+      if(!kettle.active && kettle.heater.state==2){
         BrewService.heat(kettle.heater.pin,1).then(function(){
           kettle.heater.running = null;
           kettle.heater.on = false;
@@ -149,14 +184,10 @@ $scope.kettles = BrewService.settings('kettles') || [{
           //failed to stop
         });
       }
-  };
-
-  $scope.startStopKettleHeat = function(kettle){
-      kettle.heater.on = !kettle.heater.on;
-      //stop the heating element
-      if(!kettle.heater.on && kettle.heater.running){
-        BrewService.heat(kettle.heater.pin,1).then(function(){
-          kettle.heater.running = null;
+      if(!kettle.active && kettle.pump.state==2){
+        BrewService.heat(kettle.pump.pin,1).then(function(){
+          kettle.pump.running = null;
+          kettle.pump.on = false;
         },function(err){
           //failed to stop
         });

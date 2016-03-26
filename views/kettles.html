@@ -11,21 +11,28 @@
             <li ng-repeat="p in [0,1,2,3,4,5] track by $index"><a href="#" ng-click="kettle.pin=p" ng-if="p != kettle.pin">A{{p}}</a></li>
           </ul>
         </div>
-        <br/>Heat
-        <div class="btn-group">
-          <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            D{{kettle.heater.pin}} <span class="caret"></span>
-          </button>
-          <ul class="dropdown-menu">
-            <li ng-repeat="p in [2,3,4,5,6,7,8,9,10,11,12,13] track by $index"><a href="#" ng-click="kettle.heater.pin=p" ng-if="p != kettle.heater.pin">D{{p}}</a></li>
-          </ul>
+        <div class="digital">
+          <strong class="heat" ng-click="toggleKettle('heat',kettle)" ng-class="{'running':kettle.heater.state==2,'on':kettle.heater.state==1}">Heat</strong>
+          <div class="btn-group">
+            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              D{{kettle.heater.pin}} <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+              <li ng-repeat="p in [2,3,4,5,6,7,8,9,10,11,12,13] track by $index"><a href="#" ng-click="kettle.heater.pin=p" ng-if="p != kettle.heater.pin">D{{p}}</a></li>
+            </ul>
+          </div>
+          <strong class="pump" ng-click="toggleKettle('pump',kettle)" ng-class="{'running':kettle.pump.state==2,'on':kettle.pump.state==1}">Pump</strong>
+          <div class="btn-group">
+            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              D{{kettle.pump.pin}} <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+              <li ng-repeat="p in [2,3,4,5,6,7,8,9,10,11,12,13] track by $index"><a href="#" ng-click="kettle.pump.pin=p" ng-if="p != kettle.pump.pin">D{{p}}</a></li>
+            </ul>
+          </div>
         </div>
       </div>
       <div ng-show="!showRemoveKettle" class="right">
-        <span class="fa-stack fa-2x" ng-click="startStopKettleHeat(kettle)">
-          <i class="fa fa-sun-o fa-stack-2x" ng-class="{'fa-spin':kettle.heater.running}"></i>
-          <i class="fa fa-stack-1x" ng-class="{'fa-fire on':kettle.heater.on,'fa-fire off':!kettle.heater.on}"></i>
-        </span>
         <i class="fa fa-4x" ng-click="startStopKettle(kettle)" ng-class="{'fa-stop-circle':kettle.active,'fa-play-circle':!kettle.active}"></i>
       </div>
       <div ng-show="showRemoveKettle" class="remove right"><button class="btn btn-danger" ng-click="showRemoveKettle=false;kettles.splice($index,1)">Remove Kettle</button></div>

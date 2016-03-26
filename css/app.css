@@ -64,6 +64,11 @@ body { padding-top: 70px; }
   display: table-cell;
 }
 
+.panel-heading .left .digital{
+  padding-top: 5px;
+  cursor: pointer;
+}
+
 .panel-heading strong{
   font-size: 16px;
 }
@@ -191,78 +196,10 @@ input[type=radio].with-font:checked + label:before {
     width: 35px: 5px;
 }
 
-/* modified from https://github.com/aus/led.css */
-
-.led {
-    margin-right: .88em;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background-color: rgba(255, 255, 255, 0.25);
-    box-shadow: #000 0 -1px 6px 1px;
-    position: relative;
-    display: inline-block;
+.digital .heat.running, .digital .pump.running{
+  color: #d9534f;
 }
 
-.led.blink{
-  animation: blink 1s step-start 0s infinite;
-  -webkit-animation: blink 1s step-start 0s infinite;
-}
-
-.led.last {
-  margin:0;
-}
-
-.led-red {
-    background-color: #F00;
-    box-shadow: #000 0 -1px 6px 1px, inset #600 0 -1px 8px, #F00 0 3px 11px;
-}
-
-.led-orange {
-    background-color: #FF7000;
-    box-shadow: #000 0 -1px 6px 1px, inset #630 0 -1px 8px, #FF7000 0 3px 11px;
-}
-
-.led-yellow {
-    background-color: #FF0;
-    box-shadow: #000 0 -1px 6px 1px, inset #660 0 -1px 8px, #FF0 0 3px 11px;
-}
-
-.led-green {
-    background-color: #80FF00;
-    box-shadow: #000 0 -1px 6px 1px, inset #460 0 -1px 8px, #80FF00 0 3px 11px;
-}
-
-.led-blue {
-    background-color: #06F;
-    box-shadow: #000 0 -1px 6px 1px, inset #006 0 -1px 8px, #06F 0 3px 11px;
-}
-
-@keyframes blink {
-  0% {
-    opacity: 1.0;
-  }
-  30% {
-    opacity: 0.5;
-  }
-  70% {
-    opacity: 0.0;
-  }
-  100% {
-    opacity: 1.0;
-  }
-}
-@-webkit-keyframes blink {
-  0% {
-    opacity: 1.0;
-  }
-  30% {
-    opacity: 0.5;
-  }
-  70% {
-    opacity: 0.0;
-  }
-  100% {
-    opacity: 1.0;
-  }
+.digital .heat.on, .digital .pump.on{
+  color: #5cb85c;
 }

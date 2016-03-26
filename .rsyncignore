@@ -11,3 +11,4 @@ README.md
 *.git
 .rsyncignore
 brewbench-wiredup.jpg
+*.fzz

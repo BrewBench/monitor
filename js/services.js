@@ -57,9 +57,9 @@ brewBench.factory('BrewService', function($http, $q, $filter){
     // read/write heater
     // http://arduinotronics.blogspot.com/2013/01/working-with-sainsmart-5v-relay-board.html
     // http://myhowtosandprojects.blogspot.com/2014/02/sainsmart-2-channel-5v-relay-arduino.html
-    heat: function(sensor,value){
+    digital: function(sensor,value){
       var q = $q.defer();
-      var url = this.domain()+'/arduino/heat/'+sensor+'/'+value;
+      var url = this.domain()+'/arduino/digital/'+sensor+'/'+value;
 
       $http.get(url,{timeout:10000}).then(function(response){
         q.resolve(response.data);

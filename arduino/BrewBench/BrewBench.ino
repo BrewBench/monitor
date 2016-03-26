@@ -33,15 +33,15 @@ void process(BridgeClient client) {
   client.println("Connection: close");
   client.println();
 
-  if (command == "heat") {
-    heatCommand(client);
+  if (command == "digital") {
+    digitalCommand(client);
   }
   if (command == "temp") {
     tempCommand(client);
-  }  
+  }
 }
 
-void heatCommand(BridgeClient client) {
+void digitalCommand(BridgeClient client) {
   int pin, value;
   pin = client.parseInt();
 
@@ -52,7 +52,7 @@ void heatCommand(BridgeClient client) {
     if(value == 1)
       digitalWrite(pin, HIGH);//turn on relay
     else
-      digitalWrite(pin, LOW);//turn off relay  
+      digitalWrite(pin, LOW);//turn off relay
   }
   else {
     value = digitalRead(pin);
@@ -119,7 +119,7 @@ void tempCommand(BridgeClient client) {
 }
 
 void setup() {
-  
+
   Bridge.begin();
   server.listenOnLocalhost();
   server.begin();
