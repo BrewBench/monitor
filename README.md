@@ -20,9 +20,13 @@ cd brewbench
 
 ## Deployment
 
-There are two options here, you can either run the code on your Arduino or on a webserver.
+There are three options here, you can either run the code on your Arduino or on a webserver.
 
-### 1. Arduino Deployment
+### 1. AVT Hosted
+
+Once you have uploaded the sketch simply use: [brewbench.andrewvantassel.com](http://brewbench.andrewvantassel.com)
+
+### 2. Arduino Deployment
 
 The Arduino has a built in webserver running in ```/www/```.
 
@@ -39,9 +43,12 @@ rsync -rav -e ssh --delete --exclude-from '.rsyncignore' ./ root@arduino.local:/
 
 * [http://arduino.local/brewbench/](http://arduino.local/brewbench/)
 
-### 2.  Webserver Deployment
+### 3.  Webserver Deployment
 
-If you have Apache setup copy the code to
+```
+npm install -g live-server
+live-server
+```
 
 * [http://localhost/brewbench/](http://localhost/brewbench/)
 
