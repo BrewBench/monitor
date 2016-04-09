@@ -197,6 +197,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
 
     k.running=!k.running;
 
+    console.log(k)
     //start the digital port
     if(kettle.active && k.running){
       BrewService.digital(k.pin,0).then(function(){
@@ -204,7 +205,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
       },function(err){
         //failed to start
       });
-    } else if(k.state==0){
+    } else if(!k.running){
       BrewService.digital(k.pin,1).then(function(){
         //stopped
       },function(err){

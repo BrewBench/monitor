@@ -12,7 +12,7 @@ See [Thermistor](https://learn.adafruit.com/thermistor/using-a-thermistor) for w
 * Enable the REST API (see [ArduinoYun](https://www.arduino.cc/en/Guide/ArduinoYun#toc5))
 * Upload the [Arduino sketch](arduino/BrewBench/BrewBench.ino)
 
-```
+```sh
 # get the web code
 git clone https://github.com/avantassel/brewbench
 cd brewbench
@@ -28,9 +28,9 @@ Once you have uploaded the sketch simply use: [brewbench.andrewvantassel.com](ht
 
 ### 2. Arduino Deployment
 
-The Arduino has a built in webserver running in ```/www/```.
+The Arduino has a built in webserver running in `/www/`.
 
-```
+```sh
 # Add rsync to your Arduino
 ssh root@arduino.local
 opkg update
@@ -45,8 +45,8 @@ rsync -rav -e ssh --delete --exclude-from '.rsyncignore' ./ root@arduino.local:/
 
 ### 3.  Webserver Deployment
 
-```
-npm install -g live-server
+```sh
+npm install
 live-server
 ```
 
@@ -54,9 +54,9 @@ live-server
 
 ## Development
 
-For development just run ```npm install```, and look at [index.html](index.html) for un-commenting the un-minified files.
+For development just run `npm install`, and look at [index.html](index.html) for un-commenting the un-minified files.
 
-```
+```sh
 npm install
 gulp
 ```
