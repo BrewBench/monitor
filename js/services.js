@@ -93,7 +93,7 @@ brewBench.factory('BrewService', function($http, $q, $filter){
                   bottom: 100,
                   left: 65
               },
-              x: function(d){ return d[0]; },
+              x: function(d){ return d[0] || d; },
               y: function(d){ return d[1]; },
               // average: function(d) { return d.mean },
 

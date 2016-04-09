@@ -51,15 +51,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
     ,values: []
   }];
 
-  // Option to add alerts for mash schedule?
-  // $scope.mashTemps = {
-  //   doughIn:
-  //   protein:
-  //   steep:
-  //   boil:
-  // };
-
-  // check if pumps are running
+  // check if pump or heater are running
   $scope.init = function(){
     for(k in $scope.kettles){
         BrewService.digitalRead($scope.kettles[k].heater.pin).then(function(response){
@@ -148,21 +140,6 @@ $scope.kettles = BrewService.settings('kettles') || [{
         kettle.temp.hit=new Date();//set the time the target was hit so we can now start alerts
         kettle.low=null;
         kettle.high=null;
-        //stop the heating element
-        if(kettle.heater.auto && kettle.heater.running){
-          BrewService.digital(kettle.heater.pin,1).then(function(){
-            kettle.heater.running = false;
-          },function(err){
-            //failed to stop
-          });
-        }
-        if(kettle.pump.auto && kettle.pump.running){
-          BrewService.digital(kettle.pump.pin,1).then(function(){
-            kettle.pump.running = false;
-          },function(err){
-            //failed to stop
-          });
-        }
       }
     }
   };
@@ -197,7 +174,6 @@ $scope.kettles = BrewService.settings('kettles') || [{
 
     k.running=!k.running;
 
-    console.log(k)
     //start the digital port
     if(kettle.active && k.running){
       BrewService.digital(k.pin,0).then(function(){
@@ -266,8 +242,12 @@ $scope.kettles = BrewService.settings('kettles') || [{
 
       if(kettle && kettle.high)
         message = 'Your '+kettle.key+' kettle is '+kettle.high+' degrees too hot';
-      else if(kettle && kettle.low)
+      else if(kettle && kettle.low){
+        //don't alert if the heater is running and temp is too low
+        if(kettle.heater.running)
+          return;
         message = 'Your '+kettle.key+' kettle is '+kettle.low+' degrees too cold';
+      }
       else if(!kettle)
         message = 'Testing Alerts, you are ready to go, click play on a kettle.';
 
@@ -382,4 +362,5 @@ $scope.kettles = BrewService.settings('kettles') || [{
   $scope.$watch('kettles',function(newValue,oldValue){
     BrewService.settings('kettles',newValue);
   },true);
+
 });
