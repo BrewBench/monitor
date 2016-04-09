@@ -232,6 +232,9 @@ $scope.kettles = BrewService.settings('kettles') || [{
 
     // Sound Notification
     if($scope.settings.sound===true){
+      //don't alert if the heater is running and temp is too low
+      if(kettle && kettle.low && kettle.heater.running)
+        return;
       var snd = new Audio("audio/error.mp3"); // buffers automatically when created
       snd.play();
     }
@@ -240,12 +243,13 @@ $scope.kettles = BrewService.settings('kettles') || [{
     if ($scope.settings.notifications===true && "Notification" in window) {
       var message, icon = 'img/brewbench-logo-45.png';
 
+      //don't alert if the heater is running and temp is too low
+      if(kettle && kettle.low && kettle.heater.running)
+        return;
+
       if(kettle && kettle.high)
         message = 'Your '+kettle.key+' kettle is '+kettle.high+' degrees too hot';
       else if(kettle && kettle.low){
-        //don't alert if the heater is running and temp is too low
-        if(kettle.heater.running)
-          return;
         message = 'Your '+kettle.key+' kettle is '+kettle.low+' degrees too cold';
       }
       else if(!kettle)
