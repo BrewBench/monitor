@@ -23,7 +23,7 @@
               </ul>
             </div>
             <br/>
-            <span class="label" ng-class="{'label-default':!kettle.heater.running&&!kettle.heater.auto,'label-success':kettle.heater.running,'label-warning':!kettle.pump.running&&kettle.heater.auto}" ng-click="toggleKettle('heat',kettle)">{{kettle.heater.running ? 'On' : (kettle.heater.auto ? 'Wait' :'Off')}}</span>
+            <span class="label" ng-class="{'label-default':!kettle.heater.running&&!kettle.heater.auto,'label-success':kettle.heater.running,'label-warning':!kettle.heater.running&&kettle.heater.auto}" ng-click="toggleKettle('heat',kettle)">{{kettle.heater.running ? 'On' : (kettle.heater.auto ? 'Wait' :'Off')}}</span>
             <span class="label" ng-class="{'label-default':!kettle.heater.auto,'label-success':kettle.heater.auto}" ng-click="kettle.heater.auto=!kettle.heater.auto">Auto</span>
           </div>
           <div class="item col-md-6 col-xs-6">

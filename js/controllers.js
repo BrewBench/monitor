@@ -248,16 +248,6 @@ $scope.kettles = BrewService.settings('kettles') || [{
 
     // Txt or Email Notification?
 
-    // Arduino Notification
-    // BrewService.blink(13).then(function(){
-    //   //success
-    // },function(err){
-    //   if(err.statusText)
-    //     alert(err.statusText);
-    //   else if(err.status===0)
-    //     alert('We could not connect to your Arduino, make sure you are on the same WiFi');
-    // });
-
     // Mobile Vibrate Notification
     if ("vibrate" in navigator) {
       navigator.vibrate([500, 300, 500]);
@@ -270,7 +260,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
     }
 
     // Desktop Notification
-    if ($scope.settings.notifications && "Notification" in window) {
+    if ($scope.settings.notifications===true && "Notification" in window) {
       var message, icon = 'img/brewbench-logo-45.png';
 
       if(kettle && kettle.high)
