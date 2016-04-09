@@ -69,6 +69,18 @@ brewBench.factory('BrewService', function($http, $q, $filter){
       return q.promise;
     },
 
+    digitalRead: function(sensor){
+      var q = $q.defer();
+      var url = this.domain()+'/arduino/digital/'+sensor;
+
+      $http.get(url,{timeout:10000}).then(function(response){
+        q.resolve(response.data);
+      },function(err){
+        q.reject(err);
+      });
+      return q.promise;
+    },
+
     chartOptions: function(){
       return {
         chart: {

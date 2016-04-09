@@ -59,6 +59,28 @@ $scope.kettles = BrewService.settings('kettles') || [{
   //   boil:
   // };
 
+  // check if pumps are running
+  $scope.init = function(){
+    for(k in $scope.kettles){
+        BrewService.digitalRead($scope.kettles[k].heater.pin).then(function(response){
+          if(response.value=="0"){
+            $scope.kettles[k].active = true;
+            $scope.kettles[k].heater.running = true;
+          }
+        },function(err){
+          //failed to stop
+        });
+        BrewService.digitalRead($scope.kettles[k].pump.pin).then(function(response){
+          if(response.value=="0"){
+            $scope.kettles[k].active = true;
+            $scope.kettles[k].pump.running = true;
+          }
+        },function(err){
+          //failed to stop
+        });
+      }
+  };
+
   function updateTemp(response){
     $scope.error_message = '';
     if(response && response.temp){
@@ -208,6 +230,10 @@ $scope.kettles = BrewService.settings('kettles') || [{
           //failed to stop
         });
       }
+      if(!kettle.active){
+        kettle.pump.auto=false;
+        kettle.heater.auto=false;
+      }
   };
 
   $scope.clearKettles = function(){
@@ -275,10 +301,6 @@ $scope.kettles = BrewService.settings('kettles') || [{
     }
   };
 
-  $scope.tempCheck = function(kettle){
-
-  };
-
   $scope.changeUnits = function(unit){
     for(k in $scope.kettles){
       $scope.kettles[k].temp.current = $filter('formatDegrees')($scope.kettles[k].temp.current,unit);
@@ -321,7 +343,10 @@ $scope.kettles = BrewService.settings('kettles') || [{
     //only process active sensors
     for(k in $scope.kettles){
       if($scope.kettles[k].active){
-        allSensors.push(BrewService.temp($scope.kettles[k].pin).then(updateTemp,function error(err){ $scope.error_message='Could not connect to Arduino!'; }));
+        allSensors.push(BrewService.temp($scope.kettles[k].pin).then(updateTemp
+          ,function error(err){
+            $scope.error_message='Could not connect to the Arduino at '+BrewService.domain();
+          }));
       }
     }
 
@@ -348,6 +373,8 @@ $scope.kettles = BrewService.settings('kettles') || [{
   $scope.processTemps();
 
   $scope.tempAlert();
+
+  $scope.init();
 
   //timer check
   for(k in $scope.kettles){

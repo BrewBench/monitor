@@ -43,6 +43,7 @@ brewBench.filter('moment', function() {
         element.bind('keypress', function(e) {
             if (e.charCode === 13 || e.keyCode ===13 ) {
               scope.$apply(attrs.ngEnter);
+              scope.init();
             }
         });
     };

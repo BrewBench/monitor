@@ -48,7 +48,7 @@ body { padding-top: 70px; }
 }
 
 .panel-heading{
-  height: 116px;
+  height: 130px;
   display: flex;
 }
 
@@ -66,6 +66,10 @@ body { padding-top: 70px; }
 
 .panel-heading .left .digital{
   padding-top: 5px;
+}
+
+.panel-heading .left .digital .btn-group{
+  padding-bottom: 7px;
 }
 
 .panel-heading strong{
