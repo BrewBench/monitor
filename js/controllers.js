@@ -112,6 +112,17 @@ $scope.kettles = BrewService.settings('kettles') || [{
         },function(err){
           //failed to stop
         });
+        //check timers for running
+        // if(!!$scope.kettles[k].timers && $scope.kettles[k].timers.length){
+        //   for(timer in $scope.kettles[k].timers){
+        //     console.log($scope.kettles[k].timers[timer])
+        //     if($scope.kettles[k].timers[timer].running){
+        //       $scope.timerStart($scope.kettles[k].timers[timer]);
+        //     } else if($scope.kettles[k].timers[timer].up && $scope.kettles[k].timers[timer].up.running){
+        //       $scope.timerStart($scope.kettles[k].timers[timer].up);
+        //     }
+        //   }
+        // }
         $scope.updateKnobCopy($scope.kettles[k]);
       }
   };
@@ -376,22 +387,35 @@ $scope.kettles = BrewService.settings('kettles') || [{
   $scope.timerRun = function(timer){
     timer.interval = $interval(function () {
       //cancel interval if zero out
-      if(timer.min==0 && timer.sec==0){
+      if(!timer.up && timer.min==0 && timer.sec==0){
         $interval.cancel(timer.interval);
         $scope.alert(timer,'timer');
-      } else if(timer.sec > 0){
+        timer.up = {min:0,sec:0,running:true};
+        $scope.timerRun(timer);
+      } else if(!timer.up && timer.sec > 0){
         //count down seconds
         timer.sec--;
-      } else {
+      } else if(timer.up && timer.up.sec < 59){
+        //count down seconds
+        timer.up.sec++;
+      } else if(!timer.up){
         //cound down minutes and seconds
         timer.sec=59;
         timer.min--;
+      } else if(timer.up){
+        //cound down minutes and seconds
+        timer.up.sec=0;
+        timer.up.min++;
       }
     },1000);
   };
 
   $scope.timerStart = function(timer){
-    if(timer.running){
+    if(timer.up && timer.up.running){
+      //stop timer
+      timer.up.running=false;
+      $interval.cancel(timer.up.interval);
+    } else if(timer.running){
       //stop timer
       timer.running=false;
       $interval.cancel(timer.interval);

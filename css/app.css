@@ -82,8 +82,25 @@ body { padding-top: 70px; }
   width: 75px;
 }
 
-.kettles .timer{
+.kettles .timers .timer{
   padding-right: 15px;
+}
+
+.kettles .timers .count-up {
+  padding-right: 15px;
+  font-size: 22px;
+  color: rgba(200,47,47,1);
+  cursor: pointer;
+}
+
+.kettles .timers .timer-secs {
+  color: #777;
+  font-size: 16px;
+}
+
+.kettles .timers .timer-secs-up {
+  color: rgba(200,47,47,1);
+  font-size: 16px;
 }
 
 .kettles .temp-row{

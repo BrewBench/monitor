@@ -116,7 +116,7 @@ brewBench.factory('BrewService', function($http, $q, $filter){
               yAxis: {
                   axisLabel: 'Temperature',
                   tickFormat: function(d){
-                      return d;
+                      return d+'\u00B0';
                   },
                   orient: 'left',
                   showMaxMin: true,
