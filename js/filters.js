@@ -23,15 +23,16 @@ brewBench.filter('moment', function() {
 }).directive('editable', function() {
     return {
         restrict: 'E',
-        scope: {model: '='},
+        scope: {model: '=',type:'@?',change:'@?'},
         replace: false,
         template:
 '<span>'+
-    '<input type="text" ng-model="model" ng-show="edit" ng-enter="edit=false"></input>'+
+    '<input type="{{type}}" ng-model="model" ng-show="edit" ng-enter="edit=false" class="editable"></input>'+
         '<span ng-show="!edit">{{model}}</span>'+
 '</span>',
         link: function(scope, element, attrs) {
             scope.edit = false;
+            scope.type = !!scope.type ? scope.type : 'text';
             element.bind('click', function() {
                 scope.$apply(scope.edit = true);
                 // element.find('input').focus();
