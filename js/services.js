@@ -1,4 +1,4 @@
-brewBench.factory('BrewService', function($http, $q, $filter){
+brewBench.factory('BrewService', function($http, $q, $filter, MONGO_CONFIG){
 
   return {
 

@@ -22,4 +22,5 @@ var brewBench = angular.module('brewbench', [
      templateUrl: 'views/not-found.html'
    });
 
-});
+}.constant('MONGO_CONFIG', {url:'mongodb://brewbench:P2qGJmjNZm3X37hNz2XhuZCwNiATz@ds051655.mlab.com:51655/brewbench'});
+);

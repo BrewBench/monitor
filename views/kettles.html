@@ -76,10 +76,17 @@
         </div>
       </div>
       <div class="row">
-        <div class="col-md-8 col-xs-8">
-        </div>
-        <div class="col-md-4 col-xs-4">
-          <button class="btn btn-default" ng-click="addTimer(kettle)">Add Timer</button>
+        <div class="col-md-12 col-xs-12">
+          <div class="btn-group pull-right" role="group">
+            <button type="button" class="btn btn-default" ng-click="addTimer(kettle)">Add Timer</button>
+            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></button>
+            <ul class="dropdown-menu">
+              <li><a href="#" ng-click="addTimer(kettle,{label:'Whirlfloc',min:10})">Whirlfloc</a></li>
+              <li><a href="#" ng-click="addTimer(kettle,{label:'Hops',min:60})">Hops 60</a></li>
+              <li><a href="#" ng-click="addTimer(kettle,{label:'Hops',min:45})">Hops 45</a></li>
+              <li><a href="#" ng-click="addTimer(kettle,{label:'Hops',min:15})">Hops 15</a></li>
+            </ul>
+          </div>
         </div>
       </div>
       <div class="row timers">

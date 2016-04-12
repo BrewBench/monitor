@@ -1,0 +1,111 @@
+style,name,lovibond,gravity,description
+American,Black Barley,525°,1.023-1.027,Imparts dryness. Unmalted; use in porters and dry stouts.
+American,Black Patent Malt,500°,1.026,Provides color and sharp flavor in stouts and porters.
+American,Chocolate Malt,350°,1.034,"Use in all types to adjust color and add nutty, toasted flavor. Chocolate flavor."
+American,Crystal Malt,40°,1.033-1.035,"Sweet, mild caramel flavor and a golden color. Use in light lagers and light ales."
+American,Crystal Malt,90°,1.033-1.035,"Pronounced caramel flavor and a red color. For stouts, porters and black beers."
+American,Crystal Malt,60°,1.033-1.035,"Sweet caramel flavor, deep golden to red color. For dark amber and brown ales."
+American,Crystal Malt,30°,1.033-1.035,"Sweet, mild caramel flavor and a golden color. Use in light lagers and light ales."
+American,Crystal Malt,20°,1.033-1.035,"Sweet, mild caramel flavor and a golden color. Use in light lagers and light ales."
+American,Crystal Malt,120°,1.033-1.035,"Pronounced caramel flavor and a red color. For stouts, porters and black beers."
+American,Crystal Malt,10°,1.033-1.035,"Sweet, mild caramel flavor and a golden color. Use in light lagers and light ales."
+American,Crystal Malt,80°,1.033-1.035,"Sweet, smooth caramel flavor and a red to deep red color. For porters, old ales."
+American,Dextrin Malt (carapils),1.5°,1.033,"Balances body and flavor without adding color, aids in head retention. For any beer."
+American,Munich Malt,10°,1.034,"Sweet, toasted flavor and aroma. For Oktoberfests and malty styles."
+American,Pale Malt (Brewers 2-row),1.8°,1.037-1.038,"Smooth, less grainy, moderate malt flavor. Basic malt for all beer styles."
+American,Pale Malt (Brewers 6-row),1.8°,1.035,Moderate malt flavor. Basic malt for all beer styles.
+American,Roasted Barley,300°,1.025,"Sweet, grainy, coffee flavor and a red to deep brown color. For porters and stouts."
+American,Special Roast,50°,1.035,Provides a deep golden to brown color for ales. Use in all darker ales.
+American,Victory Malt,25°,1.034,"Provides a deep golden to brown color. Use in nut brown ales, IPAs and Scottish ales."
+American,Vienna Malt,3.5°-4°,1.035,"Increases malty flavor, provides balance. Use in Vienna, Märzen and Oktoberfest."
+American,Wheat Malt,2°,1.038,"Light flavor and creamy head. For American weizenbier, weissbier and dunkelweiss."
+American,White Wheat Malt,2°,1.037,"Imparts a malty flavor. For American wheat beers, wheat bock and doppel bock."
+Belgian,Aromatic Malt,20°-26°,1.036,"Imparts a big malt aroma. Use in brown ales, Belgian dubbels and tripels."
+Belgian,Belgian Pale Ale Malt,2.7°-3.8°,1.038,Use as a base malt for any Belgian style beer with full body.
+Belgian,Biscuit Malt,23°-25°,1.035,Warm baked biscuit flavor and aroma. Increases body. Use in Belgian beers.
+Belgian,Caramel Pils,6°-9°,1.03,"A very light crystal malt that lends body, smoother mouth-feel and foam stability."
+Belgian,Caramunich Malt,56°,1.033,"Caramel, full flavor, copper color. For Belgian ales, German smoked and bocks."
+Belgian,Caravienne Malt,21°-22°,1.034,Belgian light crystal malt. Used in lighter Abbey or Trappist style ales.
+Belgian,Chocolate Malt,300°-380°,1.03,Will add a deep red color and nutty/roasted taste.
+Belgian,De-Bittered Black Malt,500°-600°,1.03,Will add a deep black color without the astringent flavor of black malt.
+Belgian,Pale Wheat,1.2°-2°,1.038,Can be used in amounts of up to 70% of grist to create many wheat beer styles and aid in head retention in smaller amounts.
+Belgian,Pilsen Malt,1.5°,1.037,"Light color, malty flavor. For pilsners, dubbels, tripels, whites and specialty ales."
+Belgian,Roasted Wheat,10°-14°,1.036,"Slightly roasted wheat which imparts a bready, nut-like quality."
+Belgian,Special B Malt,130°-220°,1.03,Extreme caramel aroma and flavor. For dark Abbey beers and other dark beers.
+British,Amber Malt,35°,1.032,"Roasted malt used in British milds, old ales, brown ales, nut brown ales."
+British,Amber Malt,65°,1.032,"Imparts a dry, biscuit flavor. Use in porters, brown, nut brown and Belgian ales."
+British,Black Patent Malt,500°-600°,1.026,"Dry, burnt, chalky character. Use in porters, stouts, brown ales and dark lagers."
+British,Brown Malt,65°,1.032,"Imparts a dry, biscuit flavor. Use in porters, brown, nut brown and Belgian ales."
+British,Cara-Pils Dextrin,10°-14°,1.033,"Adds body; aids head retention. For porters, stouts and heavier bodied beers."
+British,Caramalt,30°-37°,NA,"Made from green malt, imparts a red hue and contributes to flavor and foam stability."
+British,Chocolate Malt,395°-475°,1.034,"Nutty, toasted flavor, brown color. Use in brown ales, porters, stouts and bocks."
+British,Crystal Malt,55°-60°,1.033-1.035,"Sweet caramel flavor, adds mouthfeel and head retention. For pale or amber ales."
+British,Dark Crystal Malt,145°-188°,1.033-1.035,"Sweet caramel flavor, mouthfeel. For porters, stouts, old ales and any dark ale."
+British,Lager Malt,1.6°,1.038,Used to make light colored and flavored lagers.
+British,Maris Otter Pale Malt,3°,1.038,Premium base malt for any beer. Good for pale ales.
+British,Mild Ale Malt,2.3°-2.7°,1.037,"Dry, nutty malty flavor. Promotes body. Use in English mild ales."
+British,Oat Malt,4°,1.034,"Enhances body and flavor. For winter beers, stouts, porters and other robust beers."
+British,Pale Ale,2.2°,1.038,Moderate malt flavor. Used to produce traditional English and Scottish style ales.
+British,Pale Chocolate Malt,180°-250°,1.034,"Less roasted than regular chocolate malt, adds color and mild chocolate/coffee flavors to porters, milds & stouts."
+British,Peat Smoked Malt,2.8°,1.034,Imparts a robust smoky flavor and aroma. For Scottish ales and wee heavies.
+British,Roasted Barley,500°,1.025,"Dry, roasted flavor, amber color. For stouts, porters and Scottish ales."
+British,Toasted Pale Malt,25°,1.038,Imparts nutty flavor and aroma. Use in IPAs and Scottish ales.
+British,Torrified Wheat,1°-1.5°,1.036,"Puffed wheat created by high heat. Use in pale ales, bitters and milds."
+British,Wheat Malt,2°,1.038,"Light flavor, creamy head. For wheat beers, stouts, doppelbocks and alt beers."
+German,Acidulated (Sauer) Malt,1.7°-2.8°,1.033,"High lactic acid. For lambics, sour mash beers, Irish stout, pilsners and wheats."
+German,Cara Wheat® Malt,38°-53°,1.035,"For dark ales, hefeweizen, dunkelweizen, wheat bocks and double bocks."
+German,CaraAmber® (crystal malt),23°-31°,1.033,"Adds aroma and color intensity to darker beers. For use in alts, bocks, stouts and porters."
+German,CaraAroma® (crystal malt),130°-170°,1.034,"Imparts a deep red color, adds body and malt aroma. For use in bocks, porters, stouts and ambers."
+German,Carafa I ®,300°-340°,1.038,"Gives deep aroma and color to dark beers, bocks, stout, alt and schwarzbier."
+German,Carafa II ®,375°-450°,1.038,"Carafa I, II and III also are available de-husked. Adds aroma, color and body."
+German,Carafa III ®,490°-560°,1.038,
+German,CaraFoam® (crystal malt),1.3°-2.3°,1.033,Improves head retention and body.
+German,CaraHell® (crystal malt),8°-12°,1.033-1.035,"For light colored beer for body; hefeweizen, pale ale, golden ale, Oktoberfest."
+German,CaraMunich Malt I ®,30°-38°,1.033-1.035,"Provides body. For Oktoberfest, bock, porter, stout, red, amber and brown ales."
+German,CaraMunich Malt II ®,42°-50°,1.033-1.035,
+German,CaraMunich Malt III ®,53°-60°,1.033-1.035,CaraMunich Malt III is dark crystal.
+German,CaraRed® (crystal malt),15°-20°,1.033,"Provides body and a deep red color for use in red ales, lagers, Scottish ales and alts."
+German,Chocolate Rye Malt,190°-300°,1.03,Enhances aroma of dark ales and improves color. For dunkel rye wheat and ale.
+German,Chocolate Wheat Malt,375°-450°,1.038,"Intensifies aroma; improves color. For dark ales, alt, dark wheat, stout and porter."
+German,Dark Munich Malt,8°-10°,1.034,"Enhances body and aroma. Stout, schwarzbier, brown ale, dark and amber ales."
+German,Kölsch Malt,4.5°,1.034,"Traditionally for Kölsch-style beers, can be used in a variety of German and American styled beers. Adds a light, sweet, biscuity flavor."
+German,Light Munich Malt,5°-6°,1.034,"For a desired malty, nutty flavor. Lagers, Oktoberfests and bock beer."
+German,Melanoidin Malt,23°-31°,1.033,"For amber lagers and ales, dark lagers and ales, Scottish & red ales."
+German,Rauch Smoked Malt,2°-4°,1.037,"For rauchbier, kellerbier, smoked porters, Scottish ales and barleywines."
+German,Rye Malt,2.8°-4.3°,1.029,"Dry character. Can use as a base malt. For seasonal beers, roggenbier and ales."
+German,Vienna Malt,3.2°-3.9°,1.035,"European lager malt kilned slightly more than Pilsner malt. Full bodied, golden color."
+German,Wheat Malt Dark,6°-8°,1.039,
+German,Wheat Malt Light,1.5°-2°,1.039,"Typical top fermented aroma, produces superb wheat beers."
+Other,Flaked Barley,1.5°,1.032,"Helps head retention, imparts creamy smoothness. For porters and stouts."
+Other,Flaked Maize,1°,1.037,Lightens body and color. For light American pilsners and ales.
+Other,Flaked Oats,1°,1.033,Adds body and creamy head. For stouts and oat ales.
+Other,Flaked Rye,2°,1.036,"Imparts a dry, crisp character. Use in rye beers."
+Other,Flaked Wheat,2°,1.036,"Imparts a wheat flavor, hazy color. For wheat and Belgian white beers."
+Other,Franco-Belges Kiln Coffee Malt,150°-180°,NA,A unique malt which imparts a coffee flavor.
+Other,Gambrinus Honey Malt,25°,1.034,"Nutty honey flavor. For brown ales, Belgian wheats, bocks and many other styles."
+Other,Grits,1°-1.5°,1.037,Imparts a corn/grain taste. Use in American lagers.
+Other,Irish Moss,NA,NA,Prevents chill haze. Use in all beers except cloudy wheat and white beers.
+Other,Malto Dextrin,NA,1.043,Adds body and mouthfeel. For all extract beers. Does not ferment.
+Other,Oak Chips,NA,NA,"Creates cask-conditioned flavor and aroma. Use in IPAs, Belgian ales and Scottish ales."
+Other,Scotmalt Golden Promise,2.4°,1.038,Scottish pale ale malt; base malt for all Scottish beers.
+Sugars,Belgian Candi Sugar (clear),0.5°,1.036,"Smooth taste, good head retention, sweet aroma and high gravity without being apparent. Use in Belgian and holiday ales. Use clear for tripels."
+Sugars,Brown Sugar,40°,1.046,"Imparts rich, sweet flavor. Use in Scottish ales, old ales and holiday beers."
+Sugars,Candi Sugar (amber),75°,1.036,"Smooth taste, good head retention, sweet aroma and high gravity without being apparent. Use in Belgian and holiday ales. Use amber for dubbels."
+Sugars,Candi Sugar (dark),275°,1.036,"Smooth taste, good head retention, sweet aroma and high gravity without being apparent. Use in Belgian and holiday ales. Use dark in brown beer and strong golden ales."
+Sugars,Corn Sugar,1°,1.037,Use in priming beer or in extract recipes where flaked maize would be used in a mash.
+Sugars,Dark Brown Sugar,60°,1.046,"Imparts rich, sweet flavor. Use in Scottish ales, old ales and holiday beers."
+Sugars,Demerara Sugar,1°,1.041-1.042,"Imparts mellow, sweet flavor. Use in English ales."
+Sugars,Dextrose (glucose),1°,1.037,Imparts a mild sweet taste and smoothness. Use in English beers.
+Sugars,Dry Malt Extract,Varies,1.044,"Extra light (2.5°), Light (3.5°), Amber (10°), Dark (30°), Wheat (3°)"
+Sugars,Honey,Varies,1.032,Imparts sweet and dry taste. For honey and brown ales. Also: specialty ales.
+Sugars,Invert Sugar,NA,1.046,Increases alcohol. Use in some Belgian or English ales. Use as an adjunct for priming. Made from sucrose. No dextrins. Use 1 cup for priming.
+Sugars,Lactose,NA,1.043,Adds sweetness and body. Use in sweet or milk stouts.
+Sugars,Licorice Stick,NA,NA,"Adds a smooth flavor to stouts, porters, holiday ales and flavored beers."
+Sugars,Lyle's Golden Syrup,0°,1.036,Increases alcohol without flavor. Liquid Invert Sugar. Use in English and Belgian (Chimay) ales.
+Sugars,Maple Sap,3°,1.009,"Crisp dry, earthy flavor. Use in pale ales, porters and maple ales."
+Sugars,Maple Syrup,35°,1.03,"Imparts a dry, woodsy flavor if used in the boil. If beer is bottled with it, it gives it a smooth sweet, maple taste. Use in maple ales, pale ales, brown ales and porters."
+Sugars,Molasses,80°,1.036,Imparts strong sweet flavor. Use in stouts and porters.
+Sugars,Rice Solids,0°,1.04,Lightens flavor without taste. Use in American and Asian lagers.
+Sugars,Sucrose (white table sugar),NA,1.046,Increases alcohol. Use in Australian lagers and English bitters.
+Sugars,Syrup Malt Extract,Varies,1.033-1.037,"Extra Light (3.5°), Light (3.5 -5°), Amber (10°), Dark (30°), Wheat (2°)."
+Sugars,Treacle,100°,1.036,"Imparts intense, sweet flavor. A British mixture of molasses, invert sugar and golden syrup (corn syrup). Use in dark English ales."

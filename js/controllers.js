@@ -73,7 +73,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
 
   $scope.addKettle = function(){
     if($scope.kettles.length < 5){
-      $scope.kettles.unshift(
+      $scope.kettles.push(
         {
           key: 'New Kettle'
           ,pin: $scope.kettles.length
@@ -204,12 +204,15 @@ $scope.kettles = BrewService.settings('kettles') || [{
     return 20+angular.element(document.getElementById('navbar'))[0].offsetHeight;
   };
 
-  $scope.addTimer = function(kettle){
+  $scope.addTimer = function(kettle,options){
     if(!kettle.timers)
       kettle.timers=[];
-    kettle.timers.push(
-      {label:'Edit label',min:60,sec:0,running:false}
-    );
+    if(options){
+      options.running = false;
+      kettle.timers.push(options);
+    } else {
+      kettle.timers.push({label:'Edit label',min:60,sec:0,running:false});
+    }
   };
 
   $scope.toggleKettle = function(item,kettle){
