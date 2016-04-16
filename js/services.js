@@ -83,7 +83,7 @@ brewBench.factory('BrewService', function($http, $q, $filter){
 
     grains: function(){
         var q = $q.defer();
-        $http.get('https://api.myjson.com/bins/4jzqc').then(function(response){
+        $http.get('/data/grains.json').then(function(response){
           q.resolve(response.data);
         },function(err){
           q.reject(err);
@@ -93,7 +93,7 @@ brewBench.factory('BrewService', function($http, $q, $filter){
 
     hops: function(){
         var q = $q.defer();
-        $http.get('https://api.myjson.com/bins/r16c').then(function(response){
+        $http.get('/data/hops.json').then(function(response){
           q.resolve(response.data);
         },function(err){
           q.reject(err);

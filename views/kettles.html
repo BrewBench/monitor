@@ -78,13 +78,22 @@
       <div class="row">
         <div class="col-md-12 col-xs-12">
           <div class="btn-group pull-right" role="group">
-            <button type="button" class="btn btn-default" ng-click="addTimer(kettle)">Add Timer</button>
+            <button type="button" class="btn btn-default" ng-click="addTimer(kettle)">Add Hop</button>
+            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></button>
+            <ul class="dropdown-menu">
+              <li ng-repeat="hop in hops">
+                <a href="#" ng-click="addTimer(kettle,{label:hop.name,min:30})">{{hop.name}}</a>
+              </li>
+            </ul>
+          </div>
+          <div class="btn-group pull-right" role="group">
+            <button type="button" class="btn btn-default" ng-click="addTimer(kettle)">Add Grain</button>
             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></button>
             <ul class="dropdown-menu">
               <li><a href="#" ng-click="addTimer(kettle,{label:'Whirlfloc',min:10})">Whirlfloc</a></li>
-              <li><a href="#" ng-click="addTimer(kettle,{label:'Hops',min:60})">Hops 60</a></li>
-              <li><a href="#" ng-click="addTimer(kettle,{label:'Hops',min:45})">Hops 45</a></li>
-              <li><a href="#" ng-click="addTimer(kettle,{label:'Hops',min:15})">Hops 15</a></li>
+              <li ng-repeat="grain in grains">
+                <a href="#" ng-click="addTimer(kettle,{label:grain.name,min:60})">{{grain.name}}</a>
+              </li>
             </ul>
           </div>
         </div>

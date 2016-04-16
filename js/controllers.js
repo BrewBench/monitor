@@ -3,8 +3,6 @@ brewBench.controller('mainCtrl', function($scope, $stateParams, $state, $filter,
 var notification = null
   ,resetChart = 100;//reset chart after 100 polls
 
-// BrewService.clear();
-
 $scope.chartOptions = BrewService.chartOptions();
 
 $scope.error_message = '';
@@ -91,10 +89,15 @@ $scope.kettles = BrewService.settings('kettles') || [{
 
   // check if pump or heater are running
   $scope.init = function(){
-    for(k in $scope.kettles){
+    BrewService.grains().then(function(response){
+      $scope.grains = _.sortBy(_.uniqBy(response,'name'),'name');
+    });
 
-        if(!$scope.kettles[k].knob)
-          BrewService.clear();
+    BrewService.hops().then(function(response){
+      $scope.hops = _.sortBy(_.uniqBy(response,'name'),'name');
+    });
+
+    for(k in $scope.kettles){
 
         BrewService.digitalRead($scope.kettles[k].heater.pin).then(function(response){
           if(response.value=="0"){
