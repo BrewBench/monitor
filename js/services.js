@@ -1,4 +1,4 @@
-brewBench.factory('BrewService', function($http, $q, $filter, MONGO_CONFIG){
+brewBench.factory('BrewService', function($http, $q, $filter){
 
   return {
 
@@ -79,6 +79,26 @@ brewBench.factory('BrewService', function($http, $q, $filter, MONGO_CONFIG){
         q.reject(err);
       });
       return q.promise;
+    },
+
+    grains: function(){
+        var q = $q.defer();
+        $http.get('https://api.myjson.com/bins/4jzqc').then(function(response){
+          q.resolve(response.data);
+        },function(err){
+          q.reject(err);
+        });
+        return q.promise;
+    },
+
+    hops: function(){
+        var q = $q.defer();
+        $http.get('https://api.myjson.com/bins/r16c').then(function(response){
+          q.resolve(response.data);
+        },function(err){
+          q.reject(err);
+        });
+        return q.promise;
     },
 
     chartOptions: function(){
