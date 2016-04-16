@@ -92,6 +92,10 @@ $scope.kettles = BrewService.settings('kettles') || [{
   // check if pump or heater are running
   $scope.init = function(){
     for(k in $scope.kettles){
+
+        if(!$scope.kettles[k].knob)
+          BrewService.clear();
+
         BrewService.digitalRead($scope.kettles[k].heater.pin).then(function(response){
           if(response.value=="0"){
             $scope.kettles[k].active = true;
