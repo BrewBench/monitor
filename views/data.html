@@ -31,7 +31,7 @@
         <img src="img/grain.svg" class="pull-right" width="55"/>
       </div>
       <div class="modal-body">
-        <input ng-model="searchGrains" placeholder="Search Hops">
+        <input ng-model="searchGrains" placeholder="Search Grains">
         <table class="table table-hover">
           <tr ng-repeat="grain in grains | filter:searchGrains">
             <td>{{grain.name}}</td>
