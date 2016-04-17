@@ -1,0 +1,46 @@
+<!-- Modal -->
+<div class="modal fade" id="dataModal-hops" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+        <h1 class="modal-title">Hops</h1>
+        <img src="img/hop.svg" class="pull-right" width="55"/>
+      </div>
+      <div class="modal-body">
+        <input ng-model="searchHops" placeholder="Search Hops">
+        <table class="table table-hover">
+          <tr ng-repeat="hop in hops | filter:searchHops">
+            <td>{{hop.name}}</td>
+            <td>{{hop.alpha_acid}}</td>
+            <td>{{hop.substitutions}}</td>
+            <td>{{hop.description}}</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="dataModal-grains" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+        <h1 class="modal-title">Grains</h1>
+        <img src="img/grain.svg" class="pull-right" width="55"/>
+      </div>
+      <div class="modal-body">
+        <input ng-model="searchGrains" placeholder="Search Hops">
+        <table class="table table-hover">
+          <tr ng-repeat="grain in grains | filter:searchGrains">
+            <td>{{grain.name}}</td>
+            <td>{{grain.lovibond}}</td>
+            <td>{{grain.gravity}}</td>
+            <td>{{grain.description}}</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

@@ -10,6 +10,10 @@
         <li class="active"><a href="#" data-toggle="modal" data-target="#aboutModal">BrewBench</a></li>
       </ul>
       <ul class="nav navbar-nav">
+        <li><a href="#" data-toggle="modal" data-target="#dataModal-hops" class="modal-link"><img src="img/hop.svg" width="30"></a></li>
+        <li><a href="#" data-toggle="modal" data-target="#dataModal-grains" class="modal-link"><img src="img/grain.svg" width="30"></a></li>
+      </ul>
+      <ul class="nav navbar-nav">
         <li ng-repeat="kettle in kettles track by $index">
           <a href="#kettle{{$index}}" du-smooth-scroll duration="1000" offset="{{getNavOffset()}}" ng-if="kettle.active">{{kettle.key}} {{kettle.temp.current}}&deg;F</a>
         </li>

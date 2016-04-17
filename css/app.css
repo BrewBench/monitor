@@ -17,6 +17,12 @@ body { padding-top: 70px; }
   color: #ffffff;
 }
 
+.modal-link {
+  padding-top: 0!important;
+  padding-bottom: 0!important;
+  margin-top: 10px;
+}
+
 .navbar-inverse .navbar-collapse, .navbar-inverse .navbar-form{
   border-color: #008184;
 }
@@ -52,6 +58,11 @@ body { padding-top: 70px; }
   height: 130px;
 }
 
+.kettles .btn.add-timer {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
 .panel-heading .left{
   text-align: left;
   width: 66%;
@@ -76,7 +87,10 @@ body { padding-top: 70px; }
   font-size: 16px;
 }
 
-.settings input[type=number], .kettles input[type=number], .kettles .temp, .kettles .timer, .settings .poll{
+.settings input[type=number],
+.kettles input[type=number],
+.kettles .temp, .kettles .timer, .settings .poll
+ {
   font-size: 22px;
   color: #777;
   width: 75px;
@@ -115,7 +129,7 @@ body { padding-top: 70px; }
   margin: none;
 }
 
-.settings input[type=text]{
+.settings input[type=text], .modal input{
   font-size: 22px;
   color: #777;
   width: 100%;
