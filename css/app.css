@@ -50,6 +50,19 @@ body { padding-top: 70px; }
   display: flex;
 }
 
+.kettles .scrollable-menu {
+    height: auto;
+    max-height: 200px;
+    width: 250px;
+    overflow-x: hidden;
+}
+
+.kettles .scrollable-menu>li>a {
+  word-wrap: break-word;
+  word-break: break-word;
+  white-space: normal;
+}
+
 .kettles .panel {
   min-width: 390px;
 }

@@ -4,12 +4,17 @@
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
-        <h1 class="modal-title">Hops</h1>
-        <img src="img/hop.svg" class="pull-right" width="55"/>
+        <h1 class="modal-title"><img src="img/hop.svg" width="55"/> Hops</h1>
       </div>
       <div class="modal-body">
         <input ng-model="searchHops" placeholder="Search Hops">
         <table class="table table-hover">
+          <tr>
+            <th>Hop</th>
+            <th>Alpha Acid</th>
+            <th>Substitutions</th>
+            <th>Description</th>
+          </tr>
           <tr ng-repeat="hop in hops | filter:searchHops">
             <td>{{hop.name}}</td>
             <td>{{hop.alpha_acid}}</td>
@@ -27,12 +32,17 @@
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
-        <h1 class="modal-title">Grains</h1>
-        <img src="img/grain.svg" class="pull-right" width="55"/>
+        <h1 class="modal-title"><img src="img/grain.svg" width="55"/> Grains</h1>
       </div>
       <div class="modal-body">
         <input ng-model="searchGrains" placeholder="Search Grains">
         <table class="table table-hover">
+          <tr>
+            <th>Grain</th>
+            <th>Lovibond</th>
+            <th>Gravity</th>
+            <th>Description</th>
+          </tr>
           <tr ng-repeat="grain in grains | filter:searchGrains">
             <td>{{grain.name}}</td>
             <td>{{grain.lovibond}}</td>

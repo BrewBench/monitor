@@ -99,6 +99,10 @@ $scope.kettles = BrewService.settings('kettles') || [{
 
     for(k in $scope.kettles){
 
+        //update max
+        $scope.kettles[k].knob.max=$scope.kettles[k].temp['target']+$scope.kettles[k].temp['diff'];
+
+        //check if heater is running
         BrewService.digitalRead($scope.kettles[k].heater.pin).then(function(response){
           if(response.value=="0"){
             $scope.kettles[k].active = true;
@@ -109,6 +113,8 @@ $scope.kettles = BrewService.settings('kettles') || [{
         },function(err){
           //failed to stop
         });
+
+        //check if pump is running
         BrewService.digitalRead($scope.kettles[k].pump.pin).then(function(response){
           if(response.value=="0"){
             $scope.kettles[k].active = true;
@@ -142,7 +148,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
 
       //if kettle has been stopped since request started
       if(!kettle.active)
-        reutrn;
+        return;
 
       // temp response is in C
       if($scope.settings.unit=='F')
@@ -348,6 +354,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
   };
 
   $scope.updateKnobCopy = function(kettle){
+
     if(!kettle.active){
       kettle.knob.subText.text = 'not running';
       kettle.knob.trackColor = '#ddd';
@@ -463,14 +470,15 @@ $scope.kettles = BrewService.settings('kettles') || [{
 
   $scope.changeValue = function(kettle,field,up){
 
-    if(up){
-      $scope.kettles[kettle]['temp'][field]++;
-      $scope.kettles[kettle].knob.max++;
-    } else {
-      $scope.kettles[kettle]['temp'][field]--;
-      $scope.kettles[kettle].knob.min--
-    }
-    $scope.updateKnobCopy($scope.kettles[kettle]);
+    if(up)
+      kettle.temp[field]++;
+    else
+      kettle.temp[field]--;
+
+    //update max
+    kettle.knob.max=kettle.temp['target']+kettle.temp['diff'];
+
+    $scope.updateKnobCopy(kettle);
   };
 
   // App start logic

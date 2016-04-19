@@ -57,9 +57,9 @@
               <div class="col-md-12 col-xs-12">
                 <div class="btn-group pull-right" role="group">
                   <label class="adjust">Target</label>
-                  <button type="button" class="btn btn-default" style="width:62px;"><editable type="number" model="kettle.temp.target" change="updateKnobCopy(kettle)">{{kettle.temp.target}}</editable>&deg;{{settings.unit}}</button>
-                  <button type="button" class="btn btn-default" ng-click="changeValue($index,'target',false)"><i class="fa fa-minus fa-lg"></i></button>
-                  <button type="button" class="btn btn-default" ng-click="changeValue($index,'target',true)"><i class="fa fa-plus fa-lg"></i></button>
+                  <button type="button" class="btn btn-default" style="width:62px;"><editable type="number" model="kettle.temp.target">{{kettle.temp.target}}</editable>&deg;{{settings.unit}}</button>
+                  <button type="button" class="btn btn-default" ng-click="changeValue(kettle,'target',false)"><i class="fa fa-minus fa-lg"></i></button>
+                  <button type="button" class="btn btn-default" ng-click="changeValue(kettle,'target',true)"><i class="fa fa-plus fa-lg"></i></button>
                 </div>
               </div>
             </div>
@@ -67,9 +67,9 @@
               <div class="col-md-12 col-xs-12">
                 <div class="btn-group pull-right" role="group">
                   <label class="adjust">Diff</label>
-                  <button type="button" class="btn btn-default" style="width:62px;"><editable type="number" model="kettle.temp.diff" change="updateKnobCopy(kettle)">{{kettle.temp.diff}}</editable>&deg;{{settings.unit}}</button>
-                  <button type="button" class="btn btn-default" ng-click="changeValue($index,'diff',false)"><i class="fa fa-minus fa-lg"></i></button>
-                  <button type="button" class="btn btn-default" ng-click="changeValue($index,'diff',true)"><i class="fa fa-plus fa-lg"></i></button>
+                  <button type="button" class="btn btn-default" style="width:62px;"><editable type="number" model="kettle.temp.diff">{{kettle.temp.diff}}</editable>&deg;{{settings.unit}}</button>
+                  <button type="button" class="btn btn-default" ng-click="changeValue(kettle,'diff',false)"><i class="fa fa-minus fa-lg"></i></button>
+                  <button type="button" class="btn btn-default" ng-click="changeValue(kettle,'diff',true)"><i class="fa fa-plus fa-lg"></i></button>
                 </div>
               </div>
           </div>
@@ -80,7 +80,7 @@
           <div class="btn-group pull-right" role="group">
             <button type="button" class="btn btn-default add-timer" ng-click="addTimer(kettle)"><img src="img/grain.svg" width="32"></button>
             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></button>
-            <ul class="dropdown-menu">
+            <ul class="dropdown-menu scrollable-menu">
               <li><a href="#" ng-click="addTimer(kettle,{label:'Whirlfloc',min:10})">Whirlfloc</a></li>
               <li ng-repeat="grain in grains">
                 <a href="#" ng-click="addTimer(kettle,{label:grain.name,min:60})">{{grain.name}}</a>
@@ -90,7 +90,7 @@
           <div class="btn-group pull-right" role="group">
             <button type="button" class="btn btn-default add-timer" ng-click="addTimer(kettle)"><img src="img/hop.svg" width="32"></button>
             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></button>
-            <ul class="dropdown-menu">
+            <ul class="dropdown-menu scrollable-menu">
               <li ng-repeat="hop in hops">
                 <a href="#" ng-click="addTimer(kettle,{label:hop.name,min:30})">{{hop.name}}</a>
               </li>

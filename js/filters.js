@@ -23,7 +23,7 @@ brewBench.filter('moment', function() {
 }).directive('editable', function() {
     return {
         restrict: 'E',
-        scope: {model: '=',type:'@?',change:'@?'},
+        scope: {model: '=',type:'@?'},
         replace: false,
         template:
 '<span>'+
