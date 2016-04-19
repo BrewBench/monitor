@@ -101,6 +101,16 @@ brewBench.factory('BrewService', function($http, $q, $filter){
         return q.promise;
     },
 
+    lovibond: function(){
+        var q = $q.defer();
+        $http.get('/data/lovibond.json').then(function(response){
+          q.resolve(response.data);
+        },function(err){
+          q.reject(err);
+        });
+        return q.promise;
+    },
+
     chartOptions: function(){
       return {
         chart: {

@@ -23,6 +23,11 @@ body { padding-top: 70px; }
   margin-top: 10px;
 }
 
+.modal h1 sup{
+  color: #e5e5e5;
+  font-family: cursive;
+}
+
 .navbar-inverse .navbar-collapse, .navbar-inverse .navbar-form{
   border-color: #008184;
 }

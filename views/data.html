@@ -4,7 +4,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
-        <h1 class="modal-title"><img src="img/hop.svg" width="55"/> Hops</h1>
+        <h1 class="modal-title"><img src="img/hop.svg" width="55"/> Hop <sup>Reference</sup></h1>
       </div>
       <div class="modal-body">
         <input ng-model="searchHops" placeholder="Search Hops">
@@ -32,7 +32,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
-        <h1 class="modal-title"><img src="img/grain.svg" width="55"/> Grains</h1>
+        <h1 class="modal-title"><img src="img/grain.svg" width="55"/> Grain <sup>Reference</sup></h1>
       </div>
       <div class="modal-body">
         <input ng-model="searchGrains" placeholder="Search Grains">
@@ -47,7 +47,9 @@
             <td>{{grain.name}}</td>
             <td>{{grain.lovibond}}</td>
             <td>{{grain.gravity}}</td>
-            <td>{{grain.description}}</td>
+            <td>{{grain.description}}
+              <div style="float:right; clear: both; width:32px; height:32px; background-color: {{getLovibondColor(grain.lovibond)}}"></div>
+            </td>
           </tr>
         </table>
       </div>

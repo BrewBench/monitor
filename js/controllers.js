@@ -1,11 +1,34 @@
 brewBench.controller('mainCtrl', function($scope, $stateParams, $state, $filter, $timeout, $interval, $q, BrewService){
 
 var notification = null
-  ,resetChart = 100;//reset chart after 100 polls
+  ,resetChart = 100
+  ,timeout = null;//reset chart after 100 polls
+
+$scope.hops;
+$scope.grains;
+$scope.lovibond;
 
 $scope.chartOptions = BrewService.chartOptions();
 
 $scope.error_message = '';
+
+$scope.getLovibondColor = function(range){
+  range = range.replace(/°/g,'').replace(/ /g,'');
+  if(range.indexOf('-')!==-1){
+    var rArr=range.split('-');
+    range = (parseFloat(rArr[0])+parseFloat(rArr[1]))/2;
+  } else {
+    range = parseFloat(range);
+  }
+  if(!range)
+    return '';
+  var l = _.filter($scope.lovibond, function(item){
+    return (item.srm <= range) ? item.hex : '';
+  });
+  if(!!l.length)
+    return l[l.length-1].hex;
+  return '';
+};
 
 //default settings values
 $scope.settings = BrewService.settings('settings') || {
@@ -89,13 +112,23 @@ $scope.kettles = BrewService.settings('kettles') || [{
 
   // check if pump or heater are running
   $scope.init = function(){
-    BrewService.grains().then(function(response){
-      $scope.grains = _.sortBy(_.uniqBy(response,'name'),'name');
-    });
+    if(!$scope.grains){
+      BrewService.grains().then(function(response){
+        $scope.grains = _.sortBy(_.uniqBy(response,'name'),'name');
+      });
+    }
 
-    BrewService.hops().then(function(response){
-      $scope.hops = _.sortBy(_.uniqBy(response,'name'),'name');
-    });
+    if(!$scope.hops){
+      BrewService.hops().then(function(response){
+        $scope.hops = _.sortBy(_.uniqBy(response,'name'),'name');
+      });
+    }
+
+    if(!$scope.lovibond){
+      BrewService.lovibond().then(function(response){
+        $scope.lovibond = response;
+      });
+    }
 
     for(k in $scope.kettles){
 
@@ -470,15 +503,20 @@ $scope.kettles = BrewService.settings('kettles') || [{
 
   $scope.changeValue = function(kettle,field,up){
 
+    if(timeout)
+      $timeout.cancel(timeout);
+
     if(up)
       kettle.temp[field]++;
     else
       kettle.temp[field]--;
 
-    //update max
-    kettle.knob.max=kettle.temp['target']+kettle.temp['diff'];
-
-    $scope.updateKnobCopy(kettle);
+    //update knob after 1 seconds, otherwise we get a lot of refresh on the knob when clicking plus or minus
+    timeout = $timeout(function(){
+      //update max
+      kettle.knob.max=kettle.temp['target']+kettle.temp['diff'];
+      $scope.updateKnobCopy(kettle);
+    },1000);
   };
 
   // App start logic

@@ -24,7 +24,7 @@ There are three options here, you can either run the code on your Arduino or on 
 
 ### 1. AVT Hosted
 
-Once you have uploaded the sketch simply use: [brewbench.andrewvantassel.com](http://brewbench.andrewvantassel.com)
+Once you have uploaded the [sketch](arduino/BrewBench/BrewBench.ino), simply use: [brewbench.andrewvantassel.com](http://brewbench.andrewvantassel.com)
 
 ### 2. Arduino Deployment
 
@@ -65,13 +65,6 @@ gulp
 
 <img src="img/brewbench-wiredup.jpg?raw=true" alt="BrewBench wired up" align="center" />
 
-## TODO
-* Save settings to key/value data store on the Arduino
-* Load settings from key/value data store on the Arduino
-* Add option to post readings to a cloud based DB
-* Add option to poll cloud based DB instead of the Arduino
-* Add option to save readings to an SD card
-* Add option to load readings from an SD card
-* Add option to save a brew session
-* Add option to load a brew session
-* Add txt message alert option
+## Thanks
+* For the Lovibond Hex colors: http://brookstonbeerbulletin.com/thinking-about-beer-color
+* For the SVG hop and grain icons: https://thenounproject.com/dejv
