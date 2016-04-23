@@ -17,6 +17,22 @@ body { padding-top: 70px; }
   color: #ffffff;
 }
 
+#dataModal-hops .modal-body, #dataModal-grains .modal-body{
+  max-height: calc(100vh - 210px);
+    overflow-y: auto;
+}
+
+.modal-header .close {
+    margin-top: -13px;
+    color: #e5e5e5;
+    font-size: 35px;
+    opacity: 0.6;
+}
+
+.modal-header .close:hover {
+    opacity: 1;
+}
+
 .modal-link {
   padding-top: 0!important;
   padding-bottom: 0!important;
