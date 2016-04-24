@@ -1,9 +1,10 @@
 <div id="recipe" class="recipe col-md-12 col-xs-12">
   <div class="panel panel-default">
     <div class="panel-body">
-      <h3><editable model="settings.recipe.name"></editable></h3>
+      <h3><editable model="settings.recipe.name"></editable> <sup>{{settings.recipe.category}}</sup></h3>
       <ul>
         <li ng-repeat="yeast in settings.recipe.yeast">{{yeast.name}}</li>
+        <li>ABV: {{settings.recipe.abv}}%</li>
       </ul>
     </div>
   </div>

@@ -126,6 +126,15 @@ $scope.kettles = BrewService.settings('kettles') || [{
 
         if(!!jsonObj.Recipes.Data.Recipe.F_R_NAME)
           $scope.settings.recipe.name = jsonObj.Recipes.Data.Recipe.F_R_NAME;
+        if(!!jsonObj.Recipes.Data.Recipe.F_R_STYLE.F_S_CATEGORY)
+          $scope.settings.recipe.category = jsonObj.Recipes.Data.Recipe.F_R_STYLE.F_S_CATEGORY;
+
+        if(!!jsonObj.Recipes.Data.Recipe.F_R_STYLE.F_S_MAX_ABV && !!jsonObj.Recipes.Data.Recipe.F_R_STYLE.F_S_MIN_ABV)
+          $scope.settings.recipe.abv = parseFloat(jsonObj.Recipes.Data.Recipe.F_R_STYLE.F_S_MIN_ABV).toFixed(2)+'-'+parseFloat(jsonObj.Recipes.Data.Recipe.F_R_STYLE.F_S_MAX_ABV).toFixed(2);
+        else if(!!jsonObj.Recipes.Data.Recipe.F_R_STYLE.F_S_MAX_ABV)
+          $scope.settings.recipe.abv = parseFloat(jsonObj.Recipes.Data.Recipe.F_R_STYLE.F_S_MAX_ABV).toFixed(2);
+        else if(!!jsonObj.Recipes.Data.Recipe.F_R_STYLE.F_S_MIN_ABV)
+          $scope.settings.recipe.abv = parseFloat(jsonObj.Recipes.Data.Recipe.F_R_STYLE.F_S_MIN_ABV).toFixed(2);
 
         if(!!jsonObj.Recipes.Data.Recipe.Ingredients.Data.Grain){
           var kettle = _.filter($scope.kettles,{type:'grain'})[0];
@@ -140,6 +149,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
             });
           }
         }
+
         if(!!jsonObj.Recipes.Data.Recipe.Ingredients.Data.Hops){
           var kettle = _.filter($scope.kettles,{type:'hop'})[0];
           if(kettle){
