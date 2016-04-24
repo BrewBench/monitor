@@ -37,7 +37,7 @@ $scope.settings = BrewService.settings('settings') || {
   ,arduinoUrl: 'http://arduino.local'
   ,storage: 'sd'
   ,recipe: {name:'Brew Name (click to edit)',yeast:[]}
-  ,notifications: {on:true,slack:'Slack notification webhook Url'}
+  ,notifications: {on:true,timers:true,high:true,low:true,target:true,slack:'Slack notification webhook Url',last:''}
   ,sounds: {on:true,alert:'audio/bike.mp3',timer:'audio/school.mp3'}
 };
 
@@ -250,17 +250,18 @@ $scope.kettles = BrewService.settings('kettles') || [{
         },function(err){
           //failed to stop
         });
-        //check timers for running
-        // if(!!$scope.kettles[k].timers && $scope.kettles[k].timers.length){
-        //   for(timer in $scope.kettles[k].timers){
-        //     console.log($scope.kettles[k].timers[timer])
-        //     if($scope.kettles[k].timers[timer].running){
-        //       $scope.timerStart($scope.kettles[k].timers[timer]);
-        //     } else if($scope.kettles[k].timers[timer].up && $scope.kettles[k].timers[timer].up.running){
-        //       $scope.timerStart($scope.kettles[k].timers[timer].up);
-        //     }
-        //   }
-        // }
+        // check timers for running
+        if(!!$scope.kettles[k].timers && $scope.kettles[k].timers.length){
+          for(timer in $scope.kettles[k].timers){
+            if($scope.kettles[k].timers[timer].running){
+              $scope.kettles[k].timers[timer].running = false;
+              $scope.timerStart($scope.kettles[k].timers[timer]);
+            } else if($scope.kettles[k].timers[timer].up && $scope.kettles[k].timers[timer].up.running){
+              $scope.kettles[k].timers[timer].up.running = false;
+              $scope.timerStart($scope.kettles[k].timers[timer].up);
+            }
+          }
+        }
         $scope.updateKnobCopy($scope.kettles[k]);
       }
   };
@@ -334,6 +335,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
         }
       } else {
         kettle.temp.hit=new Date();//set the time the target was hit so we can now start alerts
+        $scope.alert(kettle);
       }
     }
   };
@@ -421,11 +423,47 @@ $scope.kettles = BrewService.settings('kettles') || [{
   $scope.alert = function(kettle,type){
 
     //don't start alerts until we have hit the temp.target
-    if(!type && kettle && !kettle.temp.hit){
+    if(!type && kettle && !kettle.temp.hit
+    || $scope.settings.notifications.on===false){
       return;
     }
 
-    // Txt or Email Notification?
+    // Desktop / Slack Notification
+    var message, icon = 'img/brewbench-logo-45.png', color = 'good';
+
+    //don't alert if the heater is running and temp is too low
+    if(kettle && kettle.low && kettle.heater.running)
+      return;
+
+    if(type && type=='timer'){ //kettle is a timer object
+      if(!$scope.settings.notifications.timers)
+        return;
+      message = 'Your '+kettle.label+' timer is up';
+    }
+    else if(kettle && kettle.high){
+      if(!$scope.settings.notifications.high || $scope.settings.notifications.last=='high')
+        return;
+      message = 'Your '+kettle.key+' kettle is '+kettle.high+'\u00B0 high';
+      color = 'danger';
+      $scope.settings.notifications.last='high';
+    }
+    else if(kettle && kettle.low){
+      if(!$scope.settings.notifications.low || $scope.settings.notifications.last=='low')
+        return;
+      message = 'Your '+kettle.key+' kettle is '+kettle.low+'\u00B0 low';
+      color = '#3498DB';
+      $scope.settings.notifications.last='low';
+    }
+    else if(kettle){
+      if(!$scope.settings.notifications.target || $scope.settings.notifications.last=='target')
+        return;
+      message = 'Your '+kettle.key+' kettle is within the target at '+kettle.temp.current+'\u00B0';
+      color = 'good';
+      $scope.settings.notifications.last='target';
+    }
+    else if(!kettle){
+      message = 'Testing Alerts, you are ready to go, click play on a kettle.';
+    }
 
     // Mobile Vibrate Notification
     if ("vibrate" in navigator) {
@@ -441,54 +479,32 @@ $scope.kettles = BrewService.settings('kettles') || [{
       snd.play();
     }
 
-    // Desktop / Slack Notification
-    if ($scope.settings.notifications.on===true) {
-      var message, icon = 'img/brewbench-logo-45.png', color = 'good';
+    // Window Notification
+    if("Notification" in window){
+      //close the previous notification
+      if(notification)
+        notification.close();
 
-      //don't alert if the heater is running and temp is too low
-      if(kettle && kettle.low && kettle.heater.running)
-        return;
-
-      if(type && type=='timer')//kettle is a timer object
-        message = 'Your '+kettle.label+' timer is up';
-      else if(kettle && kettle.high){
-        message = 'Your '+kettle.key+' kettle is '+kettle.high+'\u00B0 high';
-        color = 'danger';
-      }
-      else if(kettle && kettle.low){
-        message = 'Your '+kettle.key+' kettle is '+kettle.low+'\u00B0 low';
-        color = '#3498DB';
-      }
-      else if(!kettle)
-        message = 'Testing Alerts, you are ready to go, click play on a kettle.';
-
-      //Window Notification
-      if("Notification" in window){
-        //close the previous notification
-        if(notification)
-          notification.close();
-
-        if(Notification.permission === "granted"){
-          if(message){
-            notification = new Notification('BrewBench',{body:message,icon:icon});
-          }
-        } else if(Notification.permission !== 'denied'){
-          Notification.requestPermission(function (permission) {
-            // If the user accepts, let's create a notification
-            if (permission === "granted") {
-              if(message){
-                notification = new Notification('BrewBench',{body:message,icon:icon});
-              }
-            }
-          });
+      if(Notification.permission === "granted"){
+        if(message){
+          notification = new Notification('BrewBench',{body:message,icon:icon});
         }
-      }
-      //Slack Notification
-      if($scope.settings.notifications.slack.indexOf('http')!==-1){
-        BrewService.slack($scope.settings.notifications.slack,message,color).then(function(response){
-          // console.log('Slack',response);
+      } else if(Notification.permission !== 'denied'){
+        Notification.requestPermission(function (permission) {
+          // If the user accepts, let's create a notification
+          if (permission === "granted") {
+            if(message){
+              notification = new Notification('BrewBench',{body:message,icon:icon});
+            }
+          }
         });
       }
+    }
+    // Slack Notification
+    if($scope.settings.notifications.slack.indexOf('http')!==-1){
+      BrewService.slack($scope.settings.notifications.slack,message,color).then(function(response){
+        // console.log('Slack',response);
+      });
     }
   };
 
@@ -547,7 +563,9 @@ $scope.kettles = BrewService.settings('kettles') || [{
       $scope.kettles[k].temp.current = $filter('formatDegrees')($scope.kettles[k].temp.current,unit);
       $scope.kettles[k].temp.target = $filter('formatDegrees')($scope.kettles[k].temp.target,unit);
       $scope.kettles[k].temp.diff = $filter('formatDegrees')($scope.kettles[k].temp.diff,unit);
+      $scope.updateKnobCopy($scope.kettles[k]);
     }
+    $scope.chartOptions = BrewService.chartOptions(unit);
   };
 
   $scope.timerRun = function(timer){

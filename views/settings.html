@@ -5,23 +5,27 @@
         <h3>Settings</h3>
       </div>
       <div class="right row">
-        <div class="col-md-3 col-xs-3">
-          <input id="celsius" class="with-font" type="radio" ng-model="settings.unit" value="C" ng-click="changeUnits('C')"> <label for="celsius">&deg;C</label>
-        </div>
-        <div class="col-md-3 col-xs-3">
-          <input id="fahrenheit" class="with-font" type="radio" ng-model="settings.unit" value="F" ng-click="changeUnits('F')"> <label for="fahrenheit">&deg;F</label>
-        </div>
-        <div class="col-md-3 col-xs-3">
-          <span class="fa-stack fa-lg" ng-click="settings.sounds.on = !settings.sounds.on">
-            <i class="fa fa-volume-up fa-stack-1x"></i>
-            <i class="fa fa-ban fa-stack-2x text-danger" ng-show="!settings.sounds.on"></i>
-          </span>
-        </div>
-        <div class="col-md-3 col-xs-3">
-          <span class="fa-stack fa-lg" ng-click="settings.notifications.on = !settings.notifications.on">
-            <i class="fa fa-bell fa-stack-1x"></i>
-            <i class="fa fa-ban fa-stack-2x text-danger" ng-show="!settings.notifications.on"></i>
-          </span>
+        <div class="col-md-12 col-xs-12">
+
+          <input id="celsius" class="degree" type="radio" ng-model="settings.unit" value="C" ng-click="changeUnits('C')"> <label for="celsius">&deg;C</label>
+          <input id="fahrenheit" class="degree" type="radio" ng-model="settings.unit" value="F" ng-click="changeUnits('F')"> <label for="fahrenheit">&deg;F</label>
+
+          <div class="btn-group notifications" role="group">
+            <button type="button" class="btn btn-default" style="padding:0 5px 0 5px;" ng-click="settings.notifications.on = !settings.notifications.on">
+              <span class="fa-stack fa-lg" style="top: 3px;">
+                <i class="fa fa-bell fa-stack-1x"></i>
+                <i class="fa fa-ban fa-stack-2x text-danger" ng-show="!settings.notifications.on"></i>
+              </span>
+            </button>
+            <button type="button" class="btn btn-default dropdown-toggle" style="height: 44px;" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></button>
+            <ul class="dropdown-menu dropdown-menu-right">
+              <li><a href="#" ng-class="{'on':settings.sounds.on}" ng-click="settings.sounds.on = !settings.sounds.on">Sounds</a></li>
+              <li><a href="#" ng-class="{'on':settings.notifications.timers}" ng-click="settings.notifications.timers = !settings.notifications.timers">Timers</a></li>
+              <li><a href="#" ng-class="{'on':settings.notifications.high}" ng-click="settings.notifications.high = !settings.notifications.high">High</a></li>
+              <li><a href="#" ng-class="{'on':settings.notifications.low}" ng-click="settings.notifications.low = !settings.notifications.low">Low</a></li>
+              <li><a href="#" ng-class="{'on':settings.notifications.target}" ng-click="settings.notifications.target = !settings.notifications.target">Target</a></li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>

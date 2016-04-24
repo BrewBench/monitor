@@ -131,7 +131,7 @@ brewBench.factory('BrewService', function($http, $q, $filter){
         return q.promise;
     },
 
-    chartOptions: function(){
+    chartOptions: function(unit){
       return {
         chart: {
               type: 'lineChart',
@@ -162,7 +162,7 @@ brewBench.factory('BrewService', function($http, $q, $filter){
                   axisLabelDistance: 40,
                   staggerLabels: true
               },
-              forceY: [0,220],
+              forceY: (!unit || unit=='F') ? [0,220] : [-17,104],
               yAxis: {
                   axisLabel: 'Temperature',
                   tickFormat: function(d){

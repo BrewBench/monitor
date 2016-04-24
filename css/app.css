@@ -22,6 +22,10 @@ body { padding-top: 70px; }
   font-size: 16px;
 }
 
+.btn-link, .btn-link:hover{
+  color: #333;
+}
+
 #dataModal-hops .modal-body, #dataModal-grains .modal-body{
   max-height: calc(100vh - 185px);
     overflow-y: auto;
@@ -84,6 +88,18 @@ sup{
   display: flex;
 }
 
+.settings .panel-heading .left{
+  text-align: left;
+  width: 25%;
+  display: table-cell;
+}
+
+.settings .panel-heading .right{
+  text-align: right;
+  width: 83%;
+  display: table-cell;
+}
+
 .kettles .scrollable-menu {
     height: auto;
     max-height: 200px;
@@ -110,15 +126,15 @@ sup{
   padding-bottom: 0;
 }
 
-.panel-heading .left{
+.kettles .panel-heading .left{
   text-align: left;
   width: 66%;
   display: table-cell;
 }
 
-.panel-heading .right{
+.kettles .panel-heading .right{
   text-align: right;
-  width: 36%;
+  width: 34%;
   display: table-cell;
 }
 
@@ -244,7 +260,11 @@ label.notes {
     vertical-align: baseline;
 }
 
-input[type=radio].with-font {
+.degree label {
+  padding-right: 5px;
+}
+
+input[type=radio].degree {
     border: 0;
     clip: rect(0 0 0 0);
     height: 1px;
@@ -255,20 +275,30 @@ input[type=radio].with-font {
     width: 1px;
 }
 
-input[type=radio].with-font + label:before {
+input[type=radio].degree + label:before {
     font-family: FontAwesome;
     display: inline-block;
     content: "\f1db";
     letter-spacing: 10px;
-    font-size: 2.2em;
+    font-size: 1.8em;
     color: #535353;
 }
-input[type=radio].with-font:checked + label:before {
+input[type=radio].degree:checked + label:before {
     content: "\f00c";
-    font-size: 2.2em;
+    font-size: 1.8em;
     color: rgba(73,163,127,1);
     letter-spacing: 5px;
     width: 35px: 5px;
+}
+
+.notifications .on:after {
+  font-family: FontAwesome;
+  display:inline-block;
+  content: "\f00c";
+  letter-spacing: 5px;
+  font-size: 1.6em;
+  color: rgba(73,163,127,1);
+  padding-left: 5px;
 }
 
 .digital .heat.running, .digital .pump.running{
