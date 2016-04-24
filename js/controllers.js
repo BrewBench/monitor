@@ -38,6 +38,7 @@ $scope.settings = BrewService.settings('settings') || {
   ,notifications: true
   ,arduinoUrl: 'http://arduino.local'
   ,storage: 'sd'
+  ,recipe: {name:'Best Ale',yeast:[]}
 };
 
 $scope.knobOptions = {
@@ -62,6 +63,7 @@ $scope.knobOptions = {
 //default kettle values
 $scope.kettles = BrewService.settings('kettles') || [{
     key: 'Boil'
+    ,type: 'hop'
     ,pin: 0
     ,active: false
     ,heater: {pin:2,running:false,auto:false}
@@ -72,6 +74,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
     ,knob: angular.merge($scope.knobOptions,{value:0,min:0,max:200+5})
   },{
     key: 'Hot Liquor'
+    ,type: 'water'
     ,pin: 1
     ,active: false
     ,heater: {pin:4,running:false,auto:false}
@@ -82,6 +85,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
     ,knob: angular.merge($scope.knobOptions,{value:0,min:0,max:200+5})
   },{
     key: 'Mash'
+    ,type: 'grain'
     ,pin: 2
     ,active: false
     ,heater: {pin:6,running:false,auto:false}
@@ -97,6 +101,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
       $scope.kettles.push(
         {
           key: 'New Kettle'
+          ,type: 'water'
           ,pin: $scope.kettles.length
           ,active: false
           ,heater: {pin:6,running:false,auto:false}
@@ -108,6 +113,81 @@ $scope.kettles = BrewService.settings('kettles') || [{
         }
       );
     }
+  };
+
+  $scope.showContent = function($fileContent){
+
+      var x2js = new X2JS();
+      var jsonObj = x2js.xml_str2json( $fileContent.replace(/&ldquo;/g,'"').replace(/&rdquo;/g,'"').replace(/&rsquo;/g,"'") );
+      if($scope.settings.recipe)
+        $scope.settings.recipe = {name:'',yeast:[]};
+
+      if(!!jsonObj.Recipes && !!jsonObj.Recipes.Data.Recipe){
+
+        if(!!jsonObj.Recipes.Data.Recipe.F_R_NAME)
+          $scope.settings.recipe.name = jsonObj.Recipes.Data.Recipe.F_R_NAME;
+
+        if(!!jsonObj.Recipes.Data.Recipe.Ingredients.Data.Grain){
+          var kettle = _.filter($scope.kettles,{type:'grain'})[0];
+          if(kettle){
+            kettle.timers = [];
+            _.each(jsonObj.Recipes.Data.Recipe.Ingredients.Data.Grain,function(grain){
+              $scope.addTimer(kettle,{
+                label: grain.F_G_NAME,
+                min: parseInt(grain.F_G_BOIL_TIME,10),
+                notes: (grain.F_G_AMOUNT/16)+' lbs.'
+              });
+            });
+          }
+        }
+        if(!!jsonObj.Recipes.Data.Recipe.Ingredients.Data.Hops){
+          var kettle = _.filter($scope.kettles,{type:'hop'})[0];
+          if(kettle){
+            kettle.timers = [];
+            _.each(jsonObj.Recipes.Data.Recipe.Ingredients.Data.Hops,function(hop){
+              $scope.addTimer(kettle,{
+                label: hop.F_H_NAME,
+                min: parseInt(hop.F_H_DRY_HOP_TIME,10) > 0 ? null : parseInt(hop.F_H_BOIL_TIME,10),
+                notes: parseInt(hop.F_H_DRY_HOP_TIME,10) > 0
+                  ? 'Dry Hop '+parseFloat(hop.F_H_AMOUNT).toFixed(2)+' oz.'+' for '+parseInt(hop.F_H_DRY_HOP_TIME,10)+' Days'
+                  : parseFloat(hop.F_H_AMOUNT).toFixed(2)+' oz.'
+              });
+              // hop.F_H_ALPHA
+              // hop.F_H_DRY_HOP_TIME
+            });
+          }
+        }
+        if(!!jsonObj.Recipes.Data.Recipe.Ingredients.Data.Misc){
+          if(jsonObj.Recipes.Data.Recipe.Ingredients.Data.Misc.length){
+            _.each(jsonObj.Recipes.Data.Recipe.Ingredients.Data.Misc,function(misc){
+              $scope.addTimer(kettle,{
+                label: misc.F_M_NAME+' '+parseFloat(misc.F_M_AMOUNT).toFixed(2),
+                min: parseInt(misc.F_M_TIME,10)
+              });
+            });
+          } else {
+            $scope.addTimer(kettle,{
+              label: jsonObj.Recipes.Data.Recipe.Ingredients.Data.Misc.F_M_NAME+' '+parseFloat(jsonObj.Recipes.Data.Recipe.Ingredients.Data.Misc.F_M_AMOUNT).toFixed(2)+' oz.',
+              min: parseInt(jsonObj.Recipes.Data.Recipe.Ingredients.Data.Misc.F_M_TIME,10)
+            });
+          }
+        }
+        if(!!jsonObj.Recipes.Data.Recipe.Ingredients.Data.Yeast){
+          if(jsonObj.Recipes.Data.Recipe.Ingredients.Data.Yeast.length){
+            _.each(jsonObj.Recipes.Data.Recipe.Ingredients.Data.Yeast,function(yeast){
+              $scope.settings.recipe.yeast.push({
+                name: yeast.F_Y_LAB+' '+yeast.F_Y_PRODUCT_ID
+              });
+            });
+          } else {
+            $scope.settings.recipe.yeast.push({
+              name: jsonObj.Recipes.Data.Recipe.Ingredients.Data.Yeast.F_Y_LAB+' '+jsonObj.Recipes.Data.Recipe.Ingredients.Data.Yeast.F_Y_PRODUCT_ID
+            });
+          }
+        }
+      } else {
+        //failed to import recipe
+      }
   };
 
   // check if pump or heater are running
@@ -424,6 +504,15 @@ $scope.kettles = BrewService.settings('kettles') || [{
       kettle.low = null;
       kettle.high = null;
     }
+  };
+
+  $scope.changeKettleType = function(kettle){
+      if(kettle.type=='hop')
+        kettle.type = 'water';
+      else if(kettle.type=='grain')
+        kettle.type = 'hop';
+      else if(kettle.type=='water')
+        kettle.type = 'grain';
   };
 
   $scope.changeUnits = function(unit){

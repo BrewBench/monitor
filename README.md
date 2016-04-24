@@ -68,3 +68,5 @@ gulp
 ## Thanks
 * For the Lovibond Hex colors: http://brookstonbeerbulletin.com/thinking-about-beer-color
 * For the SVG hop and grain icons: https://thenounproject.com/dejv
+* For the Hop and Grain reference: https://byo.com/
+* For the recipes: http://beersmithrecipes.com/

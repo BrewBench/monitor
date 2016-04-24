@@ -17,6 +17,11 @@ body { padding-top: 70px; }
   color: #ffffff;
 }
 
+.modal-header a {
+  color:#e5e5e5;
+  font-size: 16px;
+}
+
 #dataModal-hops .modal-body, #dataModal-grains .modal-body{
   max-height: calc(100vh - 185px);
     overflow-y: auto;
@@ -50,6 +55,9 @@ body { padding-top: 70px; }
 
 .navbar-brand img{
   margin-top: -14px;
+}
+.settings h3, .kettles .type {
+    cursor: pointer;
 }
 
 .settings h3, .kettles h3{
@@ -182,11 +190,18 @@ body { padding-top: 70px; }
 label.adjust{
   display: block;
   text-transform: uppercase;
-  color: #777;
+  color: #333;
   font-weight: 400;
   letter-spacing: .2em;
   padding-top: 10px;
-  padding-bottom: 5px;
+  padding-bottom: 0;
+  font-size: 13px;
+}
+
+label.notes {
+  color: #777;
+  font-weight: 400;
+  letter-spacing: .2em;
   font-size: 13px;
 }
 

@@ -2,7 +2,7 @@
 
   <div class="panel panel-default">
     <div class="panel-heading" ng-swipe-left="showRemoveKettle = true" ng-swipe-right="showRemoveKettle = false">
-      <div class="left"><h3><editable type="text" model="kettle.key"></editable></h3>
+      <div class="left"><img class="type" ng-src="img/{{kettle.type}}.svg" width="30" ng-click="changeKettleType(kettle)"><h3><editable type="text" model="kettle.key"></editable></h3>
         <div class="btn-group">
           <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             A{{kettle.pin}} <span class="caret"></span>
@@ -77,20 +77,20 @@
       </div>
       <div class="row">
         <div class="col-md-12 col-xs-12">
-          <div class="btn-group pull-right" role="group">
+          <div class="btn-group pull-right" role="group" ng-if="kettle.type=='grain'">
             <button type="button" class="btn btn-default add-timer" ng-click="addTimer(kettle)"><img src="img/grain.svg" width="32"></button>
             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></button>
             <ul class="dropdown-menu scrollable-menu">
-              <li><a href="#" ng-click="addTimer(kettle,{label:'Whirlfloc',min:10})">Whirlfloc</a></li>
               <li ng-repeat="grain in grains">
                 <a href="#" ng-click="addTimer(kettle,{label:grain.name,min:60})">{{grain.name}}</a>
               </li>
             </ul>
           </div>
-          <div class="btn-group pull-right" role="group">
+          <div class="btn-group pull-right" role="group" ng-if="kettle.type=='hop'">
             <button type="button" class="btn btn-default add-timer" ng-click="addTimer(kettle)"><img src="img/hop.svg" width="32"></button>
             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></button>
             <ul class="dropdown-menu scrollable-menu">
+              <li><a href="#" ng-click="addTimer(kettle,{label:'Whirlfloc',min:10})">Whirlfloc</a></li>
               <li ng-repeat="hop in hops">
                 <a href="#" ng-click="addTimer(kettle,{label:hop.name,min:30})">{{hop.name}}</a>
               </li>
@@ -103,13 +103,14 @@
           <ul>
             <li ng-repeat="timer in kettle.timers track by $index">
             <label class="adjust"><editable model="timer.label"></editable></label>
+            <label class="notes" ng-if="timer.notes"><editable model="timer.notes"></editable></label>
             <div class="input-group" role="group">
               <editable class="timer" type="number" model="timer.min"></editable><span class="timer-secs" ng-if="timer.running && !timer.up">: {{timer.sec}}</span>
               <span class="count-up" ng-show="timer.up" ng-click="timerStart(timer)">{{timer.up.min}}</span><span ng-if="timer.up" class="timer-secs-up">: {{timer.up.sec}}</span>
               <span class="input-group-btn">
-                <button type="button" class="btn btn-default"><i class="fa fa-minus fa-lg" ng-click="timer.min=timer.min-1"></i></button>
-                <button type="button" class="btn btn-default"><i class="fa fa-plus fa-lg" ng-click="timer.min=timer.min+1"></i></button>
-                <button type="button" class="btn btn-default"><i class="fa fa-lg" ng-click="timerStart(timer)" ng-class="{'fa-stop-circle':timer.running,'fa-play-circle':!timer.running}"></i></button>
+                <button type="button" class="btn btn-default" ng-if="timer.min!==null"><i class="fa fa-minus fa-lg" ng-click="timer.min=timer.min-1"></i></button>
+                <button type="button" class="btn btn-default" ng-if="timer.min!==null"><i class="fa fa-plus fa-lg" ng-click="timer.min=timer.min+1"></i></button>
+                <button type="button" class="btn btn-default" ng-if="timer.min!==null"><i class="fa fa-lg" ng-click="timerStart(timer)" ng-class="{'fa-stop-circle':timer.running,'fa-play-circle':!timer.running}"></i></button>
                 <button type="button" class="btn btn-default"><i class="fa fa-trash fa-lg" ng-click="kettle.timers.splice($index, 1);"></i></button>
               </span>
             </div>
