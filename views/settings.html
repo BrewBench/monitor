@@ -12,15 +12,15 @@
           <input id="fahrenheit" class="with-font" type="radio" ng-model="settings.unit" value="F" ng-click="changeUnits('F')"> <label for="fahrenheit">&deg;F</label>
         </div>
         <div class="col-md-3 col-xs-3">
-          <span class="fa-stack fa-lg" ng-click="settings.sound = !settings.sound">
+          <span class="fa-stack fa-lg" ng-click="settings.sounds.on = !settings.sounds.on">
             <i class="fa fa-volume-up fa-stack-1x"></i>
-            <i class="fa fa-ban fa-stack-2x text-danger" ng-show="!settings.sound"></i>
+            <i class="fa fa-ban fa-stack-2x text-danger" ng-show="!settings.sounds.on"></i>
           </span>
         </div>
         <div class="col-md-3 col-xs-3">
-          <span class="fa-stack fa-lg" ng-click="settings.notifications = !settings.notifications">
+          <span class="fa-stack fa-lg" ng-click="settings.notifications.on = !settings.notifications.on">
             <i class="fa fa-bell fa-stack-1x"></i>
-            <i class="fa fa-ban fa-stack-2x text-danger" ng-show="!settings.notifications"></i>
+            <i class="fa fa-ban fa-stack-2x text-danger" ng-show="!settings.notifications.on"></i>
           </span>
         </div>
       </div>
@@ -39,11 +39,14 @@
             <button type="button" class="btn btn-default"><i class="fa fa-plus fa-lg" ng-click="settings.pollSeconds=settings.pollSeconds+1"></i></button>
           </span>
           </div>
+
+          <label class="adjust">Slack Notification <a href="https://api.slack.com/incoming-webhooks" title="https://api.slack.com/incoming-webhooks" target="_blank"><img src="img/Slack_Mark_Web.png" width="45"></a></label>
+          <editable class="poll" trim="30" model="settings.notifications.slack"></editable>
         </div>
         <div class="col-md-4 col-xs-4">
           <div class="btn-group-vertical pull-right" role="group">
             <button class="btn btn-primary" ng-click="addKettle()">Add Kettle</button>
-            <button class="btn btn-warning" ng-click="tempAlert()">Test Alerts</button>
+            <button class="btn btn-warning" ng-click="alert()">Test Alerts</button>
             <button class="btn btn-default" ng-click="clearKettles()"><i class="fa fa-trash"></i> Settings</button>
           </div>
         </div>

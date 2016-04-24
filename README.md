@@ -22,9 +22,9 @@ cd brewbench
 
 There are three options here, you can either run the code on your Arduino or on a webserver.
 
-### 1. AVT Hosted
+### 1. BrewBench Hosted
 
-Once you have uploaded the [sketch](arduino/BrewBench/BrewBench.ino), simply use: [brewbench.andrewvantassel.com](http://brewbench.andrewvantassel.com)
+Once you have uploaded the [sketch](arduino/BrewBench/BrewBench.ino), simply use: [brewbench.co](https://brewbench.co)
 
 ### 2. Arduino Deployment
 
@@ -66,7 +66,15 @@ gulp
 <img src="img/brewbench-wiredup.jpg?raw=true" alt="BrewBench wired up" align="center" />
 
 ## Thanks
+
 * For the Lovibond Hex colors: http://brookstonbeerbulletin.com/thinking-about-beer-color
 * For the SVG hop and grain icons: https://thenounproject.com/dejv
-* For the Hop and Grain reference: https://byo.com/
-* For the recipes: http://beersmithrecipes.com/
+* For the Hop and Grain reference: https://byo.com
+* For the recipes: http://beersmithrecipes.com
+* For the bell sounds: http://www.orangefreesounds.com/category/sound-effects/bell-sound
+
+## About
+
+[BrewBench](//brewbench.co) is a brew monitor and controller Developed by [Andrew Van Tassel](//www.andrewvantassel.com) and [Lee Kendrick](http://www.leekendrick.info) &copy;2016.
+
+Made with <img src="img/beer.png" width="45"> from Colorado

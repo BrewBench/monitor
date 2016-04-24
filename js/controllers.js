@@ -34,11 +34,11 @@ $scope.getLovibondColor = function(range){
 $scope.settings = BrewService.settings('settings') || {
   pollSeconds: 10
   ,unit: 'F'
-  ,sound: true
-  ,notifications: true
   ,arduinoUrl: 'http://arduino.local'
   ,storage: 'sd'
-  ,recipe: {name:'Best Ale',yeast:[]}
+  ,recipe: {name:'Brew Name (click to edit)',yeast:[]}
+  ,notifications: {on:true,slack:'Slack notification webhook Url'}
+  ,sounds: {on:true,alert:'audio/bike.mp3',timer:'audio/school.mp3'}
 };
 
 $scope.knobOptions = {
@@ -130,7 +130,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
           $scope.settings.recipe.category = jsonObj.Recipes.Data.Recipe.F_R_STYLE.F_S_CATEGORY;
 
         if(!!jsonObj.Recipes.Data.Recipe.F_R_STYLE.F_S_MAX_ABV && !!jsonObj.Recipes.Data.Recipe.F_R_STYLE.F_S_MIN_ABV)
-          $scope.settings.recipe.abv = parseFloat(jsonObj.Recipes.Data.Recipe.F_R_STYLE.F_S_MIN_ABV).toFixed(2)+'-'+parseFloat(jsonObj.Recipes.Data.Recipe.F_R_STYLE.F_S_MAX_ABV).toFixed(2);
+          $scope.settings.recipe.abv = parseFloat(jsonObj.Recipes.Data.Recipe.F_R_STYLE.F_S_MIN_ABV).toFixed(2)+' - '+parseFloat(jsonObj.Recipes.Data.Recipe.F_R_STYLE.F_S_MAX_ABV).toFixed(2);
         else if(!!jsonObj.Recipes.Data.Recipe.F_R_STYLE.F_S_MAX_ABV)
           $scope.settings.recipe.abv = parseFloat(jsonObj.Recipes.Data.Recipe.F_R_STYLE.F_S_MAX_ABV).toFixed(2);
         else if(!!jsonObj.Recipes.Data.Recipe.F_R_STYLE.F_S_MIN_ABV)
@@ -417,6 +417,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
       BrewService.clear();
   };
 
+
   $scope.alert = function(kettle,type){
 
     //don't start alerts until we have hit the temp.target
@@ -432,17 +433,17 @@ $scope.kettles = BrewService.settings('kettles') || [{
     }
 
     // Sound Notification
-    if($scope.settings.sound===true){
+    if($scope.settings.sounds.on===true){
       //don't alert if the heater is running and temp is too low
       if(type!='timer' && kettle && kettle.low && kettle.heater.running)
         return;
-      var snd = new Audio("audio/error.mp3"); // buffers automatically when created
+      var snd = new Audio((type=='timer') ? $scope.settings.sounds.timer : $scope.settings.sounds.alert); // buffers automatically when created
       snd.play();
     }
 
-    // Desktop Notification
-    if ($scope.settings.notifications===true && "Notification" in window) {
-      var message, icon = 'img/brewbench-logo-45.png';
+    // Desktop / Slack Notification
+    if ($scope.settings.notifications.on===true) {
+      var message, icon = 'img/brewbench-logo-45.png', color = 'good';
 
       //don't alert if the heater is running and temp is too low
       if(kettle && kettle.low && kettle.heater.running)
@@ -450,29 +451,42 @@ $scope.kettles = BrewService.settings('kettles') || [{
 
       if(type && type=='timer')//kettle is a timer object
         message = 'Your '+kettle.label+' timer is up';
-      else if(kettle && kettle.high)
-        message = 'Your '+kettle.key+' kettle is '+kettle.high+' degrees high';
-      else if(kettle && kettle.low)
-        message = 'Your '+kettle.key+' kettle is '+kettle.low+' degrees low';
+      else if(kettle && kettle.high){
+        message = 'Your '+kettle.key+' kettle is '+kettle.high+'\u00B0 high';
+        color = 'danger';
+      }
+      else if(kettle && kettle.low){
+        message = 'Your '+kettle.key+' kettle is '+kettle.low+'\u00B0 low';
+        color = '#3498DB';
+      }
       else if(!kettle)
         message = 'Testing Alerts, you are ready to go, click play on a kettle.';
 
-      //close the previous notification
-      if(notification)
-        notification.close();
+      //Window Notification
+      if("Notification" in window){
+        //close the previous notification
+        if(notification)
+          notification.close();
 
-      if(Notification.permission === "granted"){
-        if(message){
-          notification = new Notification('BrewBench',{body:message,icon:icon});
-        }
-      } else if(Notification.permission !== 'denied'){
-        Notification.requestPermission(function (permission) {
-          // If the user accepts, let's create a notification
-          if (permission === "granted") {
-            if(message){
-              notification = new Notification('BrewBench',{body:message,icon:icon});
-            }
+        if(Notification.permission === "granted"){
+          if(message){
+            notification = new Notification('BrewBench',{body:message,icon:icon});
           }
+        } else if(Notification.permission !== 'denied'){
+          Notification.requestPermission(function (permission) {
+            // If the user accepts, let's create a notification
+            if (permission === "granted") {
+              if(message){
+                notification = new Notification('BrewBench',{body:message,icon:icon});
+              }
+            }
+          });
+        }
+      }
+      //Slack Notification
+      if($scope.settings.notifications.slack.indexOf('http')!==-1){
+        BrewService.slack($scope.settings.notifications.slack,message,color).then(function(response){
+          // console.log('Slack',response);
         });
       }
     }
@@ -481,9 +495,10 @@ $scope.kettles = BrewService.settings('kettles') || [{
   $scope.updateKnobCopy = function(kettle){
 
     if(!kettle.active){
-      kettle.knob.subText.text = 'not running';
       kettle.knob.trackColor = '#ddd';
       kettle.knob.barColor = '#777';
+      kettle.knob.subText.text = 'not running';
+      kettle.knob.subText.color = 'gray';
       return;
     }
     //is temp too high?
@@ -494,7 +509,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
       kettle.low = null;
       //update knob text
       kettle.knob.subText.text = kettle.high+'\u00B0 high';
-      kettle.knob.subText.color = 'gray';
+      kettle.knob.subText.color = 'rgba(255,0,0,.6)';
     } else if(kettle.temp.current <= kettle.temp.target-kettle.temp.diff){
       kettle.knob.barColor = 'rgba(52,152,219,.5)';
       kettle.knob.trackColor = 'rgba(52,152,219,.1)';
@@ -506,7 +521,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
       } else {
         //update knob text
         kettle.knob.subText.text = kettle.low+'\u00B0 low';
-        kettle.knob.subText.color = 'gray';
+        kettle.knob.subText.color = 'rgba(52,152,219,1)';
       }
     } else {
       kettle.knob.barColor = 'rgba(44,193,133,.6)';
@@ -547,14 +562,14 @@ $scope.kettles = BrewService.settings('kettles') || [{
         //count down seconds
         timer.sec--;
       } else if(timer.up && timer.up.sec < 59){
-        //count down seconds
+        //count up seconds
         timer.up.sec++;
       } else if(!timer.up){
         //cound down minutes and seconds
         timer.sec=59;
         timer.min--;
       } else if(timer.up){
-        //cound down minutes and seconds
+        //cound up minutes and seconds
         timer.up.sec=0;
         timer.up.min++;
       }
@@ -623,8 +638,6 @@ $scope.kettles = BrewService.settings('kettles') || [{
   // App start logic
   $scope.processTemps();
 
-  $scope.alert();
-
   $scope.init();
 
   //timer check
@@ -635,9 +648,9 @@ $scope.kettles = BrewService.settings('kettles') || [{
   }
 
   // scope watch
-  $scope.$watchCollection('settings',function(newValue,oldValue){
+  $scope.$watch('settings',function(newValue,oldValue){
     BrewService.settings('settings',newValue);
-  });
+  },true);
 
   $scope.$watch('kettles',function(newValue,oldValue){
     BrewService.settings('kettles',newValue);

@@ -4,7 +4,7 @@
       <h3><editable model="settings.recipe.name"></editable> <sup>{{settings.recipe.category}}</sup></h3>
       <ul>
         <li ng-repeat="yeast in settings.recipe.yeast">{{yeast.name}}</li>
-        <li>ABV: {{settings.recipe.abv}}%</li>
+        <li ng-if="settings.recipe.abv">ABV: {{settings.recipe.abv}}%</li>
       </ul>
     </div>
   </div>

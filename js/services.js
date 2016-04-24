@@ -39,6 +39,26 @@ brewBench.factory('BrewService', function($http, $q, $filter){
         return 'http://arduino.local';
       return '';
     },
+
+    slack: function(webhook_url,msg,color){
+      var q = $q.defer();
+
+      var postObj = {'attachments': [{'fallback': msg,
+            'fields': [{'value': msg}],
+            'color': color,
+            'mrkdwn_in': ['text', 'fallback', 'fields'],
+            'thumb_url':'https://brewbench.co/img/brewbench-logo.png'
+          }]
+        };
+
+      $http({url: webhook_url,method:'POST',data:'payload='+JSON.stringify(postObj), headers: { 'Content-Type': 'application/x-www-form-urlencoded' }}).then(function(response){
+        q.resolve(response.data);
+      },function(err){
+        q.reject(err);
+      });
+      return q.promise;
+    },
+
     // read/write thermistors
     // https://learn.adafruit.com/thermistor/using-a-thermistor
     temp: function(sensor,value){
