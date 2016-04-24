@@ -135,7 +135,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
               $scope.addTimer(kettle,{
                 label: grain.F_G_NAME,
                 min: parseInt(grain.F_G_BOIL_TIME,10),
-                notes: (grain.F_G_AMOUNT/16)+' lbs.'
+                notes: parseFloat(grain.F_G_AMOUNT/16).toFixed(2)+' lbs.'
               });
             });
           }
