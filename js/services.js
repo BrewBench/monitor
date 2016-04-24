@@ -34,7 +34,7 @@ brewBench.factory('BrewService', function($http, $q, $filter){
       var settings = this.settings('settings');
 
       if(settings && settings.arduinoUrl)
-        return settings.arduinoUrl;
+        return settings.arduinoUrl.indexOf('//')==-1 ? '//'+settings.arduinoUrl : settings.arduinoUrl;
       else if(document.location.host == 'localhost')
         return 'http://arduino.local';
       return '';

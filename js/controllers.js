@@ -34,7 +34,7 @@ $scope.getLovibondColor = function(range){
 $scope.settings = BrewService.settings('settings') || {
   pollSeconds: 10
   ,unit: 'F'
-  ,arduinoUrl: 'http://arduino.local'
+  ,arduinoUrl: 'arduino.local'
   ,storage: 'sd'
   ,recipe: {name:'Brew Name (click to edit)',yeast:[]}
   ,notifications: {on:true,timers:true,high:true,low:true,target:true,slack:'Slack notification webhook Url',last:''}
@@ -415,8 +415,12 @@ $scope.kettles = BrewService.settings('kettles') || [{
       }
   };
 
-  $scope.clearKettles = function(){
+  $scope.clearKettles = function(e,i){
+      angular.element(e.target).html('Removing...');
       BrewService.clear();
+      $timeout(function(){
+        window.location.reload();
+      },1000);
   };
 
 
