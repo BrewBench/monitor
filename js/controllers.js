@@ -185,8 +185,10 @@ $scope.kettles = BrewService.settings('kettles') || [{
             });
           }
         }
+
+        $scope.recipe_success = true;
       } else {
-        //failed to import recipe
+        $scope.recipe_success = false;
       }
   };
 
