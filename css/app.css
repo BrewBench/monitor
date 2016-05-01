@@ -129,7 +129,7 @@ sup{
     cursor: pointer;
 }
 
-.settings h3, .kettles h3{
+.recipe h3, .settings h3, .kettles h3{
     color: #777;
     display: inline;
 }
@@ -348,6 +348,32 @@ input[type=radio].degree:checked + label:before {
 .fa.fa-chevron-up, .fa.fa-chevron-down {
   color:rgba(200,47,47,.4);
   cursor: pointer;
+}
+
+.btn-file {
+    position: relative;
+    overflow: hidden;
+}
+.btn-file input[type=file] {
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-width: 100%;
+    min-height: 100%;
+    font-size: 100px;
+    text-align: right;
+    filter: alpha(opacity=0);
+    opacity: 0;
+    outline: none;
+    background: white;
+    cursor: inherit;
+    display: block;
+}
+
+#importModal .alert {
+  position: relative;
+  width: 100%;
+  margin-top: 10px;
 }
 
 @media (max-width: 767px) {

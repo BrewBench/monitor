@@ -136,7 +136,7 @@ brewBench.factory('BrewService', function($http, $q, $filter){
         chart: {
               type: 'lineChart',
               noData: 'Press play on a kettle to start graphing.',
-              height: 450,
+              height: 350,
               margin : {
                   top: 20,
                   right: 20,

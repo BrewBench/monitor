@@ -8,6 +8,10 @@
       </div>
       <div class="modal-body text-center">
 
+        <span class="btn btn-primary btn-file">
+          Choose File ... <input type="file" on-read-file="showContent($fileContent)" accept=".bsmx"/>
+        </span>
+
         <div class="alert alert-danger alert-dismissible" role="alert" ng-if="recipe_success===false">
           <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
           <strong>Failed!</strong> Please check your recipe format.  Must be BeerSmith XML format.
@@ -18,7 +22,6 @@
           <strong>Success!</strong> {{settings.recipe.name}} imported.
         </div>
 
-        <input type="file" on-read-file="showContent($fileContent)" />
       </div>
     </div>
   </div>

@@ -36,7 +36,7 @@ $scope.settings = BrewService.settings('settings') || {
   ,unit: 'F'
   ,arduinoUrl: 'arduino.local'
   ,storage: 'sd'
-  ,recipe: {name:'Brew Name (click to edit)',yeast:[]}
+  ,recipe: {name:'',yeast:[]}
   ,notifications: {on:true,timers:true,high:true,low:true,target:true,slack:'Slack notification webhook Url',last:''}
   ,sounds: {on:true,alert:'audio/bike.mp3',timer:'audio/school.mp3'}
 };
