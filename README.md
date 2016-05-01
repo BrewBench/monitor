@@ -68,7 +68,9 @@ gulp
 ## Thanks
 
 * For the Lovibond Hex colors: http://brookstonbeerbulletin.com/thinking-about-beer-color
-* For the SVG hop and grain icons: https://thenounproject.com/dejv
+* For the SVG icons:
+  * https://thenounproject.com/dejv
+  * https://thenounproject.com/creativestall
 * For the Hop and Grain reference: https://byo.com
 * For the recipes: http://beersmithrecipes.com
 * For the bell sounds: http://www.orangefreesounds.com/category/sound-effects/bell-sound
