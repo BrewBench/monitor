@@ -14,7 +14,7 @@ See [Thermistor](https://learn.adafruit.com/thermistor/using-a-thermistor) for w
 
 ```sh
 # get the web code
-git clone https://github.com/avantassel/brewbench
+git clone https://github.com/brewbench/web-controller brewbench
 cd brewbench
 ```
 
