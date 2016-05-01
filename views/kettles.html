@@ -1,18 +1,26 @@
 <div class="kettles col-md-{{kettles.length==5?2:12/kettles.length}}" ng-repeat="kettle in kettles track by $index" id="kettle{{$index}}">
 
   <div class="panel panel-default">
-    <div class="panel-heading" ng-swipe-left="showRemoveKettle = true" ng-swipe-right="showRemoveKettle = false">
-      <div class="left"><img class="type" ng-src="img/{{kettle.type}}.svg" width="30" ng-click="changeKettleType(kettle)"><h3><editable type="text" model="kettle.key"></editable></h3>
-        <div class="btn-group">
-          <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            A{{kettle.pin}} <span class="caret"></span>
-          </button>
-          <ul class="dropdown-menu">
-            <li ng-repeat="p in [0,1,2,3,4,5] track by $index"><a href="#" ng-click="kettle.pin=p" ng-if="p != kettle.pin">A{{p}}</a></li>
-          </ul>
+    <div class="panel-heading container-fluid">
+
+      <div class="row">
+        <div class="col-md-8 col-xs-9"><img class="type" ng-src="img/{{kettle.type}}.svg" width="30" ng-click="changeKettleType(kettle)"><h3><editable type="text" model="kettle.key"></editable></h3>
+            <div class="btn-group">
+              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                A{{kettle.pin}} <span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu">
+                <li ng-repeat="p in [0,1,2,3,4,5] track by $index"><a href="#" ng-click="kettle.pin=p" ng-if="p != kettle.pin">A{{p}}</a></li>
+              </ul>
+            </div>
+          </div>
+          <div class="col-md-4 col-xs-3 right">
+            <i class="fa fa-4x" ng-click="startStopKettle(kettle)" ng-class="{'fa-stop-circle':kettle.active,'fa-play-circle':!kettle.active}"></i>
+          </div>
         </div>
+
         <div class="digital row">
-          <div class="item col-md-6 col-xs-6">
+          <div class="col-md-6 col-xs-6">
             <strong class="heat">Heat</strong>
             <div class="btn-group">
               <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -22,11 +30,8 @@
                 <li ng-repeat="p in [2,3,4,5,6,7,8,9,10,11,12,13] track by $index"><a href="#" ng-click="kettle.heater.pin=p" ng-if="p != kettle.heater.pin">D{{p}}</a></li>
               </ul>
             </div>
-            <br/>
-            <span class="label" ng-class="{'label-default':!kettle.heater.running&&!kettle.heater.auto,'label-success':kettle.heater.running,'label-warning':!kettle.heater.running&&kettle.heater.auto}" ng-click="toggleKettle('heat',kettle)">{{kettle.heater.running ? 'On' : (kettle.heater.auto ? 'Wait' :'Off')}}</span>
-            <span class="label" ng-class="{'label-default':!kettle.heater.auto,'label-success':kettle.heater.auto}" ng-click="kettle.heater.auto=!kettle.heater.auto">Auto</span>
           </div>
-          <div class="item col-md-6 col-xs-6">
+          <div class="col-md-6 col-xs-6">
             <strong class="pump">Pump</strong>
             <div class="btn-group">
               <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -36,23 +41,26 @@
                 <li ng-repeat="p in [2,3,4,5,6,7,8,9,10,11,12,13] track by $index"><a href="#" ng-click="kettle.pump.pin=p" ng-if="p != kettle.pump.pin">D{{p}}</a></li>
               </ul>
             </div>
-            <br/>
+          </div>
+        </div>
+        <div class="digital row">
+          <div class="col-md-6 col-xs-6">
+            <span class="label" ng-class="{'label-default':!kettle.heater.running&&!kettle.heater.auto,'label-success':kettle.heater.running,'label-warning':!kettle.heater.running&&kettle.heater.auto}" ng-click="toggleKettle('heat',kettle)">{{kettle.heater.running ? 'On' : (kettle.heater.auto ? 'Wait' :'Off')}}</span>
+            <span class="label" ng-class="{'label-default':!kettle.heater.auto,'label-success':kettle.heater.auto}" ng-click="kettle.heater.auto=!kettle.heater.auto">Auto</span>
+          </div>
+          <div class="col-md-6 col-xs-6">
             <span class="label" ng-class="{'label-default':!kettle.pump.running&&!kettle.pump.auto,'label-success':kettle.pump.running,'label-warning':!kettle.pump.running&&kettle.pump.auto}" ng-click="toggleKettle('pump',kettle)">{{kettle.pump.running ? 'On' : (kettle.pump.auto ? 'Wait' :'Off')}}</span>
             <span class="label" ng-class="{'label-default':!kettle.pump.auto,'label-success':kettle.pump.auto}" ng-click="kettle.pump.auto=!kettle.pump.auto">Auto</span>
           </div>
         </div>
       </div>
-      <div ng-show="!showRemoveKettle" class="right">
-        <i class="fa fa-4x" ng-click="startStopKettle(kettle)" ng-class="{'fa-stop-circle':kettle.active,'fa-play-circle':!kettle.active}"></i>
-      </div>
-      <div ng-show="showRemoveKettle" class="remove right"><button class="btn btn-danger" ng-click="showRemoveKettle=false;kettles.splice($index,1)">Remove Kettle</button></div>
-    </div>
-    <div class="panel-body">
+
+    <div class="panel-body container-fluid">
       <div class="row">
-        <div class="col-md-7 col-xs-7">
+        <div class="col-md-7 col-sm-7 col-xs-12" style="text-align: center;">
           <ui-knob value="kettle.temp.current" options="kettle.knob"></ui-knob>
         </div>
-        <div class="col-md-5 col-xs-5 grid">
+        <div class="col-md-5 col-sm-5 col-xs-12 grid">
           <div class="row temp-row">
               <div class="col-md-12 col-xs-12">
                 <div class="btn-group pull-right" role="group">
@@ -75,7 +83,7 @@
           </div>
         </div>
       </div>
-      <div class="row">
+      <div class="row" style="padding-top: 15px;">
         <div class="col-md-12 col-xs-12">
           <div class="btn-group pull-right" role="group" ng-if="kettle.type=='grain'">
             <button type="button" class="btn btn-default add-timer" ng-click="addTimer(kettle)"><img src="img/grain.svg" width="32"></button>
@@ -118,6 +126,15 @@
           </ul>
         </div>
       </div>
+
+      <div class="row">
+        <div class="col-md-12 col-xs-12" style="text-align: center;">
+          <i class="fa fa-chevron-up fa-3x" aria-hidden="true" ng-click="showRemoveKettle=!showRemoveKettle"></i>
+          <br>
+          <button ng-show="showRemoveKettle" class="btn btn-danger" ng-click="showRemoveKettle=false;kettles.splice($index,1)">Remove Kettle</button>
+        </div>
+      </div>
+
     </div>
 
   </div>

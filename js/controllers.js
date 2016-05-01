@@ -62,6 +62,7 @@ $scope.knobOptions = {
 
 //default kettle values
 $scope.kettles = BrewService.settings('kettles') || [{
+// $scope.kettles = [{
     key: 'Boil'
     ,type: 'hop'
     ,pin: 0
@@ -167,7 +168,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
             });
           }
         }
-        if(!!jsonObj.Recipes.Data.Recipe.Ingredients.Data.Misc){
+        if(kettle && !!jsonObj.Recipes.Data.Recipe.Ingredients.Data.Misc){
           if(jsonObj.Recipes.Data.Recipe.Ingredients.Data.Misc.length){
             _.each(jsonObj.Recipes.Data.Recipe.Ingredients.Data.Misc,function(misc){
               $scope.addTimer(kettle,{

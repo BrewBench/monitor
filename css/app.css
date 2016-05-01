@@ -83,23 +83,6 @@ sup{
   margin: 10px;
 }
 
-.panel-heading{
-  height: 116px;
-  display: flex;
-}
-
-.settings .panel-heading .left{
-  text-align: left;
-  width: 25%;
-  display: table-cell;
-}
-
-.settings .panel-heading .right{
-  text-align: right;
-  width: 83%;
-  display: table-cell;
-}
-
 .kettles .scrollable-menu {
     height: auto;
     max-height: 200px;
@@ -113,29 +96,17 @@ sup{
   white-space: normal;
 }
 
-.kettles .panel {
-  min-width: 390px;
-}
-
-.kettles .panel-heading{
-  height: 130px;
-}
-
 .kettles .btn.add-timer {
   padding-top: 0;
   padding-bottom: 0;
 }
 
-.kettles .panel-heading .left{
+.left{
   text-align: left;
-  width: 66%;
-  display: table-cell;
 }
 
-.kettles .panel-heading .right{
+.right{
   text-align: right;
-  width: 34%;
-  display: table-cell;
 }
 
 .panel-heading .left .digital{
@@ -305,11 +276,16 @@ input[type=radio].degree:checked + label:before {
   color: #d9534f;
 }
 
-.digital .item .label, .digital .item .heat, .digital .item .pump{
+.digital .label, .digital .heat, .digital .pump{
   cursor: pointer;
   font-size: 14px;
 }
 
-.digital .item .btn-group {
-  padding-top: 5px;
+.digital {
+  padding-top: 10px;
+}
+
+.fa.fa-chevron-up {
+  color:rgba(200,47,47,.4);
+  cursor: pointer;
 }
