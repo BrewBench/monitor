@@ -116,6 +116,10 @@ $scope.kettles = BrewService.settings('kettles') || [{
     }
   };
 
+  $scope.activeKettles = function(){
+    return _.filter($scope.kettles,{active:true}).length;
+  }
+
   $scope.showContent = function($fileContent){
 
       var x2js = new X2JS();
@@ -342,7 +346,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
   };
 
   $scope.getNavOffset = function(){
-    return 20+angular.element(document.getElementById('navbar'))[0].offsetHeight;
+    return 55+angular.element(document.getElementById('navbar'))[0].offsetHeight;
   };
 
   $scope.addTimer = function(kettle,options){

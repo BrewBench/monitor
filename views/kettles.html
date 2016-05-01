@@ -129,7 +129,7 @@
 
       <div class="row">
         <div class="col-md-12 col-xs-12" style="text-align: center;">
-          <i class="fa fa-chevron-up fa-3x" aria-hidden="true" ng-click="showRemoveKettle=!showRemoveKettle"></i>
+          <i class="fa fa-3x" ng-class="{'fa-chevron-up':!showRemoveKettle,'fa-chevron-down':showRemoveKettle}" aria-hidden="true" ng-click="showRemoveKettle=!showRemoveKettle"></i>
           <br>
           <button ng-show="showRemoveKettle" class="btn btn-danger" ng-click="showRemoveKettle=false;kettles.splice($index,1)">Remove Kettle</button>
         </div>

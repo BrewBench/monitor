@@ -24,7 +24,7 @@ There are three options here, you can either run the code on your Arduino or on 
 
 ### 1. BrewBench Hosted
 
-Once you have uploaded the [sketch](arduino/BrewBench/BrewBench.ino), simply use: [brewbench.co](https://brewbench.co)
+Once you have uploaded the [sketch](arduino/BrewBench/BrewBench.ino), simply use: [brewbench.io](http://brewbench.io)
 
 ### 2. Arduino Deployment
 
