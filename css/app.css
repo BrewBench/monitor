@@ -3,16 +3,15 @@
 html {
   position: relative;
   min-height: 100%;
-  background-color: #2a2730;
+  /*background-color: #2a2730;*/
 }
 
 body {
   font-family: 'Open Sans',sans-serif;
   font-weight: 300;
   line-height: 145%;
-  margin: 0;
+  margin: 0 0 110px 0;
   color: #161b1f;
-  margin-bottom: 60px;
 }
 
 .navbar {
@@ -34,36 +33,35 @@ body {
   color: #ffffff;
 }
 
-footer {
+.footer {
   position: absolute;
   bottom: 0;
   width: 100%;
-  padding-top: 20px;
-  padding-bottom: 20px;
-  height: 60px;
+  padding-top: 15px;
+  padding-bottom: 15px;
   text-align: center;
   color: #99979c;
   background-color: #2a2730;
 }
 
-footer .container {
+.footer .container {
     padding-right: 15px;
     padding-left: 15px;
     margin-right: auto;
     margin-left: auto;
 }
 
-footer .links {
+.footer .links {
   padding-left: 0;
   margin-bottom: 5px;
   color: #fff;
 }
 
-footer .links a{
+.footer .links a{
   color: #fff;
 }
 
-footer .links li{
+.footer .links li{
   display: inline-block;
   padding-right: 15px;
 }
@@ -108,7 +106,7 @@ footer .links li{
   margin-top: 10px;
 }
 
-sup{
+sup.ref{
   color: #777;
   font-family: cursive;
 }
@@ -248,6 +246,10 @@ label.adjust{
   padding-top: 10px;
   padding-bottom: 0;
   font-size: 13px;
+}
+
+sup.queue, .fa-clock-o{
+  color: #F0AD4F;
 }
 
 label.notes {

@@ -227,48 +227,52 @@ $scope.kettles = BrewService.settings('kettles') || [{
       });
     }
 
-    for(k in $scope.kettles){
+    _.each($scope.kettles,function(kettle){
 
         //update max
-        $scope.kettles[k].knob.max=$scope.kettles[k].temp['target']+$scope.kettles[k].temp['diff'];
+        kettle.knob.max=kettle.temp['target']+kettle.temp['diff'];
 
         //check if heater is running
-        BrewService.digitalRead($scope.kettles[k].heater.pin).then(function(response){
+        BrewService.digitalRead(kettle.heater.pin).then(function(response){
           if(response.value=="0"){
-            $scope.kettles[k].active = true;
-            $scope.kettles[k].heater.running = true;
+            kettle.active = true;
+            kettle.heater.running = true;
           } else {
-            $scope.kettles[k].heater.running = false;
+            kettle.heater.running = false;
           }
         },function(err){
           //failed to stop
         });
 
         //check if pump is running
-        BrewService.digitalRead($scope.kettles[k].pump.pin).then(function(response){
+        BrewService.digitalRead(kettle.pump.pin).then(function(response){
           if(response.value=="0"){
-            $scope.kettles[k].active = true;
-            $scope.kettles[k].pump.running = true;
+            kettle.active = true;
+            kettle.pump.running = true;
           } else {
-            $scope.kettles[k].pump.running = false;
+            kettle.pump.running = false;
           }
         },function(err){
           //failed to stop
         });
         // check timers for running
-        if(!!$scope.kettles[k].timers && $scope.kettles[k].timers.length){
-          for(timer in $scope.kettles[k].timers){
-            if($scope.kettles[k].timers[timer].running){
-              $scope.kettles[k].timers[timer].running = false;
-              $scope.timerStart($scope.kettles[k].timers[timer]);
-            } else if($scope.kettles[k].timers[timer].up && $scope.kettles[k].timers[timer].up.running){
-              $scope.kettles[k].timers[timer].up.running = false;
-              $scope.timerStart($scope.kettles[k].timers[timer].up);
+        if(!!kettle.timers && kettle.timers.length){
+          _.each(kettle.timers, function(timer){
+            if(timer.running){
+              timer.running = false;
+              $scope.timerStart(timer,kettle);
+            } else if(!timer.running && timer.queue){
+              $timeout(function(){
+                $scope.timerStart(timer,kettle);
+              },60000);
+            } else if(timer.up && timer.up.running){
+              timer.up.running = false;
+              $scope.timerStart(timer.up);
             }
-          }
+          });
         }
-        $scope.updateKnobCopy($scope.kettles[k]);
-      }
+        $scope.updateKnobCopy(kettle);
+      });
   };
 
   function updateTemp(response){
@@ -353,10 +357,13 @@ $scope.kettles = BrewService.settings('kettles') || [{
     if(!kettle.timers)
       kettle.timers=[];
     if(options){
-      options.running = false;
+      options.min = options.min ? options.min : 0;
+      options.sec = options.sec ? options.sec : 0;
+      options.running = options.running ? options.running : false;
+      options.queue = options.queue ? options.queue : false;      
       kettle.timers.push(options);
     } else {
-      kettle.timers.push({label:'Edit label',min:60,sec:0,running:false});
+      kettle.timers.push({label:'Edit label',min:60,sec:0,running:false,queue:false});
     }
   };
 
@@ -429,10 +436,10 @@ $scope.kettles = BrewService.settings('kettles') || [{
   };
 
 
-  $scope.alert = function(kettle,type){
+  $scope.alert = function(kettle,timer){
 
     //don't start alerts until we have hit the temp.target
-    if(!type && kettle && !kettle.temp.hit
+    if(!timer && kettle && !kettle.temp.hit
     || $scope.settings.notifications.on===false){
       return;
     }
@@ -444,10 +451,10 @@ $scope.kettles = BrewService.settings('kettles') || [{
     if(kettle && kettle.low && kettle.heater.running)
       return;
 
-    if(type && type=='timer'){ //kettle is a timer object
+    if(!!timer){ //kettle is a timer object
       if(!$scope.settings.notifications.timers)
         return;
-      message = 'Your '+kettle.label+' timer is up';
+      message = 'Time to add '+timer.notes+' of '+timer.label +' to your '+ kettle.key;
     }
     else if(kettle && kettle.high){
       if(!$scope.settings.notifications.high || $scope.settings.notifications.last=='high')
@@ -482,9 +489,9 @@ $scope.kettles = BrewService.settings('kettles') || [{
     // Sound Notification
     if($scope.settings.sounds.on===true){
       //don't alert if the heater is running and temp is too low
-      if(type!='timer' && kettle && kettle.low && kettle.heater.running)
+      if(!!timer && kettle && kettle.low && kettle.heater.running)
         return;
-      var snd = new Audio((type=='timer') ? $scope.settings.sounds.timer : $scope.settings.sounds.alert); // buffers automatically when created
+      var snd = new Audio((!!timer) ? $scope.settings.sounds.timer : $scope.settings.sounds.alert); // buffers automatically when created
       snd.play();
     }
 
@@ -568,21 +575,20 @@ $scope.kettles = BrewService.settings('kettles') || [{
   };
 
   $scope.changeUnits = function(unit){
-    for(k in $scope.kettles){
-      $scope.kettles[k].temp.current = $filter('formatDegrees')($scope.kettles[k].temp.current,unit);
-      $scope.kettles[k].temp.target = $filter('formatDegrees')($scope.kettles[k].temp.target,unit);
-      $scope.kettles[k].temp.diff = $filter('formatDegrees')($scope.kettles[k].temp.diff,unit);
-      $scope.updateKnobCopy($scope.kettles[k]);
-    }
+    _.each($scope.kettles,function(kettle){
+      kettle.temp.current = $filter('formatDegrees')(kettle.temp.current,unit);
+      kettle.temp.target = $filter('formatDegrees')(kettle.temp.target,unit);
+      kettle.temp.diff = $filter('formatDegrees')(kettle.temp.diff,unit);
+      $scope.updateKnobCopy(kettle);
+    });
     $scope.chartOptions = BrewService.chartOptions(unit);
   };
 
-  $scope.timerRun = function(timer){
+  $scope.timerRun = function(timer,kettle){
     timer.interval = $interval(function () {
       //cancel interval if zero out
       if(!timer.up && timer.min==0 && timer.sec==0){
         $interval.cancel(timer.interval);
-        $scope.alert(timer,'timer');
         timer.up = {min:0,sec:0,running:true};
         $scope.timerRun(timer);
       } else if(!timer.up && timer.sec > 0){
@@ -592,6 +598,16 @@ $scope.kettles = BrewService.settings('kettles') || [{
         //count up seconds
         timer.up.sec++;
       } else if(!timer.up){
+        //should we start the next timer?
+        if(!!kettle){
+          _.each(_.filter(kettle.timers, {running:false,min:timer.min,queue:false}),function(nextTimer){
+            $scope.alert(kettle,nextTimer);
+            nextTimer.queue=true;
+            $timeout(function(){
+              $scope.timerStart(nextTimer,kettle);
+            },60000);
+          });
+        }
         //cound down minutes and seconds
         timer.sec=59;
         timer.min--;
@@ -603,7 +619,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
     },1000);
   };
 
-  $scope.timerStart = function(timer){
+  $scope.timerStart = function(timer,kettle){
     if(timer.up && timer.up.running){
       //stop timer
       timer.up.running=false;
@@ -615,7 +631,8 @@ $scope.kettles = BrewService.settings('kettles') || [{
     } else {
       //start timer
       timer.running=true;
-      $scope.timerRun(timer);
+      timer.queue=false;
+      $scope.timerRun(timer,kettle);
     }
   };
 
@@ -623,14 +640,14 @@ $scope.kettles = BrewService.settings('kettles') || [{
     var allSensors = [];
 
     //only process active sensors
-    for(k in $scope.kettles){
-      if($scope.kettles[k].active){
-        allSensors.push(BrewService.temp($scope.kettles[k].pin).then(updateTemp
+    _.each($scope.kettles, function(kettle){
+      if(kettle.active){
+        allSensors.push(BrewService.temp(kettle.pin).then(updateTemp
           ,function error(err){
             $scope.error_message='Could not connect to the Arduino at '+BrewService.domain();
           }));
       }
-    }
+    });
 
     $q.all(allSensors).then(function(values){
       //re process on timeout
@@ -666,13 +683,6 @@ $scope.kettles = BrewService.settings('kettles') || [{
   $scope.processTemps();
 
   $scope.init();
-
-  //timer check
-  for(k in $scope.kettles){
-    if($scope.kettles[k].timer && $scope.kettles[k].timer.running){
-      $scope.timerRun(k);
-    }
-  }
 
   // scope watch
   $scope.$watch('settings',function(newValue,oldValue){
