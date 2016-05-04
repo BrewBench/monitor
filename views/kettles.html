@@ -114,7 +114,7 @@
             <label class="notes" ng-if="timer.notes"><editable model="timer.notes"></editable></label>
             <div class="input-group" role="group">
               <editable class="timer" type="number" model="timer.min"></editable><span class="timer-secs" ng-if="timer.running && !timer.up">: {{timer.sec}}</span>
-              <span class="count-up" ng-show="timer.up" ng-click="timerStart(timer,kettle)">{{timer.up.min}}</span><span ng-if="timer.up" class="timer-secs-up">: {{timer.up.sec}}</span>
+              <span class="count-up" ng-show="timer.up" ng-click="timerStart(timer,kettle)">{{timer.up.min}}</span><span ng-if="timer.up" class="timer-secs-up" ng-click="timerStart(timer,kettle)">: {{timer.up.sec}}</span>
               <span class="input-group-btn">
                 <button type="button" class="btn btn-default" ng-if="timer.min!==null" ng-click="timer.min=timer.min-1"><i class="fa fa-minus fa-lg"></i></button>
                 <button type="button" class="btn btn-default" ng-if="timer.min!==null" ng-click="timer.min=timer.min+1"><i class="fa fa-plus fa-lg"></i></button>

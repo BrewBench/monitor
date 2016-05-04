@@ -207,6 +207,7 @@ sup.ref{
 .kettles .timers .timer-secs-up {
   color: rgba(200,47,47,1);
   font-size: 16px;
+  cursor: pointer;
 }
 
 .kettles .temp-row{

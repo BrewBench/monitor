@@ -360,7 +360,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
       options.min = options.min ? options.min : 0;
       options.sec = options.sec ? options.sec : 0;
       options.running = options.running ? options.running : false;
-      options.queue = options.queue ? options.queue : false;      
+      options.queue = options.queue ? options.queue : false;
       kettle.timers.push(options);
     } else {
       kettle.timers.push({label:'Edit label',min:60,sec:0,running:false,queue:false});
@@ -445,7 +445,10 @@ $scope.kettles = BrewService.settings('kettles') || [{
     }
 
     // Desktop / Slack Notification
-    var message, icon = 'img/brewbench-logo-45.png', color = 'good';
+    var message, icon = 'http://brewbench.io/img/brewbench-logo.png', color = 'good';
+
+    if(['hop','grain','water'].indexOf(kettle.type)!==-1)
+      icon = 'http://brewbench.io/img/'+kettle.type+'.png';
 
     //don't alert if the heater is running and temp is too low
     if(kettle && kettle.low && kettle.heater.running)
@@ -454,7 +457,10 @@ $scope.kettles = BrewService.settings('kettles') || [{
     if(!!timer){ //kettle is a timer object
       if(!$scope.settings.notifications.timers)
         return;
-      message = 'Time to add '+timer.notes+' of '+timer.label +' to your '+ kettle.key;
+      if(timer.up)
+        message = 'Your timers are done';
+      else
+        message = 'Time to add '+timer.notes+' of '+timer.label;
     }
     else if(kettle && kettle.high){
       if(!$scope.settings.notifications.high || $scope.settings.notifications.last=='high')
@@ -510,7 +516,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
           // If the user accepts, let's create a notification
           if (permission === "granted") {
             if(message){
-              notification = new Notification('BrewBench',{body:message,icon:icon});
+              notification = new Notification('BrewBench',{title:kettle.key,body:message,icon:icon});
             }
           }
         });
@@ -518,7 +524,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
     }
     // Slack Notification
     if($scope.settings.notifications.slack.indexOf('http')!==-1){
-      BrewService.slack($scope.settings.notifications.slack,message,color).then(function(response){
+      BrewService.slack($scope.settings.notifications.slack,message,color,icon,kettle).then(function(response){
         // console.log('Slack',response);
       });
     }
@@ -588,9 +594,16 @@ $scope.kettles = BrewService.settings('kettles') || [{
     timer.interval = $interval(function () {
       //cancel interval if zero out
       if(!timer.up && timer.min==0 && timer.sec==0){
-        $interval.cancel(timer.interval);
+        //stop running
+        timer.running = false;
+        //start up counter
         timer.up = {min:0,sec:0,running:true};
         $scope.timerRun(timer);
+        //if all timers are done send an alert
+        if( !!kettle && _.filter(kettle.timers, {up: {running:true}}).length == kettle.timers.length )
+          $scope.alert(kettle,timer);
+        //cancel timer
+        $interval.cancel(timer.interval);
       } else if(!timer.up && timer.sec > 0){
         //count down seconds
         timer.sec--;

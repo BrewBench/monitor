@@ -40,14 +40,16 @@ brewBench.factory('BrewService', function($http, $q, $filter){
       return '';
     },
 
-    slack: function(webhook_url,msg,color){
+    slack: function(webhook_url,msg,color,icon,kettle){
       var q = $q.defer();
 
       var postObj = {'attachments': [{'fallback': msg,
+            'title': kettle.key+' kettle',
+            'title_link': document.location.href,
             'fields': [{'value': msg}],
             'color': color,
             'mrkdwn_in': ['text', 'fallback', 'fields'],
-            'thumb_url':'https://brewbench.co/img/brewbench-logo.png'
+            'thumb_url': icon
           }]
         };
 
