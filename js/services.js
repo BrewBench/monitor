@@ -160,7 +160,7 @@ brewBench.factory('BrewService', function($http, $q, $filter){
                   left: 65
               },
               x: function(d){ return (d && d.length) ? d[0] : d; },
-              y: function(d){ return d[1]; },
+              y: function(d){ return (d && d.length) ? d[1] : d; },
               // average: function(d) { return d.mean },
 
               color: d3.scale.category10().range(),

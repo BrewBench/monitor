@@ -290,7 +290,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
     $scope.error_message = '';
     if(response && response.temp){
       // this will fail if two kettles are on the same pin
-      var kettle = $scope.kettles.filter(function(k){return k.pin == parseInt(response.pin);})[0];
+      var kettle = _.filter($scope.kettles, {pin: parseInt(response.pin)})[0];
 
       //if kettle has been stopped since request started
       if(!kettle.active)
