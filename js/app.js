@@ -17,6 +17,11 @@ var brewBench = angular.module('brewbench', [
       templateUrl: 'views/monitor.html',
       controller: 'mainCtrl'
     })
+    .state('arduino', {
+      url: '/arduino/:domain',
+      templateUrl: 'views/monitor.html',
+      controller: 'mainCtrl'
+    })
     .state('otherwise', {
      url: '*path',
      templateUrl: 'views/not-found.html'

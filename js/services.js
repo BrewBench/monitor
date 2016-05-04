@@ -30,14 +30,18 @@ brewBench.factory('BrewService', function($http, $q, $filter){
       return encodeURI(s).split(/%..|./).length - 1;
     },
 
-    domain: function(){
+    domain: function(format){
       var settings = this.settings('settings');
+      var domain = '';
 
       if(settings && settings.arduinoUrl)
-        return settings.arduinoUrl.indexOf('//')==-1 ? '//'+settings.arduinoUrl : settings.arduinoUrl;
+        domain = settings.arduinoUrl.indexOf('//')===-1 ? '//'+settings.arduinoUrl : settings.arduinoUrl;
       else if(document.location.host == 'localhost')
-        return 'http://arduino.local';
-      return '';
+        domain = '//arduino.local';
+
+      if(!!format)
+        return domain.indexOf('//')!==-1 ? domain.substring(domain.indexOf('//')+2) : domain;
+      return domain;
     },
 
     slack: function(webhook_url,msg,color,icon,kettle){
@@ -45,7 +49,7 @@ brewBench.factory('BrewService', function($http, $q, $filter){
 
       var postObj = {'attachments': [{'fallback': msg,
             'title': kettle.key+' kettle',
-            'title_link': document.location.href,
+            'title_link': 'http://'+document.location.host+'/#/arduino/'+this.domain(true),
             'fields': [{'value': msg}],
             'color': color,
             'mrkdwn_in': ['text', 'fallback', 'fields'],

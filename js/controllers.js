@@ -42,6 +42,10 @@ $scope.settings = BrewService.settings('settings') || {
   ,sounds: {on:true,alert:'audio/bike.mp3',timer:'audio/school.mp3'}
 };
 
+if(!!$stateParams.domain){
+  $scope.settings.arduinoUrl=$stateParams.domain;
+}
+
 $scope.knobOptions = {
   readOnly: true,
   unit: '\u00B0',
