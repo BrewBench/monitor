@@ -1,0 +1,25 @@
+salt,name,concentration_one_gram_per_gallon,grams_per_tsp,effects,description
+"Calcium Carbonate
+(CaCO3)",Chalk,"105 ppm
+Ca+2
+158 ppm CO3-2",1.8,Raises pH,Because of its limited solubility it is only effective when added directly to the mash. Use for making dark beers in areas of soft water. Use nomograph and monitor the mash pH with pH test papers to determine how much to add.
+"Calcium Sulfate
+(CaSO4*2 H2O)",Gypsum,"61.5 ppm
+Ca+2
+147.4 ppm
+SO4-2",4,Lowers pH,"Useful for adding calcium if the water is low in sulfate. Can be used to add sulfate ""crispness"" to the hop bitterness."
+"Calcium Chloride
+(CaCl2*2H2O)",,"72 ppm
+Ca+2
+127 ppm
+Cl-1",3.4,Lowers pH,Useful for adding Calcium if the water is low in chlorides.
+"Magnesium Sulfate
+(MgSO4*7H2O)",Epsom Salt,"26 ppm
+Mg+2
+103 ppm
+SO4-2",4.5,Lowers pH by a small amount.,"Can be used to add sulfate ""crispness"" to the hop bitterness."
+"Sodium Bicarbonate
+(NaHCO3)",Baking Soda,"75 ppm
+Na+1
+191 ppm
+HCO3-",4.4,Raises pH by adding alkalinity.,"If your pH is too low and/or has low residual alkalinity, then you can add alkalinity. See procedure for calcium carbonate."

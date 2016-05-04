@@ -56,3 +56,33 @@
     </div>
   </div>
 </div>
+
+<div class="modal fade" id="dataModal-water" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+        <h1 class="modal-title"><img src="img/water.svg" width="40"/> Water <sup class="ref">Reference</sup></h1>
+        <input ng-model="searchWater" placeholder="Search Water">
+      </div>
+      <div class="modal-body">
+        <table class="table table-hover">
+          <tr>
+            <th>Salt</th>
+            <th>Name</th>
+            <th>Amount (1g/1gal)</th>
+            <th>Effects</th>
+            <th>Description</th>
+          </tr>
+          <tr ng-repeat="water in water | filter:searchWater">
+            <td>{{water.salt}}</td>
+            <td>{{water.name}}</td>
+            <td>{{water.concentration_one_gram_per_gallon}}</td>
+            <td>{{water.effects}}</td>
+            <td>{{water.description}}</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

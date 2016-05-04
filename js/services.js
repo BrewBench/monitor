@@ -123,6 +123,16 @@ brewBench.factory('BrewService', function($http, $q, $filter){
         return q.promise;
     },
 
+    water: function(){
+        var q = $q.defer();
+        $http.get('/data/water.json').then(function(response){
+          q.resolve(response.data);
+        },function(err){
+          q.reject(err);
+        });
+        return q.promise;
+    },
+
     lovibond: function(){
         var q = $q.defer();
         $http.get('/data/lovibond.json').then(function(response){
@@ -145,7 +155,7 @@ brewBench.factory('BrewService', function($http, $q, $filter){
                   bottom: 100,
                   left: 65
               },
-              x: function(d){ return d[0] || d; },
+              x: function(d){ return (d && d.length) ? d[0] : d; },
               y: function(d){ return d[1]; },
               // average: function(d) { return d.mean },
 

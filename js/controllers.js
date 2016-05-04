@@ -6,6 +6,7 @@ var notification = null
 
 $scope.hops;
 $scope.grains;
+$scope.water;
 $scope.lovibond;
 
 $scope.chartOptions = BrewService.chartOptions();
@@ -218,6 +219,12 @@ $scope.kettles = BrewService.settings('kettles') || [{
     if(!$scope.hops){
       BrewService.hops().then(function(response){
         $scope.hops = _.sortBy(_.uniqBy(response,'name'),'name');
+      });
+    }
+
+    if(!$scope.water){
+      BrewService.water().then(function(response){
+        $scope.water = _.sortBy(_.uniqBy(response,'name'),'name');
       });
     }
 
@@ -445,10 +452,10 @@ $scope.kettles = BrewService.settings('kettles') || [{
     }
 
     // Desktop / Slack Notification
-    var message, icon = 'http://brewbench.io/img/brewbench-logo.png', color = 'good';
+    var message, icon = 'https://brewbench.io/img/brewbench-logo.png', color = 'good';
 
     if(['hop','grain','water'].indexOf(kettle.type)!==-1)
-      icon = 'http://brewbench.io/img/'+kettle.type+'.png';
+      icon = 'https://brewbench.io/img/'+kettle.type+'.png';
 
     //don't alert if the heater is running and temp is too low
     if(kettle && kettle.low && kettle.heater.running)
@@ -459,8 +466,10 @@ $scope.kettles = BrewService.settings('kettles') || [{
         return;
       if(timer.up)
         message = 'Your timers are done';
-      else
+      else if(!!timer.notes)
         message = 'Time to add '+timer.notes+' of '+timer.label;
+      else
+        message = 'Time to add '+timer.label;
     }
     else if(kettle && kettle.high){
       if(!$scope.settings.notifications.high || $scope.settings.notifications.last=='high')
@@ -509,14 +518,14 @@ $scope.kettles = BrewService.settings('kettles') || [{
 
       if(Notification.permission === "granted"){
         if(message){
-          notification = new Notification('BrewBench',{body:message,icon:icon});
+          notification = new Notification(kettle.key+' kettle',{body:message,icon:icon});
         }
       } else if(Notification.permission !== 'denied'){
         Notification.requestPermission(function (permission) {
           // If the user accepts, let's create a notification
           if (permission === "granted") {
             if(message){
-              notification = new Notification('BrewBench',{title:kettle.key,body:message,icon:icon});
+              notification = new Notification(kettle.key+' kettle',{body:message,icon:icon});
             }
           }
         });

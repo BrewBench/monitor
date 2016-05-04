@@ -84,9 +84,9 @@ body {
   color: #333;
 }
 
-#dataModal-hops .modal-body, #dataModal-grains .modal-body{
+#dataModal-hops .modal-body, #dataModal-grains .modal-body, #dataModal-water .modal-body{
   max-height: calc(100vh - 185px);
-    overflow-y: auto;
+  overflow-y: auto;
 }
 
 .modal-header .close {
