@@ -65,11 +65,13 @@ brewBench.factory('BrewService', function($http, $q, $filter){
       return q.promise;
     },
 
-    // read/write thermistors
+    // read/write thermistors or DS18B20
     // https://learn.adafruit.com/thermistor/using-a-thermistor
-    temp: function(sensor,value){
+    // https://www.adafruit.com/product/381)
+    temp: function(temp,value){
       var q = $q.defer();
-      var url = this.domain()+'/arduino/temp/'+sensor;
+      var url = this.domain()+'/arduino/'+temp.type+'/'+temp.pin;
+
       if(value)
         url += '/'+value;
 

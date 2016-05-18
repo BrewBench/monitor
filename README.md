@@ -2,15 +2,17 @@
 
 <img src="img/brewbench-logo.png?raw=true" alt="BrewBench logo" title="BrewBench" align="right" />
 
-Is an Arduino Yun brew monitor for the home brewer enthusiast that uses the Arduino REST API to interface with thermistors connected to the analog ports.
-
-See [Thermistor](https://learn.adafruit.com/thermistor/using-a-thermistor) for wiring these up on analog ports.
+BrewBench is an Arduino brew monitor, controller and alert system for the home brewer enthusiast.  It uses the Arduino REST API to interface with thermistors connected to the analog ports.  You can also connect a relay to the digital ports and add a heater / pump to create a RIMS system.  The software will start/stop the heater/pump based on the target temperature you set.
 
 ## Setup the Arduino
 
 * Connect it to your WiFi (see [ArduinoYun](https://www.arduino.cc/en/Guide/ArduinoYun#toc14))
 * Enable the REST API (see [ArduinoYun](https://www.arduino.cc/en/Guide/ArduinoYun#toc5))
 * Upload the [Arduino sketch](arduino/BrewBench/BrewBench.ino)
+* Temp Sensors
+  * Analog [Thermistors](https://learn.adafruit.com/thermistor/using-a-thermistor)
+  * Digital [DS18B20](https://www.adafruit.com/product/381)
+    * Will need the [cactus](http://static.cactus.io/downloads/library/ds18b20/cactus_io_DS18B20.zip) library
 
 ```sh
 # get the web code
@@ -26,7 +28,7 @@ There are three options here, you can either run the code on your Arduino or on 
 
 Once you have uploaded the [sketch](arduino/BrewBench/BrewBench.ino), simply use: [brewbench.io](http://brewbench.io)
 
-### 2. Arduino Deployment
+### 2. Arduino Hosted
 
 The Arduino has a built in webserver running in `/www/`.
 
@@ -43,8 +45,8 @@ rsync -rav -e ssh --delete --exclude-from '.rsyncignore' ./ root@arduino.local:/
 
 * [http://arduino.local/brewbench/](http://arduino.local/brewbench/)
 
-### 3.  Webserver Deployment
-
+### 3.  Local Network Hosted
+Copy to your local webserver or run locally
 ```sh
 npm install
 live-server

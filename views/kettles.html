@@ -5,12 +5,30 @@
 
       <div class="row">
         <div class="col-md-8 col-xs-9"><img class="type" ng-src="img/{{kettle.type}}.svg" width="30" ng-click="changeKettleType(kettle)"><h3><editable type="text" model="kettle.key"></editable></h3>
-            <div class="btn-group">
+            <div class="btn-group" ng-if="kettle.temp.type=='Thermistor'">
               <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                A{{kettle.pin}} <span class="caret"></span>
+                A{{kettle.temp.pin}} <span class="caret"></span>
               </button>
+              <i class="fa fa-3x" ng-class="{'fa-chevron-right':!showTempType,'fa-chevron-left':showTempType}" aria-hidden="true" ng-click="showTempType=!showTempType"></i>
+              <div class="tempType">
+                <span class="label label-default" ng-if="showTempType" ng-class="{'label-success':kettle.temp.type=='Thermistor'}" ng-click="kettle.temp.type='Thermistor'">Thermistor</span>
+                <span class="label label-default" ng-if="showTempType" ng-class="{'label-success':kettle.temp.type=='DS18B20'}"ng-click="kettle.temp.type='DS18B20'">DS18B20</span>
+              </div>
               <ul class="dropdown-menu">
-                <li ng-repeat="p in [0,1,2,3,4,5] track by $index"><a href="#" ng-click="kettle.pin=p" ng-if="p != kettle.pin">A{{p}}</a></li>
+                <li ng-repeat="p in [0,1,2,3,4,5] track by $index"><a href="#" ng-click="kettle.temp.pin=p" ng-if="p != kettle.temp.pin">A{{p}}</a></li>
+              </ul>
+            </div>
+            <div class="btn-group" ng-if="kettle.temp.type=='DS18B20'">
+              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                D{{kettle.temp.pin}} <span class="caret"></span>
+              </button>
+              <i class="fa fa-3x" ng-class="{'fa-chevron-right':!showTempType,'fa-chevron-left':showTempType}" aria-hidden="true" ng-click="showTempType=!showTempType"></i>
+              <div class="tempType">
+                <span class="label label-default" ng-if="showTempType" ng-class="{'label-success':kettle.temp.type=='Thermistor'}" ng-click="kettle.temp.type='Thermistor'">Thermistor</span>
+                <span class="label label-default" ng-if="showTempType" ng-class="{'label-success':kettle.temp.type=='DS18B20'}"ng-click="kettle.temp.type='DS18B20'">DS18B20</span>
+              </div>
+              <ul class="dropdown-menu">
+                <li ng-repeat="p in [2,3,4,5,6,7,8,9,10,11,12,13] track by $index"><a href="#" ng-click="kettle.temp.pin=p" ng-if="p != kettle.temp.pin">D{{p}}</a></li>
               </ul>
             </div>
           </div>

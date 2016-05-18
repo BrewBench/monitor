@@ -129,7 +129,7 @@ sup.ref{
 
 .recipe h3, .settings h3, .kettles h3{
     color: #777;
-    display: inline;
+    display: inline-block;
 }
 
 .settings ul, .kettles ul{
@@ -157,6 +157,16 @@ sup.ref{
 .kettles .btn.add-timer {
   padding-top: 0;
   padding-bottom: 0;
+}
+
+.kettles .tempType {
+  display: inline-block;
+  position: relative;;
+}
+
+.kettles .tempType span{
+  margin-bottom: 4px;
+  display: block;
 }
 
 .left{
@@ -339,7 +349,7 @@ input[type=radio].degree:checked + label:before {
   color: #d9534f;
 }
 
-.digital .label, .digital .heat, .digital .pump{
+.label, .digital .heat, .digital .pump{
   cursor: pointer;
   font-size: 14px;
 }
@@ -351,6 +361,12 @@ input[type=radio].degree:checked + label:before {
 .fa.fa-chevron-up, .fa.fa-chevron-down {
   color:rgba(200,47,47,.4);
   cursor: pointer;
+}
+
+.fa-chevron-right, .fa-chevron-left {
+  cursor: pointer;
+  padding-left: 5px;
+  color:rgba(119,119,119,.4);
 }
 
 .btn-file {

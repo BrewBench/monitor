@@ -4,6 +4,9 @@
 #include <Bridge.h>
 #include <BridgeServer.h>
 #include <BridgeClient.h>
+// https://www.adafruit.com/product/381
+// http://static.cactus.io/downloads/library/ds18b20/cactus_io_DS18B20.zip
+#include "cactus_io_DS18B20.h"
 
 // https://learn.adafruit.com/thermistor/using-a-thermistor
 // resistance at 25 degrees C
@@ -36,8 +39,11 @@ void process(BridgeClient client) {
   if (command == "digital") {
     digitalCommand(client);
   }
-  if (command == "temp") {
-    tempCommand(client);
+  if (command == "DS18B20") {
+    ds18B20Command(client);
+  }    
+  if (command == "Thermistor") {
+    thermistorCommand(client);
   }
 }
 
@@ -66,7 +72,22 @@ void digitalCommand(BridgeClient client) {
   Bridge.put(key, String(value));
 }
 
-void tempCommand(BridgeClient client) {
+void ds18B20Command(BridgeClient client) {
+  int pin, value;
+  pin = client.parseInt();
+  DS18B20 ds(pin);
+  ds.readSensor();
+  value = ds.getTemperature_C();
+  
+  // Send JSON response to client
+  client.print("{\"pin\":\""+String(pin)+"\",\"temp\":\""+String(value)+"\"}");
+
+  String key = "D";
+  key += pin;
+  Bridge.put(key, String(value));
+}
+
+void thermistorCommand(BridgeClient client) {
   int pin, value;
 
   pin = client.parseInt();

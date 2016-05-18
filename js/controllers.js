@@ -70,33 +70,30 @@ $scope.kettles = BrewService.settings('kettles') || [{
 // $scope.kettles = [{
     key: 'Boil'
     ,type: 'hop'
-    ,pin: 0
     ,active: false
     ,heater: {pin:2,running:false,auto:false}
     ,pump: {pin:3,running:false,auto:false}
-    ,temp: {hit:false,current:0,target:200,diff:5}
+    ,temp: {pin:0,type:'Thermistor',hit:false,current:0,target:200,diff:5}
     ,values: []
     ,timers: []
     ,knob: angular.merge($scope.knobOptions,{value:0,min:0,max:200+5})
   },{
     key: 'Hot Liquor'
     ,type: 'water'
-    ,pin: 1
     ,active: false
     ,heater: {pin:4,running:false,auto:false}
     ,pump: {pin:5,running:false,auto:false}
-    ,temp: {hit:false,current:0,target:200,diff:5}
+    ,temp: {pin:1,type:'Thermistor',hit:false,current:0,target:200,diff:5}
     ,values: []
     ,timers: []
     ,knob: angular.merge($scope.knobOptions,{value:0,min:0,max:200+5})
   },{
     key: 'Mash'
     ,type: 'grain'
-    ,pin: 2
     ,active: false
     ,heater: {pin:6,running:false,auto:false}
     ,pump: {pin:7,running:false,auto:false}
-    ,temp: {hit:false,current:0,target:150,diff:5}
+    ,temp: {pin:2,type:'Thermistor',hit:false,current:0,target:150,diff:5}
     ,values: []
     ,timers: []
     ,knob: angular.merge($scope.knobOptions,{value:0,min:0,max:150+5})
@@ -108,11 +105,10 @@ $scope.kettles = BrewService.settings('kettles') || [{
         {
           key: 'New Kettle'
           ,type: 'water'
-          ,pin: $scope.kettles.length
           ,active: false
           ,heater: {pin:6,running:false,auto:false}
           ,pump: {pin:7,running:false,auto:false}
-          ,temp: {hit:false,current:0,target:150,diff:5}
+          ,temp: {pin:0,type:'Thermistor',hit:false,current:0,target:150,diff:5}
           ,values: []
           ,timers: []
           ,knob: angular.merge($scope.knobOptions,{value:0,min:0,max:150+5})
@@ -298,7 +294,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
     $scope.error_message = '';
     if(response && response.temp){
       // this will fail if two kettles are on the same pin
-      var kettle = _.filter($scope.kettles, {pin: parseInt(response.pin)})[0];
+      var kettle = _.filter($scope.kettles, {temp: {pin: parseInt(response.pin)}})[0];
 
       //if kettle has been stopped since request started
       if(!kettle.active)
@@ -415,7 +411,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
       kettle.active = !kettle.active;
 
       if(kettle.active){
-        BrewService.temp(kettle.pin).then(updateTemp
+        BrewService.temp(kettle.temp).then(updateTemp
           ,function error(err){
             $scope.error_message='Could not connect to the Arduino at '+BrewService.domain();
           });
@@ -676,7 +672,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
     //only process active sensors
     _.each($scope.kettles, function(kettle){
       if(kettle.active){
-        allSensors.push(BrewService.temp(kettle.pin).then(updateTemp
+        allSensors.push(BrewService.temp(kettle.temp).then(updateTemp
           ,function error(err){
             $scope.error_message='Could not connect to the Arduino at '+BrewService.domain();
           }));
