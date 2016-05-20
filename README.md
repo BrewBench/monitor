@@ -9,7 +9,7 @@ BrewBench is an Arduino brew monitor, controller and alert system for the home b
 * Connect it to your WiFi (see [ArduinoYun](https://www.arduino.cc/en/Guide/ArduinoYun#toc14))
 * Enable the REST API (see [ArduinoYun](https://www.arduino.cc/en/Guide/ArduinoYun#toc5))
 * Upload the [Arduino sketch](arduino/BrewBench/BrewBench.ino)
-* Temp Sensors
+* Temp Sensors (See [Hackster](https://www.hackster.io/brewbench/brewbench-d64d90) for wiring details)
   * Analog [Thermistors](https://learn.adafruit.com/thermistor/using-a-thermistor)
   * Digital [DS18B20](https://www.adafruit.com/product/381)
     * Will need the [cactus](http://static.cactus.io/downloads/library/ds18b20/cactus_io_DS18B20.zip) library
