@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/BrewBench/web-controller.png?label=ready&title=Ready)](https://waffle.io/BrewBench/web-controller)
 # BrewBench
 
 <img src="img/brewbench-logo.png?raw=true" alt="BrewBench logo" title="BrewBench" align="right" />
