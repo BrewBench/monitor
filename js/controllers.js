@@ -8,7 +8,6 @@ $scope.hops;
 $scope.grains;
 $scope.water;
 $scope.lovibond;
-
 $scope.chartOptions = BrewService.chartOptions();
 
 $scope.error_message = '';
@@ -37,10 +36,35 @@ $scope.settings = BrewService.settings('settings') || {
   ,unit: 'F'
   ,arduinoUrl: 'arduino.local'
   ,storage: 'sd'
-  ,recipe: {name:'',yeast:[]}
+  ,recipe: {'name':'', 'yeast':[], 'og': 1.060, 'fg': 1.015}
   ,notifications: {on:true,timers:true,high:true,low:true,target:true,slack:'Slack notification webhook Url',last:''}
   ,sounds: {on:true,alert:'audio/bike.mp3',timer:'audio/school.mp3'}
+  ,scale: 'gravity'
 };
+
+// init calc values
+$scope.updateABV = function(){
+  if($scope.settings.scale=='gravity')
+    $scope.settings.recipe.abv = BrewService.abv($scope.settings.recipe.og,$scope.settings.recipe.fg);
+  else
+    $scope.settings.recipe.abv = BrewService.abv(BrewService.sg($scope.settings.recipe.og),BrewService.sg($scope.settings.recipe.fg));
+}
+$scope.changeScale = function(scale){
+  $scope.settings.scale = scale;
+  if(scale=='gravity'){
+    $scope.settings.recipe.og = BrewService.sg($scope.settings.recipe.og);
+    $scope.settings.recipe.fg = BrewService.sg($scope.settings.recipe.fg);
+  } else {
+    $scope.settings.recipe.og = BrewService.plato($scope.settings.recipe.og);
+    $scope.settings.recipe.fg = BrewService.plato($scope.settings.recipe.fg);
+  }
+};
+$scope.updateABV();
+
+$scope.urls = BrewService.settings('urls') || [];
+
+if(!$scope.urls.length && $scope.settings.arduinoUrl)
+  $scope.urls.push($scope.settings.arduinoUrl);
 
 if(!!$stateParams.domain){
   $scope.settings.arduinoUrl=$stateParams.domain;
@@ -67,7 +91,6 @@ $scope.knobOptions = {
 
 //default kettle values
 $scope.kettles = BrewService.settings('kettles') || [{
-// $scope.kettles = [{
     key: 'Boil'
     ,type: 'hop'
     ,active: false
@@ -293,74 +316,72 @@ $scope.kettles = BrewService.settings('kettles') || [{
   function updateTemp(response){
     $scope.error_message = '';
     if(response && response.temp){
-      // this will fail if two kettles are on the same pin
-      var kettle = _.filter($scope.kettles, {temp: {pin: parseInt(response.pin)}})[0];
+      var kettles = _.filter($scope.kettles, {'active': true, 'temp': {'pin': parseInt(response.pin)}});
 
-      //if kettle has been stopped since request started
-      if(!kettle.active)
+      if(!kettles.length)
         return;
 
-      // temp response is in C
-      if($scope.settings.unit=='F')
-        kettle.temp.current = $filter('toFahrenheit')(response.temp);
-      else
-        kettle.temp.current = Math.round(response.temp);
-
-      //reset all kettles every resetChart
-      if(kettle.values.length > resetChart){
-        $scope.kettles.map(function(k){
-          return k.values=[];
-        });
-      }
-
-      //chart data
+      //chart date
       var date = new Date();
-      kettle.values.push([date.getTime(),kettle.temp.current]);
 
-      $scope.updateKnobCopy(kettle);
+      _.each(kettles,function(kettle){
+        // temp response is in C
+        kettle.temp.current = ($scope.settings.unit=='F') ? $filter('toFahrenheit')(response.temp) : Math.round(response.temp);
 
-      //is temp too high?
-      if(kettle.temp.current >= kettle.temp.target+kettle.temp.diff){
-        $scope.alert(kettle);
-        //stop the heating element
-        if(kettle.heater.auto && kettle.heater.running){
-          BrewService.digital(kettle.heater.pin,1).then(function(){
-            kettle.heater.running = false;
-          },function(err){
-            //failed to stop
+        //reset all kettles every resetChart
+        if(kettle.values.length > resetChart){
+          $scope.kettles.map(function(k){
+            return k.values=[];
           });
         }
-        if(kettle.pump.auto && kettle.pump.running){
-          BrewService.digital(kettle.pump.pin,1).then(function(){
-            kettle.pump.running = false;
-          },function(err){
-            //failed to stop
-          });
+
+        kettle.values.push([date.getTime(),kettle.temp.current]);
+
+        $scope.updateKnobCopy(kettle);
+
+        //is temp too high?
+        if(kettle.temp.current >= kettle.temp.target+kettle.temp.diff){
+          $scope.alert(kettle);
+          //stop the heating element
+          if(kettle.heater.auto && kettle.heater.running){
+            BrewService.digital(kettle.heater.pin,1).then(function(){
+              kettle.heater.running = false;
+            },function(err){
+              //failed to stop
+            });
+          }
+          if(kettle.pump.auto && kettle.pump.running){
+            BrewService.digital(kettle.pump.pin,1).then(function(){
+              kettle.pump.running = false;
+            },function(err){
+              //failed to stop
+            });
+          }
+        } //is temp too low?
+        else if(kettle.temp.current <= kettle.temp.target-kettle.temp.diff){
+          $scope.alert(kettle);
+          //start the heating element
+          if(kettle.heater.auto && !kettle.heater.running){
+            BrewService.digital(kettle.heater.pin,0).then(function(){
+              kettle.heater.running = true;
+              kettle.knob.subText.text = 'heating';
+              kettle.knob.subText.color = 'rgba(200,47,47,1)';
+            },function(err){
+              //failed to start
+            });
+          }
+          if(kettle.pump.auto && !kettle.pump.running){
+            BrewService.digital(kettle.pump.pin,0).then(function(){
+              kettle.pump.running = true;
+            },function(err){
+              //failed to start
+            });
+          }
+        } else {
+          kettle.temp.hit=new Date();//set the time the target was hit so we can now start alerts
+          $scope.alert(kettle);
         }
-      } //is temp too low?
-      else if(kettle.temp.current <= kettle.temp.target-kettle.temp.diff){
-        $scope.alert(kettle);
-        //start the heating element
-        if(kettle.heater.auto && !kettle.heater.running){
-          BrewService.digital(kettle.heater.pin,0).then(function(){
-            kettle.heater.running = true;
-            kettle.knob.subText.text = 'heating';
-            kettle.knob.subText.color = 'rgba(200,47,47,1)';
-          },function(err){
-            //failed to start
-          });
-        }
-        if(kettle.pump.auto && !kettle.pump.running){
-          BrewService.digital(kettle.pump.pin,0).then(function(){
-            kettle.pump.running = true;
-          },function(err){
-            //failed to start
-          });
-        }
-      } else {
-        kettle.temp.hit=new Date();//set the time the target was hit so we can now start alerts
-        $scope.alert(kettle);
-      }
+      });
     }
   };
 
@@ -450,7 +471,6 @@ $scope.kettles = BrewService.settings('kettles') || [{
       },1000);
   };
 
-
   $scope.alert = function(kettle,timer){
 
     //don't start alerts until we have hit the temp.target
@@ -460,10 +480,10 @@ $scope.kettles = BrewService.settings('kettles') || [{
     }
 
     // Desktop / Slack Notification
-    var message, icon = 'https://brewbench.io/img/brewbench-logo.png', color = 'good';
+    var message, icon = 'img/brewbench-logo.png', color = 'good';
 
-    if(['hop','grain','water'].indexOf(kettle.type)!==-1)
-      icon = 'https://brewbench.io/img/'+kettle.type+'.png';
+    if(kettle && ['hop','grain','water'].indexOf(kettle.type)!==-1)
+      icon = 'img/'+kettle.type+'.png';
 
     //don't alert if the heater is running and temp is too low
     if(kettle && kettle.low && kettle.heater.running)
@@ -526,7 +546,10 @@ $scope.kettles = BrewService.settings('kettles') || [{
 
       if(Notification.permission === "granted"){
         if(message){
-          notification = new Notification(kettle.key+' kettle',{body:message,icon:icon});
+          if(kettle)
+            notification = new Notification(kettle.key+' kettle',{body:message,icon:icon});
+          else
+            notification = new Notification('Test kettle',{body:message,icon:icon});
         }
       } else if(Notification.permission !== 'denied'){
         Notification.requestPermission(function (permission) {
@@ -707,6 +730,13 @@ $scope.kettles = BrewService.settings('kettles') || [{
       kettle.knob.max=kettle.temp['target']+kettle.temp['diff'];
       $scope.updateKnobCopy(kettle);
     },1000);
+  };
+
+  $scope.saveArduinoUrl = function(){
+    if($scope.urls.indexOf($scope.settings.arduinoUrl) === -1){
+      $scope.urls.push($scope.settings.arduinoUrl);
+      BrewService.settings('urls',$scope.urls);
+    }
   };
 
   // App start logic

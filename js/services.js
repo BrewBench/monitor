@@ -7,6 +7,7 @@ brewBench.factory('BrewService', function($http, $q, $filter){
       if(window.localStorage){
         window.localStorage.removeItem('settings');
         window.localStorage.removeItem('kettles');
+        window.localStorage.removeItem('urls');
       }
     },
 
@@ -68,14 +69,11 @@ brewBench.factory('BrewService', function($http, $q, $filter){
     // read/write thermistors or DS18B20
     // https://learn.adafruit.com/thermistor/using-a-thermistor
     // https://www.adafruit.com/product/381)
-    temp: function(temp,value){
+    temp: function(temp){
       var q = $q.defer();
       var url = this.domain()+'/arduino/'+temp.type+'/'+temp.pin;
 
-      if(value)
-        url += '/'+value;
-
-      $http.get(url,{timeout:10000}).then(function(response){
+      $http.get(url,{timeout:10000,headers: {'Content-Type': 'application/json'}}).then(function(response){
         q.resolve(response.data);
       },function(err){
         q.reject(err);
@@ -192,6 +190,27 @@ brewBench.factory('BrewService', function($http, $q, $filter){
               }
           }
         };
+    },
+    // http://www.brewersfriend.com/2011/06/16/alcohol-by-volume-calculator-updated/
+    abv: function(og,fg){
+      return (( 76.08 * ( og - fg ) / ( 1.775 - og ) ) * ( fg / 0.794 )).toFixed(2);
+    },
+    // http://www.brewersfriend.com/plato-to-sg-conversion-chart/
+    sg: function(plato){
+      let sg = ( 1 + (plato / (258.6 - ( (plato/258.2) * 227.1) ) ) ).toFixed(3);
+      return parseFloat(sg);
+    },
+    plato: function(sg){
+      let plato = ((-1 * 616.868) + (1111.14 * sg) - (630.272 * Math.pow(sg,2)) + (135.997 * Math.pow(sg,3))).toString();
+      if(plato.substring(plato.indexOf('.')+1,plato.indexOf('.')+2) == 5)
+        plato = plato.substring(0,plato.indexOf('.')+2);
+      else if(plato.substring(plato.indexOf('.')+1,plato.indexOf('.')+2) < 5)
+        plato = plato.substring(0,plato.indexOf('.'));
+      else if(plato.substring(plato.indexOf('.')+1,plato.indexOf('.')+2) > 5){
+        plato = plato.substring(0,plato.indexOf('.'));
+        plato = parseFloat(plato) + 1;
+      }
+      return parseFloat(plato);
     }
   };
 });

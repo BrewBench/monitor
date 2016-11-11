@@ -193,7 +193,7 @@ sup.ref{
 .kettles input[type=number],
 .kettles .temp, .kettles .timer, .settings .poll
  {
-  font-size: 22px;
+  font-size: 24px;
   color: #777;
   width: 75px;
 }
@@ -233,7 +233,7 @@ sup.ref{
 }
 
 .settings input[type=text], .modal input{
-  font-size: 22px;
+  font-size: 24px;
   color: #777;
   width: 100%;
 }

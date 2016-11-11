@@ -33,15 +33,24 @@
       <div class="row">
         <div class="col-md-8 col-xs-8">
           <label class="adjust">Arduino URL</label>
-          <h3><editable model="settings.arduinoUrl"></editable></h3>
-
+          <div class="input-group" role="group">
+            <editable class="poll" model="settings.arduinoUrl" change="saveArduinoUrl()"></editable>
+            <span class="input-group-btn">
+              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu">
+                <li ng-repeat="u in urls"><a href="#" ng-click="settings.arduinoUrl=u">{{u}}</a></li>
+              </ul>
+            </span>
+          </div>
           <label class="adjust">Poll every</label>
           <div class="input-group" role="group">
-          <editable class="poll" type="number" model="settings.pollSeconds"></editable>
-          <span class="input-group-btn">
-            <button type="button" class="btn btn-default"><i class="fa fa-minus fa-lg" ng-click="settings.pollSeconds=settings.pollSeconds-1"></i></button>
-            <button type="button" class="btn btn-default"><i class="fa fa-plus fa-lg" ng-click="settings.pollSeconds=settings.pollSeconds+1"></i></button>
-          </span>
+            <editable class="poll" type="number" model="settings.pollSeconds"></editable>
+            <span class="input-group-btn">
+              <button type="button" class="btn btn-default"><i class="fa fa-minus fa-lg" ng-click="settings.pollSeconds=settings.pollSeconds-1"></i></button>
+              <button type="button" class="btn btn-default"><i class="fa fa-plus fa-lg" ng-click="settings.pollSeconds=settings.pollSeconds+1"></i></button>
+            </span>
           </div>
 
           <label class="adjust">Slack Notification <a href="https://api.slack.com/incoming-webhooks" title="https://api.slack.com/incoming-webhooks" target="_blank"><img src="img/Slack_Mark_Web.png" width="45"></a></label>

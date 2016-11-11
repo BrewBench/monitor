@@ -4,11 +4,11 @@
   "description": "Is an Arduino Yun brew monitor for the home brewer enthusiast that uses the Arduino REST API to interface with thermistors connected to the analog ports.",
   "main": "dist/app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/avantassel/brewbench.git"
+    "url": "git+https://github.com/brewbench/web-controller.git"
   },
   "keywords": [
     "Arduino",
@@ -21,9 +21,9 @@
   "author": "Andrew Van Tassel",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/avantassel/brewbench/issues"
+    "url": "https://github.com/brewbench/web-controller/issues"
   },
-  "homepage": "https://github.com/avantassel/brewbench#readme",
+  "homepage": "https://brewbench.co",
   "devDependencies": {
     "gulp": "^3.9.0",
     "gulp-concat": "^2.6.0",
@@ -33,6 +33,7 @@
     "gulp-ng-annotate": "^1.1.0",
     "gulp-pipe": "^1.0.4",
     "gulp-uglify": "^1.5.1",
-    "live-server": "^0.9.2"
+    "live-server": "^0.9.2",
+    "mocha": "^3.1.2"
   }
 }

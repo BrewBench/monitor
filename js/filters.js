@@ -23,11 +23,11 @@ brewBench.filter('moment', function() {
 }).directive('editable', function() {
     return {
         restrict: 'E',
-        scope: {model: '=',type:'@?',trim:'@?'},
+        scope: {model:'=',type:'@?',trim:'@?',change:'&?'},
         replace: false,
         template:
 '<span>'+
-    '<input type="{{type}}" ng-model="model" ng-show="edit" ng-enter="edit=false" class="editable"></input>'+
+    '<input type="{{type}}" ng-model="model" ng-show="edit" ng-enter="edit=false" ng-change="{{change||false}}" class="editable"></input>'+
         '<span ng-show="!edit">{{(trim) ? (model | limitTo:trim)+"..." : model}}</span>'+
 '</span>',
         link: function(scope, element, attrs) {
@@ -35,7 +35,6 @@ brewBench.filter('moment', function() {
             scope.type = !!scope.type ? scope.type : 'text';
             element.bind('click', function() {
                 scope.$apply(scope.edit = true);
-                // element.find('input').focus();
             });
         }
     };
@@ -44,6 +43,8 @@ brewBench.filter('moment', function() {
         element.bind('keypress', function(e) {
             if (e.charCode === 13 || e.keyCode ===13 ) {
               scope.$apply(attrs.ngEnter);
+              if(scope.change)
+                scope.$apply(scope.change);
             }
         });
     };
