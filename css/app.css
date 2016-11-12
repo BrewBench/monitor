@@ -173,6 +173,16 @@ sup.ref{
   display: block;
 }
 
+.kettles .adjusted{
+    color: #777;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.kettles .adjusted:hover{
+  color: #d9534f;
+}
+
 .left{
   text-align: left;
 }
