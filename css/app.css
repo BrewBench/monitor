@@ -21,6 +21,10 @@ body {
   margin-bottom: 20px;
 }
 
+.navbar .fa-calculator {
+  margin-top: 10px;
+}
+
 .navbar-inverse .navbar-nav>li>a{
   color: #ffffff;
 }

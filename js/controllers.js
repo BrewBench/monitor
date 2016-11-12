@@ -116,7 +116,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
     ,active: false
     ,heater: {pin:2,running:false,auto:false}
     ,pump: {pin:3,running:false,auto:false}
-    ,temp: {pin:0,type:'Thermistor',hit:false,current:0,target:200,diff:5}
+    ,temp: {pin:0,type:'Thermistor',hit:false,current:0,previous:0,adjust:0,target:200,diff:5}
     ,values: []
     ,timers: []
     ,knob: angular.merge($scope.knobOptions,{value:0,min:0,max:200+5})
@@ -126,7 +126,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
     ,active: false
     ,heater: {pin:4,running:false,auto:false}
     ,pump: {pin:5,running:false,auto:false}
-    ,temp: {pin:1,type:'Thermistor',hit:false,current:0,target:200,diff:5}
+    ,temp: {pin:1,type:'Thermistor',hit:false,current:0,previous:0,adjust:0,target:200,diff:5}
     ,values: []
     ,timers: []
     ,knob: angular.merge($scope.knobOptions,{value:0,min:0,max:200+5})
@@ -136,7 +136,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
     ,active: false
     ,heater: {pin:6,running:false,auto:false}
     ,pump: {pin:7,running:false,auto:false}
-    ,temp: {pin:2,type:'Thermistor',hit:false,current:0,target:150,diff:5}
+    ,temp: {pin:2,type:'Thermistor',hit:false,current:0,previous:0,adjust:0,target:150,diff:5}
     ,values: []
     ,timers: []
     ,knob: angular.merge($scope.knobOptions,{value:0,min:0,max:150+5})
@@ -151,7 +151,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
           ,active: false
           ,heater: {pin:6,running:false,auto:false}
           ,pump: {pin:7,running:false,auto:false}
-          ,temp: {pin:0,type:'Thermistor',hit:false,current:0,target:150,diff:5}
+          ,temp: {pin:0,type:'Thermistor',hit:false,current:0,previous:0,adjust:0,target:150,diff:5}
           ,values: []
           ,timers: []
           ,knob: angular.merge($scope.knobOptions,{value:0,min:0,max:150+5})
@@ -346,7 +346,8 @@ $scope.kettles = BrewService.settings('kettles') || [{
 
       _.each(kettles,function(kettle){
         // temp response is in C
-        kettle.temp.current = ($scope.settings.unit=='F') ? $filter('toFahrenheit')(response.temp) : Math.round(response.temp);
+        kettle.temp.previous = ($scope.settings.unit=='F') ? $filter('toFahrenheit')(response.temp) : Math.round(response.temp);
+        kettle.temp.current = kettle.temp.previous+kettle.temp.adjust;
 
         //reset all kettles every resetChart
         if(kettle.values.length > resetChart){
@@ -448,6 +449,13 @@ $scope.kettles = BrewService.settings('kettles') || [{
     }
   };
 
+  $scope.knobClick = function(kettle){
+      //set adjustment amount
+      if(!!kettle.temp.previous){
+        kettle.temp.adjust = kettle.temp.current - kettle.temp.previous;
+      }
+  };
+
   $scope.startStopKettle = function(kettle){
       kettle.active = !kettle.active;
 
@@ -457,6 +465,9 @@ $scope.kettles = BrewService.settings('kettles') || [{
             $scope.error_message='Could not connect to the Arduino at '+BrewService.domain();
           });
         kettle.knob.subText.text = 'starting...';
+        kettle.knob.readOnly = false;
+      } else {
+        kettle.knob.readOnly = true;
       }
 
       //stop the heating element
