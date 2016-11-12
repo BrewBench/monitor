@@ -9,26 +9,51 @@
         <div class="row">
           <div class="col-md-12">
           <div class="btn-group pull-right">
-            <button class="btn btn-primary" ng-class="{'active':settings.scale=='gravity'}" ng-click="changeScale('gravity')">Gravity</button>
-            <button class="btn btn-primary" ng-class="{'active':settings.scale=='plato'}" ng-click="changeScale('plato')">Plato</button>
+            <button class="btn btn-primary" ng-class="{'active':settings.recipe.scale=='gravity'}" ng-click="changeScale('gravity')">Gravity</button>
+            <button class="btn btn-primary" ng-class="{'active':settings.recipe.scale=='plato'}" ng-click="changeScale('plato')">&deg;Plato</button>
           </div>
           </div>
         </div>
         <br>
         <div class="panel panel-default">
-          <div class="panel-heading">ABV</div>
+          <div class="panel-heading"><strong>Nutrition Facts</strong></div>
           <div class="panel-body">
-            <strong>{{ settings.recipe.abv }}%</strong>
+            <div class="table-striped">
+              <table class="table">
+                <tr>
+                  <td><strong>ABV</strong></td>
+                  <td>
+                    {{ settings.recipe.abv }}%
+                    <span class="pull-right">
+                      <button class="btn btn-xs btn-primary" ng-class="{'active':settings.recipe.method=='papazian'}" ng-click="changeMethod('papazian')">Papazian</button>
+                      <button class="btn btn-xs btn-primary" ng-class="{'active':settings.recipe.method=='daniels'}" ng-click="changeMethod('daniels')">Daniels</button>
+                    </span>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>ABW</strong></td>
+                  <td>{{ settings.recipe.abw }}%</td>
+                </tr>
+                <tr>
+                  <td><strong>Attenuation</strong></td>
+                  <td>{{ settings.recipe.attenuation }}%</td>
+                </tr>
+                <tr>
+                  <td><strong>Calories</strong></td>
+                  <td>{{ settings.recipe.calories }} per 12oz</td>
+                </tr>
+              </table>
+            </div>
           </div>
         </div>
         <div class="input-group">
-          <span class="input-group-addon">{{settings.scale=='gravity' ? 'Original Gravity' : 'Original Plato'}}</span>
-          <input type="number" step="{{settings.scale=='gravity' ? 0.001 : 0.5}}" class="form-control" ng-change="updateABV()" ng-model="settings.recipe.og" placeholder="Original Gravity">
+          <span class="input-group-addon">Original Gravity</span>
+          <input type="number" step="{{settings.recipe.scale=='gravity' ? 0.001 : 0.5}}" class="form-control" ng-change="updateABV()" ng-model="settings.recipe.og" placeholder="Original Gravity">
         </div>
         <br>
         <div class="input-group">
-          <span class="input-group-addon">{{settings.scale=='gravity' ? 'Final Gravity' : 'Final Plato'}}</span>
-          <input type="number" step="{{settings.scale=='gravity' ? 0.001 : 0.5}}" class="form-control" ng-change="updateABV()" ng-model="settings.recipe.fg" placeholder="Final Gravity">
+          <span class="input-group-addon">Final Gravity</span>
+          <input type="number" step="{{settings.recipe.scale=='gravity' ? 0.001 : 0.5}}" class="form-control" ng-change="updateABV()" ng-model="settings.recipe.fg" placeholder="Final Gravity">
         </div>
       </div>
     </div>

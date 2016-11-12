@@ -36,21 +36,41 @@ $scope.settings = BrewService.settings('settings') || {
   ,unit: 'F'
   ,arduinoUrl: 'arduino.local'
   ,storage: 'sd'
-  ,recipe: {'name':'', 'yeast':[], 'og': 1.060, 'fg': 1.015}
+  ,recipe: {'name':'','yeast':[],scale:'gravity',method:'papazian','og': 1.060, 'fg': 1.015, 'abv':0, 'abw':0, 'calories':0, 'attenuation':0}
   ,notifications: {on:true,timers:true,high:true,low:true,target:true,slack:'Slack notification webhook Url',last:''}
   ,sounds: {on:true,alert:'audio/bike.mp3',timer:'audio/school.mp3'}
-  ,scale: 'gravity'
 };
 
 // init calc values
 $scope.updateABV = function(){
-  if($scope.settings.scale=='gravity')
-    $scope.settings.recipe.abv = BrewService.abv($scope.settings.recipe.og,$scope.settings.recipe.fg);
-  else
-    $scope.settings.recipe.abv = BrewService.abv(BrewService.sg($scope.settings.recipe.og),BrewService.sg($scope.settings.recipe.fg));
-}
+  if($scope.settings.recipe.scale=='gravity'){
+    if($scope.settings.recipe.method=='papazian')
+      $scope.settings.recipe.abv = BrewService.abv($scope.settings.recipe.og,$scope.settings.recipe.fg);
+    else
+      $scope.settings.recipe.abv = BrewService.abva($scope.settings.recipe.og,$scope.settings.recipe.fg);
+    $scope.settings.recipe.abw = BrewService.abw($scope.settings.recipe.abv,$scope.settings.recipe.fg);
+    $scope.settings.recipe.attenuation = BrewService.attenuation(BrewService.plato($scope.settings.recipe.og),BrewService.plato($scope.settings.recipe.fg));
+    $scope.settings.recipe.calories = BrewService.calories($scope.settings.recipe.abw
+      ,BrewService.re(BrewService.plato($scope.settings.recipe.og),BrewService.plato($scope.settings.recipe.fg))
+      ,$scope.settings.recipe.fg);
+  } else {
+    if($scope.settings.recipe.method=='papazian')
+      $scope.settings.recipe.abv = BrewService.abv(BrewService.sg($scope.settings.recipe.og),BrewService.sg($scope.settings.recipe.fg));
+    else
+      $scope.settings.recipe.abv = BrewService.abva(BrewService.sg($scope.settings.recipe.og),BrewService.sg($scope.settings.recipe.fg));
+    $scope.settings.recipe.abw = BrewService.abw($scope.settings.recipe.abv,BrewService.sg($scope.settings.recipe.fg));
+    $scope.settings.recipe.attenuation = BrewService.attenuation($scope.settings.recipe.og,$scope.settings.recipe.fg);
+    $scope.settings.recipe.calories = BrewService.calories($scope.settings.recipe.abw
+      ,BrewService.re($scope.settings.recipe.og,$scope.settings.recipe.fg)
+      ,BrewService.sg($scope.settings.recipe.fg));
+  }
+};
+$scope.changeMethod = function(method){
+  $scope.settings.recipe.method = method;
+  $scope.updateABV();
+};
 $scope.changeScale = function(scale){
-  $scope.settings.scale = scale;
+  $scope.settings.recipe.scale = scale;
   if(scale=='gravity'){
     $scope.settings.recipe.og = BrewService.sg($scope.settings.recipe.og);
     $scope.settings.recipe.fg = BrewService.sg($scope.settings.recipe.fg);

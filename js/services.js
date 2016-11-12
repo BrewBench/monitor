@@ -192,8 +192,26 @@ brewBench.factory('BrewService', function($http, $q, $filter){
         };
     },
     // http://www.brewersfriend.com/2011/06/16/alcohol-by-volume-calculator-updated/
+    // Papazian
     abv: function(og,fg){
-      return (( 76.08 * ( og - fg ) / ( 1.775 - og ) ) * ( fg / 0.794 )).toFixed(2);
+      return (( og - fg ) * 131.25).toFixed(2);
+    },
+    // Daniels, used for high gravity beers
+    abva: function(og,fg){
+      return (( 76.08 * ( og - fg ) / ( 1.775 - og )) * ( fg / 0.794 )).toFixed(2);
+    },
+    // http://hbd.org/ensmingr/
+    abw: function(abv,fg){
+      return ((0.79 * abv) / fg).toFixed(2);
+    },
+    re: function(op,fp){
+      return (0.1808 * op) + (0.8192 * fp);
+    },
+    attenuation: function(op,fp){
+      return ((1 - (fp/op))*100).toFixed(2);
+    },
+    calories: function(abw,re,fg){
+      return (((6.9 * abw) + 4.0 * (re - 0.1)) * fg * 3.55).toFixed(1);
     },
     // http://www.brewersfriend.com/plato-to-sg-conversion-chart/
     sg: function(plato){
