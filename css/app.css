@@ -182,6 +182,9 @@ sup.ref{
 .kettles .adjusted:hover{
   color: #d9534f;
 }
+.kettles .pininuse{
+  color: #ccc;
+}
 
 .left{
   text-align: left;
