@@ -34,7 +34,7 @@ $scope.getLovibondColor = function(range){
 $scope.settings = BrewService.settings('settings') || {
   pollSeconds: 10
   ,unit: 'F'
-  ,arduinoUrl: 'arduino.local'
+  ,arduinoUrl: '192.168.240.1'
   ,storage: 'sd'
   ,recipe: {'name':'','yeast':[],scale:'gravity',method:'papazian','og': 1.060, 'fg': 1.015, 'abv':0, 'abw':0, 'calories':0, 'attenuation':0}
   ,notifications: {on:true,timers:true,high:true,low:true,target:true,slack:'Slack notification webhook Url',last:''}
