@@ -7,11 +7,53 @@
 // https://www.adafruit.com/product/381
 // http://static.cactus.io/downloads/library/ds18b20/cactus_io_DS18B20.zip
 #include "cactus_io_DS18B20.h"
-#include "thermistor.h"
-
-uint16_t temp;
 
 YunServer server;
+
+// https://learn.adafruit.com/thermistor/using-a-thermistor
+// resistance at 25 degrees C
+#define THERMISTORNOMINAL 10000
+// temp. for nominal resistance (almost always 25 C)
+#define TEMPERATURENOMINAL 25
+// how many samples to take and average, more takes longer
+// but is more 'smooth'
+#define NUMSAMPLES 5
+// The beta coefficient of the thermistor (usually 3000-4000)
+#define BCOEFFICIENT 3950
+// the value of the 'other' resistor
+#define SERIESRESISTOR 10000
+
+int samples[NUMSAMPLES];
+
+float Thermistor(int pin) {
+   uint8_t i;
+   float average;
+
+   // take N samples in a row, with a slight delay
+   for (i=0; i< NUMSAMPLES; i++) {
+     samples[i] = analogRead(pin);
+     delay(10);
+   }
+   // average all the samples out
+   average = 0;
+   for (i=0; i< NUMSAMPLES; i++) {
+      average += samples[i];
+   }
+   average /= NUMSAMPLES;
+   // convert the value to resistance
+   average = 1023 / average - 1;
+   average = SERIESRESISTOR / average;
+
+   float steinhart;
+   steinhart = average / THERMISTORNOMINAL;     // (R/Ro)
+   steinhart = log(steinhart);                  // ln(R/Ro)
+   steinhart /= BCOEFFICIENT;                   // 1/B * ln(R/Ro)
+   steinhart += 1.0 / (TEMPERATURENOMINAL + 273.15); // + (1/To)
+   steinhart = 1.0 / steinhart;                 // Invert
+   steinhart -= 273.15;
+
+   return steinhart;
+}
 
 void process(YunClient client) {
   String command = client.readStringUntil('/');
@@ -62,25 +104,23 @@ void digitalCommand(YunClient client) {
 }
 
 void ds18B20Command(YunClient client) {
-  int pin, value;
+  int pin;
+  float temp;
   pin = client.parseInt();
   DS18B20 ds(pin);
   ds.readSensor();
-  value = ds.getTemperature_C();
+  temp = ds.getTemperature_C();
 
   // Send JSON response to client
-  client.print("{\"pin\":\""+String(pin)+"\",\"temp\":\""+String(value)+"\"}");
+  client.print("{\"pin\":\""+String(pin)+"\",\"temp\":\""+String(temp)+"\"}");
 }
 
 void thermistorCommand(YunClient client) {
-  int pin, value;
+  int pin;
+  float temp;
   pin = client.parseInt();
-  THERMISTOR thermistor(pin,        // Analog pin
-                      10000,          // Nominal resistance at 25 ºC
-                      3950,           // thermistor's beta coefficient
-                      10000);         // Value of the series resistor
-
-  temp = thermistor.read();
+  temp = Thermistor(pin);
+  
   // Send JSON response to client
   client.print("{\"pin\":\""+String(pin)+"\",\"temp\":\""+String(temp)+"\"}");
 }
