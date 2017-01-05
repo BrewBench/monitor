@@ -3,6 +3,7 @@
 <img src="img/brewbench-logo.png?raw=true" alt="BrewBench logo" title="BrewBench" align="right" />
 
 [![Stories in Ready](https://badge.waffle.io/BrewBench/web-controller.png?label=ready&title=Ready)](https://waffle.io/BrewBench/web-controller)
+![codeship](https://codeship.com/projects/8b6f3bc0-b4fd-0134-65d1-5ed8b845772e/status?branch=master)
 
 BrewBench is an Arduino brew monitor, controller and alert system for the home brewer enthusiast.  It uses the Arduino REST API to interface with thermistors connected to the analog ports.  You can also connect a relay to the digital ports and add a heater / pump to create a RIMS system.  The software will start/stop the heater/pump based on the target temperature you set.
 
@@ -55,6 +56,7 @@ For development just run `npm install`, and look at [index.html](index.html) for
 
 ```sh
 npm install
+jspm install
 gulp
 ```
 
