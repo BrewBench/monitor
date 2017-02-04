@@ -3,162 +3,154 @@
   <div class="panel panel-default">
     <div class="panel-heading container-fluid">
 
-      <div class="row">
-        <div class="col-md-8 col-xs-9"><img class="type" ng-src="img/{{kettle.type}}.svg" width="30" ng-click="changeKettleType(kettle)"><h3><editable type="text" model="kettle.key"></editable></h3>
-            <div class="btn-group" ng-if="kettle.temp.type=='Thermistor'">
-              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                A{{kettle.temp.pin}} <span class="caret"></span>
-              </button>
-              <i class="fa fa-3x" ng-class="{'fa-chevron-right':!showTempType,'fa-chevron-left':showTempType}" aria-hidden="true" ng-click="showTempType=!showTempType"></i>
-              <div class="tempType">
-                <span class="label label-default" ng-if="showTempType" ng-class="{'label-success':kettle.temp.type=='Thermistor'}" ng-click="kettle.temp.type='Thermistor'">Thermistor</span>
-                <span class="label label-default" ng-if="showTempType" ng-class="{'label-success':kettle.temp.type=='DS18B20'}"ng-click="kettle.temp.type='DS18B20'">DS18B20</span>
-              </div>
-              <ul class="dropdown-menu">
-                <li ng-repeat="p in [0,1,2,3,4,5] track by $index">
-                  <a href="#" ng-click="kettle.temp.pin=p" ng-if="!pinInUse(p,true)">A{{p}}</a>
-                  <a href="#" class="pininuse" ng-if="pinInUse(p,true)">A{{p}} (In Use)</a>
-                </li>
-              </ul>
-            </div>
-            <div class="btn-group" ng-if="kettle.temp.type=='DS18B20'">
-              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                D{{kettle.temp.pin}} <span class="caret"></span>
-              </button>
-              <i class="fa fa-3x" ng-class="{'fa-chevron-right':!showTempType,'fa-chevron-left':showTempType}" aria-hidden="true" ng-click="showTempType=!showTempType"></i>
-              <div class="tempType">
-                <span class="label label-default" ng-if="showTempType" ng-class="{'label-success':kettle.temp.type=='Thermistor'}" ng-click="kettle.temp.type='Thermistor'">Thermistor</span>
-                <span class="label label-default" ng-if="showTempType" ng-class="{'label-success':kettle.temp.type=='DS18B20'}"ng-click="kettle.temp.type='DS18B20'">DS18B20</span>
-              </div>
-              <ul class="dropdown-menu">
-                <li ng-repeat="p in [2,3,4,5,6,7,8,9,10,11,12,13] track by $index">
-                  <a href="#" ng-click="kettle.temp.pin=p" ng-if="!pinInUse(p,false)">D{{p}}</a>
-                  <a href="#" class="pininuse" ng-if="pinInUse(p,false)">D{{p}} (In Use)</a>
-                </li>
-              </ul>
-            </div>
-          </div>
-          <div class="col-md-4 col-xs-3 right">
-            <i class="fa fa-4x" ng-click="startStopKettle(kettle)" ng-class="{'fa-stop-circle':kettle.active,'fa-play-circle':!kettle.active}"></i>
-          </div>
+      <div class="kettle-row">
+        <div class="kettle-head">
+          <img class="type" ng-src="img/{{kettle.type}}.svg" width="30" ng-click="changeKettleType(kettle)"/>
+          <h3><editable type="text" model="kettle.key"></editable></h3>
         </div>
-
-        <div class="digital row">
-          <div class="col-md-6 col-xs-6">
-            <strong class="heat">Heat</strong>
-            <div class="btn-group">
-              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                D{{kettle.heater.pin}} <span class="caret"></span>
-              </button>
-              <ul class="dropdown-menu">
-                <li ng-repeat="p in [2,3,4,5,6,7,8,9,10,11,12,13] track by $index">
-                  <a href="#" ng-click="kettle.heater.pin=p" ng-if="!pinInUse(p,false)">D{{p}}</a>
-                  <a href="#" class="pininuse" ng-if="pinInUse(p,false)">D{{p}} (In Use)</a>
-                </li>
-              </ul>
-            </div>
-          </div>
-          <div class="col-md-6 col-xs-6">
-            <strong class="pump">Pump</strong>
-            <div class="btn-group">
-              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                D{{kettle.pump.pin}} <span class="caret"></span>
-              </button>
-              <ul class="dropdown-menu">
-                <li ng-repeat="p in [2,3,4,5,6,7,8,9,10,11,12,13] track by $index">
-                  <a href="#" ng-click="kettle.pump.pin=p" ng-if="!pinInUse(p,false)">D{{p}}</a>
-                  <a href="#" class="pininuse" ng-if="pinInUse(p,false)">D{{p}} (In Use)</a>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-        <div class="digital row">
-          <div class="col-md-6 col-xs-6">
-            <span class="label" ng-class="{'label-default':!kettle.heater.running&&!kettle.heater.auto,'label-success':kettle.heater.running,'label-warning':!kettle.heater.running&&kettle.heater.auto}" ng-click="toggleKettle('heat',kettle)">{{kettle.heater.running ? 'On' : (kettle.heater.auto ? 'Wait' :'Off')}}</span>
-            <span class="label" ng-class="{'label-default':!kettle.heater.auto,'label-success':kettle.heater.auto}" ng-click="kettle.heater.auto=!kettle.heater.auto">Auto</span>
-          </div>
-          <div class="col-md-6 col-xs-6">
-            <span class="label" ng-class="{'label-default':!kettle.pump.running&&!kettle.pump.auto,'label-success':kettle.pump.running,'label-warning':!kettle.pump.running&&kettle.pump.auto}" ng-click="toggleKettle('pump',kettle)">{{kettle.pump.running ? 'On' : (kettle.pump.auto ? 'Wait' :'Off')}}</span>
-            <span class="label" ng-class="{'label-default':!kettle.pump.auto,'label-success':kettle.pump.auto}" ng-click="kettle.pump.auto=!kettle.pump.auto">Auto</span>
-          </div>
+        <div>
+          <i class="fa fa-4x" ng-click="startStopKettle(kettle)" ng-class="{'fa-stop-circle':kettle.active,'fa-play-circle':!kettle.active}"></i>
         </div>
       </div>
 
+      <div class="kettle-row">
+        <div class="kettle-col">
+          <label class="adjust">Temp</label>
+          <div class="btn-group" ng-if="kettle.temp.type=='Thermistor'">
+            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              A{{kettle.temp.pin}} <span class="caret"></span>
+            </button>
+            <div class="tempType">
+              <span class="label label-default" ng-class="{'label-success':kettle.temp.type=='Thermistor'}" ng-click="kettle.temp.type='Thermistor'">Thermistor</span>
+              <span class="label label-default" ng-class="{'label-success':kettle.temp.type=='DS18B20'}" ng-click="kettle.temp.type='DS18B20'">DS18B20</span>
+            </div>
+            <ul class="dropdown-menu">
+              <li ng-repeat="p in [0,1,2,3,4,5] track by $index">
+                <a href="#" ng-click="pinChange(kettle.temp.pin,p,true); kettle.temp.pin=p;">A{{p}} <span class="pininuse" ng-show="pinInUse(p,true)">(In Use)</span></a>
+              </li>
+            </ul>
+          </div>
+          <div class="btn-group" ng-if="kettle.temp.type=='DS18B20'">
+            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              D{{kettle.temp.pin}} <span class="caret"></span>
+            </button>
+            <div class="tempType">
+              <span class="label label-default" ng-class="{'label-success':kettle.temp.type=='Thermistor'}" ng-click="kettle.temp.type='Thermistor'">Thermistor</span>
+              <span class="label label-default" ng-class="{'label-success':kettle.temp.type=='DS18B20'}" ng-click="kettle.temp.type='DS18B20'">DS18B20</span>
+            </div>
+            <ul class="dropdown-menu">
+              <li ng-repeat="p in [2,3,4,5,6,7,8,9,10,11,12,13] track by $index">
+                <a href="#" ng-click="pinChange(kettle.temp.pin,p,false); kettle.temp.pin=p;">D{{p}} <span class="pininuse" ng-show="pinInUse(p,false)">(In Use)</span></a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="kettle-col">
+          <label class="adjust">Heat</label>
+          <div class="btn-group">
+            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              D{{kettle.heater.pin}} <span class="caret"></span>
+            </button>
+            <div class="tempType">
+              <span class="label" ng-class="{'label-default':!kettle.heater.running&&!kettle.heater.auto,'label-success':kettle.heater.running,'label-warning':!kettle.heater.running&&kettle.heater.auto}" ng-click="toggleKettle('heat',kettle)">{{kettle.heater.running ? 'On' : (kettle.heater.auto ? 'Wait' :'Off')}}</span>
+              <span class="label" ng-class="{'label-default':!kettle.heater.auto,'label-success':kettle.heater.auto}" ng-click="kettle.heater.auto=!kettle.heater.auto">Auto</span>
+            </div>
+            <ul class="dropdown-menu">
+              <li ng-repeat="p in [2,3,4,5,6,7,8,9,10,11,12,13] track by $index">
+                <a href="#" ng-click="pinChange(kettle.heater.pin,p,false); kettle.heater.pin=p;">D{{p}} <span class="pininuse" ng-show="pinInUse(p,false)">(In Use)</span></a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="kettle-col">
+          <label class="adjust">Pump</label>
+          <div class="btn-group">
+            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              D{{kettle.pump.pin}} <span class="caret"></span>
+            </button>
+            <div class="tempType">
+              <span class="label" ng-class="{'label-default':!kettle.pump.running&&!kettle.pump.auto,'label-success':kettle.pump.running,'label-warning':!kettle.pump.running&&kettle.pump.auto}" ng-click="toggleKettle('pump',kettle)">{{kettle.pump.running ? 'On' : (kettle.pump.auto ? 'Wait' :'Off')}}</span>
+              <span class="label" ng-class="{'label-default':!kettle.pump.auto,'label-success':kettle.pump.auto}" ng-click="kettle.pump.auto=!kettle.pump.auto">Auto</span>
+            </div>
+            <ul class="dropdown-menu">
+              <li ng-repeat="p in [2,3,4,5,6,7,8,9,10,11,12,13] track by $index">
+                <a href="#" ng-click="pinChange(kettle.pump.pin,p,false); kettle.pump.pin=p;">D{{p}} <span class="pininuse" ng-show="pinInUse(p,false)">(In Use)</span></a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
     <div class="panel-body container-fluid">
-      <div class="row">
-        <div class="col-md-7 col-sm-7 col-xs-12" style="text-align: center;">
+      <div class="kettle-row">
+        <div class="kettle-col">
           <ui-knob value="kettle.temp.current" options="kettle.knob" ng-click="knobClick(kettle)"></ui-knob>
           <div class="adjusted" ng-if="kettle.temp.adjust != 0" ng-click="kettle.temp.adjust=0;kettle.temp.current=kettle.temp.previous;">adjusted {{kettle.temp.adjust}}&deg;</div>
         </div>
-        <div class="col-md-5 col-sm-5 col-xs-12 grid">
-          <div class="row temp-row">
-              <div class="col-md-12 col-xs-12">
-                <div class="btn-group pull-right" role="group">
-                  <label class="adjust">Target</label>
-                  <button type="button" class="btn btn-default" style="width:62px;"><editable type="number" model="kettle.temp.target">{{kettle.temp.target}}</editable>&deg;{{settings.unit}}</button>
-                  <button type="button" class="btn btn-default" ng-click="changeValue(kettle,'target',false)"><i class="fa fa-minus fa-lg"></i></button>
-                  <button type="button" class="btn btn-default" ng-click="changeValue(kettle,'target',true)"><i class="fa fa-plus fa-lg"></i></button>
-                </div>
-              </div>
+        <div class="kettle-col">
+            <div class="btn-group pull-right" role="group">
+              <label class="adjust">Target</label>
+              <button type="button" class="btn btn-default" style="width:62px;"><editable type="number" model="kettle.temp.target">{{kettle.temp.target}}</editable>&deg;{{settings.unit}}</button>
+              <button type="button" class="btn btn-default" ng-click="changeValue(kettle,'target',false)"><i class="fa fa-minus fa-lg"></i></button>
+              <button type="button" class="btn btn-default" ng-click="changeValue(kettle,'target',true)"><i class="fa fa-plus fa-lg"></i></button>
             </div>
-            <div class="row temp-row">
-              <div class="col-md-12 col-xs-12">
-                <div class="btn-group pull-right" role="group">
-                  <label class="adjust">Diff</label>
-                  <button type="button" class="btn btn-default" style="width:62px;"><editable type="number" model="kettle.temp.diff">{{kettle.temp.diff}}</editable>&deg;{{settings.unit}}</button>
-                  <button type="button" class="btn btn-default" ng-click="changeValue(kettle,'diff',false)"><i class="fa fa-minus fa-lg"></i></button>
-                  <button type="button" class="btn btn-default" ng-click="changeValue(kettle,'diff',true)"><i class="fa fa-plus fa-lg"></i></button>
-                </div>
-              </div>
-          </div>
+            <div class="btn-group pull-right" role="group">
+              <label class="adjust">Diff</label>
+              <button type="button" class="btn btn-default" style="width:62px;"><editable type="number" model="kettle.temp.diff">{{kettle.temp.diff}}</editable>&deg;{{settings.unit}}</button>
+              <button type="button" class="btn btn-default" ng-click="changeValue(kettle,'diff',false)"><i class="fa fa-minus fa-lg"></i></button>
+              <button type="button" class="btn btn-default" ng-click="changeValue(kettle,'diff',true)"><i class="fa fa-plus fa-lg"></i></button>
+            </div>
+            <div class="btn-group pull-right" role="group" ng-if="kettle.type=='grain'">
+              <label class="adjust">Timers</label>
+              <button type="button" class="btn btn-default add-timer" ng-click="addTimer(kettle)"><img src="img/grain.svg" width="32"></button>
+              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></button>
+              <ul class="dropdown-menu scrollable-menu">
+                <li ng-repeat="grain in grains">
+                  <a href="#" ng-click="addTimer(kettle,{label:grain.name,min:60})">{{grain.name}}</a>
+                </li>
+              </ul>
+            </div>
+            <div class="btn-group pull-right" role="group" ng-if="kettle.type=='hop'">
+              <label class="adjust">Timers</label>
+              <button type="button" class="btn btn-default add-timer" ng-click="addTimer(kettle)"><img src="img/hop.svg" width="32"></button>
+              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></button>
+              <ul class="dropdown-menu scrollable-menu">
+                <li><a href="#" ng-click="addTimer(kettle,{label:'Whirlfloc',min:10})">Whirlfloc</a></li>
+                <li ng-repeat="hop in hops">
+                  <a href="#" ng-click="addTimer(kettle,{label:hop.name,min:30})">{{hop.name}}</a>
+                </li>
+              </ul>
+            </div>
+            <div class="btn-group pull-right" role="group" ng-if="kettle.type=='water'">
+              <label class="adjust">Timers</label>
+              <button type="button" class="btn btn-default add-timer" ng-click="addTimer(kettle)"><img src="img/water.svg" width="32"></button>
+              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></button>
+              <ul class="dropdown-menu scrollable-menu">
+                <li ng-repeat="water in water">
+                  <a href="#" ng-click="addTimer(kettle,{label:water.name,min:10})">{{water.name}}</a>
+                </li>
+              </ul>
+            </div>
         </div>
       </div>
-      <div class="row" style="padding-top: 15px;">
-        <div class="col-md-12 col-xs-12">
-          <div class="btn-group pull-right" role="group" ng-if="kettle.type=='grain'">
-            <button type="button" class="btn btn-default add-timer" ng-click="addTimer(kettle)"><img src="img/grain.svg" width="32"></button>
-            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></button>
-            <ul class="dropdown-menu scrollable-menu">
-              <li ng-repeat="grain in grains">
-                <a href="#" ng-click="addTimer(kettle,{label:grain.name,min:60})">{{grain.name}}</a>
-              </li>
-            </ul>
-          </div>
-          <div class="btn-group pull-right" role="group" ng-if="kettle.type=='hop'">
-            <button type="button" class="btn btn-default add-timer" ng-click="addTimer(kettle)"><img src="img/hop.svg" width="32"></button>
-            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></button>
-            <ul class="dropdown-menu scrollable-menu">
-              <li><a href="#" ng-click="addTimer(kettle,{label:'Whirlfloc',min:10})">Whirlfloc</a></li>
-              <li ng-repeat="hop in hops">
-                <a href="#" ng-click="addTimer(kettle,{label:hop.name,min:30})">{{hop.name}}</a>
-              </li>
-            </ul>
-          </div>
-          <div class="btn-group pull-right" role="group" ng-if="kettle.type=='water'">
-            <button type="button" class="btn btn-default add-timer" ng-click="addTimer(kettle)"><img src="img/water.svg" width="32"></button>
-            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></button>
-            <ul class="dropdown-menu scrollable-menu">
-              <li ng-repeat="water in water">
-                <a href="#" ng-click="addTimer(kettle,{label:water.name,min:10})">{{water.name}}</a>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-      <div class="row timers">
-        <div class="col-md-12 col-xs-12">
+      <div class="kettle-row timers">
+        <div class="kettle-col">
           <ul>
-            <li ng-repeat="timer in kettle.timers track by $index">
+            <li ng-repeat="timer in kettle.timers track by $index" ng-class="{'running':(timer.running && !timer.up), 'queue': timer.queue, 'finished': timer.up}">
             <label class="adjust"><editable model="timer.label"></editable> <sup ng-if="timer.queue" class="queue">in queue</sup></label>
             <label class="notes" ng-if="timer.notes"><editable model="timer.notes"></editable></label>
             <div class="input-group" role="group">
-              <editable class="timer" type="number" model="timer.min"></editable><span class="timer-secs" ng-if="timer.running && !timer.up">: {{timer.sec}}</span>
+              <editable class="timer" ng-show="!timer.up" type="number" model="timer.min"></editable><span class="timer-secs" ng-if="!timer.up">: {{timer.sec}}</span>
               <span class="count-up" ng-show="timer.up" ng-click="timerStart(timer,kettle)">{{timer.up.min}}</span><span ng-if="timer.up" class="timer-secs-up" ng-click="timerStart(timer,kettle)">: {{timer.up.sec}}</span>
               <span class="input-group-btn">
-                <button type="button" class="btn btn-default" ng-if="timer.min!==null" ng-click="timer.min=timer.min-1"><i class="fa fa-minus fa-lg"></i></button>
-                <button type="button" class="btn btn-default" ng-if="timer.min!==null" ng-click="timer.min=timer.min+1"><i class="fa fa-plus fa-lg"></i></button>
-                <button type="button" class="btn btn-default" ng-if="timer.min!==null" ng-click="timerStart(timer,kettle)" ng-disabled="timer.queue"><i class="fa fa-lg" ng-class="{'fa-stop-circle':timer.running,'fa-play-circle':!timer.running&&!timer.queue,'fa-clock-o':timer.queue}"></i></button>
+                <button type="button" class="btn btn-default" ng-if="timer.min!==null" ng-click="timer.min=timer.min-1" ng-disabled="timer.up"><i class="fa fa-minus fa-lg"></i></button>
+                <button type="button" class="btn btn-default" ng-if="timer.min!==null" ng-click="timer.min=timer.min+1" ng-disabled="timer.up"><i class="fa fa-plus fa-lg"></i></button>
+                <button type="button" class="btn btn-default" ng-if="timer.min!==null" ng-click="timerStart(timer,kettle)" ng-disabled="timer.queue"><i class="fa fa-lg" ng-class="{'fa-stop-circle':timer.running||timer.up.running,'fa-play-circle':!timer.running&&!timer.queue&&!timer.up.running,'fa-clock-o':timer.queue}"></i></button>
                 <button type="button" class="btn btn-default" ng-click="kettle.timers.splice($index, 1);"><i class="fa fa-trash fa-lg"></i></button>
               </span>
             </div>
@@ -167,10 +159,9 @@
         </div>
       </div>
 
-      <div class="row">
-        <div class="col-md-12 col-xs-12" style="text-align: center;">
+      <div class="kettle-row">
+        <div class="kettle-col" style="text-align: center;">
           <i class="fa fa-3x" ng-class="{'fa-chevron-up':!showRemoveKettle,'fa-chevron-down':showRemoveKettle}" aria-hidden="true" ng-click="showRemoveKettle=!showRemoveKettle"></i>
-          <br>
           <button ng-show="showRemoveKettle" class="btn btn-danger" ng-click="showRemoveKettle=false;kettles.splice($index,1)">Remove Kettle</button>
         </div>
       </div>

@@ -165,18 +165,28 @@ $scope.kettles = BrewService.settings('kettles') || [{
   }
 
   $scope.pinInUse = function(pin,analog){
-    if(analog){
-        if( _.filter($scope.kettles,{'temp':{'type':'Thermistor','pin':pin}}).length)
-          return true;
-    } else {
-      if( _.filter($scope.kettles,{'temp':{'type':'DS18B20','pin':pin}}).length
-          || _.filter($scope.kettles,{'heater':{'pin':pin}}).length
-          || _.filter($scope.kettles,{'pump':{'pin':pin}}).length
-        ){
-        return true;
-      }
+    var kettle = _.find($scope.kettles, function(kettle){
+      return (
+        (analog && kettle.temp.type=='Thermistor' && kettle.temp.pin==pin) ||
+        (!analog && kettle.temp.type=='DS18B20' && kettle.temp.pin==pin) ||
+        (!analog && kettle.heater.pin==pin) ||
+        (!analog && kettle.pump.pin==pin)
+      );
+    });
+    return kettle || false;
+  };
+
+  $scope.pinChange = function(old_pin,new_pin,analog){
+    //find kettle with new pin and replace it with old pin
+    var kettle = $scope.pinInUse(new_pin,analog);
+    if(kettle){
+      if(kettle.temp.pin == new_pin)
+        kettle.temp.pin = old_pin;
+      else if(kettle.heater.pin == new_pin)
+        kettle.heater.pin = old_pin;
+      else if(kettle.pump.pin == new_pin)
+        kettle.pump.pin = old_pin;
     }
-    return false;
   };
 
   $scope.showContent = function($fileContent){
@@ -273,59 +283,85 @@ $scope.kettles = BrewService.settings('kettles') || [{
       }
   };
 
-  // check if pump or heater are running
-  $scope.init = function(){
+  $scope.loadConfig = function(){
+    var config = [];
+    if(!$scope.pkg){
+      config.push(BrewService.pkg().then(function(response){
+          $scope.pkg = response;
+          return $scope.settings.sketch_version = response.sketch_version;
+        })
+      );
+    }
+
     if(!$scope.grains){
-      BrewService.grains().then(function(response){
-        $scope.grains = _.sortBy(_.uniqBy(response,'name'),'name');
-      });
+      config.push(BrewService.grains().then(function(response){
+          return $scope.grains = _.sortBy(_.uniqBy(response,'name'),'name');
+        })
+      );
     }
 
     if(!$scope.hops){
-      BrewService.hops().then(function(response){
-        $scope.hops = _.sortBy(_.uniqBy(response,'name'),'name');
-      });
+      config.push(
+        BrewService.hops().then(function(response){
+          return $scope.hops = _.sortBy(_.uniqBy(response,'name'),'name');
+        })
+      );
     }
 
     if(!$scope.water){
-      BrewService.water().then(function(response){
-        $scope.water = _.sortBy(_.uniqBy(response,'name'),'name');
-      });
+      config.push(
+        BrewService.water().then(function(response){
+          return $scope.water = _.sortBy(_.uniqBy(response,'name'),'name');
+        })
+      );
     }
 
     if(!$scope.lovibond){
-      BrewService.lovibond().then(function(response){
-        $scope.lovibond = response;
-      });
+      config.push(
+        BrewService.lovibond().then(function(response){
+          return $scope.lovibond = response;
+        })
+      );
     }
 
+    return $q.all(config);
+};
+
+  // check if pump or heater are running
+  $scope.init = function(){
+    var running = [];
     _.each($scope.kettles,function(kettle){
         //update max
         kettle.knob.max=kettle.temp['target']+kettle.temp['diff'];
 
         //check if heater is running
-        BrewService.digitalRead(kettle.heater.pin).then(function(response){
-          if(response.value=="0"){
-            kettle.active = true;
-            kettle.heater.running = true;
-          } else {
-            kettle.heater.running = false;
-          }
-        },function(err){
-          //failed to stop
-        });
+        running.push(BrewService.digitalRead(kettle.heater.pin,2000).then(function(response){
+            if(response.value=="1"){
+              kettle.active = true;
+              kettle.heater.running = true;
+            } else {
+              kettle.heater.running = false;
+            }
+            return kettle;
+          },function(err){
+            return err;
+          })
+        );
 
         //check if pump is running
-        BrewService.digitalRead(kettle.pump.pin).then(function(response){
-          if(response.value=="0"){
-            kettle.active = true;
-            kettle.pump.running = true;
-          } else {
-            kettle.pump.running = false;
-          }
-        },function(err){
-          //failed to stop
-        });
+        running.push(BrewService.digitalRead(kettle.pump.pin,2000).then(function(response){
+            if(response.value=="1"){
+              kettle.active = true;
+              kettle.pump.running = true;
+            } else {
+              kettle.pump.running = false;
+            }
+            return kettle;
+          },function(err){
+            return err;
+          })
+        );
+
         // check timers for running
         if(!!kettle.timers && kettle.timers.length){
           _.each(kettle.timers, function(timer){
@@ -344,71 +380,94 @@ $scope.kettles = BrewService.settings('kettles') || [{
         }
         $scope.updateKnobCopy(kettle);
       });
+
+      return $q.all(running);
   };
 
   function updateTemp(response,kettle){
+
+    if(!response || !response.temp){
+      return false;
+    }
+
     $scope.error_message = '';
-    if(response && response.temp){
-      //chart date
-      var date = new Date();
-      // temp response is in C
-      kettle.temp.previous = ($scope.settings.unit=='F') ? $filter('toFahrenheit')(response.temp) : Math.round(response.temp);
-      kettle.temp.current = kettle.temp.previous+kettle.temp.adjust;
+    var temps = [];
+    //chart date
+    var date = new Date();
+    // temp response is in C
+    kettle.temp.previous = ($scope.settings.unit=='F') ? $filter('toFahrenheit')(response.temp) : Math.round(response.temp);
+    kettle.temp.current = kettle.temp.previous+kettle.temp.adjust;
 
-      //reset all kettles every resetChart
-      if(kettle.values.length > resetChart){
-        $scope.kettles.map(function(k){
-          return k.values=[];
-        });
-      }
+    //reset all kettles every resetChart
+    if(kettle.values.length > resetChart){
+      $scope.kettles.map(function(k){
+        return k.values=[];
+      });
+    }
 
-      kettle.values.push([date.getTime(),kettle.temp.current]);
+    kettle.values.push([date.getTime(),kettle.temp.current]);
 
-      $scope.updateKnobCopy(kettle);
+    $scope.updateKnobCopy(kettle);
 
-      //is temp too high?
-      if(kettle.temp.current >= kettle.temp.target+kettle.temp.diff){
-        $scope.alert(kettle);
-        //stop the heating element
-        if(kettle.heater.auto && kettle.heater.running){
-          BrewService.digital(kettle.heater.pin,1).then(function(){
+    //is temp too high?
+    if(kettle.temp.current >= kettle.temp.target+kettle.temp.diff){
+      $scope.alert(kettle);
+      //stop the heating element
+      if(kettle.heater.auto && kettle.heater.running){
+        temps.push(BrewService.digital(kettle.heater.pin,0).then(function(){
             kettle.heater.running = false;
           },function(err){
-            //failed to stop
-          });
-        }
-        if(kettle.pump.auto && kettle.pump.running){
-          BrewService.digital(kettle.pump.pin,1).then(function(){
+            if(err && typeof err == 'string')
+              $scope.error_message = err;
+            else
+              $scope.error_message='Could not connect to the Arduino at '+BrewService.domain();
+          })
+        );
+      }
+      if(kettle.pump.auto && kettle.pump.running){
+        temps.push(BrewService.digital(kettle.pump.pin,0).then(function(){
             kettle.pump.running = false;
           },function(err){
-            //failed to stop
-          });
-        }
-      } //is temp too low?
-      else if(kettle.temp.current <= kettle.temp.target-kettle.temp.diff){
-        $scope.alert(kettle);
-        //start the heating element
-        if(kettle.heater.auto && !kettle.heater.running){
-          BrewService.digital(kettle.heater.pin,0).then(function(){
+            if(err && typeof err == 'string')
+              $scope.error_message = err;
+            else
+              $scope.error_message='Could not connect to the Arduino at '+BrewService.domain();
+          })
+        );
+      }
+    } //is temp too low?
+    else if(kettle.temp.current <= kettle.temp.target-kettle.temp.diff){
+      $scope.alert(kettle);
+      //start the heating element
+      if(kettle.heater.auto && !kettle.heater.running){
+        temps.push(BrewService.digital(kettle.heater.pin,1).then(function(){
             kettle.heater.running = true;
             kettle.knob.subText.text = 'heating';
             kettle.knob.subText.color = 'rgba(200,47,47,1)';
           },function(err){
-            //failed to start
-          });
-        }
-        if(kettle.pump.auto && !kettle.pump.running){
-          BrewService.digital(kettle.pump.pin,0).then(function(){
+            if(err && typeof err == 'string')
+              $scope.error_message = err;
+            else
+              $scope.error_message='Could not connect to the Arduino at '+BrewService.domain();
+          })
+        );
+      }
+      if(kettle.pump.auto && !kettle.pump.running){
+        temps.push(BrewService.digital(kettle.pump.pin,1).then(function(){
             kettle.pump.running = true;
           },function(err){
-            //failed to start
-          });
-        }
-      } else {
-        kettle.temp.hit=new Date();//set the time the target was hit so we can now start alerts
-        $scope.alert(kettle);
+            if(err && typeof err == 'string')
+              $scope.error_message = err;
+            else
+              $scope.error_message='Could not connect to the Arduino at '+BrewService.domain();
+          })
+        )
       }
+    } else {
+      kettle.temp.hit=new Date();//set the time the target was hit so we can now start alerts
+      $scope.alert(kettle);
     }
+    return $q.all(temps);
   };
 
   $scope.getNavOffset = function(){
@@ -431,25 +490,27 @@ $scope.kettles = BrewService.settings('kettles') || [{
 
   $scope.toggleKettle = function(item,kettle){
 
-    var k = kettle.heater;
-    if(item == 'pump'){
-      k = kettle.pump;
-    }
-
-    k.running=!k.running;
+    var k = (item == 'pump') ? kettle.pump : kettle.heater;
+    k.running = !k.running;
 
     //start the digital port
     if(kettle.active && k.running){
-      BrewService.digital(k.pin,0).then(function(){
+      BrewService.digital(k.pin,1).then(function(){
         //started
       },function(err){
-        //failed to start
+        if(err && typeof err == 'string')
+          $scope.error_message = err;
+        else
+          $scope.error_message='Could not connect to the Arduino at '+BrewService.domain();
       });
     } else if(!k.running){
-      BrewService.digital(k.pin,1).then(function(){
+      BrewService.digital(k.pin,0).then(function(){
         //stopped
       },function(err){
-        //failed to stop
+        if(err && typeof err == 'string')
+          $scope.error_message = err;
+        else
+          $scope.error_message='Could not connect to the Arduino at '+BrewService.domain();
       });
     }
   };
@@ -468,7 +529,10 @@ $scope.kettles = BrewService.settings('kettles') || [{
         BrewService.temp(kettle.temp).then(function(response){
             updateTemp(response,kettle);
         },function error(err){
-            $scope.error_message='Could not connect to the Arduino at '+BrewService.domain();
+            if(err && typeof err == 'string')
+              $scope.error_message = err;
+            else
+              $scope.error_message='Could not connect to the Arduino at '+BrewService.domain();
           });
         kettle.knob.subText.text = 'starting...';
         kettle.knob.readOnly = false;
@@ -478,19 +542,25 @@ $scope.kettles = BrewService.settings('kettles') || [{
 
       //stop the heating element
       if(!kettle.active && kettle.heater.running){
-        BrewService.digital(kettle.heater.pin,1).then(function(){
+        BrewService.digital(kettle.heater.pin,0).then(function(){
           kettle.heater.running=false;
           $scope.updateKnobCopy(kettle);
         },function(err){
-          //failed to stop
+          if(err && typeof err == 'string')
+            $scope.error_message = err;
+          else
+            $scope.error_message='Could not connect to the Arduino at '+BrewService.domain();
         });
       }
       if(!kettle.active && kettle.pump.running){
-        BrewService.digital(kettle.pump.pin,1).then(function(){
+        BrewService.digital(kettle.pump.pin,0).then(function(){
           kettle.pump.running=false;
           $scope.updateKnobCopy(kettle);
         },function(err){
-          //failed to stop
+          if(err && typeof err == 'string')
+            $scope.error_message = err;
+          else
+            $scope.error_message='Could not connect to the Arduino at '+BrewService.domain();
         });
       }
       if(!kettle.active){
@@ -668,19 +738,16 @@ $scope.kettles = BrewService.settings('kettles') || [{
   };
 
   $scope.timerRun = function(timer,kettle){
-    timer.interval = $interval(function () {
+    return timer.interval = $interval(function () {
       //cancel interval if zero out
       if(!timer.up && timer.min==0 && timer.sec==0){
         //stop running
         timer.running = false;
         //start up counter
         timer.up = {min:0,sec:0,running:true};
-        $scope.timerRun(timer);
         //if all timers are done send an alert
         if( !!kettle && _.filter(kettle.timers, {up: {running:true}}).length == kettle.timers.length )
           $scope.alert(kettle,timer);
-        //cancel timer
-        $interval.cancel(timer.interval);
       } else if(!timer.up && timer.sec > 0){
         //count down seconds
         timer.sec--;
@@ -713,7 +780,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
     if(timer.up && timer.up.running){
       //stop timer
       timer.up.running=false;
-      $interval.cancel(timer.up.interval);
+      $interval.cancel(timer.interval);
     } else if(timer.running){
       //stop timer
       timer.running=false;
@@ -733,21 +800,25 @@ $scope.kettles = BrewService.settings('kettles') || [{
     _.each($scope.kettles, function(kettle){
       if(kettle.active){
         allSensors.push(BrewService.temp(kettle.temp).then(function(response){
-            updateTemp(response,kettle);
+            return updateTemp(response,kettle);
           },function error(err){
-            $scope.error_message='Could not connect to the Arduino at '+BrewService.domain();
+            if(err && typeof err == 'string')
+              $scope.error_message = err;
+            else
+              $scope.error_message='Could not connect to the Arduino at '+BrewService.domain();
+            return err;
           }));
       }
     });
 
-    $q.all(allSensors).then(function(values){
+    return $q.all(allSensors).then(function(values){
       //re process on timeout
       $timeout(function(){
-          $scope.processTemps();
+          return $scope.processTemps();
       },$scope.settings.pollSeconds*1000);
     },function(err){
       $timeout(function(){
-          $scope.processTemps();
+          return $scope.processTemps();
       },$scope.settings.pollSeconds*1000);
     });
   };
@@ -777,10 +848,9 @@ $scope.kettles = BrewService.settings('kettles') || [{
     }
   };
 
-  // App start logic
-  $scope.processTemps();
-
-  $scope.init();
+  $scope.loadConfig() // load config
+    .then($scope.init) // init
+    .then($scope.processTemps);// start polling
 
   // scope watch
   $scope.$watch('settings',function(newValue,oldValue){

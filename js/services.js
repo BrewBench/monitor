@@ -58,11 +58,12 @@ brewBench.factory('BrewService', function($http, $q, $filter){
           }]
         };
 
-      $http({url: webhook_url,method:'POST',data:'payload='+JSON.stringify(postObj), headers: { 'Content-Type': 'application/x-www-form-urlencoded' }}).then(function(response){
-        q.resolve(response.data);
-      },function(err){
-        q.reject(err);
-      });
+      $http({url: webhook_url, method:'POST', data:'payload='+JSON.stringify(postObj), headers: { 'Content-Type': 'application/x-www-form-urlencoded' }})
+        .then(function(response){
+          q.resolve(response.data);
+        },function(err){
+          q.reject(err);
+        });
       return q.promise;
     },
 
@@ -72,12 +73,17 @@ brewBench.factory('BrewService', function($http, $q, $filter){
     temp: function(temp){
       var q = $q.defer();
       var url = this.domain()+'/arduino/'+temp.type+'/'+temp.pin;
+      var settings = this.settings('settings');
 
-      $http.get(url,{timeout:10000,headers: {'Content-Type': 'application/json'}}).then(function(response){
-        q.resolve(response.data);
-      },function(err){
-        q.reject(err);
-      });
+      $http({url: url, method: 'GET', timeout:  settings.pollSeconds*1000, headers: {'Content-Type': 'application/json'}})
+        .then(function(response){
+          if(response.headers('X-Sketch-Version') == null || response.headers('X-Sketch-Version') != settings.sketch_version)
+            q.reject('Sketch Version is out of date.  Please Update. Sketch: '+response.headers('X-Sketch-Version')+' BrewBench: '+settings.sketch_version);
+          else
+            q.resolve(response.data);
+        }, function(err){
+          q.reject(err);
+        });
       return q.promise;
     },
     // read/write heater
@@ -86,25 +92,45 @@ brewBench.factory('BrewService', function($http, $q, $filter){
     digital: function(sensor,value){
       var q = $q.defer();
       var url = this.domain()+'/arduino/digital/'+sensor+'/'+value;
+      var settings = this.settings('settings');
 
-      $http.get(url,{timeout:10000}).then(function(response){
-        q.resolve(response.data);
-      },function(err){
-        q.reject(err);
-      });
+      $http({url: url, method: 'GET', timeout: settings.pollSeconds*1000})
+        .then(function(response){
+          if(response.headers('X-Sketch-Version') == null || response.headers('X-Sketch-Version') != settings.sketch_version)
+            q.reject('Sketch Version is out of date.  Please Update. Sketch: '+response.headers('X-Sketch-Version')+' BrewBench: '+settings.sketch_version);
+          else
+            q.resolve(response.data);
+        }, function(err){
+          q.reject(err);
+        });
       return q.promise;
     },
 
-    digitalRead: function(sensor){
+    digitalRead: function(sensor,timeout){
       var q = $q.defer();
       var url = this.domain()+'/arduino/digital/'+sensor;
+      var settings = this.settings('settings');
 
-      $http.get(url,{timeout:10000}).then(function(response){
-        q.resolve(response.data);
-      },function(err){
-        q.reject(err);
-      });
+      $http({url: url, method: 'GET', timeout: (timeout || settings.pollSeconds*1000)})
+        .then(function(response){
+          if(response.headers('X-Sketch-Version') == null || response.headers('X-Sketch-Version') != settings.sketch_version)
+            q.reject('Sketch Version is out of date.  Please Update. Sketch: '+response.headers('X-Sketch-Version')+' BrewBench: '+settings.sketch_version);
+          else
+            q.resolve(response.data);
+        }, function(err){
+          q.reject(err);
+        });
       return q.promise;
+    },
+
+    pkg: function(){
+        var q = $q.defer();
+        $http.get('/package.json').then(function(response){
+          q.resolve(response.data);
+        },function(err){
+          q.reject(err);
+        });
+        return q.promise;
     },
 
     grains: function(){

@@ -127,7 +127,7 @@ sup.ref{
 .navbar-brand img{
   margin-top: -14px;
 }
-.settings h3, .kettles .type {
+.settings .editable, .kettles .editable {
     cursor: pointer;
 }
 
@@ -143,6 +143,31 @@ sup.ref{
 .settings ul>li, .kettles ul>li{
   list-style-type: none;
   margin: 10px;
+}
+
+.settings .right label {
+    cursor: pointer;
+}
+
+.kettles .kettle-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+}
+
+.kettles .kettle-row .kettle-head {
+  flex: auto;
+  margin-top: -15px;
+}
+
+.kettles .kettle-row .kettle-head .type {
+    cursor: pointer;
+}
+
+.kettles .kettle-col {
+  display: flex;
+  flex-direction: column;
+  flex: auto;
 }
 
 .kettles .scrollable-menu {
@@ -165,7 +190,8 @@ sup.ref{
 
 .kettles .tempType {
   display: inline-block;
-  position: relative;;
+  position: relative;
+  padding: 5px 0 0 5px;
 }
 
 .kettles .tempType span{
@@ -210,9 +236,26 @@ sup.ref{
 .kettles input[type=number],
 .kettles .temp, .kettles .timer, .settings .poll
  {
-  font-size: 24px;
+  font-size: 20px;
   color: #777;
   width: 75px;
+}
+
+.kettles .timers ul>li {
+  border-left: 5px solid #ccc;
+  padding-left: 5px;
+}
+
+.kettles .timers ul>li.running {
+  border-left: 5px solid rgba(73,163,127,1);
+}
+
+.kettles .timers ul>li.queue {
+  border-left: 5px solid #F0AD4F;
+}
+
+.kettles .timers ul>li.finished {
+  border-left: 5px solid rgba(200,47,47,1);
 }
 
 .kettles .timers .timer{
@@ -269,7 +312,7 @@ label.adjust{
   display: block;
   text-transform: uppercase;
   color: #333;
-  font-weight: 400;
+  font-weight: bold;
   letter-spacing: .2em;
   padding-top: 10px;
   padding-bottom: 0;

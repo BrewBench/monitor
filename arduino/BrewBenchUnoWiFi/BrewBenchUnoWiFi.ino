@@ -5,6 +5,8 @@
 // http://static.cactus.io/downloads/library/ds18b20/cactus_io_DS18B20.zip
 #include "cactus_io_DS18B20.h"
 
+const char VERSION[] = "2.6.0";
+
 // https://learn.adafruit.com/thermistor/using-a-thermistor
 // resistance at 25 degrees C
 #define THERMISTORNOMINAL 10000
@@ -71,6 +73,8 @@ void printOkHeader(WifiData client){
     client.println("Status: 200");
     client.println("Access-Control-Allow-Origin: *");
     client.println("Access-Control-Allow-Methods: GET");
+    client.println("Access-Control-Expose-Headers: X-Sketch-Version");
+    client.println("X-Sketch-Version: "+String(VERSION));
     client.println("Content-Type: application/json");
     client.println("Connection: close");
     client.println();
@@ -85,11 +89,9 @@ void digitalCommand(WifiData client) {
     pinMode(pin, OUTPUT);
     value = client.parseInt();
     if(value == 1)
-      digitalWrite(pin, HIGH);//turn on relay
-    else if(value == 0)
-      digitalWrite(pin, LOW);//turn off relay
+      digitalWrite(pin, LOW);//turn on relay
     else
-      value = digitalRead(pin);
+      digitalWrite(pin, HIGH);//turn off relay
   }
   else {
     value = digitalRead(pin);
@@ -118,7 +120,7 @@ void thermistorCommand(WifiData client) {
   float temp;
   pin = client.parseInt();
   temp = Thermistor(pin);
-  
+
    // Send JSON response to client
    client.print("{\"pin\":\""+String(pin)+"\",\"temp\":\""+String(temp)+"\"}");
    client.println();    //char terminator

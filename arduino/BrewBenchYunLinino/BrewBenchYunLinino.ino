@@ -8,6 +8,8 @@
 // http://static.cactus.io/downloads/library/ds18b20/cactus_io_DS18B20.zip
 #include "cactus_io_DS18B20.h"
 
+const char VERSION[] = "2.6.0";
+
 YunServer server;
 
 // https://learn.adafruit.com/thermistor/using-a-thermistor
@@ -77,6 +79,8 @@ void responseOkHeader(YunClient client){
     client.println("Status: 200");
     client.println("Access-Control-Allow-Origin: *");
     client.println("Access-Control-Allow-Methods: GET");
+    client.println("Access-Control-Expose-Headers: X-Sketch-Version");
+    client.println("X-Sketch-Version: "+String(VERSION));
     client.println("Content-Type: application/json");
     client.println("Connection: close");
     client.println();
@@ -91,9 +95,9 @@ void digitalCommand(YunClient client) {
     pinMode(pin, OUTPUT);
     value = client.parseInt();
     if(value == 1)
-      digitalWrite(pin, HIGH);//turn on relay
+      digitalWrite(pin, LOW);//turn on relay
     else
-      digitalWrite(pin, LOW);//turn off relay
+      digitalWrite(pin, HIGH);//turn off relay
   }
   else {
     value = digitalRead(pin);
@@ -120,7 +124,7 @@ void thermistorCommand(YunClient client) {
   float temp;
   pin = client.parseInt();
   temp = Thermistor(pin);
-  
+
   // Send JSON response to client
   client.print("{\"pin\":\""+String(pin)+"\",\"temp\":\""+String(temp)+"\"}");
 }
