@@ -191,8 +191,14 @@ $scope.kettles = BrewService.settings('kettles') || [{
 
   $scope.showContent = function($fileContent){
 
-      var x2js = new X2JS();
-      var jsonObj = x2js.xml_str2json( $fileContent.replace(/&ldquo;/g,'"').replace(/&rdquo;/g,'"').replace(/&rsquo;/g,"'").replace(/&ndash;/g,"-") );
+      var formatted_content = BrewService.formatXML($fileContent);
+      var jsonObj;
+
+      if(!!formatted_content){
+        var x2js = new X2JS();
+        jsonObj = x2js.xml_str2json( formatted_content );
+      }
+
       if($scope.settings.recipe)
         $scope.settings.recipe = {name:'',yeast:[]};
 
