@@ -66,6 +66,12 @@
         <input ng-model="searchWater" placeholder="Search Water">
       </div>
       <div class="modal-body">
+        <p>
+          <blockquote>
+            Calcium is the key ion able to overcome the buffering capacity of the malt phosphates and lower the mash pH into the acceptable 5.2 to 5.5 range.
+            Ideal concentrations of calcium should be between 50 and 150 ppm. <a href="https://byo.com/hops/item/1493-the-power-of-ph" target="_blank">BYO</a>
+          </blockquote>
+        </p>
         <table class="table table-hover">
           <tr>
             <th>Salt</th>
@@ -76,7 +82,7 @@
           </tr>
           <tr ng-repeat="water in water | filter:searchWater">
             <td>{{water.salt}}</td>
-            <td>{{water.name}}</td>
+            <td>{{water.common_name}}</td>
             <td>{{water.concentration_one_gram_per_gallon}}</td>
             <td>{{water.effects}}</td>
             <td>{{water.description}}</td>

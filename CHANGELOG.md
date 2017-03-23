@@ -1,5 +1,15 @@
 # Change Log
 
+## 2.6.1 - 2017-03-22
+
+### Added
+- Remove all timers button
+- Updated water additives
+- Link to BrewBench on [Hackster](https://www.hackster.io/brewbench/brewbench-d64d90)!
+
+### Fixed
+- BeerSmith import with special characters
+
 ## 2.6.0 - 2017-02-04
 
 ### Notes

@@ -317,7 +317,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
     if(!$scope.water){
       config.push(
         BrewService.water().then(function(response){
-          return $scope.water = _.sortBy(_.uniqBy(response,'name'),'name');
+          return $scope.water = _.sortBy(_.uniqBy(response,'salt'),'salt');
         })
       );
     }
@@ -491,6 +491,21 @@ $scope.kettles = BrewService.settings('kettles') || [{
       kettle.timers.push(options);
     } else {
       kettle.timers.push({label:'Edit label',min:60,sec:0,running:false,queue:false});
+    }
+  };
+
+  $scope.removeTimers = function(e,kettle){
+    var btn = angular.element(e.target);
+    if(btn.hasClass('fa-trash')) btn = btn.parent();
+
+    if(!btn.hasClass('btn-danger')){
+      btn.removeClass('btn-default').addClass('btn-danger');
+      $timeout(function(){
+        btn.removeClass('btn-danger').addClass('btn-default');
+      },1000);
+    } else {
+      btn.removeClass('btn-danger').addClass('btn-default');
+      kettle.timers=[];
     }
   };
 
@@ -744,7 +759,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
   };
 
   $scope.timerRun = function(timer,kettle){
-    return timer.interval = $interval(function () {
+    return $interval(function () {
       //cancel interval if zero out
       if(!timer.up && timer.min==0 && timer.sec==0){
         //stop running
@@ -795,7 +810,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
       //start timer
       timer.running=true;
       timer.queue=false;
-      $scope.timerRun(timer,kettle);
+      timer.interval = $scope.timerRun(timer,kettle);
     }
   };
 

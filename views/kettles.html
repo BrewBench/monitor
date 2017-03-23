@@ -107,6 +107,7 @@
             </div>
             <div class="btn-group pull-right" role="group" ng-if="kettle.type=='grain'">
               <label class="adjust">Timers</label>
+              <button type="button" class="btn btn-default" ng-click="removeTimers($event,kettle)" ng-show="kettle.timers.length"><i class="fa fa-trash fa-lg"></i></button>
               <button type="button" class="btn btn-default add-timer" ng-click="addTimer(kettle)"><img src="img/grain.svg" width="32"></button>
               <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></button>
               <ul class="dropdown-menu scrollable-menu">
@@ -117,6 +118,7 @@
             </div>
             <div class="btn-group pull-right" role="group" ng-if="kettle.type=='hop'">
               <label class="adjust">Timers</label>
+              <button type="button" class="btn btn-default" ng-click="removeTimers($event,kettle)" ng-show="kettle.timers.length"><i class="fa fa-trash fa-lg"></i></button>
               <button type="button" class="btn btn-default add-timer" ng-click="addTimer(kettle)"><img src="img/hop.svg" width="32"></button>
               <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></button>
               <ul class="dropdown-menu scrollable-menu">
@@ -128,6 +130,7 @@
             </div>
             <div class="btn-group pull-right" role="group" ng-if="kettle.type=='water'">
               <label class="adjust">Timers</label>
+              <button type="button" class="btn btn-default" ng-click="removeTimers($event,kettle)" ng-show="kettle.timers.length"><i class="fa fa-trash fa-lg"></i></button>
               <button type="button" class="btn btn-default add-timer" ng-click="addTimer(kettle)"><img src="img/water.svg" width="32"></button>
               <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></button>
               <ul class="dropdown-menu scrollable-menu">
