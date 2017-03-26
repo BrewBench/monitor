@@ -84,6 +84,6 @@ gulp
 
 ## About
 
-[BrewBench](//brewbench.co) is a brew monitor and controller Developed by [Andrew Van Tassel](//www.andrewvantassel.com) and [Lee Kendrick](http://www.leekendrick.info) &copy;2016.
+[BrewBench](//brewbench.co) is a brew monitor and controller Developed by [Andrew Van Tassel](https://www.andrewvantassel.com) and [Lee Kendrick](http://www.leekendrick.info) &copy;2017.
 
 Made with <img src="img/beer.png" width="45"> from Colorado
