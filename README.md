@@ -1,6 +1,6 @@
 # BrewBench
 
-<img src="img/brewbench-logo.png?raw=true" alt="BrewBench logo" title="BrewBench" align="right" />
+<img src="img/brewbench-logo-265.png?raw=true" alt="BrewBench logo" title="BrewBench" align="right" />
 
 [![Stories in Ready](https://badge.waffle.io/BrewBench/web-controller.png?label=ready&title=Ready)](https://waffle.io/BrewBench/web-controller)
 ![codeship](https://codeship.com/projects/8b6f3bc0-b4fd-0134-65d1-5ed8b845772e/status?branch=master)
