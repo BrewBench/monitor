@@ -8,8 +8,9 @@ $scope.hops;
 $scope.grains;
 $scope.water;
 $scope.lovibond;
+$scope.kettleTypes = BrewService.kettleTypes();
 $scope.chartOptions = BrewService.chartOptions();
-
+$scope.showSettings = true;
 $scope.error_message = '';
 
 $scope.getLovibondColor = function(range){
@@ -35,10 +36,15 @@ $scope.settings = BrewService.settings('settings') || {
   pollSeconds: 10
   ,unit: 'F'
   ,arduinoUrl: '192.168.240.1'
+  ,ports: {'analog':5, 'digital':13}
   ,storage: 'sd'
   ,recipe: {'name':'','yeast':[],scale:'gravity',method:'papazian','og': 1.060, 'fg': 1.015, 'abv':0, 'abw':0, 'calories':0, 'attenuation':0}
   ,notifications: {on:true,timers:true,high:true,low:true,target:true,slack:'Slack notification webhook Url',last:''}
   ,sounds: {on:true,alert:'audio/bike.mp3',timer:'audio/school.mp3'}
+};
+
+$scope.showSettingsSide = function(){
+    $scope.showSettings = !$scope.showSettings;
 };
 
 // init calc values
@@ -65,10 +71,12 @@ $scope.updateABV = function(){
       ,BrewService.sg($scope.settings.recipe.fg));
   }
 };
+
 $scope.changeMethod = function(method){
   $scope.settings.recipe.method = method;
   $scope.updateABV();
 };
+
 $scope.changeScale = function(scale){
   $scope.settings.recipe.scale = scale;
   if(scale=='gravity'){
@@ -79,6 +87,7 @@ $scope.changeScale = function(scale){
     $scope.settings.recipe.fg = BrewService.plato($scope.settings.recipe.fg);
   }
 };
+
 $scope.updateABV();
 
 $scope.urls = BrewService.settings('urls') || [];
@@ -86,9 +95,8 @@ $scope.urls = BrewService.settings('urls') || [];
 if(!$scope.urls.length && $scope.settings.arduinoUrl)
   $scope.urls.push($scope.settings.arduinoUrl);
 
-if(!!$stateParams.domain){
+if(!!$stateParams.domain)
   $scope.settings.arduinoUrl=$stateParams.domain;
-}
 
 $scope.knobOptions = {
   readOnly: true,
@@ -142,19 +150,24 @@ $scope.kettles = BrewService.settings('kettles') || [{
     ,knob: angular.merge($scope.knobOptions,{value:0,min:0,max:150+5})
   }];
 
+  $scope.getPortRange = function(number){
+      number++;
+      return Array(number).fill().map((_, idx) => 0 + idx);
+  };
+
   $scope.addKettle = function(){
     if($scope.kettles.length < 5){
       $scope.kettles.push(
         {
-          key: 'New Kettle'
-          ,type: 'water'
+          key: $scope.kettleTypes[0].name
+          ,type: $scope.kettleTypes[0].type
           ,active: false
           ,heater: {pin:6,running:false,auto:false}
           ,pump: {pin:7,running:false,auto:false}
-          ,temp: {pin:0,type:'Thermistor',hit:false,current:0,previous:0,adjust:0,target:150,diff:5}
+          ,temp: {pin:0,type:'Thermistor',hit:false,current:0,previous:0,adjust:0,target:$scope.kettleTypes[0].target,diff:$scope.kettleTypes[0].diff}
           ,values: []
           ,timers: []
-          ,knob: angular.merge($scope.knobOptions,{value:0,min:0,max:150+5})
+          ,knob: angular.merge($scope.knobOptions,{value:0,min:0,max:$scope.kettleTypes[0].target+$scope.kettleTypes[0].diff})
         }
       );
     }
@@ -430,9 +443,24 @@ $scope.kettles = BrewService.settings('kettles') || [{
           })
         );
       }
+      //stop the pump
       if(kettle.pump.auto && kettle.pump.running){
         temps.push(BrewService.digital(kettle.pump.pin,0).then(function(){
             kettle.pump.running = false;
+          },function(err){
+            if(err && typeof err == 'string')
+              $scope.error_message = err;
+            else
+              $scope.error_message='Could not connect to the Arduino at '+BrewService.domain();
+          })
+        );
+      }
+      //start the chiller
+      if(kettle.cooler && kettle.cooler.auto && !kettle.cooler.running){
+        temps.push(BrewService.digital(kettle.heater.pin,1).then(function(){
+            kettle.heater.running = true;
+            kettle.knob.subText.text = 'cooling';
+            kettle.knob.subText.color = 'rgba(52,152,219,1)';
           },function(err){
             if(err && typeof err == 'string')
               $scope.error_message = err;
@@ -458,6 +486,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
           })
         );
       }
+      //start the pump
       if(kettle.pump.auto && !kettle.pump.running){
         temps.push(BrewService.digital(kettle.pump.pin,1).then(function(){
             kettle.pump.running = true;
@@ -468,6 +497,18 @@ $scope.kettles = BrewService.settings('kettles') || [{
               $scope.error_message='Could not connect to the Arduino at '+BrewService.domain();
           })
         )
+      }
+      //stop the chiller
+      if(kettle.cooler && kettle.cooler.auto && kettle.cooler.running){
+        temps.push(BrewService.digital(kettle.heater.pin,0).then(function(){
+            kettle.heater.running = false;
+          },function(err){
+            if(err && typeof err == 'string')
+              $scope.error_message = err;
+            else
+              $scope.error_message='Could not connect to the Arduino at '+BrewService.domain();
+          })
+        );
       }
     } else {
       kettle.temp.hit=new Date();//set the time the target was hit so we can now start alerts
@@ -511,7 +552,23 @@ $scope.kettles = BrewService.settings('kettles') || [{
 
   $scope.toggleKettle = function(item,kettle){
 
-    var k = (item == 'pump') ? kettle.pump : kettle.heater;
+    var k;
+
+    switch (item) {
+      case 'heat':
+        k = kettle.heater;
+        break;
+      case 'cool':
+        k = kettle.cooler;
+        break;
+      case 'pump':
+        k = kettle.pump;
+        break;
+    }
+
+    if(!k)
+      return;
+
     k.running = !k.running;
 
     //start the digital port
@@ -584,9 +641,22 @@ $scope.kettles = BrewService.settings('kettles') || [{
             $scope.error_message='Could not connect to the Arduino at '+BrewService.domain();
         });
       }
+      if(kettle.cooler && !kettle.active && kettle.cooler.running){
+        BrewService.digital(kettle.cooler.pin,0).then(function(){
+          kettle.cooler.running=false;
+          $scope.updateKnobCopy(kettle);
+        },function(err){
+          if(err && typeof err == 'string')
+            $scope.error_message = err;
+          else
+            $scope.error_message='Could not connect to the Arduino at '+BrewService.domain();
+        });
+      }
       if(!kettle.active){
         kettle.pump.auto=false;
         kettle.heater.auto=false;
+        if(kettle.cooler)
+          kettle.cooler.auto=false;
         $scope.updateKnobCopy(kettle);
       }
   };
@@ -713,9 +783,14 @@ $scope.kettles = BrewService.settings('kettles') || [{
       kettle.knob.trackColor = 'rgba(255,0,0,.1)';
       kettle.high = kettle.temp.current-kettle.temp.target;
       kettle.low = null;
-      //update knob text
-      kettle.knob.subText.text = kettle.high+'\u00B0 high';
-      kettle.knob.subText.color = 'rgba(255,0,0,.6)';
+      if(kettle.cooler && kettle.cooler.running){
+        kettle.knob.subText.text = 'cooling';
+        kettle.knob.subText.color = 'rgba(52,152,219,1)';
+      } else {
+        //update knob text
+        kettle.knob.subText.text = kettle.high+'\u00B0 high';
+        kettle.knob.subText.color = 'rgba(255,0,0,.6)';
+      }
     } else if(kettle.temp.current <= kettle.temp.target-kettle.temp.diff){
       kettle.knob.barColor = 'rgba(52,152,219,.5)';
       kettle.knob.trackColor = 'rgba(52,152,219,.1)';
@@ -740,12 +815,21 @@ $scope.kettles = BrewService.settings('kettles') || [{
   };
 
   $scope.changeKettleType = function(kettle){
-      if(kettle.type=='hop')
-        kettle.type = 'water';
-      else if(kettle.type=='grain')
-        kettle.type = 'hop';
-      else if(kettle.type=='water')
-        kettle.type = 'grain';
+    // find current kettle
+    var kettleIndex = _.findIndex($scope.kettleTypes, {type: kettle.type});
+    // move to next or first kettle in array
+    kettleIndex++;
+    var kettleType = ($scope.kettleTypes[kettleIndex]) ? $scope.kettleTypes[kettleIndex] : $scope.kettleTypes[0];
+    //update kettle options if changed
+    kettle.key = kettleType.name;
+    kettle.type = kettleType.type;
+    kettle.temp.target = kettleType.target;
+    kettle.temp.diff = kettleType.diff;
+    kettle.knob = angular.merge($scope.knobOptions,{value:0,min:0,max:kettleType.target+kettleType.diff});
+    if(kettleType.type === 'fermenter')
+      kettle.cooler = {pin:2,running:false,auto:false};
+    else
+      delete kettle.cooler;
   };
 
   $scope.changeUnits = function(unit){

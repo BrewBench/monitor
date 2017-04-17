@@ -308,15 +308,24 @@ sup.ref{
   height: 34px;
 }
 
-label.adjust{
+label.adjust, a.adjust{
   display: block;
   text-transform: uppercase;
+  text-decoration: none;
   color: #333;
   font-weight: bold;
   letter-spacing: .2em;
   padding-top: 10px;
   padding-bottom: 0;
   font-size: 13px;
+}
+
+a.heat {
+  color: rgba(200,47,47,1);
+}
+
+a.cool {
+  color: rgba(52,152,219,1);
 }
 
 sup.queue, .fa-clock-o{

@@ -27,6 +27,18 @@ brewBench.factory('BrewService', function($http, $q, $filter){
           return values;
     },
 
+    kettleTypes: function(type){
+      var kettles = [
+        {'name':'Boil','type':'hop','target':200,'diff':5}
+        ,{'name':'Mash','type':'grain','target':150,'diff':5}
+        ,{'name':'Hot Liquor','type':'water','target':200,'diff':5}
+        ,{'name':'Fermenter','type':'fermenter','target':74,'diff':2}
+      ];
+      if(type)
+        return _.filter(kettles, {'type': type})[0];
+      return kettles;
+    },
+
     byteCount: function(s) {
       return encodeURI(s).split(/%..|./).length - 1;
     },

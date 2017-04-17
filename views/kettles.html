@@ -5,7 +5,7 @@
 
       <div class="kettle-row">
         <div class="kettle-head">
-          <img class="type" ng-src="img/{{kettle.type}}.svg" width="30" ng-click="changeKettleType(kettle)"/>
+          <img class="type" ng-src="img/{{kettle.type}}.svg" height="30" ng-click="changeKettleType(kettle)"/>
           <h3><editable type="text" model="kettle.key"></editable></h3>
         </div>
         <div>
@@ -25,7 +25,7 @@
               <span class="label label-default" ng-class="{'label-success':kettle.temp.type=='DS18B20'}" ng-click="kettle.temp.type='DS18B20'">DS18B20</span>
             </div>
             <ul class="dropdown-menu">
-              <li ng-repeat="p in [0,1,2,3,4,5] track by $index">
+              <li ng-repeat="p in getPortRange(settings.ports.analog) track by $index">
                 <a href="#" ng-click="pinChange(kettle.temp.pin,p,true); kettle.temp.pin=p;">A{{p}} <span class="pininuse" ng-show="pinInUse(p,true)">(In Use)</span></a>
               </li>
             </ul>
@@ -39,7 +39,7 @@
               <span class="label label-default" ng-class="{'label-success':kettle.temp.type=='DS18B20'}" ng-click="kettle.temp.type='DS18B20'">DS18B20</span>
             </div>
             <ul class="dropdown-menu">
-              <li ng-repeat="p in [2,3,4,5,6,7,8,9,10,11,12,13] track by $index">
+              <li ng-repeat="p in getPortRange(settings.ports.digital) track by $index">
                 <a href="#" ng-click="pinChange(kettle.temp.pin,p,false); kettle.temp.pin=p;">D{{p}} <span class="pininuse" ng-show="pinInUse(p,false)">(In Use)</span></a>
               </li>
             </ul>
@@ -57,14 +57,14 @@
               <span class="label" ng-class="{'label-default':!kettle.heater.auto,'label-success':kettle.heater.auto}" ng-click="kettle.heater.auto=!kettle.heater.auto">Auto</span>
             </div>
             <ul class="dropdown-menu">
-              <li ng-repeat="p in [2,3,4,5,6,7,8,9,10,11,12,13] track by $index">
+              <li ng-repeat="p in getPortRange(settings.ports.digital) track by $index">
                 <a href="#" ng-click="pinChange(kettle.heater.pin,p,false); kettle.heater.pin=p;">D{{p}} <span class="pininuse" ng-show="pinInUse(p,false)">(In Use)</span></a>
               </li>
             </ul>
           </div>
         </div>
 
-        <div class="kettle-col">
+        <div class="kettle-col" ng-if="kettle.type !== 'fermenter'">
           <label class="adjust">Pump</label>
           <div class="btn-group">
             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -75,8 +75,26 @@
               <span class="label" ng-class="{'label-default':!kettle.pump.auto,'label-success':kettle.pump.auto}" ng-click="kettle.pump.auto=!kettle.pump.auto">Auto</span>
             </div>
             <ul class="dropdown-menu">
-              <li ng-repeat="p in [2,3,4,5,6,7,8,9,10,11,12,13] track by $index">
+              <li ng-repeat="p in getPortRange(settings.ports.digital) track by $index">
                 <a href="#" ng-click="pinChange(kettle.pump.pin,p,false); kettle.pump.pin=p;">D{{p}} <span class="pininuse" ng-show="pinInUse(p,false)">(In Use)</span></a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="kettle-col" ng-if="kettle.type === 'fermenter' && kettle.cooler">
+          <label class="adjust">Cool</label>
+          <div class="btn-group">
+            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              D{{kettle.cooler.pin}} <span class="caret"></span>
+            </button>
+            <div class="tempType">
+              <span class="label" ng-class="{'label-default':!kettle.cooler.running&&!kettle.cooler.auto,'label-success':kettle.cooler.running,'label-warning':!kettle.cooler.running&&kettle.cooler.auto}" ng-click="toggleKettle('cool',kettle)">{{kettle.cooler.running ? 'On' : (kettle.cooler.auto ? 'Wait' :'Off')}}</span>
+              <span class="label" ng-class="{'label-default':!kettle.cooler.auto,'label-success':kettle.cooler.auto}" ng-click="kettle.cooler.auto=!kettle.cooler.auto">Auto</span>
+            </div>
+            <ul class="dropdown-menu">
+              <li ng-repeat="p in getPortRange(settings.ports.digital) track by $index">
+                <a href="#" ng-click="pinChange(kettle.cooler.pin,p,false); kettle.cooler.pin=p;">D{{p}} <span class="pininuse" ng-show="pinInUse(p,false)">(In Use)</span></a>
               </li>
             </ul>
           </div>

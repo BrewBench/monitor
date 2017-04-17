@@ -1,5 +1,13 @@
 # Change Log
 
+## 2.6.2 - 2017-04-16
+
+### Added
+- Ports in settings to support boards with more ports like the Arduino Mega
+- Option to hide the settings
+- Fermenter type with Cooling option for use with a Glycol Chiller
+- New Logo
+
 ## 2.6.1 - 2017-03-22
 
 ### Added
