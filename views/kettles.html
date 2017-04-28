@@ -19,16 +19,16 @@
           <div class="btn-group">
             <div class="btn-group">
               <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                {{kettle.temp.type=='Thermistor' ? 'A' : 'D'}}{{kettle.temp.pin}} <span class="caret"></span>
+                {{sensorTypes(kettle.temp.type).analog ? 'A' : 'D'}}{{kettle.temp.pin}} <span class="caret"></span>
               </button>
-              <ul class="dropdown-menu" ng-if="kettle.temp.type=='Thermistor'">
+              <ul class="dropdown-menu" ng-if="sensorTypes(kettle.temp.type).analog">
                 <li ng-repeat="p in getPortRange(settings.ports.analog) track by $index" ng-class="{'active': kettle.temp.pin==p}">
                   <a href="#" ng-click="pinChange(kettle.temp.pin,p,true); kettle.temp.pin=p;">A{{p}}
                     <span class="pininuse" ng-show="pinInUse(p,true)">(In Use)</span>
                   </a>
                 </li>
               </ul>
-              <ul class="dropdown-menu" ng-if="kettle.temp.type!='Thermistor'">
+              <ul class="dropdown-menu" ng-if="!sensorTypes(kettle.temp.type).analog">
                 <li ng-repeat="p in getPortRange(settings.ports.digital) track by $index" ng-class="{'active': kettle.temp.pin==p}">
                   <a href="#" ng-click="pinChange(kettle.temp.pin,p,false); kettle.temp.pin=p;">D{{p}}
                     <span class="pininuse" ng-show="pinInUse(p,false)">(In Use)</span>
@@ -40,8 +40,8 @@
               <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 {{kettle.temp.type}} <span class="caret"></span>
               </button>
-              <ul class="dropdown-menu">
-                <li ng-repeat="s in sensorTypes track by $index" ng-class="{'active': kettle.temp.type==s.name}">
+              <ul class="dropdown-menu" ng-init="sensors = sensorTypes()">
+                <li ng-repeat="s in sensors track by $index" ng-class="{'active': kettle.temp.type==s.name}">
                   <a href="#" ng-click="kettle.temp.type=s.name;">{{s.name}}</a>
                 </li>
               </ul>

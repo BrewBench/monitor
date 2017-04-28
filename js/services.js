@@ -31,7 +31,7 @@ brewBench.factory('BrewService', function($http, $q, $filter){
       var sensors = [
         {name: 'Thermistor', analog: true}
         ,{name: 'DS18B20', analog: false}
-        ,{name: 'PT100', analog: false}
+        ,{name: 'PT100', analog: true}
       ];
       if(name)
         return _.filter(sensors, {'name': name})[0];
@@ -90,9 +90,10 @@ brewBench.factory('BrewService', function($http, $q, $filter){
       return q.promise;
     },
 
-    // read/write thermistors or DS18B20
+    // Thermistor, DS18B20, or PT100
     // https://learn.adafruit.com/thermistor/using-a-thermistor
     // https://www.adafruit.com/product/381)
+    // https://www.adafruit.com/product/3290 and https://www.adafruit.com/product/3328
     temp: function(temp){
       var q = $q.defer();
       var url = this.domain()+'/arduino/'+temp.type+'/'+temp.pin;

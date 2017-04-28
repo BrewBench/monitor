@@ -73,6 +73,10 @@ void process(YunClient client) {
     responseOkHeader(client);
     thermistorCommand(client);
   }
+  if (command == "PT100") {
+    responseOkHeader(client);
+    pt100Command(client);
+  }
 }
 
 void responseOkHeader(YunClient client){
@@ -125,6 +129,26 @@ void thermistorCommand(YunClient client) {
   pin = client.parseInt();
   temp = Thermistor(pin);
 
+  // Send JSON response to client
+  client.print("{\"pin\":\""+String(pin)+"\",\"temp\":\""+String(temp)+"\"}");
+}
+
+// http://www.instructables.com/id/Temperature-Measurement-Tutorial-Part1/
+void pt100Command(BridgeClient client) {
+  int pin;
+  float tvoltage;
+  float temp;
+  pin = client.parseInt();
+
+  tvoltage=analogRead(pin);
+  if (tvoltage<410){
+    lcd.clear();
+    lcd.print("Error");
+  }
+  else {
+    tvoltage=map(tvoltage,410,1023,0,614);
+    temp=(150*tvoltage)/614;
+  }
   // Send JSON response to client
   client.print("{\"pin\":\""+String(pin)+"\",\"temp\":\""+String(temp)+"\"}");
 }
