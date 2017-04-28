@@ -9,6 +9,7 @@ $scope.grains;
 $scope.water;
 $scope.lovibond;
 $scope.kettleTypes = BrewService.kettleTypes();
+$scope.sensorTypes = BrewService.sensorTypes();
 $scope.chartOptions = BrewService.chartOptions();
 $scope.showSettings = true;
 $scope.error_message = '';
@@ -182,8 +183,10 @@ $scope.kettles = BrewService.settings('kettles') || [{
       return (
         (analog && kettle.temp.type=='Thermistor' && kettle.temp.pin==pin) ||
         (!analog && kettle.temp.type=='DS18B20' && kettle.temp.pin==pin) ||
+        (!analog && kettle.temp.type=='PT100' && kettle.temp.pin==pin) ||
         (!analog && kettle.heater.pin==pin) ||
-        (!analog && kettle.pump.pin==pin)
+        (!analog && kettle.cooler && kettle.cooler.pin==pin) ||
+        (!analog && !kettle.cooler && kettle.pump.pin==pin)
       );
     });
     return kettle || false;

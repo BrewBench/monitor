@@ -170,6 +170,10 @@ sup.ref{
   flex: auto;
 }
 
+.kettles .kettle-col .relay .btn-default{
+  background-color: #dddddd;
+}
+
 .kettles .scrollable-menu {
     height: auto;
     max-height: 200px;

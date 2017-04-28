@@ -27,6 +27,17 @@ brewBench.factory('BrewService', function($http, $q, $filter){
           return values;
     },
 
+    sensorTypes: function(name){
+      var sensors = [
+        {name: 'Thermistor', analog: true}
+        ,{name: 'DS18B20', analog: false}
+        ,{name: 'PT100', analog: false}
+      ];
+      if(name)
+        return _.filter(sensors, {'name': name})[0];
+      return sensors;
+    },
+
     kettleTypes: function(type){
       var kettles = [
         {'name':'Boil','type':'hop','target':200,'diff':5}
