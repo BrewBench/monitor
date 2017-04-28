@@ -8,7 +8,7 @@
 // http://static.cactus.io/downloads/library/ds18b20/cactus_io_DS18B20.zip
 #include "cactus_io_DS18B20.h"
 
-const char VERSION[] = "2.6.0";
+const char VERSION[] = "2.6.1";
 
 BridgeServer server;
 
@@ -139,16 +139,12 @@ void pt100Command(BridgeClient client) {
   float tvoltage;
   float temp;
   pin = client.parseInt();
+  tvoltage = analogRead(pin);
+  if (tvoltage>409){
+    tvoltage = map(tvoltage,410,1023,0,614);
+    temp = (150*tvoltage)/614;
+  }
 
-  tvoltage=analogRead(pin);
-  if (tvoltage<410){
-    lcd.clear();
-    lcd.print("Error");
-  }
-  else {
-    tvoltage=map(tvoltage,410,1023,0,614);
-    temp=(150*tvoltage)/614;
-  }
   // Send JSON response to client
   client.print("{\"pin\":\""+String(pin)+"\",\"temp\":\""+String(temp)+"\"}");
 }
