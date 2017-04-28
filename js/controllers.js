@@ -845,7 +845,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
     kettle.type = kettleType.type;
     kettle.temp.target = kettleType.target;
     kettle.temp.diff = kettleType.diff;
-    kettle.knob = angular.merge($scope.knobOptions,{value:0,min:0,max:kettleType.target+kettleType.diff});
+    kettle.knob = angular.merge($scope.knobOptions,{value:kettle.temp.current,min:0,max:kettleType.target+kettleType.diff});
     if(kettleType.type === 'fermenter')
       kettle.cooler = {pin:2,running:false,auto:false};
     else
@@ -853,14 +853,18 @@ $scope.kettles = BrewService.settings('kettles') || [{
   };
 
   $scope.changeUnits = function(unit){
-    _.each($scope.kettles,function(kettle){
-      kettle.temp.current = $filter('formatDegrees')(kettle.temp.current,unit);
-      kettle.temp.target = $filter('formatDegrees')(kettle.temp.target,unit);
-      // update knob
-      kettle.knob = angular.merge($scope.knobOptions,{value:0,min:0,max:kettle.temp.target+kettle.temp.diff});
-      $scope.updateKnobCopy(kettle);
-    });
-    $scope.chartOptions = BrewService.chartOptions(unit);
+    if($scope.settings.unit != unit){
+      $scope.settings.unit = unit;
+      _.each($scope.kettles,function(kettle){
+        kettle.temp.current = $filter('formatDegrees')(kettle.temp.current,unit);
+        kettle.temp.target = $filter('formatDegrees')(kettle.temp.target,unit);
+        // update knob
+        kettle.knob.value = kettle.temp.current;
+        kettle.knob.max = kettle.temp.target+kettle.temp.diff;
+        $scope.updateKnobCopy(kettle);
+      });
+      $scope.chartOptions = BrewService.chartOptions(unit);
+    }
   };
 
   $scope.timerRun = function(timer,kettle){

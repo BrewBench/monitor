@@ -7,8 +7,8 @@
       <div class="right row">
         <div class="col-md-12 col-xs-12">
 
-          <input id="celsius" class="degree" type="radio" ng-model="settings.unit" value="C" ng-click="changeUnits('C')"> <label for="celsius">&deg;C</label>
-          <input id="fahrenheit" class="degree" type="radio" ng-model="settings.unit" value="F" ng-click="changeUnits('F')"> <label for="fahrenheit">&deg;F</label>
+          <input id="celsius" class="degree" type="radio" ng-checked="settings.unit=='C'" value="C" ng-click="changeUnits('C')"> <label for="celsius">&deg;C</label>
+          <input id="fahrenheit" class="degree" type="radio" ng-checked="settings.unit=='F'" value="F" ng-click="changeUnits('F')"> <label for="fahrenheit">&deg;F</label>
 
           <div class="btn-group notifications" role="group">
             <button type="button" class="btn btn-default" style="padding:0 5px 0 5px;" ng-click="settings.notifications.on = !settings.notifications.on">
