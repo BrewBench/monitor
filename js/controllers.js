@@ -796,8 +796,9 @@ $scope.kettles = BrewService.settings('kettles') || [{
       kettle.knob.subText.color = 'gray';
       return;
     }
+
     //is temp too high?
-    if(kettle.temp.current >= kettle.temp.target+kettle.temp.diff){
+    if(kettle.temp.current > kettle.temp.target+kettle.temp.diff){
       kettle.knob.barColor = 'rgba(255,0,0,.6)';
       kettle.knob.trackColor = 'rgba(255,0,0,.1)';
       kettle.high = kettle.temp.current-kettle.temp.target;
@@ -810,7 +811,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
         kettle.knob.subText.text = kettle.high+'\u00B0 high';
         kettle.knob.subText.color = 'rgba(255,0,0,.6)';
       }
-    } else if(kettle.temp.current <= kettle.temp.target-kettle.temp.diff){
+    } else if(kettle.temp.current < kettle.temp.target-kettle.temp.diff){
       kettle.knob.barColor = 'rgba(52,152,219,.5)';
       kettle.knob.trackColor = 'rgba(52,152,219,.1)';
       kettle.low = kettle.temp.target-kettle.temp.current;
@@ -855,7 +856,8 @@ $scope.kettles = BrewService.settings('kettles') || [{
     _.each($scope.kettles,function(kettle){
       kettle.temp.current = $filter('formatDegrees')(kettle.temp.current,unit);
       kettle.temp.target = $filter('formatDegrees')(kettle.temp.target,unit);
-      kettle.temp.diff = $filter('formatDegrees')(kettle.temp.diff,unit);
+      // update knob
+      kettle.knob = angular.merge($scope.knobOptions,{value:0,min:0,max:kettle.temp.target+kettle.temp.diff});
       $scope.updateKnobCopy(kettle);
     });
     $scope.chartOptions = BrewService.chartOptions(unit);

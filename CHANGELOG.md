@@ -6,6 +6,9 @@
 - Support for PT100 temp sensor
 - Design changes for sensor selection and heat/pump/cool button groupings
 
+### Fixed
+- knob changing to Celsius
+
 ## 2.6.2 - 2017-04-16
 
 ### Added
