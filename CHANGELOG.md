@@ -1,5 +1,11 @@
 # Change Log
 
+## 2.6.3 - 2017-04-27
+
+### Added
+- Support for PT100 temp sensor
+- Design changes for sensor selection and heat/pump/cool button groupings
+
 ## 2.6.2 - 2017-04-16
 
 ### Added

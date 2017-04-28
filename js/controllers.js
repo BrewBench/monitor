@@ -384,6 +384,22 @@ $scope.kettles = BrewService.settings('kettles') || [{
           })
         );
 
+        //check if cooler is running
+        if(kettle.cooler){
+            running.push(BrewService.digitalRead(kettle.cooler.pin,2000).then(function(response){
+              if(response.value=="1"){
+                kettle.active = true;
+                kettle.cooler.running = true;
+              } else {
+                kettle.cooler.running = false;
+              }
+              return kettle;
+            },function(err){
+              return err;
+            })
+          );
+        }
+
         // check timers for running
         if(!!kettle.timers && kettle.timers.length){
           _.each(kettle.timers, function(timer){
