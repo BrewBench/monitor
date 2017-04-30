@@ -1,0 +1,58 @@
+[{"_id":{"$oid":"57162aba25922b24dd44fbc4"},"srm":0,"hex":"#ffffff","color":"White","other_color_names":"Bright White, Pure Brilliant White"}
+,{"_id":{"$oid":"57162aba25922b24dd44fbc5"},"srm":1,"hex":"#f7e1a1","color":"Candleglow","other_color_names":"Sandwisp, Butter Up (Sherman Williams)"}
+,{"_id":{"$oid":"57162aba25922b24dd44fbc6"},"srm":0.5,"hex":"#fbf0cb","color":"Champagne","other_color_names":"Barely Dawn (Kelly-Moore), Grapefruit (Taubmans)"}
+,{"_id":{"$oid":"57162aba25922b24dd44fbc7"},"srm":1.5,"hex":"#f4d380","color":"Broadway Lights","other_color_names":"Yellow (Chrysler), Sunbonnet (ICI), Katydid (Taubmans)"}
+,{"_id":{"$oid":"57162aba25922b24dd44fbc8"},"srm":2,"hex":"#f0c566","color":"Cream Can","other_color_names":"Firefly (Benjamin Moore)"}
+,{"_id":{"$oid":"57162aba25922b24dd44fbc9"},"srm":2.5,"hex":"#edb950","color":"Casablanca","other_color_names":"Ronchi, Yellow Coneflower (Pittsburgh)"}
+,{"_id":{"$oid":"57162aba25922b24dd44fbca"},"srm":3,"hex":"#e9ad3f","color":"Tulip Tree","other_color_names":"Dried Mustard (Cloverdale)"}
+,{"_id":{"$oid":"57162aba25922b24dd44fbcb"},"srm":3.5,"hex":"#e5a231","color":"Fire Bush","other_color_names":"Ocker (Caparol)"}
+,{"_id":{"$oid":"57162aba25922b24dd44fbcc"},"srm":4,"hex":"#e19726","color":"Buttercup","other_color_names":"Amberger (Caparol), Pencil Yellow (Devoe)"}
+,{"_id":{"$oid":"57162aba25922b24dd44fbcd"},"srm":4.5,"hex":"#dd8d1d","color":"Zest","other_color_names":"Dixie, Golden Bark (Dulux), Butterscotch Tempest (Devoe)"}
+,{"_id":{"$oid":"57162aba25922b24dd44fbce"},"srm":5,"hex":"#d98416","color":"Golden Bell","other_color_names":"Gamboge, Desert Sunset (GM)"}
+,{"_id":{"$oid":"57162aba25922b24dd44fbcf"},"srm":5.5,"hex":"#d57b11","color":"Meteor","other_color_names":"Amber 65 (Caparol)"}
+,{"_id":{"$oid":"57162aba25922b24dd44fbd0"},"srm":6,"hex":"#d1730c","color":"Dark Goldenrod","other_color_names":"Ochre"}
+,{"_id":{"$oid":"57162aba25922b24dd44fbd1"},"srm":6.5,"hex":"#cd6c08","color":"Indochine","other_color_names":"Red Stage, Sticky Toffee (Plascon)"}
+,{"_id":{"$oid":"57162aba25922b24dd44fbd2"},"srm":7,"hex":"#c86505","color":"Alloy Orange","other_color_names":"Oxidrot 7s (Caparol)"}
+,{"_id":{"$oid":"57162aba25922b24dd44fbd3"},"srm":8,"hex":"#c05801","color":"Rose of Sharon","other_color_names":"Burnt Orange (Marston \u0026 Langinger)"}
+,{"_id":{"$oid":"57162aba25922b24dd44fbd4"},"srm":8.5,"hex":"#bc5200","color":"Ruddy Brown","other_color_names":"PMS167 (Pantone), Mahogany"}
+,{"_id":{"$oid":"57162aba25922b24dd44fbd5"},"srm":9,"hex":"#b74d00","color":"Mahogany","other_color_names":"Rust"}
+,{"_id":{"$oid":"57162aba25922b24dd44fbd6"},"srm":9.5,"hex":"#b34800","color":"Fire","other_color_names":"Rust"}
+,{"_id":{"$oid":"57162aba25922b24dd44fbd7"},"srm":10,"hex":"#af4300","color":"Orange","other_color_names":"Terra Warmth (Dutch Boy)"}
+,{"_id":{"$oid":"57162aba25922b24dd44fbd8"},"srm":10.5,"hex":"#ab3f00","color":"Dark Orange","other_color_names":"India O (Caparol)"}
+,{"_id":{"$oid":"57162aba25922b24dd44fbd9"},"srm":11,"hex":"#a73b00","color":"Chinese Red","other_color_names":"Rotor Bolus (Caparol)"}
+,{"_id":{"$oid":"57162aba25922b24dd44fbda"},"srm":11.5,"hex":"#a33700","color":"Quora","other_color_names":"Rotor Bolus (Caparol)"}
+,{"_id":{"$oid":"57162aba25922b24dd44fbdb"},"srm":7.5,"hex":"#c45e03","color":"Tawny","other_color_names":"Oxidrot 8s (Caparol)"}
+,{"_id":{"$oid":"57162aba25922b24dd44fbdc"},"srm":14,"hex":"#8f2800","color":"Peru Tan","other_color_names":"Dark Red, Kobe, Rotbraun (Caparol)"}
+,{"_id":{"$oid":"57162aba25922b24dd44fbdd"},"srm":13,"hex":"#972d00","color":"Totem Pole","other_color_names":"Oregon, Dark Red, Schwedenro/Schwedenrot (Caparol)"}
+,{"_id":{"$oid":"57162aba25922b24dd44fbde"},"srm":15,"hex":"#882300","color":"Red Beech","other_color_names":"Sienna, Grand Canyon Brown (GM)"}
+,{"_id":{"$oid":"57162aba25922b24dd44fbdf"},"srm":16,"hex":"#811f00","color":"Maroon","other_color_names":"Kenyan Copper"}
+,{"_id":{"$oid":"57162aba25922b24dd44fbe0"},"srm":17,"hex":"#7b1b00","color":"Pueblo","other_color_names":"Oxidrot+Feuerrot 1/1 (Caparol)"}
+,{"_id":{"$oid":"57162aba25922b24dd44fbe1"},"srm":18,"hex":"#741800","color":"Cedar Wood","other_color_names":"Amber Fire (Chrysler), Kardinal Braun (Caparol)"}
+,{"_id":{"$oid":"57162aba25922b24dd44fbe2"},"srm":20,"hex":"#681200","color":"Rosewood","other_color_names":"Oxidrot (Caparol), Red (Ford, Chrysler)"}
+,{"_id":{"$oid":"57162aba25922b24dd44fbe3"},"srm":21,"hex":"#631000","color":"Dark Red","other_color_names":"Oxidrot (Caparol)"}
+,{"_id":{"$oid":"57162aba25922b24dd44fbe4"},"srm":19,"hex":"#6e1500","color":"Barn Red","other_color_names":"Oxidrot Dunkel (Caparol)"}
+,{"_id":{"$oid":"57162aba25922b24dd44fbe5"},"srm":12,"hex":"#9f3400","color":"Sangria","other_color_names":"Rufous"}
+,{"_id":{"$oid":"57162aba25922b24dd44fbe6"},"srm":22,"hex":"#5e0e00","color":"Red Oxide","other_color_names":"Prune, Persian Plum, Burgundy (Ford)"}
+,{"_id":{"$oid":"57162aba25922b24dd44fbe7"},"srm":23,"hex":"#590c00","color":"Rustic Red","other_color_names":"Bulgarian Rose, Murano (Caparol), Mohawk Maroon (Ford)"}
+,{"_id":{"$oid":"57162aba25922b24dd44fbe8"},"srm":12.5,"hex":"#9b3000","color":"Dark Orange-Red","other_color_names":"A7 (Trumatch)"}
+,{"_id":{"$oid":"57162aba25922b24dd44fbe9"},"srm":25,"hex":"#500900","color":"Pheasant Red","other_color_names":"Dark Diamond Bright Red (Ford), Pimento Red (Chrysler)"}
+,{"_id":{"$oid":"57162aba25922b24dd44fbea"},"srm":24,"hex":"#540b00","color":"Burnt Maroon","other_color_names":"Indian Tan, Grenadin 35 (Caparol), Crimson Red (Chrysler)"}
+,{"_id":{"$oid":"57162aba25922b24dd44fbeb"},"srm":26,"hex":"#4c0800","color":"Brown Pod","other_color_names":"Medium Rosewood (Ford), Cordovan Brown (Chrysler)"}
+,{"_id":{"$oid":"57162aba25922b24dd44fbec"},"srm":27,"hex":"#480700","color":"Temptress","other_color_names":"Regis Red (Ford), Dark Beech Firemist (Chrysler)"}
+,{"_id":{"$oid":"57162aba25922b24dd44fbed"},"srm":28,"hex":"#440600","color":"Dark Sienna","other_color_names":"Chestnut (Ford)"}
+,{"_id":{"$oid":"57162aba25922b24dd44fbee"},"srm":29,"hex":"#410500","color":"Black Bean","other_color_names":"Dark Cordovan (Ford)"}
+,{"_id":{"$oid":"57162aba25922b24dd44fbef"},"srm":30,"hex":"#3d0500","color":"Dark Bronze","other_color_names":"Dark Champagne (Ford), Piedmont Maroon (Chrysler)"}
+,{"_id":{"$oid":"57162aba25922b24dd44fbf0"},"srm":31,"hex":"#3a0400","color":"Chocolate","other_color_names":"Carmine, Seal Brown, Maroon (Ford)"}
+,{"_id":{"$oid":"57162aba25922b24dd44fbf1"},"srm":33,"hex":"#340300","color":"Dark Cabernet","other_color_names":"Dark Maroon (Ford)"}
+,{"_id":{"$oid":"57162aba25922b24dd44fbf2"},"srm":32,"hex":"#370400","color":"Autumn Maple","other_color_names":"Imperial Maroon (Chrysler), Sunset Maroon (AMC)"}
+,{"_id":{"$oid":"57162aba25922b24dd44fbf3"},"srm":34,"hex":"#320300","color":"Titian Maroon","other_color_names":"Victoria Plum (GM)"}
+,{"_id":{"$oid":"57162aba25922b24dd44fbf4"},"srm":35,"hex":"#2f0200","color":"Sepia Black","other_color_names":"Tyrian Purple, Brown (Ford)"}
+,{"_id":{"$oid":"57162aba25922b24dd44fbf5"},"srm":36,"hex":"#2d0200","color":"Dark Gold Wing","other_color_names":"Coppertone (Ford)"}
+,{"_id":{"$oid":"57162aba25922b24dd44fbf6"},"srm":37,"hex":"#2a0200","color":"Zinnwaldite Brown","other_color_names":"Midnight Wine (Ford)"}
+,{"_id":{"$oid":"57162aba25922b24dd44fbf7"},"srm":38,"hex":"#280100","color":"Diesel","other_color_names":"Maroon Deep (AMC), Amarone (Alcro)"}
+,{"_id":{"$oid":"57162aba25922b24dd44fbf8"},"srm":39,"hex":"#260100","color":"Licorice","other_color_names":"Dark Vivid Red (AMC)"}
+,{"_id":{"$oid":"57162aba25922b24dd44fbf9"},"srm":40,"hex":"#240100","color":"Black","other_color_names":"Morocco Red, Oporto Maroon (GM)"}
+,{"_id":{"$oid":"57162aba25922b24dd44fbfa"},"srm":65,"hex":"#0d0000","color":"Coal Black","other_color_names":"Black Diamond (GM), Granada Black (GM)"}
+,{"_id":{"$oid":"57162aba25922b24dd44fbfb"},"srm":80,"hex":"#000000","color":"Moonlight Black","other_color_names":"Ebony, Jet Black (RAL), Panther Black (Ford)"}
+,{"_id":{"$oid":"57162aba25922b24dd44fbfc"},"srm":50,"hex":"#160000","color":"Smoky Black","other_color_names":"Black Magic (Homebase), Velvet Maroon (Ford)"}
+]

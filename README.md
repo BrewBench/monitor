@@ -52,19 +52,12 @@ BrewBench is an Arduino brew monitor, controller and alert system for the home b
 
 Go to [brewbench.co](http://brewbench.co) or clone this repo and start the webserver and go to [http://127.0.0.1:8080](http://127.0.0.1:8080).
 
-Install node, https://nodejs.org
-
-```sh
-npm install
-live-server
-```
-
 ## Development
 
 For development just run `npm install`, and look at [index.html](index.html) for un-commenting the un-minified files.
 
 ```sh
-npm install
+yarn
 gulp
 ```
 

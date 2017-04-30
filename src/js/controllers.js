@@ -41,7 +41,7 @@ $scope.settings = BrewService.settings('settings') || {
   ,ports: {'analog':5, 'digital':13}
   ,recipe: {'name':'','yeast':[],scale:'gravity',method:'papazian','og': 0, 'fg': 0, 'abv':0, 'abw':0, 'calories':0, 'attenuation':0}
   ,notifications: {on:true,timers:true,high:true,low:true,target:true,slack:'Slack notification webhook Url',last:''}
-  ,sounds: {on:true,alert:'audio/bike.mp3',timer:'audio/school.mp3'}
+  ,sounds: {on:true,alert:'/assets/audio/bike.mp3',timer:'/assets/audio/school.mp3'}
 };
 
 $scope.showSettingsSide = function(){
@@ -688,10 +688,10 @@ $scope.kettles = BrewService.settings('kettles') || [{
     }
 
     // Desktop / Slack Notification
-    var message, icon = 'img/brewbench-logo.png', color = 'good';
+    var message, icon = '/assets/img/brewbench-logo.png', color = 'good';
 
     if(kettle && ['hop','grain','water'].indexOf(kettle.type)!==-1)
-      icon = 'img/'+kettle.type+'.png';
+      icon = '/assets/img/'+kettle.type+'.png';
 
     //don't alert if the heater is running and temp is too low
     if(kettle && kettle.low && kettle.heater.running)

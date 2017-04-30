@@ -160,7 +160,7 @@ angular.module('brewbench')
 
     grains: function(){
         var q = $q.defer();
-        $http.get('/data/grains.json').then(function(response){
+        $http.get('/assets/data/grains.json').then(function(response){
           q.resolve(response.data);
         },function(err){
           q.reject(err);
@@ -170,7 +170,7 @@ angular.module('brewbench')
 
     hops: function(){
         var q = $q.defer();
-        $http.get('/data/hops.json').then(function(response){
+        $http.get('/assets/data/hops.json').then(function(response){
           q.resolve(response.data);
         },function(err){
           q.reject(err);
@@ -180,7 +180,7 @@ angular.module('brewbench')
 
     water: function(){
         var q = $q.defer();
-        $http.get('/data/water.json').then(function(response){
+        $http.get('/assets/data/water.json').then(function(response){
           q.resolve(response.data);
         },function(err){
           q.reject(err);
@@ -190,7 +190,7 @@ angular.module('brewbench')
 
     lovibond: function(){
         var q = $q.defer();
-        $http.get('/data/lovibond.json').then(function(response){
+        $http.get('/assets/data/lovibond.json').then(function(response){
           q.resolve(response.data);
         },function(err){
           q.reject(err);
