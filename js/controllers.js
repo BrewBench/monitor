@@ -1,4 +1,5 @@
-brewBench.controller('mainCtrl', function($scope, $stateParams, $state, $filter, $timeout, $interval, $q, BrewService){
+angular.module('brewbench')
+.controller('mainCtrl', function($scope, $stateParams, $state, $filter, $timeout, $interval, $q, BrewService){
 
 var notification = null
   ,resetChart = 100
@@ -38,8 +39,7 @@ $scope.settings = BrewService.settings('settings') || {
   ,unit: 'F'
   ,arduinoUrl: '192.168.240.1'
   ,ports: {'analog':5, 'digital':13}
-  ,storage: 'sd'
-  ,recipe: {'name':'','yeast':[],scale:'gravity',method:'papazian','og': 1.060, 'fg': 1.015, 'abv':0, 'abw':0, 'calories':0, 'attenuation':0}
+  ,recipe: {'name':'','yeast':[],scale:'gravity',method:'papazian','og': 0, 'fg': 0, 'abv':0, 'abw':0, 'calories':0, 'attenuation':0}
   ,notifications: {on:true,timers:true,high:true,low:true,target:true,slack:'Slack notification webhook Url',last:''}
   ,sounds: {on:true,alert:'audio/bike.mp3',timer:'audio/school.mp3'}
 };
@@ -205,104 +205,95 @@ $scope.kettles = BrewService.settings('kettles') || [{
     }
   };
 
-  $scope.showContent = function($fileContent){
+  $scope.importRecipe = function($fileContent,$ext){
 
       var formatted_content = BrewService.formatXML($fileContent);
-      var jsonObj;
+      var jsonObj, recipe = null;
 
       if(!!formatted_content){
         var x2js = new X2JS();
         jsonObj = x2js.xml_str2json( formatted_content );
       }
 
-      if($scope.settings.recipe)
-        $scope.settings.recipe = {name:'',yeast:[]};
+      if(!jsonObj)
+        return $scope.recipe_success = false;
 
-      var recipe = null;
-
-      if(!!jsonObj){
+      if($ext=='bsmx'){
         if(!!jsonObj.Recipes && !!jsonObj.Recipes.Data.Recipe)
           recipe = jsonObj.Recipes.Data.Recipe;
         else if(!!jsonObj.Selections && !!jsonObj.Selections.Data.Recipe)
           recipe = jsonObj.Selections.Data.Recipe;
+        if(recipe)
+          recipe = BrewService.recipeBeerSmith(recipe);
+        else
+          return $scope.recipe_success = false;
+      } else if($ext=='xml'){
+        if(!!jsonObj.RECIPES && !!jsonObj.RECIPES.RECIPE)
+          recipe = jsonObj.RECIPES.RECIPE;
+        if(recipe)
+          recipe = BrewService.recipeBeerXML(recipe);
+        else
+          return $scope.recipe_success = false;
       }
-      if(recipe){
 
-        if(!!recipe.F_R_NAME)
-          $scope.settings.recipe.name = recipe.F_R_NAME;
-        if(!!recipe.F_R_STYLE.F_S_CATEGORY)
-          $scope.settings.recipe.category = recipe.F_R_STYLE.F_S_CATEGORY;
+      if(!recipe)
+        return $scope.recipe_success = false;
 
-        if(!!recipe.F_R_STYLE.F_S_MAX_ABV && !!recipe.F_R_STYLE.F_S_MIN_ABV)
-          $scope.settings.recipe.abv = parseFloat(recipe.F_R_STYLE.F_S_MIN_ABV).toFixed(2)+' - '+parseFloat(recipe.F_R_STYLE.F_S_MAX_ABV).toFixed(2);
-        else if(!!recipe.F_R_STYLE.F_S_MAX_ABV)
-          $scope.settings.recipe.abv = parseFloat(recipe.F_R_STYLE.F_S_MAX_ABV).toFixed(2);
-        else if(!!recipe.F_R_STYLE.F_S_MIN_ABV)
-          $scope.settings.recipe.abv = parseFloat(recipe.F_R_STYLE.F_S_MIN_ABV).toFixed(2);
+      if(!!recipe.og)
+        $scope.settings.recipe.og = recipe.og;
+      if(!!recipe.fg)
+        $scope.settings.recipe.fg = recipe.fg;
 
-        if(!!recipe.Ingredients.Data.Grain){
-          var kettle = _.filter($scope.kettles,{type:'grain'})[0];
-          if(kettle){
-            kettle.timers = [];
-            _.each(recipe.Ingredients.Data.Grain,function(grain){
-              $scope.addTimer(kettle,{
-                label: grain.F_G_NAME,
-                min: parseInt(grain.F_G_BOIL_TIME,10),
-                notes: parseFloat(grain.F_G_AMOUNT/16).toFixed(2)+' lbs.'
-              });
-            });
-          }
-        }
+      $scope.settings.recipe.name = recipe.name;
+      $scope.settings.recipe.category = recipe.category;
+      $scope.settings.recipe.abv = recipe.abv;
 
-        if(!!recipe.Ingredients.Data.Hops){
-          var kettle = _.filter($scope.kettles,{type:'hop'})[0];
-          if(kettle){
-            kettle.timers = [];
-            _.each(recipe.Ingredients.Data.Hops,function(hop){
-              $scope.addTimer(kettle,{
-                label: hop.F_H_NAME,
-                min: parseInt(hop.F_H_DRY_HOP_TIME,10) > 0 ? null : parseInt(hop.F_H_BOIL_TIME,10),
-                notes: parseInt(hop.F_H_DRY_HOP_TIME,10) > 0
-                  ? 'Dry Hop '+parseFloat(hop.F_H_AMOUNT).toFixed(2)+' oz.'+' for '+parseInt(hop.F_H_DRY_HOP_TIME,10)+' Days'
-                  : parseFloat(hop.F_H_AMOUNT).toFixed(2)+' oz.'
-              });
-              // hop.F_H_ALPHA
-              // hop.F_H_DRY_HOP_TIME
-            });
-          }
-        }
-        if(kettle && !!recipe.Ingredients.Data.Misc){
-          if(recipe.Ingredients.Data.Misc.length){
-            _.each(recipe.Ingredients.Data.Misc,function(misc){
-              $scope.addTimer(kettle,{
-                label: misc.F_M_NAME+' '+parseFloat(misc.F_M_AMOUNT).toFixed(2),
-                min: parseInt(misc.F_M_TIME,10)
-              });
-            });
-          } else {
+      if(recipe.grains.length){
+        var kettle = _.filter($scope.kettles,{type:'grain'})[0];
+        if(kettle){
+          kettle.timers = [];
+          _.each(recipe.grains,function(grain){
             $scope.addTimer(kettle,{
-              label: recipe.Ingredients.Data.Misc.F_M_NAME+' '+parseFloat(recipe.Ingredients.Data.Misc.F_M_AMOUNT).toFixed(2)+' oz.',
-              min: parseInt(recipe.Ingredients.Data.Misc.F_M_TIME,10)
+              label: grain.label,
+              min: grain.min,
+              notes: grain.notes
             });
-          }
+          });
         }
-        if(!!recipe.Ingredients.Data.Yeast){
-          if(recipe.Ingredients.Data.Yeast.length){
-            _.each(recipe.Ingredients.Data.Yeast,function(yeast){
-              $scope.settings.recipe.yeast.push({
-                name: yeast.F_Y_LAB+' '+yeast.F_Y_PRODUCT_ID
-              });
-            });
-          } else {
-            $scope.settings.recipe.yeast.push({
-              name: recipe.Ingredients.Data.Yeast.F_Y_LAB+' '+recipe.Ingredients.Data.Yeast.F_Y_PRODUCT_ID
-            });
-          }
-        }
-        $scope.recipe_success = true;
-      } else {
-        $scope.recipe_success = false;
       }
+
+      if(recipe.hops.length){
+        var kettle = _.filter($scope.kettles,{type:'hop'})[0];
+        if(kettle){
+          kettle.timers = [];
+          _.each(recipe.hops,function(hop){
+            $scope.addTimer(kettle,{
+              label: hop.label,
+              min: hop.min,
+              notes: hop.notes
+            });
+          });
+        }
+      }
+      if(recipe.misc.length){
+        var kettle = _.filter($scope.kettles,{type:'hop'})[0];
+        if(kettle){
+          _.each(recipe.misc,function(misc){
+            $scope.addTimer(kettle,{
+              label: misc.label,
+              min: misc.min
+            });
+          });
+        }
+      }
+      if(recipe.yeast){
+        _.each(recipe.yeast,function(yeast){
+          $scope.settings.recipe.yeast.push({
+            name: yeast.name
+          });
+        });
+      }
+      $scope.recipe_success = true;
   };
 
   $scope.loadConfig = function(){

@@ -1,4 +1,4 @@
-var brewBench = angular.module('brewbench', [
+angular.module('brewbench', [
   'ui.router'
   ,'nvd3'
   ,'ngTouch'

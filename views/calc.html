@@ -48,12 +48,12 @@
         </div>
         <div class="input-group">
           <span class="input-group-addon">Original Gravity</span>
-          <input type="number" step="{{settings.recipe.scale=='gravity' ? 0.001 : 0.5}}" class="form-control" ng-change="updateABV()" ng-model="settings.recipe.og" placeholder="Original Gravity">
+          <input type="number" step="{{settings.recipe.scale=='gravity' ? 0.001 : 0.5}}" class="form-control" ng-change="updateABV()" ng-model="settings.recipe.og" value="{{settings.recipe.og}}" placeholder="Original Gravity">
         </div>
         <br>
         <div class="input-group">
           <span class="input-group-addon">Final Gravity</span>
-          <input type="number" step="{{settings.recipe.scale=='gravity' ? 0.001 : 0.5}}" class="form-control" ng-change="updateABV()" ng-model="settings.recipe.fg" placeholder="Final Gravity">
+          <input type="number" step="{{settings.recipe.scale=='gravity' ? 0.001 : 0.5}}" class="form-control" ng-change="updateABV()" ng-model="settings.recipe.fg" value="{{settings.recipe.fg}}" placeholder="Final Gravity">
         </div>
       </div>
     </div>

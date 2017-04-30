@@ -1,4 +1,5 @@
-brewBench.factory('BrewService', function($http, $q, $filter){
+angular.module('brewbench')
+.factory('BrewService', function($http, $q, $filter){
 
   return {
 
@@ -279,6 +280,142 @@ brewBench.factory('BrewService', function($http, $q, $filter){
         plato = parseFloat(plato) + 1;
       }
       return parseFloat(plato);
+    },
+    recipeBeerSmith: function(recipe){
+      var response = {name:'', category:'', abv:'', og:0, fg:0, hops:[], grains:[], yeast:[], misc:[]};
+      if(!!recipe.F_R_NAME)
+        response.name = recipe.F_R_NAME;
+      if(!!recipe.F_R_STYLE.F_S_CATEGORY)
+        response.category = recipe.F_R_STYLE.F_S_CATEGORY;
+
+      if(!!recipe.F_R_STYLE.F_S_MAX_ABV)
+        response.abv = $filter('number')(recipe.F_R_STYLE.F_S_MAX_ABV,2);
+      else if(!!recipe.F_R_STYLE.F_S_MIN_ABV)
+        response.abv = $filter('number')(recipe.F_R_STYLE.F_S_MIN_ABV,2);
+
+      if(!!recipe.Ingredients.Data.Grain){
+        _.each(recipe.Ingredients.Data.Grain,function(grain){
+          response.grains.push({
+            label: grain.F_G_NAME,
+            min: parseInt(grain.F_G_BOIL_TIME,10),
+            notes: $filter('number')(grain.F_G_AMOUNT/16,2)+' lbs.'
+          });
+        });
+      }
+
+      if(!!recipe.Ingredients.Data.Hops){
+          _.each(recipe.Ingredients.Data.Hops,function(hop){
+            response.hops.push({
+              label: hop.F_H_NAME,
+              min: parseInt(hop.F_H_DRY_HOP_TIME,10) > 0 ? null : parseInt(hop.F_H_BOIL_TIME,10),
+              notes: parseInt(hop.F_H_DRY_HOP_TIME,10) > 0
+                ? 'Dry Hop '+$filter('number')(hop.F_H_AMOUNT,2)+' oz.'+' for '+parseInt(hop.F_H_DRY_HOP_TIME,10)+' Days'
+                : $filter('number')(hop.F_H_AMOUNT,2)+' oz.'
+            });
+            // hop.F_H_ALPHA
+            // hop.F_H_DRY_HOP_TIME
+          });
+      }
+
+      if(!!recipe.Ingredients.Data.Misc){
+        if(recipe.Ingredients.Data.Misc.length){
+          _.each(recipe.Ingredients.Data.Misc,function(misc){
+            response.misc.push({
+              label: misc.F_M_NAME+' '+$filter('number')(misc.F_M_AMOUNT,2),
+              min: parseInt(misc.F_M_TIME,10)
+            });
+          });
+        } else {
+          response.misc.push({
+            label: recipe.Ingredients.Data.Misc.F_M_NAME+' '+$filter('number')(recipe.Ingredients.Data.Misc.F_M_AMOUNT,2)+' oz.',
+            min: parseInt(recipe.Ingredients.Data.Misc.F_M_TIME,10)
+          });
+        }
+      }
+
+      if(!!recipe.Ingredients.Data.Yeast){
+        if(recipe.Ingredients.Data.Yeast.length){
+          _.each(recipe.Ingredients.Data.Yeast,function(yeast){
+            response.yeast.push({
+              name: yeast.F_Y_LAB+' '+yeast.F_Y_PRODUCT_ID
+            });
+          });
+        } else {
+          response.yeast.push({
+            name: recipe.Ingredients.Data.Yeast.F_Y_LAB+' '+recipe.Ingredients.Data.Yeast.F_Y_PRODUCT_ID
+          });
+        }
+      }
+      return response;
+    },
+    recipeBeerXML: function(recipe){
+      var response = {name:'', category:'', abv:'', og:0, fg:0, hops:[], grains:[], yeast:[], misc:[]};
+      var mash_time = 60;
+
+      if(!!recipe.NAME)
+        response.name = recipe.NAME;
+      if(!!recipe.STYLE.CATEGORY)
+        response.category = recipe.STYLE.CATEGORY;
+      if(!!recipe.OG)
+        response.og = parseFloat(recipe.OG).toFixed(3);
+      if(!!recipe.FG)
+        response.fg = parseFloat(recipe.FG).toFixed(3);
+
+      if(!!recipe.STYLE.ABV_MAX)
+        response.abv = $filter('number')(recipe.STYLE.ABV_MAX,2);
+      else if(!!recipe.STYLE.ABV_MIN)
+        response.abv = $filter('number')(recipe.STYLE.ABV_MIN,2);
+
+      if(!!recipe.MASH.MASH_STEPS.MASH_STEP[0].STEP_TIME){
+        mash_time = recipe.MASH.MASH_STEPS.MASH_STEP[0].STEP_TIME;
+      }
+
+      if(!!recipe.FERMENTABLES){
+        _.each(recipe.FERMENTABLES.FERMENTABLE,function(grain){
+          response.grains.push({
+            label: grain.NAME,
+            min: parseInt(mash_time,10),
+            notes: $filter('number')(grain.AMOUNT,2)+' lbs.'
+          });
+        });
+      }
+
+      if(!!recipe.HOPS){
+        _.each(recipe.HOPS.HOP,function(hop){
+          response.hops.push({
+            label: hop.NAME+' ('+hop.FORM+')',
+            min: hop.USE == 'Dry Hop' ? 0 : parseInt(hop.TIME,10),
+            notes: hop.USE == 'Dry Hop'
+              ? hop.USE+' '+$filter('number')(hop.AMOUNT*1000/28.3495,2)+' oz.'+' for '+parseInt(hop.TIME/60/24,10)+' Days'
+              : hop.USE+' '+$filter('number')(hop.AMOUNT*1000/28.3495,2)+' oz.'
+          });
+        });
+      }
+
+      if(!!recipe.MISCS){
+        _.each(recipe.MISCS.MISC,function(misc){
+          response.hops.push({
+            label: misc.NAME,
+            min: parseInt(hop.TIME,10),
+            notes: misc.USE
+          });
+        });
+      }
+
+      if(!!recipe.YEASTS){
+        if(recipe.YEASTS.YEAST.length){
+          _.each(recipe.YEASTS.YEAST,function(yeast){
+            response.yeast.push({
+              name: yeast.NAME
+            });
+          });
+        } else {
+          response.yeast.push({
+            name: recipe.YEASTS.YEAST.NAME
+          });
+        }
+      }
+      return response;
     },
     formatXML: function(content){
       var htmlchars = [

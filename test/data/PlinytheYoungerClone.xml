@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RECIPES>
+ <RECIPE>
+  <NAME>Pliny the Younger Clone</NAME>
+  <VERSION>1</VERSION>
+  <TYPE>All Grain</TYPE>
+  <BREWER>Scott</BREWER>
+  <DISPLAY_BATCH_SIZE>6 gal</DISPLAY_BATCH_SIZE>
+  <DISPLAY_BOIL_SIZE>8 gal</DISPLAY_BOIL_SIZE>
+  <BATCH_SIZE>22.71247068</BATCH_SIZE>
+  <BOIL_SIZE>30.28329424</BOIL_SIZE>
+  <BOIL_TIME>90</BOIL_TIME>
+  <EFFICIENCY>80</EFFICIENCY>
+  <NOTES>Mash @ 145* for 75min then 155* for 10min&#13;
+35ml Hop Extract @ 90&#13;
+5ml Hop Extract @ 45&#13;
+10g CTZ @ 45&#13;
+1.5oz Simcoe @ 30&#13;
+2.5oz Simcoe @ 0&#13;
+1.5oz Centennial @ 0&#13;
+1.0oz Amarillo @ 0&#13;
+.5oz Chinook @ 0&#13;
+WLP001 - Cali Ale Yeast - 350 Billion Cells&#13;
+&#13;
+4 days each pulling out the old and adding new&#13;
+dry hop 1 in the primary&#13;
+dry hop 2-4 in secondary or keg&#13;
+&#13;
+DH1: .5oz ea: Simcoe/Amarillo/Warrior&#13;
+DH2: 1oz ea: CTZ/Centennial&#13;
+DH3: .5oz ea Simcoe/Chinook + .25oz Warrior&#13;
+DH4: 1oz ea Simcoe/Amarillo&#13;
+&#13;
+</NOTES>
+  <PRIMARY_TEMP>16.666666666667</PRIMARY_TEMP>
+  <EST_COLOR>6.34</EST_COLOR>
+  <IBU>113.05</IBU>
+  <IBU_METHOD>Tinseth</IBU_METHOD>
+  <EST_ABV>10.34</EST_ABV>
+  <EST_OG>1.102 sg</EST_OG>
+  <EST_FG>1.023 sg</EST_FG>
+  <OG>1.102</OG>
+  <FG>1.023</FG>
+  <PRIMING_SUGAR_NAME></PRIMING_SUGAR_NAME>
+  <CARBONATION_USED></CARBONATION_USED>
+  <BF_PRIMING_METHOD></BF_PRIMING_METHOD>
+  <BF_PRIMING_AMOUNT></BF_PRIMING_AMOUNT>
+  <BF_CO2_LEVEL></BF_CO2_LEVEL>
+  <BF_CO2_UNIT>Volumes</BF_CO2_UNIT>
+  <URL>http://www.bertusbrewery.com/2013/03/pliny-younger-clone-20.html</URL>
+  <BATCH_SIZE_MODE>f</BATCH_SIZE_MODE>
+  <YEAST_STARTER>true</YEAST_STARTER>
+  <NO_CHILL_EXTRA_MINUTES></NO_CHILL_EXTRA_MINUTES>
+  <STARTING_MASH_THICKNESS>4.1735082</STARTING_MASH_THICKNESS>
+  <PITCH_RATE>0.75</PITCH_RATE>
+  <FERMENTABLES>
+   <FERMENTABLE>
+    <NAME>Pale 2-Row</NAME>
+    <VERSION>1</VERSION>
+    <TYPE>Grain</TYPE>
+    <AMOUNT>7.8244683825</AMOUNT>
+    <YIELD>80.43</YIELD>
+    <COLOR>1.8</COLOR>
+    <ADD_AFTER_BOIL>false</ADD_AFTER_BOIL>
+    <ORIGIN>American</ORIGIN>
+   </FERMENTABLE>
+   <FERMENTABLE>
+    <NAME>Caramel / Crystal 40L</NAME>
+    <VERSION>1</VERSION>
+    <TYPE>Grain</TYPE>
+    <AMOUNT>0.18427190015</AMOUNT>
+    <YIELD>73.91</YIELD>
+    <COLOR>40</COLOR>
+    <ADD_AFTER_BOIL>false</ADD_AFTER_BOIL>
+    <ORIGIN>American</ORIGIN>
+   </FERMENTABLE>
+   <FERMENTABLE>
+    <NAME>Carapils (Dextrine Malt)</NAME>
+    <VERSION>1</VERSION>
+    <TYPE>Grain</TYPE>
+    <AMOUNT>0.3401942772</AMOUNT>
+    <YIELD>71.74</YIELD>
+    <COLOR>1.8</COLOR>
+    <ADD_AFTER_BOIL>false</ADD_AFTER_BOIL>
+    <ORIGIN>American</ORIGIN>
+   </FERMENTABLE>
+   <FERMENTABLE>
+    <NAME>Corn Sugar - Dextrose</NAME>
+    <VERSION>1</VERSION>
+    <TYPE>Sugar</TYPE>
+    <AMOUNT>0.680388555</AMOUNT>
+    <YIELD>100</YIELD>
+    <COLOR>0.5</COLOR>
+    <ADD_AFTER_BOIL>false</ADD_AFTER_BOIL>
+    <ORIGIN></ORIGIN>
+   </FERMENTABLE>
+  </FERMENTABLES>
+  <HOPS>
+   <HOP>
+    <NAME>35ml Hop Extract</NAME>
+    <VERSION>1</VERSION>
+    <ALPHA>18</ALPHA>
+    <AMOUNT>0.035</AMOUNT>
+    <USE>Boil</USE>
+    <USER_HOP_USE>Boil</USER_HOP_USE>
+    <TIME>90</TIME>
+    <FORM>Pellet</FORM>
+   </HOP>
+   <HOP>
+    <NAME>5ml Hop Extract</NAME>
+    <VERSION>1</VERSION>
+    <ALPHA>10</ALPHA>
+    <AMOUNT>0.005</AMOUNT>
+    <USE>Boil</USE>
+    <USER_HOP_USE>Boil</USER_HOP_USE>
+    <TIME>45</TIME>
+    <FORM>Pellet</FORM>
+   </HOP>
+   <HOP>
+    <NAME>CTZ</NAME>
+    <VERSION>1</VERSION>
+    <ALPHA>16</ALPHA>
+    <AMOUNT>0.01</AMOUNT>
+    <USE>Boil</USE>
+    <USER_HOP_USE>Boil</USER_HOP_USE>
+    <TIME>45</TIME>
+    <FORM>Pellet</FORM>
+   </HOP>
+   <HOP>
+    <NAME>Simcoe</NAME>
+    <VERSION>1</VERSION>
+    <ALPHA>12.7</ALPHA>
+    <AMOUNT>0.04252428465</AMOUNT>
+    <USE>Boil</USE>
+    <USER_HOP_USE>Boil</USER_HOP_USE>
+    <TIME>30</TIME>
+    <FORM>Pellet</FORM>
+   </HOP>
+   <HOP>
+    <NAME>Amarillo</NAME>
+    <VERSION>1</VERSION>
+    <ALPHA>8.6</ALPHA>
+    <AMOUNT>0.0283495231</AMOUNT>
+    <USE>Boil</USE>
+    <USER_HOP_USE>Boil</USER_HOP_USE>
+    <TIME>0</TIME>
+    <FORM>Pellet</FORM>
+   </HOP>
+   <HOP>
+    <NAME>Centennial</NAME>
+    <VERSION>1</VERSION>
+    <ALPHA>10</ALPHA>
+    <AMOUNT>0.04252428465</AMOUNT>
+    <USE>Boil</USE>
+    <USER_HOP_USE>Boil</USER_HOP_USE>
+    <TIME>0</TIME>
+    <FORM>Pellet</FORM>
+   </HOP>
+   <HOP>
+    <NAME>Chinook</NAME>
+    <VERSION>1</VERSION>
+    <ALPHA>13</ALPHA>
+    <AMOUNT>0.01417476155</AMOUNT>
+    <USE>Boil</USE>
+    <USER_HOP_USE>Boil</USER_HOP_USE>
+    <TIME>0</TIME>
+    <FORM>Pellet</FORM>
+   </HOP>
+   <HOP>
+    <NAME>Simcoe</NAME>
+    <VERSION>1</VERSION>
+    <ALPHA>12.7</ALPHA>
+    <AMOUNT>0.07087380775</AMOUNT>
+    <USE>Boil</USE>
+    <USER_HOP_USE>Boil</USER_HOP_USE>
+    <TIME>0</TIME>
+    <FORM>Pellet</FORM>
+   </HOP>
+   <HOP>
+    <NAME>Simcoe DH-1</NAME>
+    <VERSION>1</VERSION>
+    <ALPHA>12.7</ALPHA>
+    <AMOUNT>0.01417476155</AMOUNT>
+    <USE>Dry Hop</USE>
+    <USER_HOP_USE>Dry Hop</USER_HOP_USE>
+    <TIME>5760</TIME>
+    <FORM>Pellet</FORM>
+   </HOP>
+   <HOP>
+    <NAME>Amarillo DH-1</NAME>
+    <VERSION>1</VERSION>
+    <ALPHA>8.6</ALPHA>
+    <AMOUNT>0.01417476155</AMOUNT>
+    <USE>Dry Hop</USE>
+    <USER_HOP_USE>Dry Hop</USER_HOP_USE>
+    <TIME>5760</TIME>
+    <FORM>Pellet</FORM>
+   </HOP>
+   <HOP>
+    <NAME>Warrior DH-1</NAME>
+    <VERSION>1</VERSION>
+    <ALPHA>16</ALPHA>
+    <AMOUNT>0.01417476155</AMOUNT>
+    <USE>Dry Hop</USE>
+    <USER_HOP_USE>Dry Hop</USER_HOP_USE>
+    <TIME>5760</TIME>
+    <FORM>Pellet</FORM>
+   </HOP>
+   <HOP>
+    <NAME>CTZ DH-2</NAME>
+    <VERSION>1</VERSION>
+    <ALPHA>16</ALPHA>
+    <AMOUNT>0.0283495231</AMOUNT>
+    <USE>Dry Hop</USE>
+    <USER_HOP_USE>Dry Hop</USER_HOP_USE>
+    <TIME>5760</TIME>
+    <FORM>Pellet</FORM>
+   </HOP>
+   <HOP>
+    <NAME>Centennial DH-2</NAME>
+    <VERSION>1</VERSION>
+    <ALPHA>10</ALPHA>
+    <AMOUNT>0.0283495231</AMOUNT>
+    <USE>Dry Hop</USE>
+    <USER_HOP_USE>Dry Hop</USER_HOP_USE>
+    <TIME>5760</TIME>
+    <FORM>Pellet</FORM>
+   </HOP>
+   <HOP>
+    <NAME>Simcoe DH-3</NAME>
+    <VERSION>1</VERSION>
+    <ALPHA>12.7</ALPHA>
+    <AMOUNT>0.01417476155</AMOUNT>
+    <USE>Dry Hop</USE>
+    <USER_HOP_USE>Dry Hop</USER_HOP_USE>
+    <TIME>5760</TIME>
+    <FORM>Pellet</FORM>
+   </HOP>
+   <HOP>
+    <NAME>Chinook DH-3</NAME>
+    <VERSION>1</VERSION>
+    <ALPHA>13</ALPHA>
+    <AMOUNT>0.01417476155</AMOUNT>
+    <USE>Dry Hop</USE>
+    <USER_HOP_USE>Dry Hop</USER_HOP_USE>
+    <TIME>5760</TIME>
+    <FORM>Pellet</FORM>
+   </HOP>
+   <HOP>
+    <NAME>Warrior DH-3</NAME>
+    <VERSION>1</VERSION>
+    <ALPHA>16</ALPHA>
+    <AMOUNT>0.007087380775</AMOUNT>
+    <USE>Dry Hop</USE>
+    <USER_HOP_USE>Dry Hop</USER_HOP_USE>
+    <TIME>5760</TIME>
+    <FORM>Pellet</FORM>
+   </HOP>
+   <HOP>
+    <NAME>Simcoe DH-4</NAME>
+    <VERSION>1</VERSION>
+    <ALPHA>12.7</ALPHA>
+    <AMOUNT>0.0283495231</AMOUNT>
+    <USE>Dry Hop</USE>
+    <USER_HOP_USE>Dry Hop</USER_HOP_USE>
+    <TIME>5760</TIME>
+    <FORM>Pellet</FORM>
+   </HOP>
+   <HOP>
+    <NAME>Amarillo DH-4</NAME>
+    <VERSION>1</VERSION>
+    <ALPHA>8.6</ALPHA>
+    <AMOUNT>0.0283495231</AMOUNT>
+    <USE>Dry Hop</USE>
+    <USER_HOP_USE>Dry Hop</USER_HOP_USE>
+    <TIME>5760</TIME>
+    <FORM>Pellet</FORM>
+   </HOP>
+  </HOPS>
+  <MISCS/>
+  <MASH>
+   <NAME>Mash Steps</NAME>
+   <VERSION>1</VERSION>
+   <GRAIN_TEMP>20</GRAIN_TEMP>
+   <MASH_STEPS>
+    <MASH_STEP>
+     <NAME></NAME>
+     <VERSION>1</VERSION>
+     <TYPE>Temperature</TYPE>
+     <STEP_TIME>75</STEP_TIME>
+     <INFUSE_AMOUNT>18.9270589</INFUSE_AMOUNT>
+     <STEP_TEMP>62.777777777778</STEP_TEMP>
+    </MASH_STEP>
+    <MASH_STEP>
+     <NAME></NAME>
+     <VERSION>1</VERSION>
+     <TYPE>Temperature</TYPE>
+     <STEP_TIME>10</STEP_TIME>
+     <INFUSE_AMOUNT></INFUSE_AMOUNT>
+     <STEP_TEMP>68.333333333333</STEP_TEMP>
+    </MASH_STEP>
+    <MASH_STEP>
+     <NAME></NAME>
+     <VERSION>1</VERSION>
+     <TYPE>Infusion</TYPE>
+     <STEP_TIME>10</STEP_TIME>
+     <INFUSE_AMOUNT>18.9270589</INFUSE_AMOUNT>
+     <STEP_TEMP>76.666666666667</STEP_TEMP>
+    </MASH_STEP>
+   </MASH_STEPS>
+  </MASH>
+  <YEASTS>
+   <YEAST>
+    <NAME>California Ale Yeast WLP001</NAME>
+    <VERSION>1</VERSION>
+    <TYPE>Ale</TYPE>
+    <FORM>Liquid</FORM>
+    <AMOUNT>0.1</AMOUNT>
+    <PRODUCT_ID>WLP001</PRODUCT_ID>
+    <LABORATORY>White Labs</LABORATORY>
+    <ATTENUATION>76.5</ATTENUATION>
+    <FLOCCULATION>Medium</FLOCCULATION>
+    <MIN_TEMPERATURE>20</MIN_TEMPERATURE>
+    <MAX_TEMPERATURE>22.777777777778</MAX_TEMPERATURE>
+   </YEAST>
+  </YEASTS>
+  <WATERS/>
+  <STYLE>
+   <NAME>Imperial IPA</NAME>
+   <VERSION>1</VERSION>
+   <CATEGORY>India Pale Ale (IPA)</CATEGORY>
+   <CATEGORY_NUMBER>14</CATEGORY_NUMBER>
+   <STYLE_LETTER>C</STYLE_LETTER>
+   <STYLE_GUIDE>BJCP</STYLE_GUIDE>
+   <TYPE>Ale</TYPE>
+   <OG_MIN>1.07</OG_MIN>
+   <OG_MAX>1.09</OG_MAX>
+   <FG_MIN>1.01</FG_MIN>
+   <FG_MAX>1.02</FG_MAX>
+   <ABV_MIN>7.5</ABV_MIN>
+   <ABV_MAX>10</ABV_MAX>
+   <IBU_MIN>60</IBU_MIN>
+   <IBU_MAX>120</IBU_MAX>
+   <COLOR_MIN>8</COLOR_MIN>
+   <COLOR_MAX>15</COLOR_MAX>
+  </STYLE>
+ </RECIPE>
+</RECIPES>
