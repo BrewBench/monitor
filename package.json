@@ -1,5 +1,5 @@
 {
-  "name": "brewbench",
+  "name": "brewbench-monitor",
   "version": "2.6.4",
   "sketch_version": "2.6.1",
   "description": "Is an Arduino Yun brew monitor for the home brewer enthusiast that uses the Arduino REST API to interface with thermistors connected to the analog ports.",
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/brewbench/web-controller.git"
+    "url": "git+https://github.com/brewbench/monitor.git"
   },
   "keywords": [
     "Arduino",
@@ -37,9 +37,9 @@
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/brewbench/web-controller/issues"
+    "url": "https://github.com/brewbench/monitor/issues"
   },
-  "homepage": "https://brewbench.co",
+  "homepage": "http://monitor.brewbench.co",
   "devDependencies": {
     "gulp": "^3.9.1",
     "gulp-concat": "^2.6.0",
