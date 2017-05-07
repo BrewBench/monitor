@@ -1,17 +1,24 @@
-# BrewBench
+# BrewBench Monitor
 
-<img src="img/brewbench-logo-265.png?raw=true" alt="BrewBench logo" title="BrewBench" align="right" />
+<img src="src/assets/img/brewbench-logo-265.png?raw=true" alt="BrewBench logo" title="BrewBench" align="right" />
 
 [![Stories in Ready](https://badge.waffle.io/BrewBench/web-controller.png?label=ready&title=Ready)](https://waffle.io/BrewBench/web-controller)
 ![codeship](https://codeship.com/projects/8b6f3bc0-b4fd-0134-65d1-5ed8b845772e/status?branch=master)
 
-BrewBench is an Arduino brew monitor, controller and alert system for the home brewer enthusiast.  It uses the Arduino REST API to interface with thermistors connected to the analog ports.  You can also connect a relay to the digital ports and add a heater / pump to create a RIMS system.  The software will start/stop the heater/pump based on the target temperature you set.
+BrewBench is an Arduino brew monitor, controller and alert system for the home brewer enthusiast.  It uses the Arduino REST API to interface with temp sensors.
+
+#### RIMS
+You can also connect a relay to the digital ports and add a heater / pump to create a RIMS system.  The software will start/stop the heater/pump based on the target temperature you set.
+
+#### Fermenter
+BrewBench Monitor can also be used with fermenters.  I have an [SS Brewtech Chronical](https://www.ssbrewtech.com/collections/chronicals) that I thread the thermistor into the temperature [thermowell](https://www.ssbrewtech.com/collections/accessories/products/weldless-thermowell-with-lcd-temp-display) along with the digital one provided.
 
 ## Setup the Arduino
 
-* Wire up the temp Sensors
-  * Analog ports [Thermistors](https://learn.adafruit.com/thermistor/using-a-thermistor)
-  * Digital ports [DS18B20](https://www.adafruit.com/product/381)
+* Wire up a temp Sensors (Three options)
+  * [Thermistors](https://learn.adafruit.com/thermistor/using-a-thermistor) (Analog)
+  * [PT100](https://www.adafruit.com/product/3290) (Analog)
+  * [DS18B20](https://www.adafruit.com/product/381) (Digital)
     * Will need the [cactus](http://static.cactus.io/downloads/library/ds18b20/cactus_io_DS18B20.zip) library
 * Wire up a relay for heat and pump controls
   * Digital ports [Sainsmart 2 channel relay](http://www.sainsmart.com/arduino-pro-mini.html)
@@ -23,7 +30,7 @@ BrewBench is an Arduino brew monitor, controller and alert system for the home b
 
 ## Arduino Board Options
 
-1. Power up and connect to the default IP http://192.168.240.1/
+1. Power up and connect to the default IP http://192.168.240.1
 1. Set the digital pin or analog pin depending on which temp sensor you're using.
 1. Press play, you can adjust the temp by sliding the temp knob.
 
@@ -60,10 +67,11 @@ For development just run `npm install`, and look at [index.html](index.html) for
 yarn
 gulp
 ```
+<img src="src/assets/img/screenshot-fermenter.png?raw=true" alt="BrewBench fermenter" align="center" width="400" />
 
-<img src="img/screenshot-desktop.png?raw=true" alt="BrewBench screenshot" align="center" />
+<img src="src/assets/img/screenshot-desktop.png?raw=true" alt="BrewBench screenshot" align="center" />
 
-<img src="img/brewbench-wiredup.jpg?raw=true" alt="BrewBench wired up" align="center" />
+<img src="src/assets/img/brewbench-wiredup.jpg?raw=true" alt="BrewBench wired up" align="center" />
 
 ## Thanks
 
@@ -79,4 +87,4 @@ gulp
 
 [BrewBench](//brewbench.co) is a brew monitor and controller Developed by [Andrew Van Tassel](https://www.andrewvantassel.com) and [Lee Kendrick](http://www.leekendrick.info) &copy;2017.
 
-Made with <img src="img/beer.png" width="45"> from Colorado
+Made with <img src="src/assets/img/beer.png" width="45"> from Colorado
