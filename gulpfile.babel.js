@@ -32,6 +32,10 @@ const paths = {
   assets: {
     src: [`${dirs.src}/assets/**/*`],
     dest: `${dirs.dest}/assets`
+  },
+  views: {
+    src: [`${dirs.src}/views/*.html`],
+    dest: `${dirs.dest}/views`
   }
 };
 
@@ -56,7 +60,7 @@ gulp.task('scripts', () => {
   return gulp.src(paths.scripts.src)
     .pipe(babel({ presets: ['es2015']}).on('error', (err) => util.error(err)))
     .pipe(concat('js/app.js'))
-    .pipe(uglify())
+    // .pipe(uglify())
     .pipe(gulp.dest(`${dirs.dest}`));
 });
 
@@ -75,8 +79,14 @@ gulp.task('assets', () => {
     .pipe(gulp.dest(`${dirs.dest}/assets`));
 });
 
+gulp.task('views', () => {
+  util.log(`Building Views ${paths.views.src}`);
+  return gulp.src(`${paths.views.src}`)
+    .pipe(gulp.dest(`${dirs.dest}/views`));
+});
+
 gulp.task('index', () => {
-  return gulp.src(`${dirs.src}/index.html`)
+  return gulp.src([`${dirs.src}/index.html`,`package.json`])
     .pipe(gulp.dest(`${dirs.dest}`));
 });
 
@@ -84,6 +94,7 @@ gulp.task('watch', () => {
 	gulp.watch(`${paths.styles.src}`,['styles']);
   gulp.watch(`${paths.scripts.src}`,['scripts','vendor']);
   gulp.watch(`${paths.assets.src}`,['assets']);
+  gulp.watch(`${paths.views.src}`,['views']);
   gulp.watch(`${dirs.src}/index.html`,['index']);
 });
 
@@ -97,4 +108,4 @@ gulp.task('serve', () => {
   });
 });
 
-gulp.task('default', ['clean','styles','scripts','vendor','assets','index','watch','serve']);
+gulp.task('default', ['clean','styles','scripts','vendor','assets','views','index','watch','serve']);

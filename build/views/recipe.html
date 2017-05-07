@@ -1,0 +1,18 @@
+<div class="recipe col-md-12 col-xs-12" ng-if="settings.recipe.name">
+  <div class="panel panel-default">
+    <div class="panel-body">
+      <div class="row">
+        <div class="recipe col-md-6 col-xs-6">
+          <h3><editable model="settings.recipe.name"></editable>
+            <h4>{{settings.recipe.category}}</h4>
+          </h3>
+        </div>
+        <div class="recipe col-md-6 col-xs-6">
+          <ul>
+            <li ng-repeat="yeast in settings.recipe.yeast">{{yeast.name}}</li>
+            <li ng-if="settings.recipe.abv">ABV: {{settings.recipe.abv}}%</li>
+          </ul>
+      </div>
+    </div>
+  </div>
+</div>

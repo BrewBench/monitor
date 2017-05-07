@@ -18,7 +18,7 @@ angular.module('brewbench', [
       controller: 'mainCtrl'
     })
     .state('arduino', {
-      url: '/arduino/:domain',
+      url: '/:domain',
       templateUrl: 'views/monitor.html',
       controller: 'mainCtrl'
     })

@@ -282,7 +282,7 @@ angular.module('brewbench')
       return parseFloat(plato);
     },
     recipeBeerSmith: function(recipe){
-      var response = {name:'', category:'', abv:'', og:0, fg:0, hops:[], grains:[], yeast:[], misc:[]};
+      var response = {name:'', category:'', abv:'', og:0.000, fg:0.000, hops:[], grains:[], yeast:[], misc:[]};
       if(!!recipe.F_R_NAME)
         response.name = recipe.F_R_NAME;
       if(!!recipe.F_R_STYLE.F_S_CATEGORY)
@@ -349,7 +349,7 @@ angular.module('brewbench')
       return response;
     },
     recipeBeerXML: function(recipe){
-      var response = {name:'', category:'', abv:'', og:0, fg:0, hops:[], grains:[], yeast:[], misc:[]};
+      var response = {name:'', category:'', abv:'', og:0.000, fg:0.000, hops:[], grains:[], yeast:[], misc:[]};
       var mash_time = 60;
 
       if(!!recipe.NAME)
