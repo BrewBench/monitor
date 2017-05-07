@@ -4,12 +4,12 @@
       <div class="left">
         <h3>Settings</h3>
       </div>
-      <div class="right row">
-        <div class="col-md-12 col-xs-12">
-
+      <div class="row">
+        <div class="col-md-6 col-xs-6">
           <input id="celsius" class="degree" type="radio" ng-checked="settings.unit=='C'" value="C" ng-click="changeUnits('C')"> <label for="celsius">&deg;C</label>
           <input id="fahrenheit" class="degree" type="radio" ng-checked="settings.unit=='F'" value="F" ng-click="changeUnits('F')"> <label for="fahrenheit">&deg;F</label>
-
+        </div>
+        <div class="col-md-6 col-xs-6 right">  
           <div class="btn-group notifications" role="group">
             <button type="button" class="btn btn-default" style="padding:0 5px 0 5px;" ng-click="settings.notifications.on = !settings.notifications.on">
               <span class="fa-stack fa-lg" style="top: 3px;">
