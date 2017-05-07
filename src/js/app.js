@@ -1,4 +1,4 @@
-angular.module('brewbench', [
+angular.module('brewbench-monitor', [
   'ui.router'
   ,'nvd3'
   ,'ngTouch'

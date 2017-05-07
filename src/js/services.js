@@ -1,4 +1,4 @@
-angular.module('brewbench')
+angular.module('brewbench-monitor')
 .factory('BrewService', function($http, $q, $filter){
 
   return {

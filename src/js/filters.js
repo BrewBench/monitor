@@ -1,4 +1,4 @@
-angular.module('brewbench')
+angular.module('brewbench-monitor')
 .filter('moment', function() {
   return function(date) {
       if(!date)

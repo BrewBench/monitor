@@ -1,4 +1,4 @@
-angular.module('brewbench')
+angular.module('brewbench-monitor')
 .controller('mainCtrl', function($scope, $stateParams, $state, $filter, $timeout, $interval, $q, BrewService){
 
 var notification = null

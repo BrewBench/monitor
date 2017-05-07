@@ -1,11 +1,15 @@
 # Change Log
 
+## 2.6.5 - 2017-05-07
+
+### Added
+- gulp build file and babel
+
 ## 2.6.4 - 2017-04-30
 
 ### Added
 - Support for importing BeerXML recipes
 - Refactored importing
-- Tests
 
 ## 2.6.3 - 2017-04-27
 

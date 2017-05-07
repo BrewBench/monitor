@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('brewbench', ['ui.router', 'nvd3', 'ngTouch', 'duScroll', 'ui.knob']).config(function ($stateProvider, $urlRouterProvider, $httpProvider) {
+angular.module('brewbench-monitor', ['ui.router', 'nvd3', 'ngTouch', 'duScroll', 'ui.knob']).config(function ($stateProvider, $urlRouterProvider, $httpProvider) {
 
   $httpProvider.defaults.useXDomain = true;
   $httpProvider.defaults.headers.common = 'Content-Type: application/json';
@@ -21,7 +21,7 @@ angular.module('brewbench', ['ui.router', 'nvd3', 'ngTouch', 'duScroll', 'ui.kno
 });
 'use strict';
 
-angular.module('brewbench').controller('mainCtrl', function ($scope, $stateParams, $state, $filter, $timeout, $interval, $q, BrewService) {
+angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $stateParams, $state, $filter, $timeout, $interval, $q, BrewService) {
 
   var notification = null,
       resetChart = 100,
@@ -882,7 +882,7 @@ angular.module('brewbench').controller('mainCtrl', function ($scope, $stateParam
 });
 'use strict';
 
-angular.module('brewbench').directive('editable', function () {
+angular.module('brewbench-monitor').directive('editable', function () {
     return {
         restrict: 'E',
         scope: { model: '=', type: '@?', trim: '@?', change: '&?' },
@@ -929,7 +929,7 @@ angular.module('brewbench').directive('editable', function () {
 });
 'use strict';
 
-angular.module('brewbench').filter('moment', function () {
+angular.module('brewbench-monitor').filter('moment', function () {
   return function (date) {
     if (!date) return '';
     return moment(new Date(date)).fromNow();
@@ -949,7 +949,7 @@ angular.module('brewbench').filter('moment', function () {
 });
 'use strict';
 
-angular.module('brewbench').factory('BrewService', function ($http, $q, $filter) {
+angular.module('brewbench-monitor').factory('BrewService', function ($http, $q, $filter) {
 
   return {
 

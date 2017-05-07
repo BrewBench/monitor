@@ -1,4 +1,4 @@
-angular.module('brewbench')
+angular.module('brewbench-monitor')
 .directive('editable', function() {
     return {
         restrict: 'E',
