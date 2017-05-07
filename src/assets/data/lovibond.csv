@@ -1,0 +1,58 @@
+srm,hex,color,other_color_names
+0,ffffff,White,"Bright White, Pure Brilliant White"
+0.5,fbf0cb,Champagne,"Barely Dawn (Kelly-Moore), Grapefruit (Taubmans)"
+1,f7e1a1,Candleglow,"Sandwisp, Butter Up (Sherman Williams)"
+1.5,f4d380,Broadway Lights,"Yellow (Chrysler), Sunbonnet (ICI), Katydid (Taubmans)"
+2,f0c566,Cream Can,Firefly (Benjamin Moore)
+2.5,edb950,Casablanca,"Ronchi, Yellow Coneflower (Pittsburgh)"
+3,e9ad3f,Tulip Tree,Dried Mustard (Cloverdale)
+3.5,e5a231,Fire Bush,Ocker (Caparol)
+4,e19726,Buttercup,"Amberger (Caparol), Pencil Yellow (Devoe)"
+4.5,dd8d1d,Zest,"Dixie, Golden Bark (Dulux), Butterscotch Tempest (Devoe)"
+5,d98416,Golden Bell,"Gamboge, Desert Sunset (GM)"
+5.5,d57b11,Meteor,Amber 65 (Caparol)
+6,d1730c,Dark Goldenrod,Ochre
+6.5,cd6c08,Indochine,"Red Stage, Sticky Toffee (Plascon)"
+7,c86505,Alloy Orange,Oxidrot 7s (Caparol)
+7.5,c45e03,Tawny,Oxidrot 8s (Caparol)
+8,c05801,Rose of Sharon,Burnt Orange (Marston & Langinger)
+8.5,bc5200,Ruddy Brown,"PMS167 (Pantone), Mahogany"
+9,b74d00,Mahogany,Rust
+9.5,b34800,Fire,Rust
+10,af4300,Orange,Terra Warmth (Dutch Boy)
+10.5,ab3f00,Dark Orange,India O (Caparol)
+11,a73b00,Chinese Red,Rotor Bolus (Caparol)
+11.5,a33700,Quora,Rotor Bolus (Caparol)
+12,9f3400,Sangria,Rufous
+12.5,9b3000,Dark Orange-Red,A7 (Trumatch)
+13,972d00,Totem Pole,"Oregon, Dark Red, Schwedenro/Schwedenrot (Caparol)"
+14,8f2800,Peru Tan,"Dark Red, Kobe, Rotbraun (Caparol)"
+15,882300,Red Beech,"Sienna, Grand Canyon Brown (GM)"
+16,811f00,Maroon,Kenyan Copper
+17,7b1b00,Pueblo,Oxidrot+Feuerrot 1/1 (Caparol)
+18,741800,Cedar Wood,"Amber Fire (Chrysler), Kardinal Braun (Caparol)"
+19,6e1500,Barn Red,Oxidrot Dunkel (Caparol)
+20,681200,Rosewood,"Oxidrot (Caparol), Red (Ford, Chrysler)"
+21,631000,Dark Red,Oxidrot (Caparol)
+22,5e0e00,Red Oxide,"Prune, Persian Plum, Burgundy (Ford)"
+23,590c00,Rustic Red,"Bulgarian Rose, Murano (Caparol), Mohawk Maroon (Ford)"
+24,540b00,Burnt Maroon,"Indian Tan, Grenadin 35 (Caparol), Crimson Red (Chrysler)"
+25,500900,Pheasant Red,"Dark Diamond Bright Red (Ford), Pimento Red (Chrysler)"
+26,4c0800,Brown Pod,"Medium Rosewood (Ford), Cordovan Brown (Chrysler)"
+27,480700,Temptress,"Regis Red (Ford), Dark Beech Firemist (Chrysler)"
+28,440600,Dark Sienna,Chestnut (Ford)
+29,410500,Black Bean,Dark Cordovan (Ford)
+30,3d0500,Dark Bronze,"Dark Champagne (Ford), Piedmont Maroon (Chrysler)"
+31,3a0400,Chocolate,"Carmine, Seal Brown, Maroon (Ford)"
+32,370400,Autumn Maple,"Imperial Maroon (Chrysler), Sunset Maroon (AMC)"
+33,340300,Dark Cabernet,Dark Maroon (Ford)
+34,320300,Titian Maroon,Victoria Plum (GM)
+35,2f0200,Sepia Black,"Tyrian Purple, Brown (Ford)"
+36,2d0200,Dark Gold Wing,Coppertone (Ford)
+37,2a0200,Zinnwaldite Brown,Midnight Wine (Ford)
+38,280100,Diesel,"Maroon Deep (AMC), Amarone (Alcro)"
+39,260100,Licorice,Dark Vivid Red (AMC)
+40,240100,Black,"Morocco Red, Oporto Maroon (GM)"
+50,160000,Smoky Black,"Black Magic (Homebase), Velvet Maroon (Ford)"
+65,0d0000,Coal Black,"Black Diamond (GM), Granada Black (GM)"
+80+,0,Moonlight Black,"Ebony, Jet Black (RAL), Panther Black (Ford)"

@@ -1,5 +1,12 @@
 # Change Log
 
+## 2.6.4 - 2017-04-30
+
+### Added
+- Support for importing BeerXML recipes
+- Refactored importing
+- Tests
+
 ## 2.6.3 - 2017-04-27
 
 ### Added
