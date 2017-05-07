@@ -67,7 +67,7 @@ gulp.task('scripts', () => {
 gulp.task('vendor', () => {
   util.log(`Building Vendor ${paths.vendor.src}`);
   return gulp.src(paths.vendor.src)
-    .pipe(babel({ presets: ['es2015']}).on('error', (err) => util.error(err)))
+    // .pipe(babel({ presets: ['es2015']}).on('error', (err) => util.error(err)))
     .pipe(concat('js/vendor.js'))
     .pipe(uglify())
     .pipe(gulp.dest(`${dirs.dest}`));
@@ -90,22 +90,21 @@ gulp.task('index', () => {
     .pipe(gulp.dest(`${dirs.dest}`));
 });
 
-gulp.task('watch', () => {
-	gulp.watch(`${paths.styles.src}`,['styles']);
-  gulp.watch(`${paths.scripts.src}`,['scripts','vendor']);
-  gulp.watch(`${paths.assets.src}`,['assets']);
-  gulp.watch(`${paths.views.src}`,['views']);
-  gulp.watch(`${dirs.src}/index.html`,['index']);
-});
-
 gulp.task('serve', () => {
   browserSync.create().init({
     server: `${dirs.dest}`,
     port: 8080,
     logConnections: true,
     logFileChanges: true,
-    files: [`${dirs.build}/js/*.js`, `${dirs.build}/styles/*.css`, `${dirs.build}/assets/*`]
+    files: [`${dirs.dest}/js/*.js`, `${dirs.dest}/styles/*.css`, `${dirs.dest}/views/*.html`, `${dirs.dest}/assets/*`],
+    watchEvents: ['add', 'change']
   });
+
+  gulp.watch(`${paths.styles.src}`,['styles']).on('change', browserSync.reload);
+  gulp.watch(`${paths.scripts.src}`,['scripts','vendor']).on('change', browserSync.reload);
+  gulp.watch(`${paths.assets.src}`,['assets']).on('change', browserSync.reload);
+  gulp.watch(`${paths.views.src}`,['views']).on('change', browserSync.reload);
+  gulp.watch(`${dirs.src}/index.html`,['index']).on('change', browserSync.reload);
 });
 
-gulp.task('default', ['clean','styles','scripts','vendor','assets','views','index','watch','serve']);
+gulp.task('default', ['clean','styles','scripts','vendor','assets','views','index','serve']);
