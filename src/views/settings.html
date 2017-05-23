@@ -9,7 +9,7 @@
           <input id="celsius" class="degree" type="radio" ng-checked="settings.unit=='C'" value="C" ng-click="changeUnits('C')"> <label for="celsius">&deg;C</label>
           <input id="fahrenheit" class="degree" type="radio" ng-checked="settings.unit=='F'" value="F" ng-click="changeUnits('F')"> <label for="fahrenheit">&deg;F</label>
         </div>
-        <div class="col-md-6 col-xs-6 right">  
+        <div class="col-md-6 col-xs-6 right">
           <div class="btn-group notifications" role="group">
             <button type="button" class="btn btn-default" style="padding:0 5px 0 5px;" ng-click="settings.notifications.on = !settings.notifications.on">
               <span class="fa-stack fa-lg" style="top: 3px;">
@@ -64,7 +64,7 @@
         </div>
         <div class="col-md-4 col-xs-4">
           <div class="btn-group-vertical pull-right" role="group">
-            <button class="btn btn-primary" ng-click="addKettle()" ng-disabled="kettles.length==5">Add Kettle</button>
+            <button class="btn btn-primary" ng-click="addKettle()">Add Kettle</button>
             <button class="btn btn-warning" ng-click="alert()">Test Alerts</button>
             <button class="btn btn-default" ng-click="clearKettles($event)"><i class="fa fa-trash"></i> Settings</button>
           </div>
