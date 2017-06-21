@@ -40,8 +40,8 @@ const paths = {
 };
 
 gulp.task('clean', () => {
-  util.log(`Removing build directory ${dirs.build}`);
-  return del(`${dirs.build}`, {force: true});
+  util.log(`Removing build directory ${dirs.dest}`);
+  return del(`${dirs.dest}`, {force: true});
 });
 
 gulp.task('styles', () => {
@@ -107,4 +107,4 @@ gulp.task('serve', () => {
   gulp.watch(`${dirs.src}/index.html`,['index']).on('change', browserSync.reload);
 });
 
-gulp.task('default', ['clean','styles','scripts','vendor','assets','views','index','serve']);
+gulp.task('default', ['styles','scripts','vendor','assets','views','index','serve']);

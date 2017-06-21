@@ -81,6 +81,12 @@ body {
     padding-top: 60px;
 }
 
+.main-container .share {
+  position: relative;
+  text-align: center;
+  margin-left: 10px;
+}
+
 .alert {
   position: absolute;
   width: 98%;
@@ -98,6 +104,18 @@ body {
 #dataModal-hops .modal-body, #dataModal-grains .modal-body, #dataModal-water .modal-body{
   max-height: calc(100vh - 185px);
   overflow-y: auto;
+}
+
+.modal-body .form-horizontal {
+  padding: 15px;
+}
+
+.modal-body .form-horizontal input {
+  height: 44px;
+}
+
+.modal-body .alert {
+  position: inherit;
 }
 
 .modal-header .close {

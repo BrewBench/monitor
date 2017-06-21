@@ -14,6 +14,7 @@ $scope.chartOptions = BrewService.chartOptions();
 $scope.sensorTypes = BrewService.sensorTypes;
 $scope.showSettings = true;
 $scope.error_message = '';
+$scope.share = false;
 
 $scope.getLovibondColor = function(range){
   range = range.replace(/°/g,'').replace(/ /g,'');
@@ -39,7 +40,7 @@ $scope.settings = BrewService.settings('settings') || {
   ,unit: 'F'
   ,arduinoUrl: '192.168.240.1'
   ,ports: {'analog':5, 'digital':13}
-  ,recipe: {'name':'','yeast':[],scale:'gravity',method:'papazian','og': 1.050, 'fg': 1.010, 'abv':0, 'abw':0, 'calories':0, 'attenuation':0}
+  ,recipe: {'name':'','brewer':{name:'','email':''},'yeast':[],scale:'gravity',method:'papazian','og':1.050,'fg':1.010,'abv':0,'abw':0,'calories':0,'attenuation':0}
   ,notifications: {on:true,timers:true,high:true,low:true,target:true,slack:'Slack notification webhook Url',last:''}
   ,sounds: {on:true,alert:'/assets/audio/bike.mp3',timer:'/assets/audio/school.mp3'}
 };
@@ -205,6 +206,34 @@ $scope.kettles = BrewService.settings('kettles') || [{
     }
   };
 
+  $scope.createShare = function(){
+    if(!$scope.settings.recipe.brewer.name || !$scope.settings.recipe.brewer.email)
+      return;
+    BrewService.createShare()
+      .then(function(response) {
+        if(response.share && response.share.url){
+          $scope.share_success = true;
+          $scope.share_link = response.share.url;
+        } else {
+          $scope.share_success = false;
+        }
+      })
+      .catch(err => {
+        $scope.share_success = false;
+      });
+  };
+
+  $scope.loadShareFile = function(file){
+    BrewService.loadShareFile(file)
+      .then(function(contents) {
+        if(contents){
+          var shareContents = YAML.parse(contents);
+        }
+      }, function(err) {
+        $scope.error_message = "Opps, there was a problem loading the shared session.";
+      });
+  };
+
   $scope.importRecipe = function($fileContent,$ext){
 
       var formatted_content = BrewService.formatXML($fileContent);
@@ -342,14 +371,18 @@ $scope.kettles = BrewService.settings('kettles') || [{
 
   // check if pump or heater are running
   $scope.init = function(){
+    $scope.showSettings = !$scope.share;
+    if($state.params.file)
+      $scope.loadShareFile($state.params.file);
+    if($scope.share)
+      return;
     var running = [];
     _.each($scope.kettles,function(kettle){
         //update max
         kettle.knob.max=kettle.temp['target']+kettle.temp['diff'];
-
         //check if heater is running
         running.push(BrewService.digitalRead(kettle.heater.pin,2000).then(function(response){
-            if(response.value=="1"){
+            if(response.value === "1"){
               kettle.active = true;
               kettle.heater.running = true;
             } else {
@@ -363,7 +396,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
 
         //check if pump is running
         running.push(BrewService.digitalRead(kettle.pump.pin,2000).then(function(response){
-            if(response.value=="1"){
+            if(response.value === "1"){
               kettle.active = true;
               kettle.pump.running = true;
             } else {
@@ -378,7 +411,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
         //check if cooler is running
         if(kettle.cooler){
             running.push(BrewService.digitalRead(kettle.cooler.pin,2000).then(function(response){
-              if(response.value=="1"){
+              if(response.value === "1"){
                 kettle.active = true;
                 kettle.cooler.running = true;
               } else {
@@ -449,7 +482,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
             if(err && typeof err == 'string')
               $scope.error_message = err;
             else
-              $scope.error_message='Could not connect to the Arduino at '+BrewService.domain();
+              $scope.error_message = 'Could not connect to the Arduino at '+BrewService.domain();
           })
         );
       }
@@ -461,7 +494,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
             if(err && typeof err == 'string')
               $scope.error_message = err;
             else
-              $scope.error_message='Could not connect to the Arduino at '+BrewService.domain();
+              $scope.error_message = 'Could not connect to the Arduino at '+BrewService.domain();
           })
         );
       }
@@ -475,7 +508,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
             if(err && typeof err == 'string')
               $scope.error_message = err;
             else
-              $scope.error_message='Could not connect to the Arduino at '+BrewService.domain();
+              $scope.error_message = 'Could not connect to the Arduino at '+BrewService.domain();
           })
         );
       }
@@ -492,7 +525,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
             if(err && typeof err == 'string')
               $scope.error_message = err;
             else
-              $scope.error_message='Could not connect to the Arduino at '+BrewService.domain();
+              $scope.error_message = 'Could not connect to the Arduino at '+BrewService.domain();
           })
         );
       }
@@ -504,7 +537,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
             if(err && typeof err == 'string')
               $scope.error_message = err;
             else
-              $scope.error_message='Could not connect to the Arduino at '+BrewService.domain();
+              $scope.error_message = 'Could not connect to the Arduino at '+BrewService.domain();
           })
         )
       }
@@ -516,7 +549,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
             if(err && typeof err == 'string')
               $scope.error_message = err;
             else
-              $scope.error_message='Could not connect to the Arduino at '+BrewService.domain();
+              $scope.error_message = 'Could not connect to the Arduino at '+BrewService.domain();
           })
         );
       }
@@ -589,7 +622,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
         if(err && typeof err == 'string')
           $scope.error_message = err;
         else
-          $scope.error_message='Could not connect to the Arduino at '+BrewService.domain();
+          $scope.error_message = 'Could not connect to the Arduino at '+BrewService.domain();
       });
     } else if(!k.running){
       BrewService.digital(k.pin,0).then(function(){
@@ -598,7 +631,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
         if(err && typeof err == 'string')
           $scope.error_message = err;
         else
-          $scope.error_message='Could not connect to the Arduino at '+BrewService.domain();
+          $scope.error_message = 'Could not connect to the Arduino at '+BrewService.domain();
       });
     }
   };
@@ -614,13 +647,15 @@ $scope.kettles = BrewService.settings('kettles') || [{
       kettle.active = !kettle.active;
 
       if(kettle.active){
-        BrewService.temp(kettle.temp).then(function(response){
+        BrewService.temp(kettle.temp)
+          .then(function(response){
             updateTemp(response,kettle);
-        },function error(err){
+          })
+          .catch(function(err){
             if(err && typeof err == 'string')
               $scope.error_message = err;
             else
-              $scope.error_message='Could not connect to the Arduino at '+BrewService.domain();
+              $scope.error_message = 'Could not connect to the Arduino at '+BrewService.domain();
           });
         kettle.knob.subText.text = 'starting...';
         kettle.knob.readOnly = false;
@@ -637,7 +672,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
           if(err && typeof err == 'string')
             $scope.error_message = err;
           else
-            $scope.error_message='Could not connect to the Arduino at '+BrewService.domain();
+            $scope.error_message = 'Could not connect to the Arduino at '+BrewService.domain();
         });
       }
       if(!kettle.active && kettle.pump.running){
@@ -648,7 +683,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
           if(err && typeof err == 'string')
             $scope.error_message = err;
           else
-            $scope.error_message='Could not connect to the Arduino at '+BrewService.domain();
+            $scope.error_message = 'Could not connect to the Arduino at '+BrewService.domain();
         });
       }
       if(kettle.cooler && !kettle.active && kettle.cooler.running){
@@ -659,7 +694,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
           if(err && typeof err == 'string')
             $scope.error_message = err;
           else
-            $scope.error_message='Could not connect to the Arduino at '+BrewService.domain();
+            $scope.error_message = 'Could not connect to the Arduino at '+BrewService.domain();
         });
       }
       if(!kettle.active){
@@ -683,8 +718,8 @@ $scope.kettles = BrewService.settings('kettles') || [{
 
     //don't start alerts until we have hit the temp.target
     if(!timer && kettle && !kettle.temp.hit
-    || $scope.settings.notifications.on===false){
-      return;
+      || $scope.settings.notifications.on === false){
+        return;
     }
 
     // Desktop / Slack Notification
@@ -710,14 +745,14 @@ $scope.kettles = BrewService.settings('kettles') || [{
     else if(kettle && kettle.high){
       if(!$scope.settings.notifications.high || $scope.settings.notifications.last=='high')
         return;
-      message = 'Your '+kettle.key+' kettle is '+kettle.high+'\u00B0 high';
+      message = 'Your '+kettle.key+' kettle is '+(kettle.high-kettle.temp.diff)+'\u00B0 high';
       color = 'danger';
       $scope.settings.notifications.last='high';
     }
     else if(kettle && kettle.low){
       if(!$scope.settings.notifications.low || $scope.settings.notifications.last=='low')
         return;
-      message = 'Your '+kettle.key+' kettle is '+kettle.low+'\u00B0 low';
+      message = 'Your '+kettle.key+' kettle is '+(kettle.low-kettle.temp.diff)+'\u00B0 low';
       color = '#3498DB';
       $scope.settings.notifications.last='low';
     }
@@ -799,7 +834,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
         kettle.knob.subText.color = 'rgba(52,152,219,1)';
       } else {
         //update knob text
-        kettle.knob.subText.text = kettle.high+'\u00B0 high';
+        kettle.knob.subText.text = (kettle.high-kettle.temp.diff)+'\u00B0 high';
         kettle.knob.subText.color = 'rgba(255,0,0,.6)';
       }
     } else if(kettle.temp.current < kettle.temp.target-kettle.temp.diff){
@@ -812,7 +847,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
         kettle.knob.subText.color = 'rgba(255,0,0,.6)';
       } else {
         //update knob text
-        kettle.knob.subText.text = kettle.low+'\u00B0 low';
+        kettle.knob.subText.text = (kettle.low-kettle.temp.diff)+'\u00B0 low';
         kettle.knob.subText.color = 'rgba(52,152,219,1)';
       }
     } else {
@@ -926,7 +961,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
             if(err && typeof err == 'string')
               $scope.error_message = err;
             else
-              $scope.error_message='Could not connect to the Arduino at '+BrewService.domain();
+              $scope.error_message = 'Could not connect to the Arduino at '+BrewService.domain();
             return err;
           }));
       }

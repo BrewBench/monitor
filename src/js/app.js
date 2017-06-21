@@ -5,7 +5,7 @@ angular.module('brewbench-monitor', [
   ,'duScroll'
   ,'ui.knob'
 ])
-.config(function($stateProvider, $urlRouterProvider, $httpProvider) {
+.config(function($stateProvider, $urlRouterProvider, $httpProvider, $locationProvider) {
 
   $httpProvider.defaults.useXDomain = true;
   $httpProvider.defaults.headers.common = 'Content-Type: application/json';
@@ -17,8 +17,8 @@ angular.module('brewbench-monitor', [
       templateUrl: 'views/monitor.html',
       controller: 'mainCtrl'
     })
-    .state('arduino', {
-      url: '/:domain',
+    .state('share', {
+      url: '/sh/:file',
       templateUrl: 'views/monitor.html',
       controller: 'mainCtrl'
     })

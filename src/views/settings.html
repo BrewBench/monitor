@@ -1,4 +1,4 @@
-<div id="settings" class="settings">
+<div id="settings" class="settings" ng-if="!share">
   <div class="panel panel-default">
     <div class="panel-heading">
       <div class="left">
@@ -52,9 +52,9 @@
 
           <label class="adjust">Poll every</label>
           <div class="input-group" role="group">
-            <editable class="poll" type="number" model="settings.pollSeconds"></editable> Seconds
+            <editable class="poll" type="number" model="settings.pollSeconds" step="1" min="5"></editable> Seconds
             <span class="input-group-btn">
-              <button type="button" class="btn btn-default"><i class="fa fa-minus fa-lg" ng-click="settings.pollSeconds=settings.pollSeconds-1"></i></button>
+              <button type="button" class="btn btn-default"><i class="fa fa-minus fa-lg" ng-click="(settings.pollSeconds > 5) ? settings.pollSeconds=settings.pollSeconds-1 : 5"></i></button>
               <button type="button" class="btn btn-default"><i class="fa fa-plus fa-lg" ng-click="settings.pollSeconds=settings.pollSeconds+1"></i></button>
             </span>
           </div>

@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('brewbench-monitor', ['ui.router', 'nvd3', 'ngTouch', 'duScroll', 'ui.knob']).config(function ($stateProvider, $urlRouterProvider, $httpProvider) {
+angular.module('brewbench-monitor', ['ui.router', 'nvd3', 'ngTouch', 'duScroll', 'ui.knob']).config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locationProvider) {
 
   $httpProvider.defaults.useXDomain = true;
   $httpProvider.defaults.headers.common = 'Content-Type: application/json';
@@ -10,8 +10,8 @@ angular.module('brewbench-monitor', ['ui.router', 'nvd3', 'ngTouch', 'duScroll',
     url: '',
     templateUrl: 'views/monitor.html',
     controller: 'mainCtrl'
-  }).state('arduino', {
-    url: '/:domain',
+  }).state('share', {
+    url: '/sh/:file',
     templateUrl: 'views/monitor.html',
     controller: 'mainCtrl'
   }).state('otherwise', {
@@ -36,6 +36,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
   $scope.sensorTypes = BrewService.sensorTypes;
   $scope.showSettings = true;
   $scope.error_message = '';
+  $scope.share = false;
 
   $scope.getLovibondColor = function (range) {
     range = range.replace(/°/g, '').replace(/ /g, '');
@@ -59,7 +60,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
     unit: 'F',
     arduinoUrl: '192.168.240.1',
     ports: { 'analog': 5, 'digital': 13 },
-    recipe: { 'name': '', 'yeast': [], scale: 'gravity', method: 'papazian', 'og': 1.050, 'fg': 1.010, 'abv': 0, 'abw': 0, 'calories': 0, 'attenuation': 0 },
+    recipe: { 'name': '', 'brewer': { name: '', 'email': '' }, 'yeast': [], scale: 'gravity', method: 'papazian', 'og': 1.050, 'fg': 1.010, 'abv': 0, 'abw': 0, 'calories': 0, 'attenuation': 0 },
     notifications: { on: true, timers: true, high: true, low: true, target: true, slack: 'Slack notification webhook Url', last: '' },
     sounds: { on: true, alert: '/assets/audio/bike.mp3', timer: '/assets/audio/school.mp3' }
   };
@@ -201,6 +202,30 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
     }
   };
 
+  $scope.createShare = function () {
+    if (!$scope.settings.recipe.brewer.name || !$scope.settings.recipe.brewer.email) return;
+    BrewService.createShare().then(function (response) {
+      if (response.share && response.share.url) {
+        $scope.share_success = true;
+        $scope.share_link = response.share.url;
+      } else {
+        $scope.share_success = false;
+      }
+    }).catch(function (err) {
+      $scope.share_success = false;
+    });
+  };
+
+  $scope.loadShareFile = function (file) {
+    BrewService.loadShareFile(file).then(function (contents) {
+      if (contents) {
+        var shareContents = YAML.parse(contents);
+      }
+    }, function (err) {
+      $scope.error_message = "Opps, there was a problem loading the shared session.";
+    });
+  };
+
   $scope.importRecipe = function ($fileContent, $ext) {
 
     var formatted_content = BrewService.formatXML($fileContent);
@@ -317,14 +342,16 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
 
   // check if pump or heater are running
   $scope.init = function () {
+    $scope.showSettings = !$scope.share;
+    if ($state.params.file) $scope.loadShareFile($state.params.file);
+    if ($scope.share) return;
     var running = [];
     _.each($scope.kettles, function (kettle) {
       //update max
       kettle.knob.max = kettle.temp['target'] + kettle.temp['diff'];
-
       //check if heater is running
       running.push(BrewService.digitalRead(kettle.heater.pin, 2000).then(function (response) {
-        if (response.value == "1") {
+        if (response.value === "1") {
           kettle.active = true;
           kettle.heater.running = true;
         } else {
@@ -337,7 +364,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
 
       //check if pump is running
       running.push(BrewService.digitalRead(kettle.pump.pin, 2000).then(function (response) {
-        if (response.value == "1") {
+        if (response.value === "1") {
           kettle.active = true;
           kettle.pump.running = true;
         } else {
@@ -351,7 +378,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
       //check if cooler is running
       if (kettle.cooler) {
         running.push(BrewService.digitalRead(kettle.cooler.pin, 2000).then(function (response) {
-          if (response.value == "1") {
+          if (response.value === "1") {
             kettle.active = true;
             kettle.cooler.running = true;
           } else {
@@ -556,7 +583,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
     if (kettle.active) {
       BrewService.temp(kettle.temp).then(function (response) {
         updateTemp(response, kettle);
-      }, function error(err) {
+      }).catch(function (err) {
         if (err && typeof err == 'string') $scope.error_message = err;else $scope.error_message = 'Could not connect to the Arduino at ' + BrewService.domain();
       });
       kettle.knob.subText.text = 'starting...';
@@ -629,12 +656,12 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
       if (timer.up) message = 'Your timers are done';else if (!!timer.notes) message = 'Time to add ' + timer.notes + ' of ' + timer.label;else message = 'Time to add ' + timer.label;
     } else if (kettle && kettle.high) {
       if (!$scope.settings.notifications.high || $scope.settings.notifications.last == 'high') return;
-      message = 'Your ' + kettle.key + ' kettle is ' + kettle.high + '\xB0 high';
+      message = 'Your ' + kettle.key + ' kettle is ' + (kettle.high - kettle.temp.diff) + '\xB0 high';
       color = 'danger';
       $scope.settings.notifications.last = 'high';
     } else if (kettle && kettle.low) {
       if (!$scope.settings.notifications.low || $scope.settings.notifications.last == 'low') return;
-      message = 'Your ' + kettle.key + ' kettle is ' + kettle.low + '\xB0 low';
+      message = 'Your ' + kettle.key + ' kettle is ' + (kettle.low - kettle.temp.diff) + '\xB0 low';
       color = '#3498DB';
       $scope.settings.notifications.last = 'low';
     } else if (kettle) {
@@ -708,7 +735,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
         kettle.knob.subText.color = 'rgba(52,152,219,1)';
       } else {
         //update knob text
-        kettle.knob.subText.text = kettle.high + '\xB0 high';
+        kettle.knob.subText.text = kettle.high - kettle.temp.diff + '\xB0 high';
         kettle.knob.subText.color = 'rgba(255,0,0,.6)';
       }
     } else if (kettle.temp.current < kettle.temp.target - kettle.temp.diff) {
@@ -721,7 +748,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
         kettle.knob.subText.color = 'rgba(255,0,0,.6)';
       } else {
         //update knob text
-        kettle.knob.subText.text = kettle.low + '\xB0 low';
+        kettle.knob.subText.text = kettle.low - kettle.temp.diff + '\xB0 low';
         kettle.knob.subText.color = 'rgba(52,152,219,1)';
       }
     } else {
@@ -1032,7 +1059,7 @@ angular.module('brewbench-monitor').factory('BrewService', function ($http, $q, 
       var url = this.domain() + '/arduino/' + _temp.type + '/' + _temp.pin;
       var settings = this.settings('settings');
 
-      $http({ url: url, method: 'GET', timeout: settings.pollSeconds * 1000, headers: { 'Content-Type': 'application/json' } }).then(function (response) {
+      $http({ url: url, method: 'GET', timeout: settings.pollSeconds * 1000 }).then(function (response) {
         if (response.headers('X-Sketch-Version') == null || response.headers('X-Sketch-Version') != settings.sketch_version) q.reject('Sketch Version is out of date.  Please Update. Sketch: ' + response.headers('X-Sketch-Version') + ' BrewBench: ' + settings.sketch_version);else q.resolve(response.data);
       }, function (err) {
         q.reject(err);
@@ -1062,6 +1089,36 @@ angular.module('brewbench-monitor').factory('BrewService', function ($http, $q, 
 
       $http({ url: url, method: 'GET', timeout: timeout || settings.pollSeconds * 1000 }).then(function (response) {
         if (response.headers('X-Sketch-Version') == null || response.headers('X-Sketch-Version') != settings.sketch_version) q.reject('Sketch Version is out of date.  Please Update. Sketch: ' + response.headers('X-Sketch-Version') + ' BrewBench: ' + settings.sketch_version);else q.resolve(response.data);
+      }, function (err) {
+        q.reject(err);
+      });
+      return q.promise;
+    },
+
+    loadShareFile: function loadShareFile(file) {
+      var q = $q.defer();
+      $http({ url: 'http://monitor.brewbench.co/share/' + file + '.yaml', method: 'GET' }).then(function (response) {
+        q.resolve(response);
+      }, function (err) {
+        q.reject(err);
+      });
+      return q.promise;
+    },
+
+    createShare: function createShare() {
+      var q = $q.defer();
+      var settings = this.settings('settings');
+      var kettles = this.settings('kettles');
+
+      //remove some things we don't want to share
+      _.each(kettles, function (kettle, i) {
+        delete kettles[i].knob;
+        delete kettles[i].values;
+      });
+      delete settings.notifications;
+
+      $http({ url: 'http://monitor.brewbench.co/share', data: { 'settings': settings, 'kettles': kettles }, method: 'POST' }).then(function (response) {
+        q.resolve(response.data);
       }, function (err) {
         q.reject(err);
       });

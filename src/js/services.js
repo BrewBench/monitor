@@ -100,7 +100,7 @@ angular.module('brewbench-monitor')
       var url = this.domain()+'/arduino/'+temp.type+'/'+temp.pin;
       var settings = this.settings('settings');
 
-      $http({url: url, method: 'GET', timeout:  settings.pollSeconds*1000, headers: {'Content-Type': 'application/json'}})
+      $http({url: url, method: 'GET', timeout:  settings.pollSeconds*1000})
         .then(function(response){
           if(response.headers('X-Sketch-Version') == null || response.headers('X-Sketch-Version') != settings.sketch_version)
             q.reject('Sketch Version is out of date.  Please Update. Sketch: '+response.headers('X-Sketch-Version')+' BrewBench: '+settings.sketch_version);
@@ -131,7 +131,7 @@ angular.module('brewbench-monitor')
       return q.promise;
     },
 
-    digitalRead: function(sensor,timeout){
+    digitalRead: function(sensor, timeout){
       var q = $q.defer();
       var url = this.domain()+'/arduino/digital/'+sensor;
       var settings = this.settings('settings');
@@ -142,6 +142,38 @@ angular.module('brewbench-monitor')
             q.reject('Sketch Version is out of date.  Please Update. Sketch: '+response.headers('X-Sketch-Version')+' BrewBench: '+settings.sketch_version);
           else
             q.resolve(response.data);
+        }, function(err){
+          q.reject(err);
+        });
+      return q.promise;
+    },
+
+    loadShareFile: function(file){
+      var q = $q.defer();
+      $http({url: 'http://monitor.brewbench.co/share/'+file+'.yaml', method: 'GET'})
+        .then(function(response){
+          q.resolve(response);
+        }, function(err){
+          q.reject(err);
+        });
+      return q.promise;
+    },
+
+    createShare: function(){
+      var q = $q.defer();
+      var settings = this.settings('settings');
+      var kettles = this.settings('kettles');
+
+      //remove some things we don't want to share
+      _.each(kettles, (kettle, i) => {
+        delete kettles[i].knob;
+        delete kettles[i].values;
+      });
+      delete settings.notifications;
+
+      $http({url: 'http://monitor.brewbench.co/share', data: {'settings': settings, 'kettles': kettles}, method: 'POST'})
+        .then(function(response){
+          q.resolve(response.data);
         }, function(err){
           q.reject(err);
         });

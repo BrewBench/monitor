@@ -13,7 +13,7 @@
         </div>
       </div>
 
-      <div class="kettle-row">
+      <div class="kettle-row" ng-if="!share">
         <div class="kettle-col">
           <label class="adjust">Temp</label>
           <div class="btn-group">
@@ -114,12 +114,12 @@
     </div>
 
     <div class="panel-body container-fluid">
-      <div class="kettle-row">
+      <div class="kettle-row" ng-class="{'text-center': share}">
         <div class="kettle-col">
           <ui-knob value="kettle.temp.current" options="kettle.knob" ng-click="knobClick(kettle)"></ui-knob>
           <div class="adjusted" ng-if="kettle.temp.adjust != 0" ng-click="kettle.temp.adjust=0;kettle.temp.current=kettle.temp.previous;">adjusted {{kettle.temp.adjust}}&deg;</div>
         </div>
-        <div class="kettle-col">
+        <div class="kettle-col" ng-if="!share">
             <div class="btn-group pull-right" role="group">
               <label class="adjust">Target</label>
               <button type="button" class="btn btn-default" style="width:62px;"><editable type="number" model="kettle.temp.target">{{kettle.temp.target}}</editable>&deg;{{settings.unit}}</button>
@@ -168,7 +168,7 @@
             </div>
         </div>
       </div>
-      <div class="kettle-row timers">
+      <div class="kettle-row timers" ng-if="!share">
         <div class="kettle-col">
           <ul>
             <li ng-repeat="timer in kettle.timers track by $index" ng-class="{'running':(timer.running && !timer.up), 'queue': timer.queue, 'finished': timer.up}">
@@ -189,7 +189,7 @@
         </div>
       </div>
 
-      <div class="kettle-row">
+      <div class="kettle-row" ng-if="!share">
         <div class="kettle-col" style="text-align: center;">
           <i class="fa fa-3x" ng-class="{'fa-chevron-up':!showRemoveKettle,'fa-chevron-down':showRemoveKettle}" aria-hidden="true" ng-click="showRemoveKettle=!showRemoveKettle"></i>
           <button ng-show="showRemoveKettle" class="btn btn-danger" ng-click="showRemoveKettle=false;kettles.splice($index,1)">Remove Kettle</button>

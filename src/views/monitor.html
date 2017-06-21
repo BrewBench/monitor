@@ -1,6 +1,10 @@
 <ng-include src="'views/header.html'"></ng-include>
-
 <div class="container-fluid main-container kettles-{{activeKettles()}}">
+  <div class="row" ng-if="share">
+    <div class="alert alert-info share">
+      <strong>Shared Session</strong> <sup>from</sup> <a href="mailto: {{settings.recipe.brewer.email}}">{{settings.recipe.brewer.name}}</a>
+    </div>
+  </div>
   <div class="row">
     <div ng-class="{'col-md-8': showSettings, 'col-md-12': !showSettings}">
 
@@ -23,6 +27,7 @@
   </div>
 </div>
 
+<ng-include src="'views/share.html'"></ng-include>
 <ng-include src="'views/import.html'"></ng-include>
 <ng-include src="'views/data.html'"></ng-include>
 <ng-include src="'views/calc.html'"></ng-include>

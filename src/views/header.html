@@ -8,7 +8,8 @@
           <li style="display: inline-block;"><a href="#" data-toggle="modal" data-target="#dataModal-water" class="modal-link"><img src="/assets/img/water.svg" width="30"></a></li>
           <li style="display: inline-block;"><a href="#" data-toggle="modal" data-target="#dataModal-calc" class="modal-link"><i class="fa fa-calculator fa-lg" aria-hidden="true"></i></a></li>
           <li style="display: inline-block;"><a href="#" data-toggle="modal" data-target="#importModal"><i class="fa fa-upload fa-lg" aria-hidden="true"></i></a></li>
-          <li style="display: inline-block;" class="pull-right hidden-sm hidden-md hidden-lg"><a href="#" ng-click="showSettingsSide()" class="modal-link"><i class="fa fa-gear fa-lg"></i></a></li>
+          <li style="display: inline-block;"><a href="#" data-toggle="modal" data-target="#shareModal"><i class="fa fa-share fa-lg" aria-hidden="true"></i></a></li>
+          <li style="display: inline-block;" class="pull-right hidden-sm hidden-md hidden-lg" ng-if="!share"><a href="#" ng-click="showSettingsSide()" class="modal-link"><i class="fa fa-gear fa-lg"></i></a></li>
         </ul>
     </div>
     <div id="navbar" class="navbar-collapse">
@@ -19,7 +20,7 @@
       </ul>
       <ul class="nav navbar-nav navbar-right navitem hidden-xs">
         <li><a href="#" data-toggle="modal" data-target="#aboutModal">About</a></li>
-        <li><a href="#" ng-click="showSettingsSide()"><i class="fa fa-gear fa-lg"></i></a></li>
+        <li ng-if="!share"><a href="#" ng-click="showSettingsSide()"><i class="fa fa-gear fa-lg"></i></a></li>
       </ul>
   </div>
   </div>
