@@ -1,5 +1,10 @@
 # Change Log
 
+## 2.6.6 - 2017-05-20
+
+### Added
+- Share session
+
 ## 2.6.5 - 2017-05-07
 
 ### Added

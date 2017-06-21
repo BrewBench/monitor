@@ -457,7 +457,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
     //chart date
     var date = new Date();
     // temp response is in C
-    kettle.temp.previous = ($scope.settings.unit=='F') ? $filter('toFahrenheit')(response.temp) : Math.round(response.temp);
+    kettle.temp.previous = ($scope.settings.unit === 'F') ? $filter('toFahrenheit')(response.temp) : Math.round(response.temp);
     kettle.temp.current = kettle.temp.previous+kettle.temp.adjust;
 
     //reset all kettles every resetChart
@@ -544,7 +544,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
       //stop the chiller
       if(kettle.cooler && kettle.cooler.auto && kettle.cooler.running){
         temps.push(BrewService.digital(kettle.heater.pin,0).then(function(){
-            kettle.heater.running = false;
+            kettle.cooler.running = false;
           },function(err){
             if(err && typeof err == 'string')
               $scope.error_message = err;
