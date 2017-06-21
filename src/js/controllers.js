@@ -14,7 +14,6 @@ $scope.chartOptions = BrewService.chartOptions();
 $scope.sensorTypes = BrewService.sensorTypes;
 $scope.showSettings = true;
 $scope.error_message = '';
-$scope.share = false;
 
 $scope.getLovibondColor = function(range){
   range = range.replace(/°/g,'').replace(/ /g,'');
@@ -38,6 +37,7 @@ $scope.getLovibondColor = function(range){
 $scope.settings = BrewService.settings('settings') || {
   pollSeconds: 10
   ,unit: 'F'
+  ,shared: false
   ,arduinoUrl: '192.168.240.1'
   ,ports: {'analog':5, 'digital':13}
   ,recipe: {'name':'','brewer':{name:'','email':''},'yeast':[],scale:'gravity',method:'papazian','og':1.050,'fg':1.010,'abv':0,'abw':0,'calories':0,'attenuation':0}
@@ -227,7 +227,15 @@ $scope.kettles = BrewService.settings('kettles') || [{
     BrewService.loadShareFile(file)
       .then(function(contents) {
         if(contents){
-          var shareContents = YAML.parse(contents);
+          if(contents.settings)
+            $scope.settings = contents.settings;
+          if(contents.kettles){
+            _.each(contents.kettles, kettle => {
+              kettle.knob = angular.merge($scope.knobOptions,{value:0,min:0,max:200+5});
+              kettle.values = [];
+            });
+            $scope.kettles = contents.kettles;
+          }
         }
       }, function(err) {
         $scope.error_message = "Opps, there was a problem loading the shared session.";
@@ -371,10 +379,10 @@ $scope.kettles = BrewService.settings('kettles') || [{
 
   // check if pump or heater are running
   $scope.init = function(){
-    $scope.showSettings = !$scope.share;
+    $scope.showSettings = !!$scope.settings.shared;
     if($state.params.file)
       $scope.loadShareFile($state.params.file);
-    if($scope.share)
+    if(!!$scope.settings.shared)
       return;
     var running = [];
     _.each($scope.kettles,function(kettle){
@@ -706,12 +714,14 @@ $scope.kettles = BrewService.settings('kettles') || [{
       }
   };
 
-  $scope.clearKettles = function(e,i){
+  $scope.clearKettles = function(e){
+    if(e){
       angular.element(e.target).html('Removing...');
-      BrewService.clear();
-      $timeout(function(){
-        window.location.reload();
-      },1000);
+    }
+    BrewService.clear();
+    $timeout(function(){
+      window.location.href='/';
+    },1000);
   };
 
   $scope.alert = function(kettle,timer){

@@ -82,7 +82,7 @@ angular.module('brewbench-monitor')
           }]
         };
 
-      $http({url: webhook_url, method:'POST', data:'payload='+JSON.stringify(postObj), headers: { 'Content-Type': 'application/x-www-form-urlencoded' }})
+      $http({url: webhook_url, method:'POST', data: 'payload='+JSON.stringify(postObj), headers: { 'Content-Type': 'application/x-www-form-urlencoded' }})
         .then(function(response){
           q.resolve(response.data);
         },function(err){
@@ -150,9 +150,9 @@ angular.module('brewbench-monitor')
 
     loadShareFile: function(file){
       var q = $q.defer();
-      $http({url: 'http://monitor.brewbench.co/share/'+file+'.yaml', method: 'GET'})
+      $http({url: 'http://monitor.brewbench.co/share/get/'+file, method: 'GET'})
         .then(function(response){
-          q.resolve(response);
+          q.resolve(response.data);
         }, function(err){
           q.reject(err);
         });
@@ -170,8 +170,9 @@ angular.module('brewbench-monitor')
         delete kettles[i].values;
       });
       delete settings.notifications;
+      settings.shared = true;
 
-      $http({url: 'http://monitor.brewbench.co/share', data: {'settings': settings, 'kettles': kettles}, method: 'POST'})
+      $http({url: 'http://monitor.brewbench.co/share', method:'POST', data: {'settings': settings, 'kettles': kettles}, headers: { 'Content-Type': 'application/json' }})
         .then(function(response){
           q.resolve(response.data);
         }, function(err){

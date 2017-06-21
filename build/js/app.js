@@ -36,7 +36,6 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
   $scope.sensorTypes = BrewService.sensorTypes;
   $scope.showSettings = true;
   $scope.error_message = '';
-  $scope.share = false;
 
   $scope.getLovibondColor = function (range) {
     range = range.replace(/°/g, '').replace(/ /g, '');
@@ -58,6 +57,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
   $scope.settings = BrewService.settings('settings') || {
     pollSeconds: 10,
     unit: 'F',
+    shared: false,
     arduinoUrl: '192.168.240.1',
     ports: { 'analog': 5, 'digital': 13 },
     recipe: { 'name': '', 'brewer': { name: '', 'email': '' }, 'yeast': [], scale: 'gravity', method: 'papazian', 'og': 1.050, 'fg': 1.010, 'abv': 0, 'abw': 0, 'calories': 0, 'attenuation': 0 },
@@ -219,7 +219,14 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
   $scope.loadShareFile = function (file) {
     BrewService.loadShareFile(file).then(function (contents) {
       if (contents) {
-        var shareContents = YAML.parse(contents);
+        if (contents.settings) $scope.settings = contents.settings;
+        if (contents.kettles) {
+          _.each(contents.kettles, function (kettle) {
+            kettle.knob = angular.merge($scope.knobOptions, { value: 0, min: 0, max: 200 + 5 });
+            kettle.values = [];
+          });
+          $scope.kettles = contents.kettles;
+        }
       }
     }, function (err) {
       $scope.error_message = "Opps, there was a problem loading the shared session.";
@@ -342,9 +349,9 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
 
   // check if pump or heater are running
   $scope.init = function () {
-    $scope.showSettings = !$scope.share;
+    $scope.showSettings = !!$scope.settings.shared;
     if ($state.params.file) $scope.loadShareFile($state.params.file);
-    if ($scope.share) return;
+    if (!!$scope.settings.shared) return;
     var running = [];
     _.each($scope.kettles, function (kettle) {
       //update max
@@ -625,11 +632,13 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
     }
   };
 
-  $scope.clearKettles = function (e, i) {
-    angular.element(e.target).html('Removing...');
+  $scope.clearKettles = function (e) {
+    if (e) {
+      angular.element(e.target).html('Removing...');
+    }
     BrewService.clear();
     $timeout(function () {
-      window.location.reload();
+      window.location.href = '/';
     }, 1000);
   };
 
@@ -1097,8 +1106,8 @@ angular.module('brewbench-monitor').factory('BrewService', function ($http, $q, 
 
     loadShareFile: function loadShareFile(file) {
       var q = $q.defer();
-      $http({ url: 'http://monitor.brewbench.co/share/' + file + '.yaml', method: 'GET' }).then(function (response) {
-        q.resolve(response);
+      $http({ url: 'http://monitor.brewbench.co/share/get/' + file, method: 'GET' }).then(function (response) {
+        q.resolve(response.data);
       }, function (err) {
         q.reject(err);
       });
@@ -1116,8 +1125,9 @@ angular.module('brewbench-monitor').factory('BrewService', function ($http, $q, 
         delete kettles[i].values;
       });
       delete settings.notifications;
+      settings.shared = true;
 
-      $http({ url: 'http://monitor.brewbench.co/share', data: { 'settings': settings, 'kettles': kettles }, method: 'POST' }).then(function (response) {
+      $http({ url: 'http://monitor.brewbench.co/share', method: 'POST', data: { 'settings': settings, 'kettles': kettles }, headers: { 'Content-Type': 'application/json' } }).then(function (response) {
         q.resolve(response.data);
       }, function (err) {
         q.reject(err);

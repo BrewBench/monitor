@@ -107,4 +107,4 @@ gulp.task('serve', () => {
   gulp.watch(`${dirs.src}/index.html`,['index']).on('change', browserSync.reload);
 });
 
-gulp.task('default', ['styles','scripts','vendor','assets','views','index','serve']);
+gulp.task('default', ['clean','styles','scripts','vendor','assets','views','index','serve']);
