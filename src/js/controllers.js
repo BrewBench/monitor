@@ -551,7 +551,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
       }
       //stop the chiller
       if(kettle.cooler && kettle.cooler.auto && kettle.cooler.running){
-        temps.push(BrewService.digital(kettle.heater.pin,0).then(function(){
+        temps.push(BrewService.digital(kettle.cooler.pin,0).then(function(){
             kettle.cooler.running = false;
           },function(err){
             if(err && typeof err == 'string')
@@ -566,8 +566,8 @@ $scope.kettles = BrewService.settings('kettles') || [{
       kettle.temp.hit=new Date();//set the time the target was hit so we can now start alerts
       $scope.alert(kettle);
       //stop the chiller
-      if(kettle.cooler && kettle.cooler.running){
-        temps.push(BrewService.digital(kettle.heater.pin,0).then(function(){
+      if(kettle.cooler && kettle.cooler.auto && kettle.cooler.running){
+        temps.push(BrewService.digital(kettle.cooler.pin,0).then(function(){
             kettle.cooler.running = false;
           },function(err){
             if(err && typeof err == 'string')
