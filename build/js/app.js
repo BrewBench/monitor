@@ -465,8 +465,8 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
       }
       //start the chiller
       if (kettle.cooler && kettle.cooler.auto && !kettle.cooler.running) {
-        temps.push(BrewService.digital(kettle.heater.pin, 1).then(function () {
-          kettle.heater.running = true;
+        temps.push(BrewService.digital(kettle.cooler.pin, 1).then(function () {
+          kettle.cooler.running = true;
           kettle.knob.subText.text = 'cooling';
           kettle.knob.subText.color = 'rgba(52,152,219,1)';
         }, function (err) {
