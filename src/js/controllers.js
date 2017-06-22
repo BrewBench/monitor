@@ -562,8 +562,45 @@ $scope.kettles = BrewService.settings('kettles') || [{
         );
       }
     } else {
+      // within target!
       kettle.temp.hit=new Date();//set the time the target was hit so we can now start alerts
       $scope.alert(kettle);
+      //stop the chiller
+      if(kettle.cooler && kettle.cooler.running){
+        temps.push(BrewService.digital(kettle.heater.pin,0).then(function(){
+            kettle.cooler.running = false;
+          },function(err){
+            if(err && typeof err == 'string')
+              $scope.error_message = err;
+            else
+              $scope.error_message = 'Could not connect to the Arduino at '+BrewService.domain();
+          })
+        );
+      }
+      //stop the heater
+      if(kettle.heater.auto && kettle.heater.running){
+        temps.push(BrewService.digital(kettle.heater.pin,0).then(function(){
+            kettle.heater.running = false;
+          },function(err){
+            if(err && typeof err == 'string')
+              $scope.error_message = err;
+            else
+              $scope.error_message = 'Could not connect to the Arduino at '+BrewService.domain();
+          })
+        );
+      }
+      //stop the pump
+      if(kettle.pump.auto && kettle.pump.running){
+        temps.push(BrewService.digital(kettle.pump.pin,0).then(function(){
+            kettle.pump.running = false;
+          },function(err){
+            if(err && typeof err == 'string')
+              $scope.error_message = err;
+            else
+              $scope.error_message = 'Could not connect to the Arduino at '+BrewService.domain();
+          })
+        );
+      }
     }
     return $q.all(temps);
   };
