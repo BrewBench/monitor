@@ -50,7 +50,7 @@
         </div>
 
         <div class="kettle-col">
-          <label class="adjust">Heat</label>
+          <label class="adjust" ng-class="{'heating':kettle.heater.running}">Heat</label>
           <div class="btn-group">
             <div class="btn-group">
               <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -90,7 +90,7 @@
         </div>
 
         <div class="kettle-col" ng-if="kettle.type === 'fermenter' && kettle.cooler">
-          <label class="adjust">Cool</label>
+          <label class="adjust" ng-class="{'cooling':kettle.cooler.running}">Cool</label>
           <div class="btn-group">
             <div class="btn-group">
               <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

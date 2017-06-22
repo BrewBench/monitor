@@ -349,11 +349,11 @@ label.adjust, a.adjust{
   font-size: 13px;
 }
 
-a.heat {
+a.heat, label.heating {
   color: rgba(200,47,47,1);
 }
 
-a.cool {
+a.cool, label.cooling {
   color: rgba(52,152,219,1);
 }
 
