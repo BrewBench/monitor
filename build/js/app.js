@@ -419,6 +419,12 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
     return $q.all(running);
   };
 
+  $scope.connectError = function (err) {
+    if (!!$scope.settings.shared) $scope.error_message = 'The monitor seems to be off-line, re-connecting...';else {
+      if (err && typeof err == 'string') $scope.error_message = err;else $scope.error_message = 'Could not connect to the Arduino at ' + BrewService.domain();
+    }
+  };
+
   function updateTemp(response, kettle) {
 
     if (!response || !response.temp) {
@@ -452,7 +458,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
         temps.push(BrewService.digital(kettle.heater.pin, 0).then(function () {
           kettle.heater.running = false;
         }, function (err) {
-          if (err && typeof err == 'string') $scope.error_message = err;else $scope.error_message = 'Could not connect to the Arduino at ' + BrewService.domain();
+          $scope.connectError(err);
         }));
       }
       //stop the pump
@@ -460,7 +466,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
         temps.push(BrewService.digital(kettle.pump.pin, 0).then(function () {
           kettle.pump.running = false;
         }, function (err) {
-          if (err && typeof err == 'string') $scope.error_message = err;else $scope.error_message = 'Could not connect to the Arduino at ' + BrewService.domain();
+          $scope.connectError(err);
         }));
       }
       //start the chiller
@@ -470,7 +476,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
           kettle.knob.subText.text = 'cooling';
           kettle.knob.subText.color = 'rgba(52,152,219,1)';
         }, function (err) {
-          if (err && typeof err == 'string') $scope.error_message = err;else $scope.error_message = 'Could not connect to the Arduino at ' + BrewService.domain();
+          $scope.connectError(err);
         }));
       }
     } //is temp too low?
@@ -483,7 +489,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
             kettle.knob.subText.text = 'heating';
             kettle.knob.subText.color = 'rgba(200,47,47,1)';
           }, function (err) {
-            if (err && typeof err == 'string') $scope.error_message = err;else $scope.error_message = 'Could not connect to the Arduino at ' + BrewService.domain();
+            $scope.connectError(err);
           }));
         }
         //start the pump
@@ -491,7 +497,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
           temps.push(BrewService.digital(kettle.pump.pin, 1).then(function () {
             kettle.pump.running = true;
           }, function (err) {
-            if (err && typeof err == 'string') $scope.error_message = err;else $scope.error_message = 'Could not connect to the Arduino at ' + BrewService.domain();
+            $scope.connectError(err);
           }));
         }
         //stop the chiller
@@ -499,7 +505,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
           temps.push(BrewService.digital(kettle.cooler.pin, 0).then(function () {
             kettle.cooler.running = false;
           }, function (err) {
-            if (err && typeof err == 'string') $scope.error_message = err;else $scope.error_message = 'Could not connect to the Arduino at ' + BrewService.domain();
+            $scope.connectError(err);
           }));
         }
       } else {
@@ -511,7 +517,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
           temps.push(BrewService.digital(kettle.cooler.pin, 0).then(function () {
             kettle.cooler.running = false;
           }, function (err) {
-            if (err && typeof err == 'string') $scope.error_message = err;else $scope.error_message = 'Could not connect to the Arduino at ' + BrewService.domain();
+            $scope.connectError(err);
           }));
         }
         //stop the heater
@@ -519,7 +525,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
           temps.push(BrewService.digital(kettle.heater.pin, 0).then(function () {
             kettle.heater.running = false;
           }, function (err) {
-            if (err && typeof err == 'string') $scope.error_message = err;else $scope.error_message = 'Could not connect to the Arduino at ' + BrewService.domain();
+            $scope.connectError(err);
           }));
         }
         //stop the pump
@@ -527,7 +533,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
           temps.push(BrewService.digital(kettle.pump.pin, 0).then(function () {
             kettle.pump.running = false;
           }, function (err) {
-            if (err && typeof err == 'string') $scope.error_message = err;else $scope.error_message = 'Could not connect to the Arduino at ' + BrewService.domain();
+            $scope.connectError(err);
           }));
         }
       }
@@ -591,13 +597,13 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
       BrewService.digital(k.pin, 1).then(function () {
         //started
       }, function (err) {
-        if (err && typeof err == 'string') $scope.error_message = err;else $scope.error_message = 'Could not connect to the Arduino at ' + BrewService.domain();
+        $scope.connectError(err);
       });
     } else if (!k.running) {
       BrewService.digital(k.pin, 0).then(function () {
         //stopped
       }, function (err) {
-        if (err && typeof err == 'string') $scope.error_message = err;else $scope.error_message = 'Could not connect to the Arduino at ' + BrewService.domain();
+        $scope.connectError(err);
       });
     }
   };
@@ -616,7 +622,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
       BrewService.temp(kettle.temp).then(function (response) {
         updateTemp(response, kettle);
       }).catch(function (err) {
-        if (err && typeof err == 'string') $scope.error_message = err;else $scope.error_message = 'Could not connect to the Arduino at ' + BrewService.domain();
+        $scope.connectError(err);
       });
       kettle.knob.subText.text = 'starting...';
       kettle.knob.readOnly = false;
@@ -630,7 +636,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
         kettle.heater.running = false;
         $scope.updateKnobCopy(kettle);
       }, function (err) {
-        if (err && typeof err == 'string') $scope.error_message = err;else $scope.error_message = 'Could not connect to the Arduino at ' + BrewService.domain();
+        $scope.connectError(err);
       });
     }
     if (!kettle.active && kettle.pump.running) {
@@ -638,7 +644,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
         kettle.pump.running = false;
         $scope.updateKnobCopy(kettle);
       }, function (err) {
-        if (err && typeof err == 'string') $scope.error_message = err;else $scope.error_message = 'Could not connect to the Arduino at ' + BrewService.domain();
+        $scope.connectError(err);
       });
     }
     if (kettle.cooler && !kettle.active && kettle.cooler.running) {
@@ -646,7 +652,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
         kettle.cooler.running = false;
         $scope.updateKnobCopy(kettle);
       }, function (err) {
-        if (err && typeof err == 'string') $scope.error_message = err;else $scope.error_message = 'Could not connect to the Arduino at ' + BrewService.domain();
+        $scope.connectError(err);
       });
     }
     if (!kettle.active) {
@@ -889,7 +895,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
         allSensors.push(BrewService.temp(kettle.temp).then(function (response) {
           return updateTemp(response, kettle);
         }, function error(err) {
-          if (err && typeof err == 'string') $scope.error_message = err;else $scope.error_message = 'Could not connect to the Arduino at ' + BrewService.domain();
+          $scope.connectError(err);
           return err;
         }));
       }
