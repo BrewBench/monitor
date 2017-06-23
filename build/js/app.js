@@ -1152,7 +1152,7 @@ angular.module('brewbench-monitor').factory('BrewService', function ($http, $q, 
       delete settings.notifications;
       settings.shared = true;
 
-      $http({ url: 'http://monitor.brewbench.co/share', method: 'POST', data: { 'settings': settings, 'kettles': kettles }, headers: { 'Content-Type': 'application/json' } }).then(function (response) {
+      $http({ url: 'http://monitor.brewbench.co/share/temp.php', method: 'POST', data: { 'settings': settings, 'kettles': kettles }, headers: { 'Content-Type': 'application/json' } }).then(function (response) {
         q.resolve(response.data);
       }, function (err) {
         q.reject(err);
