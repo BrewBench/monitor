@@ -36,7 +36,6 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
   $scope.sensorTypes = BrewService.sensorTypes;
   $scope.showSettings = true;
   $scope.error_message = '';
-  $scope.share = { fullAccess: false, password: '' };
 
   $scope.getLovibondColor = function (range) {
     range = range.replace(/°/g, '').replace(/ /g, '');
