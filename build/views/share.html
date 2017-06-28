@@ -14,6 +14,12 @@
             <input type="email" class="form-control" ng-model="settings.recipe.brewer.email" placeholder="Email" required="required"/>
           </div>
           <div class="form-group">
+              <input type="checkbox" ng-model="share.fullAccess"/>Full Access
+          </div>
+          <div class="form-group">
+            <input type="password" class="form-control" ng-model="share.password" placeholder="Add a Password?" required="required"/>
+          </div>
+          <div class="form-group">
             <button class="btn btn-primary" ng-click="createShare()">Create Share Link</button>
           </div>
         </form>

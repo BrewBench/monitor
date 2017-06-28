@@ -1,9 +1,12 @@
 angular.module('brewbench-monitor')
 .filter('moment', function() {
-  return function(date) {
+  return function(date, format) {
       if(!date)
         return '';
-      return moment(new Date(date)).fromNow();
+      if(format)
+        return moment(new Date(date)).format(format);
+      else
+        return moment(new Date(date)).fromNow();
     };
 })
 .filter('formatDegrees', function($filter) {

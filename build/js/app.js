@@ -36,6 +36,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
   $scope.sensorTypes = BrewService.sensorTypes;
   $scope.showSettings = true;
   $scope.error_message = '';
+  $scope.share = { fullAccess: false, password: '' };
 
   $scope.getLovibondColor = function (range) {
     range = range.replace(/°/g, '').replace(/ /g, '');
@@ -219,7 +220,10 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
   $scope.loadShareFile = function (file) {
     BrewService.loadShareFile(file).then(function (contents) {
       if (contents) {
-        if (contents.settings) $scope.settings = contents.settings;
+        if (contents.settings) {
+          $scope.settings = contents.settings;
+          $scope.settings.notifications = { on: false, timers: true, high: true, low: true, target: true, slack: 'Slack notification webhook Url', last: '' };
+        }
         if (contents.kettles) {
           _.each(contents.kettles, function (kettle) {
             kettle.knob = angular.merge($scope.knobOptions, { value: 0, min: 0, max: 200 + 5 });
@@ -228,8 +232,9 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
           $scope.kettles = contents.kettles;
         }
       }
+      return true;
     }, function (err) {
-      $scope.error_message = "Opps, there was a problem loading the shared session.";
+      return $scope.error_message = "Opps, there was a problem loading the shared session.";
     });
   };
 
@@ -349,9 +354,9 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
 
   // check if pump or heater are running
   $scope.init = function () {
-    $scope.showSettings = !!$scope.settings.shared;
-    if ($state.params.file) $scope.loadShareFile($state.params.file);
-    if (!!$scope.settings.shared) return;
+    $scope.showSettings = !$scope.settings.shared;
+    if ($state.params.file) return $scope.loadShareFile($state.params.file);
+
     var running = [];
     _.each($scope.kettles, function (kettle) {
       //update max
@@ -997,9 +1002,9 @@ angular.module('brewbench-monitor').directive('editable', function () {
 'use strict';
 
 angular.module('brewbench-monitor').filter('moment', function () {
-  return function (date) {
+  return function (date, format) {
     if (!date) return '';
-    return moment(new Date(date)).fromNow();
+    if (format) return moment(new Date(date)).format(format);else return moment(new Date(date)).fromNow();
   };
 }).filter('formatDegrees', function ($filter) {
   return function (temp, unit) {
@@ -1158,7 +1163,7 @@ angular.module('brewbench-monitor').factory('BrewService', function ($http, $q, 
       delete settings.notifications;
       settings.shared = true;
 
-      $http({ url: 'http://monitor.brewbench.co/share/temp.php', method: 'POST', data: { 'settings': settings, 'kettles': kettles }, headers: { 'Content-Type': 'application/json' } }).then(function (response) {
+      $http({ url: 'http://localhost:8081/share/temp.php', method: 'POST', data: { 'settings': settings, 'kettles': kettles }, headers: { 'Content-Type': 'application/json' } }).then(function (response) {
         q.resolve(response.data);
       }, function (err) {
         q.reject(err);

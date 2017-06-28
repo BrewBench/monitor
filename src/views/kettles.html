@@ -83,7 +83,7 @@
               </ul>
             </div>
             <div class="btn-group relay">
-              <button type="button" class="btn" ng-class="{'btn-default':!kettle.pump.running&&!kettle.pump.auto,'btn-success':kettle.pump.running,'btn-warning':!kettle.pump.running&&kettle.pump.auto}" ng-click="toggleKettle('heat',kettle)">{{kettle.pump.running ? 'On' : (kettle.pump.auto ? 'Wait' :'Off')}}</button>
+              <button type="button" class="btn" ng-class="{'btn-default':!kettle.pump.running&&!kettle.pump.auto,'btn-success':kettle.pump.running,'btn-warning':!kettle.pump.running&&kettle.pump.auto}" ng-click="toggleKettle('pump',kettle)">{{kettle.pump.running ? 'On' : (kettle.pump.auto ? 'Wait' :'Off')}}</button>
               <button type="button" class="btn" ng-class="{'btn-default':!kettle.pump.auto,'btn-success':kettle.pump.auto}" ng-click="kettle.pump.auto=!kettle.pump.auto">Auto</button>
             </div>
           </div>

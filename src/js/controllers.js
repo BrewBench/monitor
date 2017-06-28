@@ -227,8 +227,10 @@ $scope.kettles = BrewService.settings('kettles') || [{
     BrewService.loadShareFile(file)
       .then(function(contents) {
         if(contents){
-          if(contents.settings)
+          if(contents.settings){
             $scope.settings = contents.settings;
+            $scope.settings.notifications = {on:false,timers:true,high:true,low:true,target:true,slack:'Slack notification webhook Url',last:''};
+          }
           if(contents.kettles){
             _.each(contents.kettles, kettle => {
               kettle.knob = angular.merge($scope.knobOptions,{value:0,min:0,max:200+5});
@@ -237,8 +239,9 @@ $scope.kettles = BrewService.settings('kettles') || [{
             $scope.kettles = contents.kettles;
           }
         }
+        return true;
       }, function(err) {
-        $scope.error_message = "Opps, there was a problem loading the shared session.";
+        return $scope.error_message = "Opps, there was a problem loading the shared session.";
       });
   };
 
@@ -379,11 +382,10 @@ $scope.kettles = BrewService.settings('kettles') || [{
 
   // check if pump or heater are running
   $scope.init = function(){
-    $scope.showSettings = !!$scope.settings.shared;
+    $scope.showSettings = !$scope.settings.shared;
     if($state.params.file)
-      $scope.loadShareFile($state.params.file);
-    if(!!$scope.settings.shared)
-      return;
+      return $scope.loadShareFile($state.params.file);
+
     var running = [];
     _.each($scope.kettles,function(kettle){
         //update max
