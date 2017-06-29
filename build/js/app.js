@@ -217,7 +217,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
   };
 
   $scope.loadShareFile = function (file) {
-    BrewService.loadShareFile(file).then(function (contents) {
+    return BrewService.loadShareFile(file).then(function (contents) {
       if (contents) {
         if (contents.settings) {
           $scope.settings = contents.settings;

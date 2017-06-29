@@ -224,7 +224,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
   };
 
   $scope.loadShareFile = function(file){
-    BrewService.loadShareFile(file)
+    return BrewService.loadShareFile(file)
       .then(function(contents) {
         if(contents){
           if(contents.settings){
