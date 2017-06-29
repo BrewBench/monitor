@@ -124,9 +124,9 @@ $scope.kettles = BrewService.settings('kettles') || [{
     key: 'Boil'
     ,type: 'hop'
     ,active: false
-    ,heater: {pin:2,running:false,auto:false}
-    ,pump: {pin:3,running:false,auto:false}
-    ,temp: {pin:0,type:'Thermistor',hit:false,current:0,previous:0,adjust:0,target:200,diff:5}
+    ,heater: {pin:'D2',running:false,auto:false,dutyCycle:100}
+    ,pump: {pin:'D3',running:false,auto:false,dutyCycle:100}
+    ,temp: {pin:'A0',type:'Thermistor',hit:false,current:0,previous:0,adjust:0,target:200,diff:5}
     ,values: []
     ,timers: []
     ,knob: angular.merge($scope.knobOptions,{value:0,min:0,max:200+5})
@@ -134,9 +134,9 @@ $scope.kettles = BrewService.settings('kettles') || [{
     key: 'Hot Liquor'
     ,type: 'water'
     ,active: false
-    ,heater: {pin:4,running:false,auto:false}
-    ,pump: {pin:5,running:false,auto:false}
-    ,temp: {pin:1,type:'Thermistor',hit:false,current:0,previous:0,adjust:0,target:200,diff:5}
+    ,heater: {pin:'D4',running:false,auto:false,dutyCycle:100}
+    ,pump: {pin:'D5',running:false,auto:false,dutyCycle:100}
+    ,temp: {pin:'A1',type:'Thermistor',hit:false,current:0,previous:0,adjust:0,target:200,diff:5}
     ,values: []
     ,timers: []
     ,knob: angular.merge($scope.knobOptions,{value:0,min:0,max:200+5})
@@ -144,9 +144,9 @@ $scope.kettles = BrewService.settings('kettles') || [{
     key: 'Mash'
     ,type: 'grain'
     ,active: false
-    ,heater: {pin:6,running:false,auto:false}
-    ,pump: {pin:7,running:false,auto:false}
-    ,temp: {pin:2,type:'Thermistor',hit:false,current:0,previous:0,adjust:0,target:150,diff:5}
+    ,heater: {pin:'D6',running:false,auto:false,dutyCycle:100}
+    ,pump: {pin:'D7',running:false,auto:false,dutyCycle:100}
+    ,temp: {pin:'A2',type:'Thermistor',hit:false,current:0,previous:0,adjust:0,target:150,diff:5}
     ,values: []
     ,timers: []
     ,knob: angular.merge($scope.knobOptions,{value:0,min:0,max:150+5})
@@ -164,9 +164,9 @@ $scope.kettles = BrewService.settings('kettles') || [{
           key: $scope.kettleTypes[0].name
           ,type: $scope.kettleTypes[0].type
           ,active: false
-          ,heater: {pin:6,running:false,auto:false}
-          ,pump: {pin:7,running:false,auto:false}
-          ,temp: {pin:0,type:'Thermistor',hit:false,current:0,previous:0,adjust:0,target:$scope.kettleTypes[0].target,diff:$scope.kettleTypes[0].diff}
+          ,heater: {pin:'D6',running:false,auto:false}
+          ,pump: {pin:'D7',running:false,auto:false}
+          ,temp: {pin:'A0',type:'Thermistor',hit:false,current:0,previous:0,adjust:0,target:$scope.kettleTypes[0].target,diff:$scope.kettleTypes[0].diff}
           ,values: []
           ,timers: []
           ,knob: angular.merge($scope.knobOptions,{value:0,min:0,max:$scope.kettleTypes[0].target+$scope.kettleTypes[0].diff})
@@ -888,7 +888,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
     kettle.temp.diff = kettleType.diff;
     kettle.knob = angular.merge($scope.knobOptions,{value:kettle.temp.current,min:0,max:kettleType.target+kettleType.diff});
     if(kettleType.type === 'fermenter')
-      kettle.cooler = {pin:2,running:false,auto:false};
+      kettle.cooler = {pin:'D2',running:false,auto:false,dutyCycle:100};
     else
       delete kettle.cooler;
   };

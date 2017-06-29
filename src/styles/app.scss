@@ -169,6 +169,12 @@ sup.ref{
   padding: 10px;
 }
 
+.kettles ul.dropdown-menu{
+  height: auto;
+  max-height: 180px;
+  overflow-x: hidden;
+}
+
 .settings ul>li, .kettles ul>li{
   list-style-type: none;
   margin: 10px;

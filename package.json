@@ -54,5 +54,9 @@
     "gulp-uglify": "^2.1.2",
     "gulp-util": "^3.0.8",
     "mocha": "^3.3.0"
+  },
+  "dependencies": {
+    "angular": "^1.6.4",
+    "angularjs-slider": "^6.2.2"
   }
 }

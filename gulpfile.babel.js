@@ -18,7 +18,8 @@ const dirs = {
 
 const paths = {
   styles: {
-    src: `${dirs.src}/styles/*.scss`,
+    src: [`${dirs.src}/styles/*.scss`
+      ,'node_modules/angularjs-slider/dist/rzslider.scss'],
     dest: `${dirs.dest}/styles`
   },
   scripts: {
@@ -26,7 +27,8 @@ const paths = {
     dest: `${dirs.dest}/js`
   },
   vendor: {
-    src: `${dirs.src}/js/vendor/*.js`,
+    src: [`${dirs.src}/js/vendor/*.js`
+      , 'node_modules/angularjs-slider/dist/rzslider.min.js'],
     dest: `${dirs.dest}/js`
   },
   assets: {

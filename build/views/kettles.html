@@ -19,19 +19,19 @@
           <div class="btn-group">
             <div class="btn-group">
               <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                {{sensorTypes(kettle.temp.type).analog ? 'A' : 'D'}}{{kettle.temp.pin}} <span class="caret"></span>
+                {{kettle.temp.pin}} <span class="caret"></span>
               </button>
               <ul class="dropdown-menu" ng-if="sensorTypes(kettle.temp.type).analog">
-                <li ng-repeat="p in getPortRange(settings.ports.analog) track by $index" ng-class="{'active': kettle.temp.pin==p}">
-                  <a href="#" ng-click="pinChange(kettle.temp.pin,p,true); kettle.temp.pin=p;">A{{p}}
-                    <span class="pininuse" ng-show="pinInUse(p,true)">(In Use)</span>
+                <li ng-repeat="p in getPortRange(settings.ports.analog) track by $index" ng-class="{'active': kettle.temp.pin=='A'+p}">
+                  <a href="#" ng-click="pinChange(kettle.temp.pin,p,true); kettle.temp.pin='A'+p;">A{{p}}
+                    <span class="pininuse" ng-show="pinInUse('A'+p,true)">(In Use)</span>
                   </a>
                 </li>
               </ul>
               <ul class="dropdown-menu" ng-if="!sensorTypes(kettle.temp.type).analog">
-                <li ng-repeat="p in getPortRange(settings.ports.digital) track by $index" ng-class="{'active': kettle.temp.pin==p}">
-                  <a href="#" ng-click="pinChange(kettle.temp.pin,p,false); kettle.temp.pin=p;">D{{p}}
-                    <span class="pininuse" ng-show="pinInUse(p,false)">(In Use)</span>
+                <li ng-repeat="p in getPortRange(settings.ports.digital) track by $index" ng-class="{'active': kettle.temp.pin=='D'+p}">
+                  <a href="#" ng-click="pinChange(kettle.temp.pin,p,false); kettle.temp.pin='D'+p;">D{{p}}
+                    <span class="pininuse" ng-show="pinInUse('D'+p,false)">(In Use)</span>
                   </a>
                 </li>
               </ul>
@@ -54,13 +54,17 @@
           <div class="btn-group">
             <div class="btn-group">
               <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                D{{kettle.heater.pin}} <span class="caret"></span>
+                {{kettle.heater.pin}} <span class="caret"></span>
               </button>
               <ul class="dropdown-menu">
-                <li ng-repeat="p in getPortRange(settings.ports.digital) track by $index" ng-class="{'active': kettle.heater.pin==p}">
-                  <a href="#" ng-click="pinChange(kettle.heater.pin,p,false); kettle.heater.pin=p;">D{{p}} <span class="pininuse" ng-show="pinInUse(p,false)">(In Use)</span></a>
+                <li ng-repeat="p in getPortRange(settings.ports.analog) track by $index" ng-class="{'active': kettle.heater.pin=='A'+p}">
+                  <a href="#" ng-click="pinChange(kettle.heater.pin,'A'+p,true); kettle.heater.pin='A'+p;">A{{p}} <span class="pininuse" ng-show="pinInUse('A'+p,false)">(In Use)</span></a>
+                </li>
+                <li ng-repeat="p in getPortRange(settings.ports.digital) track by $index" ng-class="{'active': kettle.heater.pin=='D'+p}">
+                  <a href="#" ng-click="pinChange(kettle.heater.pin,'D'+p,false); kettle.heater.pin='D'+p;">D{{p}} <span class="pininuse" ng-show="pinInUse('D'+p,false)">(In Use)</span></a>
                 </li>
               </ul>
+              <rzslider ng-if="kettle.heater.pin.indexOf('A') !== -1" rz-slider-model="kettle.heater.dutyCycle || 100"></rzslider>
             </div>
             <div class="btn-group relay">
               <button type="button" class="btn" ng-class="{'btn-default':!kettle.heater.running&&!kettle.heater.auto,'btn-success':kettle.heater.running,'btn-warning':!kettle.heater.running&&kettle.heater.auto}" ng-click="toggleKettle('heat',kettle)">{{kettle.heater.running ? 'On' : (kettle.heater.auto ? 'Wait' :'Off')}}</button>
@@ -74,13 +78,17 @@
           <div class="btn-group">
             <div class="btn-group">
               <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                D{{kettle.pump.pin}} <span class="caret"></span>
+                {{kettle.pump.pin}} <span class="caret"></span>
               </button>
               <ul class="dropdown-menu">
-                <li ng-repeat="p in getPortRange(settings.ports.digital) track by $index" ng-class="{'active': kettle.pump.pin==p}">
-                  <a href="#" ng-click="pinChange(kettle.pump.pin,p,false); kettle.pump.pin=p;">D{{p}} <span class="pininuse" ng-show="pinInUse(p,false)">(In Use)</span></a>
+                <li ng-repeat="p in getPortRange(settings.ports.analog) track by $index" ng-class="{'active': kettle.pump.pin=='A'+p}">
+                  <a href="#" ng-click="pinChange(kettle.pump.pin,'A'+p,true); kettle.pump.pin='A'+p;">A{{p}} <span class="pininuse" ng-show="pinInUse('A'+p,false)">(In Use)</span></a>
+                </li>
+                <li ng-repeat="p in getPortRange(settings.ports.digital) track by $index" ng-class="{'active': kettle.pump.pin=='D'+p}">
+                  <a href="#" ng-click="pinChange(kettle.pump.pin,'D'+p,false); kettle.pump.pin='D'+p;">D{{p}} <span class="pininuse" ng-show="pinInUse('D'+p,false)">(In Use)</span></a>
                 </li>
               </ul>
+              <rzslider ng-if="kettle.pump.pin.indexOf('A') !== -1" rz-slider-model="kettle.pump.dutyCycle || 100"></rzslider>
             </div>
             <div class="btn-group relay">
               <button type="button" class="btn" ng-class="{'btn-default':!kettle.pump.running&&!kettle.pump.auto,'btn-success':kettle.pump.running,'btn-warning':!kettle.pump.running&&kettle.pump.auto}" ng-click="toggleKettle('pump',kettle)">{{kettle.pump.running ? 'On' : (kettle.pump.auto ? 'Wait' :'Off')}}</button>
@@ -94,13 +102,17 @@
           <div class="btn-group">
             <div class="btn-group">
               <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                D{{kettle.cooler.pin}} <span class="caret"></span>
+                {{kettle.cooler.pin}} <span class="caret"></span>
               </button>
               <ul class="dropdown-menu">
-                <li ng-repeat="p in getPortRange(settings.ports.digital) track by $index" ng-class="{'active': kettle.cooler.pin==p}">
-                  <a href="#" ng-click="pinChange(kettle.cooler.pin,p,false); kettle.cooler.pin=p;">D{{p}} <span class="pininuse" ng-show="pinInUse(p,false)">(In Use)</span></a>
+                <li ng-repeat="p in getPortRange(settings.ports.analog) track by $index" ng-class="{'active': kettle.cooler.pin=='A'+p}">
+                  <a href="#" ng-click="pinChange(kettle.cooler.pin,'A'+p,true); kettle.cooler.pin='A'+p;">A{{p}} <span class="pininuse" ng-show="pinInUse('A'+p,false)">(In Use)</span></a>
+                </li>
+                <li ng-repeat="p in getPortRange(settings.ports.digital) track by $index" ng-class="{'active': kettle.cooler.pin=='D'+p}">
+                  <a href="#" ng-click="pinChange(kettle.cooler.pin,'D'+p,false); kettle.cooler.pin='D'+p;">D{{p}} <span class="pininuse" ng-show="pinInUse('D'+p,false)">(In Use)</span></a>
                 </li>
               </ul>
+              <rzslider ng-if="kettle.cooler.pin.indexOf('A') !== -1" rz-slider-model="kettle.cooler.dutyCycle || 100"></rzslider>
             </div>
             <div class="btn-group relay">
               <button type="button" class="btn" ng-class="{'btn-default':!kettle.cooler.running&&!kettle.cooler.auto,'btn-success':kettle.cooler.running,'btn-warning':!kettle.cooler.running&&kettle.cooler.auto}" ng-click="toggleKettle('cool',kettle)">{{kettle.cooler.running ? 'On' : (kettle.cooler.auto ? 'Wait' :'Off')}}</button>

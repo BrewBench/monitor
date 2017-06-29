@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('brewbench-monitor', ['ui.router', 'nvd3', 'ngTouch', 'duScroll', 'ui.knob']).config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locationProvider) {
+angular.module('brewbench-monitor', ['ui.router', 'nvd3', 'ngTouch', 'duScroll', 'ui.knob', 'rzModule']).config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locationProvider) {
 
   $httpProvider.defaults.useXDomain = true;
   $httpProvider.defaults.headers.common = 'Content-Type: application/json';
@@ -60,7 +60,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
     shared: false,
     arduinoUrl: '192.168.240.1',
     ports: { 'analog': 5, 'digital': 13 },
-    recipe: { 'name': '', 'brewer': { name: '', 'email': '' }, 'yeast': [], scale: 'gravity', method: 'papazian', 'og': 1.050, 'fg': 1.010, 'abv': 0, 'abw': 0, 'calories': 0, 'attenuation': 0 },
+    recipe: { 'name': '', 'brewer': { name: '', 'email': '' }, 'yeast': [], 'hops': [], 'malt': [], scale: 'gravity', method: 'papazian', 'og': 1.050, 'fg': 1.010, 'abv': 0, 'abw': 0, 'calories': 0, 'attenuation': 0 },
     notifications: { on: true, timers: true, high: true, low: true, target: true, slack: 'Slack notification webhook Url', last: '' },
     sounds: { on: true, alert: '/assets/audio/bike.mp3', timer: '/assets/audio/school.mp3' }
   };
@@ -132,9 +132,9 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
     key: 'Boil',
     type: 'hop',
     active: false,
-    heater: { pin: 2, running: false, auto: false },
-    pump: { pin: 3, running: false, auto: false },
-    temp: { pin: 0, type: 'Thermistor', hit: false, current: 0, previous: 0, adjust: 0, target: 200, diff: 5 },
+    heater: { pin: 'D2', running: false, auto: false, dutyCycle: 100 },
+    pump: { pin: 'D3', running: false, auto: false, dutyCycle: 100 },
+    temp: { pin: 'A0', type: 'Thermistor', hit: false, current: 0, previous: 0, adjust: 0, target: 200, diff: 5 },
     values: [],
     timers: [],
     knob: angular.merge($scope.knobOptions, { value: 0, min: 0, max: 200 + 5 })
@@ -142,9 +142,9 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
     key: 'Hot Liquor',
     type: 'water',
     active: false,
-    heater: { pin: 4, running: false, auto: false },
-    pump: { pin: 5, running: false, auto: false },
-    temp: { pin: 1, type: 'Thermistor', hit: false, current: 0, previous: 0, adjust: 0, target: 200, diff: 5 },
+    heater: { pin: 'D4', running: false, auto: false, dutyCycle: 100 },
+    pump: { pin: 'D5', running: false, auto: false, dutyCycle: 100 },
+    temp: { pin: 'A1', type: 'Thermistor', hit: false, current: 0, previous: 0, adjust: 0, target: 200, diff: 5 },
     values: [],
     timers: [],
     knob: angular.merge($scope.knobOptions, { value: 0, min: 0, max: 200 + 5 })
@@ -152,9 +152,9 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
     key: 'Mash',
     type: 'grain',
     active: false,
-    heater: { pin: 6, running: false, auto: false },
-    pump: { pin: 7, running: false, auto: false },
-    temp: { pin: 2, type: 'Thermistor', hit: false, current: 0, previous: 0, adjust: 0, target: 150, diff: 5 },
+    heater: { pin: 'D6', running: false, auto: false, dutyCycle: 100 },
+    pump: { pin: 'D7', running: false, auto: false, dutyCycle: 100 },
+    temp: { pin: 'A2', type: 'Thermistor', hit: false, current: 0, previous: 0, adjust: 0, target: 150, diff: 5 },
     values: [],
     timers: [],
     knob: angular.merge($scope.knobOptions, { value: 0, min: 0, max: 150 + 5 })
@@ -173,9 +173,9 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
         key: $scope.kettleTypes[0].name,
         type: $scope.kettleTypes[0].type,
         active: false,
-        heater: { pin: 6, running: false, auto: false },
-        pump: { pin: 7, running: false, auto: false },
-        temp: { pin: 0, type: 'Thermistor', hit: false, current: 0, previous: 0, adjust: 0, target: $scope.kettleTypes[0].target, diff: $scope.kettleTypes[0].diff },
+        heater: { pin: 'D6', running: false, auto: false },
+        pump: { pin: 'D7', running: false, auto: false },
+        temp: { pin: 'A0', type: 'Thermistor', hit: false, current: 0, previous: 0, adjust: 0, target: $scope.kettleTypes[0].target, diff: $scope.kettleTypes[0].diff },
         values: [],
         timers: [],
         knob: angular.merge($scope.knobOptions, { value: 0, min: 0, max: $scope.kettleTypes[0].target + $scope.kettleTypes[0].diff })
@@ -817,7 +817,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
     kettle.temp.target = kettleType.target;
     kettle.temp.diff = kettleType.diff;
     kettle.knob = angular.merge($scope.knobOptions, { value: kettle.temp.current, min: 0, max: kettleType.target + kettleType.diff });
-    if (kettleType.type === 'fermenter') kettle.cooler = { pin: 2, running: false, auto: false };else delete kettle.cooler;
+    if (kettleType.type === 'fermenter') kettle.cooler = { pin: 'D2', running: false, auto: false, dutyCycle: 100 };else delete kettle.cooler;
   };
 
   $scope.changeUnits = function (unit) {
@@ -1162,7 +1162,7 @@ angular.module('brewbench-monitor').factory('BrewService', function ($http, $q, 
       delete settings.notifications;
       settings.shared = true;
 
-      $http({ url: 'http://localhost:8081/share/temp.php', method: 'POST', data: { 'settings': settings, 'kettles': kettles }, headers: { 'Content-Type': 'application/json' } }).then(function (response) {
+      $http({ url: 'http://monitor.brewbench.co/share/temp.php', method: 'POST', data: { 'settings': settings, 'kettles': kettles }, headers: { 'Content-Type': 'application/json' } }).then(function (response) {
         q.resolve(response.data);
       }, function (err) {
         q.reject(err);
