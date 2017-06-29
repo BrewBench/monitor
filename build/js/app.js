@@ -60,7 +60,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
     shared: false,
     arduinoUrl: '192.168.240.1',
     ports: { 'analog': 5, 'digital': 13 },
-    recipe: { 'name': '', 'brewer': { name: '', 'email': '' }, 'yeast': [], scale: 'gravity', method: 'papazian', 'og': 1.050, 'fg': 1.010, 'abv': 0, 'abw': 0, 'calories': 0, 'attenuation': 0 },
+    recipe: { 'name': '', 'brewer': { name: '', 'email': '' }, 'yeast': [], 'hops': [], 'malt': [], scale: 'gravity', method: 'papazian', 'og': 1.050, 'fg': 1.010, 'abv': 0, 'abw': 0, 'calories': 0, 'attenuation': 0 },
     notifications: { on: true, timers: true, high: true, low: true, target: true, slack: 'Slack notification webhook Url', last: '' },
     sounds: { on: true, alert: '/assets/audio/bike.mp3', timer: '/assets/audio/school.mp3' }
   };
@@ -217,7 +217,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
   };
 
   $scope.loadShareFile = function (file) {
-    BrewService.loadShareFile(file).then(function (contents) {
+    return BrewService.loadShareFile(file).then(function (contents) {
       if (contents) {
         if (contents.settings) {
           $scope.settings = contents.settings;
@@ -1162,7 +1162,7 @@ angular.module('brewbench-monitor').factory('BrewService', function ($http, $q, 
       delete settings.notifications;
       settings.shared = true;
 
-      $http({ url: 'http://localhost:8081/share/temp.php', method: 'POST', data: { 'settings': settings, 'kettles': kettles }, headers: { 'Content-Type': 'application/json' } }).then(function (response) {
+      $http({ url: 'http://monitor.brewbench.co/share/temp.php', method: 'POST', data: { 'settings': settings, 'kettles': kettles }, headers: { 'Content-Type': 'application/json' } }).then(function (response) {
         q.resolve(response.data);
       }, function (err) {
         q.reject(err);
