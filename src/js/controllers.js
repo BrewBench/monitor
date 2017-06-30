@@ -700,11 +700,19 @@ $scope.kettles = BrewService.settings('kettles') || [{
         });
       }
     } else if(!k.running){
-      BrewService.digital(k.pin,0).then(function(){
-        //stopped
-      },function(err){
-        $scope.connectError(err);
-      });
+      if(k.pwm){
+        BrewService.analog(k.pin,0).then(function(){
+          //started
+        },function(err){
+          $scope.connectError(err);
+        });
+      } else {
+        BrewService.digital(k.pin,0).then(function(){
+          //stopped
+        },function(err){
+          $scope.connectError(err);
+        });
+      }
     }
   };
 
