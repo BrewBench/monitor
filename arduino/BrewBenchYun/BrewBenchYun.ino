@@ -116,7 +116,7 @@ void digitalCommand(BridgeClient client) {
 }
 
 // https://www.arduino.cc/en/Reference/AnalogWrite
-void analogCommand(YunClient client) {
+void analogCommand(BridgeClient client) {
   int pin, value;
   pin = client.parseInt();
 
