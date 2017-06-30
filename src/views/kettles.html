@@ -128,7 +128,6 @@
               </ul>
             </div>
             <div class="btn-group relay">
-              <button ng-if="kettle.cooler.pin.indexOf('D') !== -1" type="button" class="btn" ng-class="{'btn-default':!kettle.cooler.pwm,'btn-success': kettle.cooler.pwm}" ng-click="kettle.cooler.pwm = !kettle.cooler.pwm">PWM ~</button>
               <button type="button" class="btn" ng-class="{'btn-default':!kettle.cooler.running&&!kettle.cooler.auto,'btn-success':kettle.cooler.running,'btn-warning':!kettle.cooler.running&&kettle.cooler.auto}" ng-click="toggleKettle('cool',kettle)">{{kettle.cooler.running ? 'On' : (kettle.cooler.auto ? 'Wait' :'Off')}}</button>
               <button type="button" class="btn" ng-class="{'btn-default':!kettle.cooler.auto,'btn-success':kettle.cooler.auto}" ng-click="kettle.cooler.auto=!kettle.cooler.auto">Auto</button>
             </div>
