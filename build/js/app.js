@@ -36,6 +36,44 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
   $scope.sensorTypes = BrewService.sensorTypes;
   $scope.showSettings = true;
   $scope.error_message = '';
+  $scope.slider = { options: {
+      floor: 0,
+      ceil: 100,
+      step: 5,
+      translate: function translate(value) {
+        return value + '%';
+      },
+      onEnd: function onEnd(kettleId, modelValue, highValue, pointerType) {
+        var kettle = kettleId.split('_');
+        var k;
+
+        switch (kettle[0]) {
+          case 'heat':
+            k = $scope.kettles[kettle[1]].heater;
+            break;
+          case 'cool':
+            k = $scope.kettles[kettle[1]].cooler;
+            break;
+          case 'pump':
+            k = $scope.kettles[kettle[1]].pump;
+            break;
+        }
+
+        if (!k) return;
+        if ($scope.kettles[kettle[1]].active && k.pwm && k.running) {
+          return BrewService.analog(k.pin, Math.round(255 * k.dutyCycle / 100)).then(function () {
+            //started
+          }, function (err) {
+            $scope.connectError(err);
+          });
+        }
+      }
+    }
+  };
+
+  $scope.getKettleSliderOptions = function (type, index) {
+    return Object.assign($scope.slider.options, { id: type + '_' + index });
+  };
 
   $scope.getLovibondColor = function (range) {
     range = range.replace(/°/g, '').replace(/ /g, '');
@@ -132,8 +170,8 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
     key: 'Boil',
     type: 'hop',
     active: false,
-    heater: { pin: 'D2', running: false, auto: false, dutyCycle: 100 },
-    pump: { pin: 'D3', running: false, auto: false, dutyCycle: 100 },
+    heater: { pin: 'D2', running: false, auto: false, pwm: false, dutyCycle: 100 },
+    pump: { pin: 'D3', running: false, auto: false, pwm: false, dutyCycle: 100 },
     temp: { pin: 'A0', type: 'Thermistor', hit: false, current: 0, previous: 0, adjust: 0, target: 200, diff: 5 },
     values: [],
     timers: [],
@@ -142,8 +180,8 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
     key: 'Hot Liquor',
     type: 'water',
     active: false,
-    heater: { pin: 'D4', running: false, auto: false, dutyCycle: 100 },
-    pump: { pin: 'D5', running: false, auto: false, dutyCycle: 100 },
+    heater: { pin: 'D4', running: false, auto: false, pwm: false, dutyCycle: 100 },
+    pump: { pin: 'D5', running: false, auto: false, pwm: false, dutyCycle: 100 },
     temp: { pin: 'A1', type: 'Thermistor', hit: false, current: 0, previous: 0, adjust: 0, target: 200, diff: 5 },
     values: [],
     timers: [],
@@ -152,8 +190,8 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
     key: 'Mash',
     type: 'grain',
     active: false,
-    heater: { pin: 'D6', running: false, auto: false, dutyCycle: 100 },
-    pump: { pin: 'D7', running: false, auto: false, dutyCycle: 100 },
+    heater: { pin: 'D6', running: false, auto: false, pwm: false, dutyCycle: 100 },
+    pump: { pin: 'D7', running: false, auto: false, pwm: false, dutyCycle: 100 },
     temp: { pin: 'A2', type: 'Thermistor', hit: false, current: 0, previous: 0, adjust: 0, target: 150, diff: 5 },
     values: [],
     timers: [],
@@ -596,13 +634,21 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
 
     k.running = !k.running;
 
-    //start the digital port
+    //start the port
     if (kettle.active && k.running) {
-      BrewService.digital(k.pin, 1).then(function () {
-        //started
-      }, function (err) {
-        $scope.connectError(err);
-      });
+      if (k.pwm) {
+        BrewService.analog(k.pin, Math.round(255 * k.dutyCycle / 100)).then(function () {
+          //started
+        }, function (err) {
+          $scope.connectError(err);
+        });
+      } else {
+        BrewService.digital(k.pin, 1).then(function () {
+          //started
+        }, function (err) {
+          $scope.connectError(err);
+        });
+      }
     } else if (!k.running) {
       BrewService.digital(k.pin, 0).then(function () {
         //stopped
@@ -817,7 +863,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
     kettle.temp.target = kettleType.target;
     kettle.temp.diff = kettleType.diff;
     kettle.knob = angular.merge($scope.knobOptions, { value: kettle.temp.current, min: 0, max: kettleType.target + kettleType.diff });
-    if (kettleType.type === 'fermenter') kettle.cooler = { pin: 'D2', running: false, auto: false, dutyCycle: 100 };else delete kettle.cooler;
+    if (kettleType.type === 'fermenter') kettle.cooler = { pin: 'D2', running: false, auto: false, pwm: false, dutyCycle: 100 };else delete kettle.cooler;
   };
 
   $scope.changeUnits = function (unit) {
@@ -1116,6 +1162,19 @@ angular.module('brewbench-monitor').factory('BrewService', function ($http, $q, 
     digital: function digital(sensor, value) {
       var q = $q.defer();
       var url = this.domain() + '/arduino/digital/' + sensor + '/' + value;
+      var settings = this.settings('settings');
+
+      $http({ url: url, method: 'GET', timeout: settings.pollSeconds * 1000 }).then(function (response) {
+        if (response.headers('X-Sketch-Version') == null || response.headers('X-Sketch-Version') != settings.sketch_version) q.reject('Sketch Version is out of date.  Please Update. Sketch: ' + response.headers('X-Sketch-Version') + ' BrewBench: ' + settings.sketch_version);else q.resolve(response.data);
+      }, function (err) {
+        q.reject(err);
+      });
+      return q.promise;
+    },
+
+    analog: function analog(sensor, value) {
+      var q = $q.defer();
+      var url = this.domain() + '/arduino/analog/' + sensor + '/' + value;
       var settings = this.settings('settings');
 
       $http({ url: url, method: 'GET', timeout: settings.pollSeconds * 1000 }).then(function (response) {

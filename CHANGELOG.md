@@ -1,5 +1,14 @@
 # Change Log
 
+## 2.6.8 - 2017-06-29
+
+### Changed
+- Heater/Pump/Cooler to be either Analog or Digital for SSR relays support
+
+### Added
+- [Duty Cycle](https://www.arduino.cc/en/Tutorial/SecretsOfArduinoPWM) % adjustment to UI for when relay is digital
+- Sketch to accept analogWrite command to support Duty Cycle for PWM pins and SSR relays
+
 ## 2.6.6 - 2017-06-20
 
 ### Added

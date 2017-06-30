@@ -14,6 +14,45 @@ $scope.chartOptions = BrewService.chartOptions();
 $scope.sensorTypes = BrewService.sensorTypes;
 $scope.showSettings = true;
 $scope.error_message = '';
+$scope.slider = {options: {
+    floor: 0,
+    ceil: 100,
+    step: 5,
+    translate: function(value) {
+        return `${value}%`;
+    },
+    onEnd: function(kettleId, modelValue, highValue, pointerType){
+      var kettle = kettleId.split('_');
+      var k;
+
+      switch (kettle[0]) {
+        case 'heat':
+          k = $scope.kettles[kettle[1]].heater;
+          break;
+        case 'cool':
+          k = $scope.kettles[kettle[1]].cooler;
+          break;
+        case 'pump':
+          k = $scope.kettles[kettle[1]].pump;
+          break;
+      }
+
+      if(!k)
+        return;
+      if($scope.kettles[kettle[1]].active && k.pwm && k.running){
+        return BrewService.analog(k.pin,Math.round(255*k.dutyCycle/100)).then(function(){
+          //started
+        },function(err){
+          $scope.connectError(err);
+        });
+      }
+    }
+  }
+};
+
+$scope.getKettleSliderOptions = function(type, index){
+  return Object.assign($scope.slider.options, {id: `${type}_${index}`});
+}
 
 $scope.getLovibondColor = function(range){
   range = range.replace(/°/g,'').replace(/ /g,'');
@@ -124,8 +163,8 @@ $scope.kettles = BrewService.settings('kettles') || [{
     key: 'Boil'
     ,type: 'hop'
     ,active: false
-    ,heater: {pin:'D2',running:false,auto:false,dutyCycle:100}
-    ,pump: {pin:'D3',running:false,auto:false,dutyCycle:100}
+    ,heater: {pin:'D2',running:false,auto:false,pwm:false,dutyCycle:100}
+    ,pump: {pin:'D3',running:false,auto:false,pwm:false,dutyCycle:100}
     ,temp: {pin:'A0',type:'Thermistor',hit:false,current:0,previous:0,adjust:0,target:200,diff:5}
     ,values: []
     ,timers: []
@@ -134,8 +173,8 @@ $scope.kettles = BrewService.settings('kettles') || [{
     key: 'Hot Liquor'
     ,type: 'water'
     ,active: false
-    ,heater: {pin:'D4',running:false,auto:false,dutyCycle:100}
-    ,pump: {pin:'D5',running:false,auto:false,dutyCycle:100}
+    ,heater: {pin:'D4',running:false,auto:false,pwm:false,dutyCycle:100}
+    ,pump: {pin:'D5',running:false,auto:false,pwm:false,dutyCycle:100}
     ,temp: {pin:'A1',type:'Thermistor',hit:false,current:0,previous:0,adjust:0,target:200,diff:5}
     ,values: []
     ,timers: []
@@ -144,8 +183,8 @@ $scope.kettles = BrewService.settings('kettles') || [{
     key: 'Mash'
     ,type: 'grain'
     ,active: false
-    ,heater: {pin:'D6',running:false,auto:false,dutyCycle:100}
-    ,pump: {pin:'D7',running:false,auto:false,dutyCycle:100}
+    ,heater: {pin:'D6',running:false,auto:false,pwm:false,dutyCycle:100}
+    ,pump: {pin:'D7',running:false,auto:false,pwm:false,dutyCycle:100}
     ,temp: {pin:'A2',type:'Thermistor',hit:false,current:0,previous:0,adjust:0,target:150,diff:5}
     ,values: []
     ,timers: []
@@ -624,7 +663,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
     }
   };
 
-  $scope.toggleKettle = function(item,kettle){
+  $scope.toggleKettle = function(item, kettle){
 
     var k;
 
@@ -645,13 +684,21 @@ $scope.kettles = BrewService.settings('kettles') || [{
 
     k.running = !k.running;
 
-    //start the digital port
+    //start the port
     if(kettle.active && k.running){
-      BrewService.digital(k.pin,1).then(function(){
-        //started
-      },function(err){
-        $scope.connectError(err);
-      });
+      if(k.pwm){
+        BrewService.analog(k.pin,Math.round(255*k.dutyCycle/100)).then(function(){
+          //started
+        },function(err){
+          $scope.connectError(err);
+        });
+      } else {
+        BrewService.digital(k.pin,1).then(function(){
+          //started
+        },function(err){
+          $scope.connectError(err);
+        });
+      }
     } else if(!k.running){
       BrewService.digital(k.pin,0).then(function(){
         //stopped
@@ -888,7 +935,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
     kettle.temp.diff = kettleType.diff;
     kettle.knob = angular.merge($scope.knobOptions,{value:kettle.temp.current,min:0,max:kettleType.target+kettleType.diff});
     if(kettleType.type === 'fermenter')
-      kettle.cooler = {pin:'D2',running:false,auto:false,dutyCycle:100};
+      kettle.cooler = {pin:'D2',running:false,auto:false,pwm:false,dutyCycle:100};
     else
       delete kettle.cooler;
   };

@@ -131,6 +131,23 @@ angular.module('brewbench-monitor')
       return q.promise;
     },
 
+    analog: function(sensor,value){
+      var q = $q.defer();
+      var url = this.domain()+'/arduino/analog/'+sensor+'/'+value;
+      var settings = this.settings('settings');
+
+      $http({url: url, method: 'GET', timeout: settings.pollSeconds*1000})
+        .then(function(response){
+          if(response.headers('X-Sketch-Version') == null || response.headers('X-Sketch-Version') != settings.sketch_version)
+            q.reject('Sketch Version is out of date.  Please Update. Sketch: '+response.headers('X-Sketch-Version')+' BrewBench: '+settings.sketch_version);
+          else
+            q.resolve(response.data);
+        }, function(err){
+          q.reject(err);
+        });
+      return q.promise;
+    },
+
     digitalRead: function(sensor, timeout){
       var q = $q.defer();
       var url = this.domain()+'/arduino/digital/'+sensor;

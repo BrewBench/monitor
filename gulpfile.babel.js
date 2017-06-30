@@ -102,7 +102,7 @@ gulp.task('serve', () => {
     watchEvents: ['add', 'change']
   });
 
-  gulp.watch(`${paths.styles.src}`,['styles']).on('change', browserSync.reload);
+  gulp.watch(`${paths.styles.src[0]}`,['styles']).on('change', browserSync.reload);
   gulp.watch(`${paths.scripts.src}`,['scripts','vendor']).on('change', browserSync.reload);
   gulp.watch(`${paths.assets.src}`,['assets']).on('change', browserSync.reload);
   gulp.watch(`${paths.views.src}`,['views']).on('change', browserSync.reload);

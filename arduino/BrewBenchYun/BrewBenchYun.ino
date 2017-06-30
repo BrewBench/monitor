@@ -8,7 +8,7 @@
 // http://static.cactus.io/downloads/library/ds18b20/cactus_io_DS18B20.zip
 #include "cactus_io_DS18B20.h"
 
-const char VERSION[] = "2.6.1";
+const char VERSION[] = "2.6.8";
 
 BridgeServer server;
 
@@ -65,6 +65,10 @@ void process(BridgeClient client) {
     responseOkHeader(client);
     digitalCommand(client);
   }
+  if (command == "analog") {
+    responseOkHeader(client);
+    analogCommand(client);
+  }
   if (command == "DS18B20") {
     responseOkHeader(client);
     ds18B20Command(client);
@@ -105,6 +109,23 @@ void digitalCommand(BridgeClient client) {
   }
   else {
     value = digitalRead(pin);
+  }
+
+  // Send JSON response to client
+  client.print("{\"pin\":\""+String(pin)+"\",\"value\":\""+String(value)+"\"}");
+}
+
+// https://www.arduino.cc/en/Reference/AnalogWrite
+void analogCommand(YunClient client) {
+  int pin, value;
+  pin = client.parseInt();
+
+  if (client.read() == '/') {
+    value = client.parseInt();
+    analogWrite(pin, value);//0 - 255
+  }
+  else {
+    value = analogRead(pin);
   }
 
   // Send JSON response to client
