@@ -492,64 +492,126 @@ $scope.kettles = BrewService.settings('kettles') || [{
       $scope.alert(kettle);
       //stop the heating element
       if(kettle.heater.auto && kettle.heater.running){
-        temps.push(BrewService.digital(kettle.heater.pin,0).then(function(){
-            kettle.heater.running = false;
-          },function(err){
-            $scope.connectError(err);
-          })
-        );
+        if(kettle.heater.pwm || kettle.heater.ssr){
+          temps.push(BrewService.analog(kettle.heater.pin,0).then(function(){
+              kettle.heater.running = false;
+            },function(err){
+              $scope.connectError(err);
+            });
+          );
+        } else {
+          temps.push(BrewService.digital(kettle.heater.pin,0).then(function(){
+              kettle.heater.running = false;
+            },function(err){
+              $scope.connectError(err);
+            })
+          );
+        }
       }
       //stop the pump
       if(kettle.pump.auto && kettle.pump.running){
-        temps.push(BrewService.digital(kettle.pump.pin,0).then(function(){
-            kettle.pump.running = false;
-          },function(err){
-            $scope.connectError(err);
-          })
-        );
+        if(kettle.pump.pwm || kettle.pump.ssr){
+          temps.push(BrewService.analog(kettle.pump.pin,0).then(function(){
+              kettle.pump.running = false;
+            },function(err){
+              $scope.connectError(err);
+            });
+          );
+        } else {
+          temps.push(BrewService.digital(kettle.pump.pin,0).then(function(){
+              kettle.pump.running = false;
+            },function(err){
+              $scope.connectError(err);
+            })
+          );
+        }
       }
       //start the chiller
       if(kettle.cooler && kettle.cooler.auto && !kettle.cooler.running){
-        temps.push(BrewService.digital(kettle.cooler.pin,1).then(function(){
-            kettle.cooler.running = true;
-            kettle.knob.subText.text = 'cooling';
-            kettle.knob.subText.color = 'rgba(52,152,219,1)';
-          },function(err){
-            $scope.connectError(err);
-          })
-        );
+        if(kettle.cooler.pwm || kettle.cooler.ssr){
+          var dutyCycle = kettle.cooler.pwm ? Math.round(255*kettle.cooler.dutyCycle/100) : 255;
+          temps.push(BrewService.analog(kettle.cooler.pin,dutyCycle).then(function(){
+              kettle.cooler.running = true;
+              kettle.knob.subText.text = 'cooling';
+              kettle.knob.subText.color = 'rgba(52,152,219,1)';
+            },function(err){
+              $scope.connectError(err);
+            });
+          );
+        } else {
+          temps.push(BrewService.digital(kettle.cooler.pin,1).then(function(){
+              kettle.cooler.running = true;
+              kettle.knob.subText.text = 'cooling';
+              kettle.knob.subText.color = 'rgba(52,152,219,1)';
+            },function(err){
+              $scope.connectError(err);
+            })
+          );
+        }
+
       }
     } //is temp too low?
     else if(kettle.temp.current <= kettle.temp.target-kettle.temp.diff){
       $scope.alert(kettle);
       //start the heating element
       if(kettle.heater.auto && !kettle.heater.running){
-        temps.push(BrewService.digital(kettle.heater.pin,1).then(function(){
-            kettle.heater.running = true;
-            kettle.knob.subText.text = 'heating';
-            kettle.knob.subText.color = 'rgba(200,47,47,1)';
-          },function(err){
-            $scope.connectError(err);
-          })
-        );
+        if(kettle.heater.pwm || kettle.heater.ssr){
+          var dutyCycle = kettle.heater.pwm ? Math.round(255*kettle.heater.dutyCycle/100) : 255;
+          temps.push(BrewService.analog(kettle.heater.pin,dutyCycle).then(function(){
+              kettle.heater.running = true;
+              kettle.knob.subText.text = 'heating';
+              kettle.knob.subText.color = 'rgba(200,47,47,1)';
+            },function(err){
+              $scope.connectError(err);
+            });
+          );
+        } else {
+          temps.push(BrewService.digital(kettle.heater.pin,1).then(function(){
+              kettle.heater.running = true;
+              kettle.knob.subText.text = 'heating';
+              kettle.knob.subText.color = 'rgba(200,47,47,1)';
+            },function(err){
+              $scope.connectError(err);
+            })
+          );
+        }
       }
       //start the pump
       if(kettle.pump.auto && !kettle.pump.running){
-        temps.push(BrewService.digital(kettle.pump.pin,1).then(function(){
-            kettle.pump.running = true;
-          },function(err){
-            $scope.connectError(err);
-          })
-        )
+        if(kettle.heater.pwm || kettle.heater.ssr){
+          var dutyCycle = kettle.pump.pwm ? Math.round(255*kettle.pump.dutyCycle/100) : 255;
+          temps.push(BrewService.analog(kettle.pump.pin,dutyCycle).then(function(){
+              kettle.pump.running = true;
+            },function(err){
+              $scope.connectError(err);
+            });
+          );
+        } else {
+          temps.push(BrewService.digital(kettle.pump.pin,1).then(function(){
+              kettle.pump.running = true;
+            },function(err){
+              $scope.connectError(err);
+            })
+          );
+        }
       }
       //stop the chiller
       if(kettle.cooler && kettle.cooler.auto && kettle.cooler.running){
-        temps.push(BrewService.digital(kettle.cooler.pin,0).then(function(){
-            kettle.cooler.running = false;
-          },function(err){
-            $scope.connectError(err);
-          })
-        );
+        if(kettle.cooler.pwm || kettle.cooler.ssr){
+          temps.push(BrewService.analog(kettle.cooler.pin,0).then(function(){
+              kettle.cooler.running = false;
+            },function(err){
+              $scope.connectError(err);
+            });
+          );
+        } else {
+          temps.push(BrewService.digital(kettle.cooler.pin,0).then(function(){
+              kettle.cooler.running = false;
+            },function(err){
+              $scope.connectError(err);
+            })
+          );
+        }
       }
     } else {
       // within target!
@@ -557,30 +619,57 @@ $scope.kettles = BrewService.settings('kettles') || [{
       $scope.alert(kettle);
       //stop the chiller
       if(kettle.cooler && kettle.cooler.auto && kettle.cooler.running){
-        temps.push(BrewService.digital(kettle.cooler.pin,0).then(function(){
-            kettle.cooler.running = false;
-          },function(err){
-            $scope.connectError(err);
-          })
-        );
+        if(kettle.cooler.pwm || kettle.cooler.ssr){
+          temps.push(BrewService.analog(kettle.cooler.pin,0).then(function(){
+              kettle.cooler.running = false;
+            },function(err){
+              $scope.connectError(err);
+            });
+          );
+        } else {
+          temps.push(BrewService.digital(kettle.cooler.pin,0).then(function(){
+              kettle.cooler.running = false;
+            },function(err){
+              $scope.connectError(err);
+            })
+          );
+        }
       }
       //stop the heater
       if(kettle.heater.auto && kettle.heater.running){
-        temps.push(BrewService.digital(kettle.heater.pin,0).then(function(){
-            kettle.heater.running = false;
-          },function(err){
-            $scope.connectError(err);
-          })
-        );
+        if(kettle.heater.pwm || kettle.heater.ssr){
+          temps.push(BrewService.analog(kettle.heater.pin,0).then(function(){
+              kettle.heater.running = false;
+            },function(err){
+              $scope.connectError(err);
+            });
+          );
+        } else {
+          temps.push(BrewService.digital(kettle.heater.pin,0).then(function(){
+              kettle.heater.running = false;
+            },function(err){
+              $scope.connectError(err);
+            })
+          );
+        }
       }
       //stop the pump
       if(kettle.pump.auto && kettle.pump.running){
-        temps.push(BrewService.digital(kettle.pump.pin,0).then(function(){
-            kettle.pump.running = false;
-          },function(err){
-            $scope.connectError(err);
-          })
-        );
+        if(kettle.pump.pwm || kettle.pump.ssr){
+          temps.push(BrewService.analog(kettle.pump.pin,0).then(function(){
+              kettle.pump.running = false;
+            },function(err){
+              $scope.connectError(err);
+            });
+          );
+        } else {
+          temps.push(BrewService.digital(kettle.pump.pin,0).then(function(){
+              kettle.pump.running = false;
+            },function(err){
+              $scope.connectError(err);
+            })
+          );
+        }
       }
     }
     return $q.all(temps);
