@@ -8,7 +8,7 @@
 // http://static.cactus.io/downloads/library/ds18b20/cactus_io_DS18B20.zip
 #include "cactus_io_DS18B20.h"
 
-const char VERSION[] = "2.6.8";
+const char VERSION[] = "2.6.9";
 
 YunServer server;
 
@@ -121,6 +121,7 @@ void analogCommand(YunClient client) {
   pin = client.parseInt();
 
   if (client.read() == '/') {
+    pinMode(pin, OUTPUT);
     value = client.parseInt();
     analogWrite(pin, value);//0 - 255
   }
