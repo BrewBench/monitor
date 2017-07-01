@@ -207,8 +207,6 @@ sup.ref{
 
 .kettles .kettle-col .rzslider {
   max-width: 150px !important;
-  display: block !important;
-  margin-top: 80px !important;
 }
 
 .kettles .kettle-col .relay .btn-default{
@@ -449,7 +447,11 @@ input[type=radio].degree:checked + label:before {
     width: 35px 5px;
 }
 
-.notifications .on:after {
+li.ssr {
+  border-bottom: 1px solid #ccc;
+}
+
+.notifications .on:after, li.ssr .on:after {
   font-family: FontAwesome;
   display:inline-block;
   content: "\f00c";

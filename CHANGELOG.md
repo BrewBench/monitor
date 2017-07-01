@@ -1,5 +1,10 @@
 # Change Log
 
+## 2.6.9 - 2017-07-01
+
+### Added
+- SSR option in pin dropdown as these should not use the digital port.
+
 ## 2.6.8 - 2017-06-29
 
 ### Changed

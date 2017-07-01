@@ -614,6 +614,11 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
     }
   };
 
+  $scope.togglePWM = function (kettle) {
+    kettle.pwm = !kettle.pwm;
+    if (kettle.pwm) kettle.ssr = true;
+  };
+
   $scope.toggleKettle = function (item, kettle) {
 
     var k;
@@ -642,6 +647,12 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
         }, function (err) {
           $scope.connectError(err);
         });
+      } else if (k.ssr) {
+        BrewService.analog(k.pin, 255).then(function () {
+          //started
+        }, function (err) {
+          $scope.connectError(err);
+        });
       } else {
         BrewService.digital(k.pin, 1).then(function () {
           //started
@@ -651,6 +662,12 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
       }
     } else if (!k.running) {
       if (k.pwm) {
+        BrewService.analog(k.pin, 0).then(function () {
+          //started
+        }, function (err) {
+          $scope.connectError(err);
+        });
+      } else if (k.ssr) {
         BrewService.analog(k.pin, 0).then(function () {
           //started
         }, function (err) {
