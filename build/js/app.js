@@ -398,47 +398,6 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
     _.each($scope.kettles, function (kettle) {
       //update max
       kettle.knob.max = kettle.temp['target'] + kettle.temp['diff'];
-      //check if heater is running
-      running.push(BrewService.digitalRead(kettle.heater.pin, 2000).then(function (response) {
-        if (response.value === "1") {
-          kettle.active = true;
-          kettle.heater.running = true;
-        } else {
-          kettle.heater.running = false;
-        }
-        return kettle;
-      }, function (err) {
-        return err;
-      }));
-
-      //check if pump is running
-      running.push(BrewService.digitalRead(kettle.pump.pin, 2000).then(function (response) {
-        if (response.value === "1") {
-          kettle.active = true;
-          kettle.pump.running = true;
-        } else {
-          kettle.pump.running = false;
-        }
-        return kettle;
-      }, function (err) {
-        return err;
-      }));
-
-      //check if cooler is running
-      if (kettle.cooler) {
-        running.push(BrewService.digitalRead(kettle.cooler.pin, 2000).then(function (response) {
-          if (response.value === "1") {
-            kettle.active = true;
-            kettle.cooler.running = true;
-          } else {
-            kettle.cooler.running = false;
-          }
-          return kettle;
-        }, function (err) {
-          return err;
-        }));
-      }
-
       // check timers for running
       if (!!kettle.timers && kettle.timers.length) {
         _.each(kettle.timers, function (timer) {
