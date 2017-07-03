@@ -1,7 +1,7 @@
 .DS_Store
 node_modules
 NOTES.md
-
+build
 # share code
 src/share
 .htaccess

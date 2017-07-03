@@ -59,16 +59,25 @@ BrewBench Monitor can also be used with fermenters.  I have an [SS Brewtech Chro
 
 ## Open BrewBench
 
-Go to [brewbench.co](http://brewbench.co) or clone this repo and start the webserver and go to [http://127.0.0.1:8080](http://127.0.0.1:8080).
+Go to [brewbench.co](http://brewbench.co) or clone this repo and run gulp [http://127.0.0.1:8080](http://127.0.0.1:8080).
 
 ## Development
-
-For development just run `npm install`, and look at [index.html](index.html) for un-commenting the un-minified files.
 
 ```sh
 yarn
 gulp
 ```
+
+## Deployment
+
+Code is compiled to a `build` directory, build the code and copy that to your web server.
+
+```sh
+npm install -g yarn
+yarn
+yarn run build
+```
+
 <img src="src/assets/img/screenshot-fermenter.png?raw=true" alt="BrewBench fermenter" align="center" width="400" />
 
 <img src="src/assets/img/screenshot-desktop.png?raw=true" alt="BrewBench screenshot" align="center" />

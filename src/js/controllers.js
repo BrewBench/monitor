@@ -497,7 +497,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
               kettle.heater.running = false;
             },function(err){
               $scope.connectError(err);
-            });
+            })
           );
         } else {
           temps.push(BrewService.digital(kettle.heater.pin,0).then(function(){
@@ -515,7 +515,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
               kettle.pump.running = false;
             },function(err){
               $scope.connectError(err);
-            });
+            })
           );
         } else {
           temps.push(BrewService.digital(kettle.pump.pin,0).then(function(){
@@ -536,7 +536,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
               kettle.knob.subText.color = 'rgba(52,152,219,1)';
             },function(err){
               $scope.connectError(err);
-            });
+            })
           );
         } else {
           temps.push(BrewService.digital(kettle.cooler.pin,1).then(function(){
@@ -563,7 +563,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
               kettle.knob.subText.color = 'rgba(200,47,47,1)';
             },function(err){
               $scope.connectError(err);
-            });
+            })
           );
         } else {
           temps.push(BrewService.digital(kettle.heater.pin,1).then(function(){
@@ -584,7 +584,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
               kettle.pump.running = true;
             },function(err){
               $scope.connectError(err);
-            });
+            })
           );
         } else {
           temps.push(BrewService.digital(kettle.pump.pin,1).then(function(){
@@ -602,7 +602,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
               kettle.cooler.running = false;
             },function(err){
               $scope.connectError(err);
-            });
+            })
           );
         } else {
           temps.push(BrewService.digital(kettle.cooler.pin,0).then(function(){
@@ -624,7 +624,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
               kettle.cooler.running = false;
             },function(err){
               $scope.connectError(err);
-            });
+            })
           );
         } else {
           temps.push(BrewService.digital(kettle.cooler.pin,0).then(function(){
@@ -642,7 +642,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
               kettle.heater.running = false;
             },function(err){
               $scope.connectError(err);
-            });
+            })
           );
         } else {
           temps.push(BrewService.digital(kettle.heater.pin,0).then(function(){
@@ -660,7 +660,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
               kettle.pump.running = false;
             },function(err){
               $scope.connectError(err);
-            });
+            })
           );
         } else {
           temps.push(BrewService.digital(kettle.pump.pin,0).then(function(){
