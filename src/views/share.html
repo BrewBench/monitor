@@ -18,8 +18,8 @@
           </div>
           <div class="form-group">
             <select class="form-control" ng-model="share.access">
-              <option value="readonly" selected="selected">Read Only</option>
-              <option value="readonly" selected="selected">Full Access</option>
+              <option value="readOnly" selected="selected">Read Only</option>
+              <option value="fullAccess" selected="selected">Full Access</option>
             </select>
           </div>
           <div class="form-group">
@@ -29,11 +29,15 @@
 
         <div class="alert alert-danger alert-dismissible" role="alert" ng-if="share_success===false">
           <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-          <strong>Failed!</strong> Woops, keg is empty.  Try again.
+          <strong>Failed!</strong> {{share_status}}
         </div>
 
-        <div class="alert alert-success alert-dismissible" role="alert" ng-if="share_success===true">
-          <strong>Success!</strong> Share created: <a ng-href="{{share_link}}" target="_blank">{{share_link}}</a>.
+        <div class="alert alert-info alert-dismissible" role="alert" ng-if="share_status">
+          {{share_status}}
+        </div>
+
+        <div class="alert alert-success alert-dismissible" role="alert" ng-if="share_link">
+          <strong>Success!</strong> Share created: <a ng-href="{{share_link}}" target="_blank">{{share_link}}</a>
         </div>
 
       </div>

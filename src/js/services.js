@@ -170,7 +170,7 @@ angular.module('brewbench-monitor')
       var query = '';
       if(password)
         query = '?password='+md5(password);
-      $http({url: 'http://monitor.brewbench.co/share/get/'+file+query, method: 'GET'})
+      $http({url: 'https://monitor.brewbench.co/share/get/'+file+query, method: 'GET'})
         .then(function(response){
           q.resolve(response.data);
         }, function(err){
@@ -179,20 +179,21 @@ angular.module('brewbench-monitor')
       return q.promise;
     },
 
-    createShare: function(){
+    createShare: function(share){
       var q = $q.defer();
       var settings = this.settings('settings');
       var kettles = this.settings('kettles');
-
-      //remove some things we don't want to share
+      var sh = Object.assign({}, {password: share.password, access: share.access});
+      //remove some things we don't need to share
       _.each(kettles, (kettle, i) => {
         delete kettles[i].knob;
         delete kettles[i].values;
       });
       delete settings.notifications;
       settings.shared = true;
-
-      $http({url: 'http://monitor.brewbench.co/share/temp.php', method:'POST', data: {'settings': settings, 'kettles': kettles}, headers: { 'Content-Type': 'application/json' }})
+      if(sh.password)
+        sh.password = md5(sh.password);
+      $http({url: 'https://monitor.brewbench.co/share/create/', method:'POST', data: {'share': sh, 'settings': settings, 'kettles': kettles}, headers: { 'Content-Type': 'application/json' }})
         .then(function(response){
           q.resolve(response.data);
         }, function(err){

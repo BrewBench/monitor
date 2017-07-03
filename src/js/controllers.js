@@ -13,7 +13,7 @@ $scope.kettleTypes = BrewService.kettleTypes();
 $scope.chartOptions = BrewService.chartOptions();
 $scope.sensorTypes = BrewService.sensorTypes;
 $scope.showSettings = true;
-$scope.share = {file: $state.params.file || null, password: null, needPassword: false, access: 'readonly'};
+$scope.share = {file: $state.params.file || null, password: null, needPassword: false, access: 'readOnly'};
 $scope.error_message = '';
 $scope.slider = {options: {
     floor: 0,
@@ -249,9 +249,11 @@ $scope.kettles = BrewService.settings('kettles') || [{
   $scope.createShare = function(){
     if(!$scope.settings.recipe.brewer.name || !$scope.settings.recipe.brewer.email)
       return;
-    BrewService.createShare()
+    $scope.share_status = 'Creating share link...';
+    return BrewService.createShare($scope.share)
       .then(function(response) {
         if(response.share && response.share.url){
+          $scope.share_status = '';
           $scope.share_success = true;
           $scope.share_link = response.share.url;
         } else {
@@ -259,6 +261,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
         }
       })
       .catch(err => {
+        $scope.share_status = err;
         $scope.share_success = false;
       });
   };
@@ -276,6 +279,9 @@ $scope.kettles = BrewService.settings('kettles') || [{
             }
           } else {
             $scope.share.needPassword = false;
+            if(contents.share.access){
+              $scope.share.access = contents.share.access;
+            }
             if(contents.settings){
               $scope.settings = contents.settings;
               $scope.settings.notifications = {on:false,timers:true,high:true,low:true,target:true,slack:'Slack notification webhook Url',last:''};
