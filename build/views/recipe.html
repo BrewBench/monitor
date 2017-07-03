@@ -1,0 +1,35 @@
+<div class="recipe col-md-12 col-xs-12" ng-if="settings.recipe.name">
+  <div class="panel panel-default">
+    <div class="panel-body">
+      <div class="row">
+        <div class="recipe col-md-3 col-xs-12">
+          <h2><editable model="settings.recipe.name"></editable>
+            <h4>{{settings.recipe.category}}</h4>
+            <h5 ng-if="settings.recipe.abv">{{settings.recipe.abv}}% abv</h5>
+            <div ng-if="settings.recipe.date">
+              {{settings.recipe.date | moment:'ddd MMM Do'}} {{settings.recipe.date | moment}}
+            </div>
+          </h2>
+        </div>
+        <div class="recipe col-md-3 col-xs-12" ng-if="settings.recipe.hops">
+          <img src="/assets/img/hop.svg" width="32" class="pull-left"><strong>{{ sumValues(settings.recipe.hops) }} oz</strong>
+          <ul>
+            <li ng-repeat="(k,v) in settings.recipe.hops">{{k}} <i>{{v}}</i> oz</li>
+          </ul>
+        </div>
+        <div class="recipe col-md-3 col-xs-12" ng-if="settings.recipe.grains">
+          <img src="/assets/img/grain.svg" width="32" class="pull-left"><strong>{{ sumValues(settings.recipe.grains) }} lbs</strong>
+          <ul>
+            <li ng-repeat="(k,v) in settings.recipe.grains">{{k}} <i>{{v}}</i> lbs</li>
+          </ul>
+        </div>
+        <div class="recipe col-md-3 col-xs-12" ng-if="settings.recipe.yeast && settings.recipe.yeast.length">
+          <i class="fa fa-flask fa-2x pull-left"></i>
+          <ul>
+            <li ng-repeat="yeast in settings.recipe.yeast">{{yeast.name}}</li>
+          </ul>
+        </div>
+    </div>
+  </div>
+</div>
+</div>

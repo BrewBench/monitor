@@ -1,0 +1,33 @@
+<div class="modal fade" id="shareModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+        <h1 class="modal-title"><i class="fa fa-share fa-lg" aria-hidden="true"></i> Share <sup class="ref">your session</sup></h1>
+      </div>
+      <div class="modal-body text-center">
+        <form class="form-horizontal">
+          <div class="form-group">
+            <input type="text" class="form-control" ng-model="settings.recipe.brewer.name" placeholder="Name" required="required"/>
+          </div>
+          <div class="form-group">
+            <input type="email" class="form-control" ng-model="settings.recipe.brewer.email" placeholder="Email" required="required"/>
+          </div>
+          <div class="form-group">
+            <button class="btn btn-primary" ng-click="createShare()">Create Share Link</button>
+          </div>
+        </form>
+
+        <div class="alert alert-danger alert-dismissible" role="alert" ng-if="share_success===false">
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <strong>Failed!</strong> Woops, keg is empty.  Try again.
+        </div>
+
+        <div class="alert alert-success alert-dismissible" role="alert" ng-if="share_success===true">
+          <strong>Success!</strong> Share created: <a ng-href="{{share_link}}" target="_blank">{{share_link}}</a>.
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
