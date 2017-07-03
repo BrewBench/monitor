@@ -85,7 +85,7 @@ angular.module('brewbench-monitor')
       $http({url: webhook_url, method:'POST', data: 'payload='+JSON.stringify(postObj), headers: { 'Content-Type': 'application/x-www-form-urlencoded' }})
         .then(function(response){
           q.resolve(response.data);
-        },function(err){
+        }).catch(function(err){
           q.reject(err);
         });
       return q.promise;
@@ -102,7 +102,7 @@ angular.module('brewbench-monitor')
 
       $http({url: url, method: 'GET', timeout:  settings.pollSeconds*1000})
         .then(function(response){
-          if(response.headers('X-Sketch-Version') == null || response.headers('X-Sketch-Version') != settings.sketch_version)
+          if(!settings.shared && response.headers('X-Sketch-Version') == null || response.headers('X-Sketch-Version') < settings.sketch_version)
             q.reject('Sketch Version is out of date.  Please Update. Sketch: '+response.headers('X-Sketch-Version')+' BrewBench: '+settings.sketch_version);
           else
             q.resolve(response.data);
@@ -121,7 +121,7 @@ angular.module('brewbench-monitor')
 
       $http({url: url, method: 'GET', timeout: settings.pollSeconds*1000})
         .then(function(response){
-          if(response.headers('X-Sketch-Version') == null || response.headers('X-Sketch-Version') != settings.sketch_version)
+          if(!settings.shared && response.headers('X-Sketch-Version') == null || response.headers('X-Sketch-Version') < settings.sketch_version)
             q.reject('Sketch Version is out of date.  Please Update. Sketch: '+response.headers('X-Sketch-Version')+' BrewBench: '+settings.sketch_version);
           else
             q.resolve(response.data);
@@ -138,7 +138,7 @@ angular.module('brewbench-monitor')
 
       $http({url: url, method: 'GET', timeout: settings.pollSeconds*1000})
         .then(function(response){
-          if(response.headers('X-Sketch-Version') == null || response.headers('X-Sketch-Version') != settings.sketch_version)
+          if(!settings.shared && response.headers('X-Sketch-Version') == null || response.headers('X-Sketch-Version') < settings.sketch_version)
             q.reject('Sketch Version is out of date.  Please Update. Sketch: '+response.headers('X-Sketch-Version')+' BrewBench: '+settings.sketch_version);
           else
             q.resolve(response.data);
@@ -155,7 +155,7 @@ angular.module('brewbench-monitor')
 
       $http({url: url, method: 'GET', timeout: (timeout || settings.pollSeconds*1000)})
         .then(function(response){
-          if(response.headers('X-Sketch-Version') == null || response.headers('X-Sketch-Version') != settings.sketch_version)
+          if(!settings.shared && response.headers('X-Sketch-Version') == null || response.headers('X-Sketch-Version') < settings.sketch_version)
             q.reject('Sketch Version is out of date.  Please Update. Sketch: '+response.headers('X-Sketch-Version')+' BrewBench: '+settings.sketch_version);
           else
             q.resolve(response.data);
@@ -202,7 +202,7 @@ angular.module('brewbench-monitor')
         var q = $q.defer();
         $http.get('/package.json').then(function(response){
           q.resolve(response.data);
-        },function(err){
+        }).catch(function(err){
           q.reject(err);
         });
         return q.promise;
@@ -212,7 +212,7 @@ angular.module('brewbench-monitor')
         var q = $q.defer();
         $http.get('/assets/data/grains.json').then(function(response){
           q.resolve(response.data);
-        },function(err){
+        }).catch(function(err){
           q.reject(err);
         });
         return q.promise;
@@ -222,7 +222,7 @@ angular.module('brewbench-monitor')
         var q = $q.defer();
         $http.get('/assets/data/hops.json').then(function(response){
           q.resolve(response.data);
-        },function(err){
+        }).catch(function(err){
           q.reject(err);
         });
         return q.promise;
@@ -232,7 +232,7 @@ angular.module('brewbench-monitor')
         var q = $q.defer();
         $http.get('/assets/data/water.json').then(function(response){
           q.resolve(response.data);
-        },function(err){
+        }).catch(function(err){
           q.reject(err);
         });
         return q.promise;
@@ -242,7 +242,7 @@ angular.module('brewbench-monitor')
         var q = $q.defer();
         $http.get('/assets/data/lovibond.json').then(function(response){
           q.resolve(response.data);
-        },function(err){
+        }).catch(function(err){
           q.reject(err);
         });
         return q.promise;
