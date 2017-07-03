@@ -1,5 +1,13 @@
 # Change Log
 
+## 2.7.0 - 2017-07-03
+
+### Added
+- SSR logic to updateTemp for auto start/stop of the relay
+
+### Fixed
+- gulp build
+
 ## 2.6.9 - 2017-07-01
 
 ### Added
