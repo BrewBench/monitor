@@ -39,7 +39,7 @@ angular.module('brewbench-monitor')
 			element.on('change', function(onChangeEvent) {
 				var reader = new FileReader();
         var file = (onChangeEvent.srcElement || onChangeEvent.target).files[0];
-        var extension = file.name.split('.').pop().toLowerCase();
+        var extension = (file) ? file.name.split('.').pop().toLowerCase() : '';
 
 				reader.onload = function(onLoadEvent) {
 					scope.$apply(function() {

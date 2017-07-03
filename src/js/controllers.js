@@ -88,6 +88,10 @@ $scope.showSettingsSide = function(){
     $scope.showSettings = !$scope.showSettings;
 };
 
+$scope.sumValues = function(obj){
+  return _.sum(_.values(obj));
+}
+
 // init calc values
 $scope.updateABV = function(){
   if($scope.settings.recipe.scale=='gravity'){
@@ -327,17 +331,26 @@ $scope.kettles = BrewService.settings('kettles') || [{
       $scope.settings.recipe.name = recipe.name;
       $scope.settings.recipe.category = recipe.category;
       $scope.settings.recipe.abv = recipe.abv;
+      $scope.settings.recipe.date = recipe.date;
+      $scope.settings.recipe.brewer = recipe.brewer;
 
       if(recipe.grains.length){
+        $scope.settings.recipe.grains = recipe.grains;
         var kettle = _.filter($scope.kettles,{type:'grain'})[0];
         if(kettle){
           kettle.timers = [];
+          $scope.settings.recipe.grains = {};
           _.each(recipe.grains,function(grain){
             $scope.addTimer(kettle,{
               label: grain.label,
               min: grain.min,
               notes: grain.notes
             });
+            // sum the amounts for the grains
+            if($scope.settings.recipe.grains[grain.label])
+              $scope.settings.recipe.grains[grain.label] += Math.round(grain.amount*100/100);
+            else
+              $scope.settings.recipe.grains[grain.label] = Math.round(grain.amount*100/100);
           });
         }
       }
@@ -346,17 +359,23 @@ $scope.kettles = BrewService.settings('kettles') || [{
         var kettle = _.filter($scope.kettles,{type:'hop'})[0];
         if(kettle){
           kettle.timers = [];
+          $scope.settings.recipe.hops = {};
           _.each(recipe.hops,function(hop){
             $scope.addTimer(kettle,{
               label: hop.label,
               min: hop.min,
               notes: hop.notes
             });
+            // sum the amounts for the hops
+            if($scope.settings.recipe.hops[hop.label])
+              $scope.settings.recipe.hops[hop.label] += Math.round(hop.amount*100/100);
+            else
+              $scope.settings.recipe.hops[hop.label] = Math.round(hop.amount*100/100);
           });
         }
       }
       if(recipe.misc.length){
-        var kettle = _.filter($scope.kettles,{type:'hop'})[0];
+        var kettle = _.filter($scope.kettles,{type:'water'})[0];
         if(kettle){
           _.each(recipe.misc,function(misc){
             $scope.addTimer(kettle,{
@@ -366,7 +385,8 @@ $scope.kettles = BrewService.settings('kettles') || [{
           });
         }
       }
-      if(recipe.yeast){
+      if(recipe.yeast.length){
+        $scope.settings.recipe.yeast = [];
         _.each(recipe.yeast,function(yeast){
           $scope.settings.recipe.yeast.push({
             name: yeast.name
@@ -941,9 +961,16 @@ $scope.kettles = BrewService.settings('kettles') || [{
     }
     // Slack Notification
     if($scope.settings.notifications.slack.indexOf('http')!==-1){
-      BrewService.slack($scope.settings.notifications.slack,message,color,icon,kettle).then(function(response){
-        // console.log('Slack',response);
-      });
+      BrewService.slack($scope.settings.notifications.slack,message,color,icon,kettle)
+        .then(function(response){
+          // console.log('Slack',response);
+        })
+        .catch(function(err){
+          if(err.message)
+            $scope.error_message = `Failed posting to Slack ${err.message}`;
+          else
+            $scope.error_message = `Failed posting to Slack ${JSON.stringify(err)}`;
+        });
     }
   };
 

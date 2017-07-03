@@ -332,11 +332,15 @@ angular.module('brewbench-monitor')
       return parseFloat(plato);
     },
     recipeBeerSmith: function(recipe){
-      var response = {name:'', category:'', abv:'', og:0.000, fg:0.000, hops:[], grains:[], yeast:[], misc:[]};
+      var response = {name:'', date:'', brewer: {name:''}, category:'', abv:'', og:0.000, fg:0.000, hops:[], grains:[], yeast:[], misc:[]};
       if(!!recipe.F_R_NAME)
         response.name = recipe.F_R_NAME;
       if(!!recipe.F_R_STYLE.F_S_CATEGORY)
         response.category = recipe.F_R_STYLE.F_S_CATEGORY;
+      if(!!recipe.F_R_DATE)
+        response.date = recipe.F_R_DATE;
+      if(!!recipe.F_R_BREWER)
+        response.brewer.name = recipe.F_R_BREWER;
 
       if(!!recipe.F_R_STYLE.F_S_MAX_ABV)
         response.abv = $filter('number')(recipe.F_R_STYLE.F_S_MAX_ABV,2);
@@ -348,7 +352,8 @@ angular.module('brewbench-monitor')
           response.grains.push({
             label: grain.F_G_NAME,
             min: parseInt(grain.F_G_BOIL_TIME,10),
-            notes: $filter('number')(grain.F_G_AMOUNT/16,2)+' lbs.'
+            notes: $filter('number')(grain.F_G_AMOUNT/16,2)+' lbs.',
+            amount: $filter('number')(grain.F_G_AMOUNT/16,2)
           });
         });
       }
@@ -360,7 +365,8 @@ angular.module('brewbench-monitor')
               min: parseInt(hop.F_H_DRY_HOP_TIME,10) > 0 ? null : parseInt(hop.F_H_BOIL_TIME,10),
               notes: parseInt(hop.F_H_DRY_HOP_TIME,10) > 0
                 ? 'Dry Hop '+$filter('number')(hop.F_H_AMOUNT,2)+' oz.'+' for '+parseInt(hop.F_H_DRY_HOP_TIME,10)+' Days'
-                : $filter('number')(hop.F_H_AMOUNT,2)+' oz.'
+                : $filter('number')(hop.F_H_AMOUNT,2)+' oz.',
+              amount: $filter('number')(hop.F_H_AMOUNT,2)
             });
             // hop.F_H_ALPHA
             // hop.F_H_DRY_HOP_TIME
@@ -399,7 +405,7 @@ angular.module('brewbench-monitor')
       return response;
     },
     recipeBeerXML: function(recipe){
-      var response = {name:'', category:'', abv:'', og:0.000, fg:0.000, hops:[], grains:[], yeast:[], misc:[]};
+      var response = {name:'', date:'', brewer: {name:''}, category:'', abv:'', og:0.000, fg:0.000, hops:[], grains:[], yeast:[], misc:[]};
       var mash_time = 60;
 
       if(!!recipe.NAME)
@@ -425,7 +431,8 @@ angular.module('brewbench-monitor')
           response.grains.push({
             label: grain.NAME,
             min: parseInt(mash_time,10),
-            notes: $filter('number')(grain.AMOUNT,2)+' lbs.'
+            notes: $filter('number')(grain.AMOUNT,2)+' lbs.',
+            amount: $filter('number')(grain.AMOUNT,2),
           });
         });
       }
@@ -437,14 +444,15 @@ angular.module('brewbench-monitor')
             min: hop.USE == 'Dry Hop' ? 0 : parseInt(hop.TIME,10),
             notes: hop.USE == 'Dry Hop'
               ? hop.USE+' '+$filter('number')(hop.AMOUNT*1000/28.3495,2)+' oz.'+' for '+parseInt(hop.TIME/60/24,10)+' Days'
-              : hop.USE+' '+$filter('number')(hop.AMOUNT*1000/28.3495,2)+' oz.'
+              : hop.USE+' '+$filter('number')(hop.AMOUNT*1000/28.3495,2)+' oz.',
+            amount: $filter('number')(hop.AMOUNT*1000/28.3495,2)
           });
         });
       }
 
       if(!!recipe.MISCS){
         _.each(recipe.MISCS.MISC,function(misc){
-          response.hops.push({
+          response.misc.push({
             label: misc.NAME,
             min: parseInt(hop.TIME,10),
             notes: misc.USE
