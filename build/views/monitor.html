@@ -1,12 +1,21 @@
 <ng-include src="'views/header.html'"></ng-include>
 <div class="container-fluid main-container kettles-{{activeKettles()}}">
-  <div class="row" ng-if="settings.shared">
+  <div class="row share" ng-if="settings.shared">
     <div class="alert alert-info alert-dismissible share">
       <button type="button" class="close" data-dismiss="alert" aria-label="Close" ng-click="clearKettles()"><i class="fa fa-trash"></i></button>
-      <strong>Shared Session</strong> <sup>from</sup> <a href="mailto: {{settings.recipe.brewer.email}}">{{settings.recipe.brewer.name}}</a>
+      <h3>Shared Session <sup>from</sup> <a href="mailto: {{settings.recipe.brewer.email}}">{{settings.recipe.brewer.name}}</a></h3>
+      <form ng-if="share.needPassword">
+        A password is required to load this session <br>
+        <div class="input-group">
+          <input type="password" class="form-control" ng-model="share.password" placeholder="Enter the share password">
+          <span class="input-group-btn">
+            <button class="btn btn-primary" type="button" ng-click="loadShareFile()">Unlock Share</button>
+          </span>
+        </div>
+      </form>
     </div>
   </div>
-  <div class="row">
+  <div class="row" ng-disabled="share.needPassword" ng-class="{'disabled':share.needPassword}">
     <div ng-class="{'col-md-8': showSettings, 'col-md-12': !showSettings}">
 
       <div class="alert alert-danger alert-dismissible" role="alert" ng-if="error_message">
@@ -20,10 +29,10 @@
       <ng-include src="'views/settings.html'"></ng-include>
     </div>
   </div>
-  <div class="row">
+  <div class="row" ng-disabled="share.needPassword" ng-class="{'disabled':share.needPassword}">
     <ng-include src="'views/recipe.html'"></ng-include>
   </div>
-  <div class="row">
+  <div class="row" ng-disabled="share.needPassword" ng-class="{'disabled':share.needPassword}">
     <ng-include src="'views/kettles.html'"></ng-include>
   </div>
 </div>

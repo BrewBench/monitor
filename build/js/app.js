@@ -35,6 +35,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
   $scope.chartOptions = BrewService.chartOptions();
   $scope.sensorTypes = BrewService.sensorTypes;
   $scope.showSettings = true;
+  $scope.share = { file: $state.params.file || null, password: null, needPassword: false, access: 'readOnly' };
   $scope.error_message = '';
   $scope.slider = { options: {
       floor: 0,
@@ -61,11 +62,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
 
         if (!k) return;
         if ($scope.kettles[kettle[1]].active && k.pwm && k.running) {
-          return BrewService.analog(k.pin, Math.round(255 * k.dutyCycle / 100)).then(function () {
-            //started
-          }).catch(function (err) {
-            $scope.connectError(err);
-          });
+          return toggleRelay($scope.kettles[kettle[1]], k, true);
         }
       }
     }
@@ -246,31 +243,47 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
 
   $scope.createShare = function () {
     if (!$scope.settings.recipe.brewer.name || !$scope.settings.recipe.brewer.email) return;
-    BrewService.createShare().then(function (response) {
+    $scope.share_status = 'Creating share link...';
+    return BrewService.createShare($scope.share).then(function (response) {
       if (response.share && response.share.url) {
+        $scope.share_status = '';
         $scope.share_success = true;
         $scope.share_link = response.share.url;
       } else {
         $scope.share_success = false;
       }
     }).catch(function (err) {
+      $scope.share_status = err;
       $scope.share_success = false;
     });
   };
 
-  $scope.loadShareFile = function (file) {
-    return BrewService.loadShareFile(file).then(function (contents) {
+  $scope.loadShareFile = function () {
+    BrewService.clear();
+    $scope.settings.shared = true;
+    return BrewService.loadShareFile($scope.share.file, $scope.share.password || null).then(function (contents) {
       if (contents) {
-        if (contents.settings) {
-          $scope.settings = contents.settings;
-          $scope.settings.notifications = { on: false, timers: true, high: true, low: true, target: true, slack: 'Slack notification webhook Url', last: '' };
-        }
-        if (contents.kettles) {
-          _.each(contents.kettles, function (kettle) {
-            kettle.knob = angular.merge($scope.knobOptions, { value: 0, min: 0, max: 200 + 5, subText: { enabled: true, text: 'starting...', color: 'gray', font: 'auto' } });
-            kettle.values = [];
-          });
-          $scope.kettles = contents.kettles;
+        if (contents.needPassword) {
+          $scope.share.needPassword = true;
+          if (contents.settings.recipe) {
+            $scope.settings.recipe = contents.settings.recipe;
+          }
+        } else {
+          $scope.share.needPassword = false;
+          if (contents.share.access) {
+            $scope.share.access = contents.share.access;
+          }
+          if (contents.settings) {
+            $scope.settings = contents.settings;
+            $scope.settings.notifications = { on: false, timers: true, high: true, low: true, target: true, slack: 'Slack notification webhook Url', last: '' };
+          }
+          if (contents.kettles) {
+            _.each(contents.kettles, function (kettle) {
+              kettle.knob = angular.merge($scope.knobOptions, { value: 0, min: 0, max: 200 + 5, subText: { enabled: true, text: 'starting...', color: 'gray', font: 'auto' } });
+              kettle.values = [];
+            });
+            $scope.kettles = contents.kettles;
+          }
         }
       }
       return true;
@@ -406,7 +419,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
   // check if pump or heater are running
   $scope.init = function () {
     $scope.showSettings = !$scope.settings.shared;
-    if ($state.params.file) return $scope.loadShareFile($state.params.file);
+    if ($scope.share.file) return $scope.loadShareFile();
 
     var running = [];
     _.each($scope.kettles, function (kettle) {
@@ -472,165 +485,52 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
       $scope.alert(kettle);
       //stop the heating element
       if (kettle.heater.auto && kettle.heater.running) {
-        if (kettle.heater.pwm || kettle.heater.ssr) {
-          temps.push(BrewService.analog(kettle.heater.pin, 0).then(function () {
-            kettle.heater.running = false;
-          }).catch(function (err) {
-            $scope.connectError(err);
-          }));
-        } else {
-          temps.push(BrewService.digital(kettle.heater.pin, 0).then(function () {
-            kettle.heater.running = false;
-          }).catch(function (err) {
-            $scope.connectError(err);
-          }));
-        }
+        temps.push(toggleRelay(kettle, kettle.heater, false));
       }
       //stop the pump
       if (kettle.pump.auto && kettle.pump.running) {
-        if (kettle.pump.pwm || kettle.pump.ssr) {
-          temps.push(BrewService.analog(kettle.pump.pin, 0).then(function () {
-            kettle.pump.running = false;
-          }).catch(function (err) {
-            $scope.connectError(err);
-          }));
-        } else {
-          temps.push(BrewService.digital(kettle.pump.pin, 0).then(function () {
-            kettle.pump.running = false;
-          }).catch(function (err) {
-            $scope.connectError(err);
-          }));
-        }
+        temps.push(toggleRelay(kettle, kettle.pump, false));
       }
       //start the chiller
       if (kettle.cooler && kettle.cooler.auto && !kettle.cooler.running) {
-        if (kettle.cooler.pwm || kettle.cooler.ssr) {
-          var dutyCycle = kettle.cooler.pwm ? Math.round(255 * kettle.cooler.dutyCycle / 100) : 255;
-          temps.push(BrewService.analog(kettle.cooler.pin, dutyCycle).then(function () {
-            kettle.cooler.running = true;
-            kettle.knob.subText.text = 'cooling';
-            kettle.knob.subText.color = 'rgba(52,152,219,1)';
-          }).catch(function (err) {
-            $scope.connectError(err);
-          }));
-        } else {
-          temps.push(BrewService.digital(kettle.cooler.pin, 1).then(function () {
-            kettle.cooler.running = true;
-            kettle.knob.subText.text = 'cooling';
-            kettle.knob.subText.color = 'rgba(52,152,219,1)';
-          }).catch(function (err) {
-            $scope.connectError(err);
-          }));
-        }
+        temps.push(toggleRelay(kettle, kettle.cooler, true).then(function (cooler) {
+          kettle.knob.subText.text = 'cooling';
+          kettle.knob.subText.color = 'rgba(52,152,219,1)';
+        }));
       }
     } //is temp too low?
     else if (kettle.temp.current <= kettle.temp.target - kettle.temp.diff) {
         $scope.alert(kettle);
         //start the heating element
         if (kettle.heater.auto && !kettle.heater.running) {
-          if (kettle.heater.pwm || kettle.heater.ssr) {
-            var dutyCycle = kettle.heater.pwm ? Math.round(255 * kettle.heater.dutyCycle / 100) : 255;
-            temps.push(BrewService.analog(kettle.heater.pin, dutyCycle).then(function () {
-              kettle.heater.running = true;
-              kettle.knob.subText.text = 'heating';
-              kettle.knob.subText.color = 'rgba(200,47,47,1)';
-            }).catch(function (err) {
-              $scope.connectError(err);
-            }));
-          } else {
-            temps.push(BrewService.digital(kettle.heater.pin, 1).then(function () {
-              kettle.heater.running = true;
-              kettle.knob.subText.text = 'heating';
-              kettle.knob.subText.color = 'rgba(200,47,47,1)';
-            }).catch(function (err) {
-              $scope.connectError(err);
-            }));
-          }
+          temps.push(toggleRelay(kettle, kettle.heater, true).then(function (heating) {
+            kettle.knob.subText.text = 'heating';
+            kettle.knob.subText.color = 'rgba(200,47,47,1)';
+          }));
         }
         //start the pump
         if (kettle.pump.auto && !kettle.pump.running) {
-          if (kettle.heater.pwm || kettle.heater.ssr) {
-            var dutyCycle = kettle.pump.pwm ? Math.round(255 * kettle.pump.dutyCycle / 100) : 255;
-            temps.push(BrewService.analog(kettle.pump.pin, dutyCycle).then(function () {
-              kettle.pump.running = true;
-            }).catch(function (err) {
-              $scope.connectError(err);
-            }));
-          } else {
-            temps.push(BrewService.digital(kettle.pump.pin, 1).then(function () {
-              kettle.pump.running = true;
-            }).catch(function (err) {
-              $scope.connectError(err);
-            }));
-          }
+          temps.push(toggleRelay(kettle, kettle.pump, true));
         }
-        //stop the chiller
+        //stop the cooler
         if (kettle.cooler && kettle.cooler.auto && kettle.cooler.running) {
-          if (kettle.cooler.pwm || kettle.cooler.ssr) {
-            temps.push(BrewService.analog(kettle.cooler.pin, 0).then(function () {
-              kettle.cooler.running = false;
-            }).catch(function (err) {
-              $scope.connectError(err);
-            }));
-          } else {
-            temps.push(BrewService.digital(kettle.cooler.pin, 0).then(function () {
-              kettle.cooler.running = false;
-            }).catch(function (err) {
-              $scope.connectError(err);
-            }));
-          }
+          temps.push(toggleRelay(kettle, kettle.cooler, false));
         }
       } else {
         // within target!
         kettle.temp.hit = new Date(); //set the time the target was hit so we can now start alerts
         $scope.alert(kettle);
-        //stop the chiller
-        if (kettle.cooler && kettle.cooler.auto && kettle.cooler.running) {
-          if (kettle.cooler.pwm || kettle.cooler.ssr) {
-            temps.push(BrewService.analog(kettle.cooler.pin, 0).then(function () {
-              kettle.cooler.running = false;
-            }).catch(function (err) {
-              $scope.connectError(err);
-            }));
-          } else {
-            temps.push(BrewService.digital(kettle.cooler.pin, 0).then(function () {
-              kettle.cooler.running = false;
-            }).catch(function (err) {
-              $scope.connectError(err);
-            }));
-          }
-        }
         //stop the heater
         if (kettle.heater.auto && kettle.heater.running) {
-          if (kettle.heater.pwm || kettle.heater.ssr) {
-            temps.push(BrewService.analog(kettle.heater.pin, 0).then(function () {
-              kettle.heater.running = false;
-            }).catch(function (err) {
-              $scope.connectError(err);
-            }));
-          } else {
-            temps.push(BrewService.digital(kettle.heater.pin, 0).then(function () {
-              kettle.heater.running = false;
-            }).catch(function (err) {
-              $scope.connectError(err);
-            }));
-          }
+          temps.push(toggleRelay(kettle, kettle.heater, false));
         }
         //stop the pump
         if (kettle.pump.auto && kettle.pump.running) {
-          if (kettle.pump.pwm || kettle.pump.ssr) {
-            temps.push(BrewService.analog(kettle.pump.pin, 0).then(function () {
-              kettle.pump.running = false;
-            }).catch(function (err) {
-              $scope.connectError(err);
-            }));
-          } else {
-            temps.push(BrewService.digital(kettle.pump.pin, 0).then(function () {
-              kettle.pump.running = false;
-            }).catch(function (err) {
-              $scope.connectError(err);
-            }));
-          }
+          temps.push(toggleRelay(kettle, kettle.pump, false));
+        }
+        //stop the cooler
+        if (kettle.cooler && kettle.cooler.auto && kettle.cooler.running) {
+          temps.push(toggleRelay(kettle, kettle.cooler, false));
         }
       }
     return $q.all(temps);
@@ -693,47 +593,12 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
 
     k.running = !k.running;
 
-    //start the port
     if (kettle.active && k.running) {
-      if (k.pwm) {
-        BrewService.analog(k.pin, Math.round(255 * k.dutyCycle / 100)).then(function () {
-          //started
-        }).catch(function (err) {
-          $scope.connectError(err);
-        });
-      } else if (k.ssr) {
-        BrewService.analog(k.pin, 255).then(function () {
-          //started
-        }).catch(function (err) {
-          $scope.connectError(err);
-        });
-      } else {
-        BrewService.digital(k.pin, 1).then(function () {
-          //started
-        }).catch(function (err) {
-          $scope.connectError(err);
-        });
-      }
+      //start the relay
+      toggleRelay(kettle, k, true);
     } else if (!k.running) {
-      if (k.pwm) {
-        BrewService.analog(k.pin, 0).then(function () {
-          //started
-        }).catch(function (err) {
-          $scope.connectError(err);
-        });
-      } else if (k.ssr) {
-        BrewService.analog(k.pin, 0).then(function () {
-          //started
-        }).catch(function (err) {
-          $scope.connectError(err);
-        });
-      } else {
-        BrewService.digital(k.pin, 0).then(function () {
-          //stopped
-        }).catch(function (err) {
-          $scope.connectError(err);
-        });
-      }
+      //stop the relay
+      toggleRelay(kettle, k, false);
     }
   };
 
@@ -755,34 +620,31 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
       });
       kettle.knob.subText.text = 'starting...';
       kettle.knob.readOnly = false;
+      // start the relays
+      if (kettle.heater.running) {
+        toggleRelay(kettle, kettle.heater, true);
+      }
+      if (kettle.pump.running) {
+        toggleRelay(kettle, kettle.pump, true);
+      }
+      if (kettle.cooler && kettle.cooler.running) {
+        toggleRelay(kettle, kettle.cooler, true);
+      }
     } else {
       kettle.knob.readOnly = true;
     }
 
-    //stop the heating element
+    //stop the heater
     if (!kettle.active && kettle.heater.running) {
-      BrewService.digital(kettle.heater.pin, 0).then(function () {
-        kettle.heater.running = false;
-        $scope.updateKnobCopy(kettle);
-      }).catch(function (err) {
-        $scope.connectError(err);
-      });
+      toggleRelay(kettle, kettle.heater, false);
     }
+    //stop the pump
     if (!kettle.active && kettle.pump.running) {
-      BrewService.digital(kettle.pump.pin, 0).then(function () {
-        kettle.pump.running = false;
-        $scope.updateKnobCopy(kettle);
-      }).catch(function (err) {
-        $scope.connectError(err);
-      });
+      toggleRelay(kettle, kettle.pump, false);
     }
-    if (kettle.cooler && !kettle.active && kettle.cooler.running) {
-      BrewService.digital(kettle.cooler.pin, 0).then(function () {
-        kettle.cooler.running = false;
-        $scope.updateKnobCopy(kettle);
-      }).catch(function (err) {
-        $scope.connectError(err);
-      });
+    //stop the cooler
+    if (!kettle.active && kettle.cooler && kettle.cooler.running) {
+      toggleRelay(kettle, kettle.cooler, false);
     }
     if (!kettle.active) {
       kettle.pump.auto = false;
@@ -791,6 +653,49 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
       $scope.updateKnobCopy(kettle);
     }
   };
+
+  function toggleRelay(kettle, element, on) {
+    if (on) {
+      if (element.pwm) {
+        return BrewService.analog(element.pin, Math.round(255 * element.dutyCycle / 100)).then(function () {
+          //started
+          element.running = true;
+        }).catch(function (err) {
+          $scope.connectError(err);
+        });
+      } else if (element.ssr) {
+        return BrewService.analog(element.pin, 255).then(function () {
+          //started
+          element.running = true;
+        }).catch(function (err) {
+          $scope.connectError(err);
+        });
+      } else {
+        return BrewService.digital(element.pin, 1).then(function () {
+          //started
+          element.running = true;
+        }).catch(function (err) {
+          $scope.connectError(err);
+        });
+      }
+    } else {
+      if (element.pwm || element.ssr) {
+        return BrewService.analog(element.pin, 0).then(function () {
+          element.running = false;
+          $scope.updateKnobCopy(kettle);
+        }).catch(function (err) {
+          $scope.connectError(err);
+        });
+      } else {
+        return BrewService.digital(element.pin, 0).then(function () {
+          element.running = false;
+          $scope.updateKnobCopy(kettle);
+        }).catch(function (err) {
+          $scope.connectError(err);
+        });
+      }
+    }
+  }
 
   $scope.clearKettles = function (e) {
     if (e) {
@@ -1036,11 +941,11 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
       //re process on timeout
       $timeout(function () {
         return $scope.processTemps();
-      }, $scope.settings.pollSeconds * 1000);
+      }, !!$scope.settings.pollSeconds ? $scope.settings.pollSeconds * 1000 : 10000);
     }).catch(function (err) {
       $timeout(function () {
         return $scope.processTemps();
-      }, $scope.settings.pollSeconds * 1000);
+      }, !!$scope.settings.pollSeconds ? $scope.settings.pollSeconds * 1000 : 10000);
     });
   };
 
@@ -1279,9 +1184,11 @@ angular.module('brewbench-monitor').factory('BrewService', function ($http, $q, 
       return q.promise;
     },
 
-    loadShareFile: function loadShareFile(file) {
+    loadShareFile: function loadShareFile(file, password) {
       var q = $q.defer();
-      $http({ url: 'http://monitor.brewbench.co/share/get/' + file, method: 'GET' }).then(function (response) {
+      var query = '';
+      if (password) query = '?password=' + md5(password);
+      $http({ url: 'https://monitor.brewbench.co/share/get/' + file + query, method: 'GET' }).then(function (response) {
         q.resolve(response.data);
       }, function (err) {
         q.reject(err);
@@ -1289,20 +1196,20 @@ angular.module('brewbench-monitor').factory('BrewService', function ($http, $q, 
       return q.promise;
     },
 
-    createShare: function createShare() {
+    createShare: function createShare(share) {
       var q = $q.defer();
       var settings = this.settings('settings');
       var kettles = this.settings('kettles');
-
-      //remove some things we don't want to share
+      var sh = Object.assign({}, { password: share.password, access: share.access });
+      //remove some things we don't need to share
       _.each(kettles, function (kettle, i) {
         delete kettles[i].knob;
         delete kettles[i].values;
       });
       delete settings.notifications;
       settings.shared = true;
-
-      $http({ url: 'http://monitor.brewbench.co/share/temp.php', method: 'POST', data: { 'settings': settings, 'kettles': kettles }, headers: { 'Content-Type': 'application/json' } }).then(function (response) {
+      if (sh.password) sh.password = md5(sh.password);
+      $http({ url: 'https://monitor.brewbench.co/share/create/', method: 'POST', data: { 'share': sh, 'settings': settings, 'kettles': kettles }, headers: { 'Content-Type': 'application/json' } }).then(function (response) {
         q.resolve(response.data);
       }, function (err) {
         q.reject(err);
