@@ -165,9 +165,12 @@ angular.module('brewbench-monitor')
       return q.promise;
     },
 
-    loadShareFile: function(file){
+    loadShareFile: function(file, password){
       var q = $q.defer();
-      $http({url: 'http://monitor.brewbench.co/share/get/'+file, method: 'GET'})
+      var query = '';
+      if(password)
+        query = '?password='+md5(password);
+      $http({url: 'http://monitor.brewbench.co/share/get/'+file+query, method: 'GET'})
         .then(function(response){
           q.resolve(response.data);
         }, function(err){

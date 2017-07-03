@@ -64,6 +64,7 @@ Go to [brewbench.co](http://brewbench.co) or clone this repo and run gulp [http:
 ## Development
 
 ```sh
+npm install -g yarn
 yarn
 gulp
 ```

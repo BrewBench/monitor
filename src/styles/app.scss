@@ -87,6 +87,24 @@ body {
   margin-left: 10px;
 }
 
+.main-container .share form {
+ text-align: center;
+ position: relative;
+ display: block;
+ width: 300px;
+ margin: 0 auto;
+}
+
+.disabled{
+  opacity: 0.5;
+  pointer-events: none;
+
+  > * {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+}
+
 .alert {
   position: absolute;
   width: 98%;
@@ -110,8 +128,8 @@ body {
   padding: 15px;
 }
 
-.modal-body .form-horizontal input {
-  height: 44px;
+.modal-body .form-horizontal input, .modal-body .form-horizontal select {
+  height: 35px;
 }
 
 .modal-body .alert {
