@@ -362,9 +362,9 @@ $scope.kettles = BrewService.settings('kettles') || [{
             });
             // sum the amounts for the grains
             if($scope.settings.recipe.grains[grain.label])
-              $scope.settings.recipe.grains[grain.label] += Math.round(grain.amount*100/100);
+              $scope.settings.recipe.grains[grain.label] += Number(grain.amount);
             else
-              $scope.settings.recipe.grains[grain.label] = Math.round(grain.amount*100/100);
+              $scope.settings.recipe.grains[grain.label] = Number(grain.amount);
           });
         }
       }
@@ -382,19 +382,21 @@ $scope.kettles = BrewService.settings('kettles') || [{
             });
             // sum the amounts for the hops
             if($scope.settings.recipe.hops[hop.label])
-              $scope.settings.recipe.hops[hop.label] += Math.round(hop.amount*100/100);
+              $scope.settings.recipe.hops[hop.label] += Number(hop.amount);
             else
-              $scope.settings.recipe.hops[hop.label] = Math.round(hop.amount*100/100);
+              $scope.settings.recipe.hops[hop.label] = Number(hop.amount);
           });
         }
       }
       if(recipe.misc.length){
         var kettle = _.filter($scope.kettles,{type:'water'})[0];
         if(kettle){
+          kettle.timers = [];
           _.each(recipe.misc,function(misc){
             $scope.addTimer(kettle,{
               label: misc.label,
-              min: misc.min
+              min: misc.min,
+              notes: misc.notes
             });
           });
         }

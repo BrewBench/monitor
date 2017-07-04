@@ -12,13 +12,13 @@
           </h2>
         </div>
         <div class="recipe col-md-3 col-xs-12" ng-if="settings.recipe.hops">
-          <img src="/assets/img/hop.svg" width="32" class="pull-left"><strong>{{ sumValues(settings.recipe.hops) }} oz</strong>
+          <img src="/assets/img/hop.svg" width="32" class="pull-left"><strong>{{ sumValues(settings.recipe.hops) | number:2 }} oz</strong>
           <ul>
             <li ng-repeat="(k,v) in settings.recipe.hops">{{k}} <i>{{v}}</i> oz</li>
           </ul>
         </div>
         <div class="recipe col-md-3 col-xs-12" ng-if="settings.recipe.grains">
-          <img src="/assets/img/grain.svg" width="32" class="pull-left"><strong>{{ sumValues(settings.recipe.grains) }} lbs</strong>
+          <img src="/assets/img/grain.svg" width="32" class="pull-left"><strong>{{ sumValues(settings.recipe.grains) | number:2 }} lbs</strong>
           <ul>
             <li ng-repeat="(k,v) in settings.recipe.grains">{{k}} <i>{{v}}</i> lbs</li>
           </ul>

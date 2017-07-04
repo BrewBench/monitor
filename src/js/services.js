@@ -64,21 +64,17 @@ angular.module('brewbench-monitor')
       return kettles;
     },
 
-    byteCount: function(s) {
-      return encodeURI(s).split(/%..|./).length - 1;
-    },
-
     domain: function(format){
       var settings = this.settings('settings');
       var domain = '';
 
       if(settings && settings.arduinoUrl)
-        domain = settings.arduinoUrl.indexOf('//')===-1 ? '//'+settings.arduinoUrl : settings.arduinoUrl;
+        domain = (settings.arduinoUrl.indexOf('//') === -1) ? '//'+settings.arduinoUrl : settings.arduinoUrl;
       else if(document.location.host == 'localhost')
-        domain = '//arduino.local';
+        domain = 'http://arduino.local';
 
       if(!!format)
-        return domain.indexOf('//')!==-1 ? domain.substring(domain.indexOf('//')+2) : domain;
+        return domain.indexOf('//') !== -1 ? domain.substring(domain.indexOf('//')+2) : domain;
       return domain;
     },
 
@@ -87,7 +83,7 @@ angular.module('brewbench-monitor')
 
       var postObj = {'attachments': [{'fallback': msg,
             'title': kettle.key+' kettle',
-            'title_link': 'http://'+document.location.host+'/#/arduino/'+this.domain(true),
+            'title_link': 'http://'+document.location.host,
             'fields': [{'value': msg}],
             'color': color,
             'mrkdwn_in': ['text', 'fallback', 'fields'],
@@ -395,13 +391,17 @@ angular.module('brewbench-monitor')
           _.each(recipe.Ingredients.Data.Misc,function(misc){
             response.misc.push({
               label: misc.F_M_NAME+' '+$filter('number')(misc.F_M_AMOUNT,2),
-              min: parseInt(misc.F_M_TIME,10)
+              min: parseInt(misc.F_M_TIME,10),
+              notes: 'Add '+$filter('number')(misc.F_H_AMOUNT,2),
+              amount: $filter('number')(misc.F_H_AMOUNT,2)
             });
           });
         } else {
           response.misc.push({
             label: recipe.Ingredients.Data.Misc.F_M_NAME+' '+$filter('number')(recipe.Ingredients.Data.Misc.F_M_AMOUNT,2)+' oz.',
-            min: parseInt(recipe.Ingredients.Data.Misc.F_M_TIME,10)
+            min: parseInt(recipe.Ingredients.Data.Misc.F_M_TIME,10),
+            notes: 'Add '+$filter('number')(recipe.Ingredients.Data.Misc.F_H_AMOUNT,2),
+            amount: $filter('number')(recipe.Ingredients.Data.Misc.F_H_AMOUNT,2)
           });
         }
       }
@@ -429,6 +429,12 @@ angular.module('brewbench-monitor')
         response.name = recipe.NAME;
       if(!!recipe.STYLE.CATEGORY)
         response.category = recipe.STYLE.CATEGORY;
+
+      // if(!!recipe.F_R_DATE)
+      //   response.date = recipe.F_R_DATE;
+      if(!!recipe.BREWER)
+        response.brewer.name = recipe.BREWER;
+
       if(!!recipe.OG)
         response.og = parseFloat(recipe.OG).toFixed(3);
       if(!!recipe.FG)
@@ -439,12 +445,13 @@ angular.module('brewbench-monitor')
       else if(!!recipe.STYLE.ABV_MIN)
         response.abv = $filter('number')(recipe.STYLE.ABV_MIN,2);
 
-      if(!!recipe.MASH.MASH_STEPS.MASH_STEP[0].STEP_TIME){
+      if(!!recipe.MASH.MASH_STEPS.MASH_STEP && recipe.MASH.MASH_STEPS.MASH_STEP.length && recipe.MASH.MASH_STEPS.MASH_STEP[0].STEP_TIME){
         mash_time = recipe.MASH.MASH_STEPS.MASH_STEP[0].STEP_TIME;
       }
 
       if(!!recipe.FERMENTABLES){
-        _.each(recipe.FERMENTABLES.FERMENTABLE,function(grain){
+        var grains = (recipe.FERMENTABLES.FERMENTABLE && recipe.FERMENTABLES.FERMENTABLE.length) ? recipe.FERMENTABLES.FERMENTABLE : recipe.FERMENTABLES;
+        _.each(grains,function(grain){
           response.grains.push({
             label: grain.NAME,
             min: parseInt(mash_time,10),
@@ -455,7 +462,8 @@ angular.module('brewbench-monitor')
       }
 
       if(!!recipe.HOPS){
-        _.each(recipe.HOPS.HOP,function(hop){
+        var hops = (recipe.HOPS.HOP && recipe.HOPS.HOP.length) ? recipe.HOPS.HOP : recipe.HOPS;
+        _.each(hops,function(hop){
           response.hops.push({
             label: hop.NAME+' ('+hop.FORM+')',
             min: hop.USE == 'Dry Hop' ? 0 : parseInt(hop.TIME,10),
@@ -468,27 +476,24 @@ angular.module('brewbench-monitor')
       }
 
       if(!!recipe.MISCS){
-        _.each(recipe.MISCS.MISC,function(misc){
+        var misc = (recipe.MISCS.MISC && recipe.MISCS.MISC.length) ? recipe.MISCS.MISC : recipe.MISCS;
+        _.each(misc,function(misc){
           response.misc.push({
             label: misc.NAME,
-            min: parseInt(hop.TIME,10),
-            notes: misc.USE
+            min: parseInt(misc.TIME,10),
+            notes: 'Add '+misc.AMOUNT+' to '+misc.USE,
+            amount: misc.AMOUNT
           });
         });
       }
 
       if(!!recipe.YEASTS){
-        if(recipe.YEASTS.YEAST.length){
-          _.each(recipe.YEASTS.YEAST,function(yeast){
+        var yeast = (recipe.YEASTS.YEAST && recipe.YEASTS.YEAST.length) ? recipe.YEASTS.YEAST : recipe.YEASTS;
+          _.each(yeast,function(yeast){
             response.yeast.push({
               name: yeast.NAME
             });
           });
-        } else {
-          response.yeast.push({
-            name: recipe.YEASTS.YEAST.NAME
-          });
-        }
       }
       return response;
     },
