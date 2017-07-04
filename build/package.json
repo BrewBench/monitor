@@ -5,7 +5,7 @@
   "description": "Is an Arduino Yun brew monitor for the home brewer enthusiast that uses the Arduino REST API to interface with thermistors connected to the analog ports.",
   "main": "build/app.js",
   "scripts": {
-    "test": "mocha",
+    "test": "karma start karma.conf.js --single-run",
     "build": "gulp build"
   },
   "repository": {
@@ -61,7 +61,6 @@
     "karma-chrome-launcher": "^2.2.0",
     "karma-jasmine": "^1.1.0",
     "karma-spec-reporter": "^0.0.31",
-    "mocha": "^3.3.0",
     "node-sass": "^4.5.3"
   },
   "dependencies": {

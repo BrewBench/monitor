@@ -1,5 +1,11 @@
 # Change Log
 
+## 2.7.2 - 2017-07-04
+
+### Fixed
+- Tests, started adding karma and jasmine tests
+- BeerXML import
+
 ## 2.7.1 - 2017-07-03
 
 ### Added
