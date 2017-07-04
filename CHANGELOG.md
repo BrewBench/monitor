@@ -1,5 +1,11 @@
 # Change Log
 
+## 2.7.1 - 2017-07-03
+
+### Added
+- Share features for password and access level
+- Refactored toggleRelay
+
 ## 2.7.0 - 2017-07-03
 
 ### Added

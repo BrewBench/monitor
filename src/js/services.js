@@ -12,6 +12,19 @@ angular.module('brewbench-monitor')
       }
     },
 
+    reset: function(){
+      return {
+        pollSeconds: 10
+        ,unit: 'F'
+        ,shared: false
+        ,arduinoUrl: '192.168.240.1'
+        ,ports: {'analog':5, 'digital':13}
+        ,recipe: {'name':'','brewer':{name:'','email':''},'yeast':[],'hops':[],'malt':[],scale:'gravity',method:'papazian','og':1.050,'fg':1.010,'abv':0,'abw':0,'calories':0,'attenuation':0}
+        ,notifications: {on:true,timers:true,high:true,low:true,target:true,slack:'Slack notification webhook Url',last:''}
+        ,sounds: {on:true,alert:'/assets/audio/bike.mp3',timer:'/assets/audio/school.mp3'}
+      };
+    },
+
     settings: function(key,values){
           if(!window.localStorage)
             return values;

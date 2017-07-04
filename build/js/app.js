@@ -89,16 +89,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
   };
 
   //default settings values
-  $scope.settings = BrewService.settings('settings') || {
-    pollSeconds: 10,
-    unit: 'F',
-    shared: false,
-    arduinoUrl: '192.168.240.1',
-    ports: { 'analog': 5, 'digital': 13 },
-    recipe: { 'name': '', 'brewer': { name: '', 'email': '' }, 'yeast': [], 'hops': [], 'malt': [], scale: 'gravity', method: 'papazian', 'og': 1.050, 'fg': 1.010, 'abv': 0, 'abw': 0, 'calories': 0, 'attenuation': 0 },
-    notifications: { on: true, timers: true, high: true, low: true, target: true, slack: 'Slack notification webhook Url', last: '' },
-    sounds: { on: true, alert: '/assets/audio/bike.mp3', timer: '/assets/audio/school.mp3' }
-  };
+  $scope.settings = BrewService.settings('settings') || BrewService.reset();
 
   $scope.showSettingsSide = function () {
     $scope.showSettings = !$scope.showSettings;
@@ -258,8 +249,17 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
     });
   };
 
+  $scope.shareAccess = function (access) {
+    if ($scope.settings.shared) {
+      if (access) return !!($scope.share.access && $scope.share.access === access);
+      return true;
+    }
+    return true;
+  };
+
   $scope.loadShareFile = function () {
     BrewService.clear();
+    $scope.settings = BrewService.reset();
     $scope.settings.shared = true;
     return BrewService.loadShareFile($scope.share.file, $scope.share.password || null).then(function (contents) {
       if (contents) {
@@ -270,7 +270,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
           }
         } else {
           $scope.share.needPassword = false;
-          if (contents.share.access) {
+          if (contents.share && contents.share.access) {
             $scope.share.access = contents.share.access;
           }
           if (contents.settings) {
@@ -924,7 +924,6 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
 
   $scope.processTemps = function () {
     var allSensors = [];
-
     //only process active sensors
     _.each($scope.kettles, function (kettle) {
       if (kettle.active) {
@@ -1063,6 +1062,19 @@ angular.module('brewbench-monitor').factory('BrewService', function ($http, $q, 
         window.localStorage.removeItem('kettles');
         window.localStorage.removeItem('urls');
       }
+    },
+
+    reset: function reset() {
+      return {
+        pollSeconds: 10,
+        unit: 'F',
+        shared: false,
+        arduinoUrl: '192.168.240.1',
+        ports: { 'analog': 5, 'digital': 13 },
+        recipe: { 'name': '', 'brewer': { name: '', 'email': '' }, 'yeast': [], 'hops': [], 'malt': [], scale: 'gravity', method: 'papazian', 'og': 1.050, 'fg': 1.010, 'abv': 0, 'abw': 0, 'calories': 0, 'attenuation': 0 },
+        notifications: { on: true, timers: true, high: true, low: true, target: true, slack: 'Slack notification webhook Url', last: '' },
+        sounds: { on: true, alert: '/assets/audio/bike.mp3', timer: '/assets/audio/school.mp3' }
+      };
     },
 
     settings: function settings(key, values) {
