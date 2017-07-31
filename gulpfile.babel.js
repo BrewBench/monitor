@@ -88,7 +88,7 @@ gulp.task('views', () => {
 });
 
 gulp.task('index', () => {
-  return gulp.src([`${dirs.src}/index.html`,`package.json`])
+  return gulp.src([`${dirs.src}/index.html`,`${dirs.src}/favicon.ico`,`package.json`])
     .pipe(gulp.dest(`${dirs.dest}`));
 });
 
