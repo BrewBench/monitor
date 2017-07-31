@@ -251,6 +251,16 @@ angular.module('brewbench-monitor')
         return q.promise;
     },
 
+    styles: function(){
+      var q = $q.defer();
+      $http.get('/assets/data/styleguide.json').then(function(response){
+        q.resolve(response.data);
+      }).catch(function(err){
+        q.reject(err);
+      });
+      return q.promise;
+    },
+
     lovibond: function(){
         var q = $q.defer();
         $http.get('/assets/data/lovibond.json').then(function(response){

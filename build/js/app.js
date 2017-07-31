@@ -382,6 +382,12 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
     $scope.recipe_success = true;
   };
 
+  $scope.loadStyles = function () {
+    BrewService.styles().then(function (response) {
+      $scope.styles = response;
+    });
+  };
+
   $scope.loadConfig = function () {
     var config = [];
     if (!$scope.pkg) {
@@ -1260,6 +1266,16 @@ angular.module('brewbench-monitor').factory('BrewService', function ($http, $q, 
     water: function water() {
       var q = $q.defer();
       $http.get('/assets/data/water.json').then(function (response) {
+        q.resolve(response.data);
+      }).catch(function (err) {
+        q.reject(err);
+      });
+      return q.promise;
+    },
+
+    styles: function styles() {
+      var q = $q.defer();
+      $http.get('/assets/data/styleguide.json').then(function (response) {
         q.resolve(response.data);
       }).catch(function (err) {
         q.reject(err);

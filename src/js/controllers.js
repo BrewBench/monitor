@@ -412,6 +412,12 @@ $scope.kettles = BrewService.settings('kettles') || [{
       $scope.recipe_success = true;
   };
 
+  $scope.loadStyles = function(){
+      BrewService.styles().then(function(response){
+        $scope.styles = response;
+      });
+  };
+
   $scope.loadConfig = function(){
     var config = [];
     if(!$scope.pkg){

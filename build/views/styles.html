@@ -1,0 +1,78 @@
+<!-- Modal -->
+<div class="modal fade" id="dataModal-styles" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+        <h1 class="modal-title"><i class="fa fa-book fa-lg" aria-hidden="true"></i> Style <sup class="ref">Guide</sup></h1>
+        <input ng-model="searchStyles" placeholder="Search Styles">
+      </div>
+      <div class="modal-body">
+        <table class="table table-hover">
+          <tr ng-repeat="type in styles.styleguide.class">
+            <td>
+              <h3>{{type._type}}</h3>
+              <table class="table table-hover" ng-repeat="style in type.category | filter:searchStyles">
+                <tr>
+                  <td>
+                    <h4>{{style.name}}</h4>
+                    <p>{{style.notes}}</p>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <table class="table table-hover" ng-repeat="beer in style.subcategory | filter:searchStyles">
+                      <tr>
+                        <td colspan="2"><strong>{{beer.name}}</strong></td>
+                      </tr>
+                      <tr>
+                        <td>History</td>
+                        <td>{{beer.history}}</td>
+                      </tr>
+                      <tr>
+                        <td>Appearance</td>
+                        <td>{{beer.appearance}}</td>
+                      </tr>
+                      <tr>
+                        <td>Aroma</td>
+                        <td>{{beer.aroma}}</td>
+                      </tr>
+                      <tr>
+                        <td>Comments</td>
+                        <td>{{beer.comments}}</td>
+                      </tr>
+                      <tr>
+                        <td>Comparison</td>
+                        <td>{{beer.comparison}}</td>
+                      </tr>
+                      <tr>
+                        <td>Examples</td>
+                        <td>{{beer.examples}}</td>
+                      </tr>
+                      <tr>
+                        <td>Flavor</td>
+                        <td>{{beer.flavor}}</td>
+                      </tr>
+                      <tr>
+                        <td>Impression</td>
+                        <td>{{beer.impression}}</td>
+                      </tr>
+                      <tr>
+                        <td>Ingredients</td>
+                        <td>{{beer.ingredients}}</td>
+                      </tr>
+                      <tr>
+                        <td>Mouth Feel</td>
+                        <td>{{beer.mouthfeel}}</td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
