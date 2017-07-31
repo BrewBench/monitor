@@ -140,6 +140,13 @@ describe('BrewBench Service', function() {
     });
   });
 
+  describe('.styles()', function() {
+    // A simple test to verify the method styles exists
+    it('should exist', function() {
+      expect(BrewService.styles).toBeDefined();
+    });
+  });
+
   describe('.lovibond()', function() {
     // A simple test to verify the method lovibond exists
     it('should exist', function() {
