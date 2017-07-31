@@ -413,9 +413,11 @@ $scope.kettles = BrewService.settings('kettles') || [{
   };
 
   $scope.loadStyles = function(){
+    if(!$scope.styles){
       BrewService.styles().then(function(response){
         $scope.styles = response;
       });
+    }
   };
 
   $scope.loadConfig = function(){

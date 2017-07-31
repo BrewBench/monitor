@@ -383,9 +383,11 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
   };
 
   $scope.loadStyles = function () {
-    BrewService.styles().then(function (response) {
-      $scope.styles = response;
-    });
+    if (!$scope.styles) {
+      BrewService.styles().then(function (response) {
+        $scope.styles = response;
+      });
+    }
   };
 
   $scope.loadConfig = function () {
