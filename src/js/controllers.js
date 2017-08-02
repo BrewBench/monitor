@@ -222,7 +222,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
     var kettle = _.find($scope.kettles, function(kettle){
       return (
         (analog && kettle.temp.type=='Thermistor' && kettle.temp.pin==pin) ||
-        (kettle.temp.type=='DS18B20' && kettle.temp.pin==pin) ||
+        (!analog && kettle.temp.type=='DS18B20' && kettle.temp.pin==pin) ||
         (kettle.temp.type=='PT100' && kettle.temp.pin==pin) ||
         (!analog && kettle.heater.pin==pin) ||
         (!analog && kettle.cooler && kettle.cooler.pin==pin) ||

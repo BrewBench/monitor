@@ -227,7 +227,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
 
   $scope.pinInUse = function (pin, analog) {
     var kettle = _.find($scope.kettles, function (kettle) {
-      return analog && kettle.temp.type == 'Thermistor' && kettle.temp.pin == pin || kettle.temp.type == 'DS18B20' && kettle.temp.pin == pin || kettle.temp.type == 'PT100' && kettle.temp.pin == pin || !analog && kettle.heater.pin == pin || !analog && kettle.cooler && kettle.cooler.pin == pin || !analog && !kettle.cooler && kettle.pump.pin == pin;
+      return analog && kettle.temp.type == 'Thermistor' && kettle.temp.pin == pin || !analog && kettle.temp.type == 'DS18B20' && kettle.temp.pin == pin || kettle.temp.type == 'PT100' && kettle.temp.pin == pin || !analog && kettle.heater.pin == pin || !analog && kettle.cooler && kettle.cooler.pin == pin || !analog && !kettle.cooler && kettle.pump.pin == pin;
     });
     return kettle || false;
   };
@@ -1135,7 +1135,7 @@ angular.module('brewbench-monitor').factory('BrewService', function ($http, $q, 
     },
 
     sensorTypes: function sensorTypes(name) {
-      var sensors = [{ name: 'Thermistor', analog: true }, { name: 'DS18B20', analog: false }, { name: 'PT100', analog: false }];
+      var sensors = [{ name: 'Thermistor', analog: true, digital: false }, { name: 'DS18B20', analog: false, digital: true }, { name: 'PT100', analog: true, digital: true }];
       if (name) return _.filter(sensors, { 'name': name })[0];
       return sensors;
     },

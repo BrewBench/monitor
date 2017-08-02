@@ -8,7 +8,7 @@
 // http://static.cactus.io/downloads/library/ds18b20/cactus_io_DS18B20.zip
 #include "cactus_io_DS18B20.h"
 
-const char VERSION[] = "2.6.9";
+const char VERSION[] = "2.7.0";
 
 YunServer server;
 
@@ -95,8 +95,9 @@ void responseOkHeader(YunClient client){
 }
 
 void digitalCommand(YunClient client) {
-  int pin, value;
-  pin = client.parseInt();
+  char spin = client.read();
+  int pin = client.parseInt();
+  int value;
 
   if (client.read() == '/') {
     //set pin as output
@@ -112,13 +113,14 @@ void digitalCommand(YunClient client) {
   }
 
   // Send JSON response to client
-  client.print("{\"pin\":\""+String(pin)+"\",\"value\":\""+String(value)+"\"}");
+  client.print("{\"pin\":\""+String(spin)+String(pin)+"\",\"value\":\""+String(value)+"\"}");
 }
 
 // https://www.arduino.cc/en/Reference/AnalogWrite
 void analogCommand(YunClient client) {
-  int pin, value;
-  pin = client.parseInt();
+  char spin = client.read();
+  int pin = client.parseInt();
+  int value;
 
   if (client.read() == '/') {
     pinMode(pin, OUTPUT);
@@ -130,45 +132,49 @@ void analogCommand(YunClient client) {
   }
 
   // Send JSON response to client
-  client.print("{\"pin\":\""+String(pin)+"\",\"value\":\""+String(value)+"\"}");
+  client.print("{\"pin\":\""+String(spin)+String(pin)+"\",\"value\":\""+String(value)+"\"}");
 }
 
 void ds18B20Command(YunClient client) {
-  int pin;
+  char spin = client.read();
+  int pin = client.parseInt();
   float temp;
-  pin = client.parseInt();
+
   DS18B20 ds(pin);
   ds.readSensor();
   temp = ds.getTemperature_C();
 
   // Send JSON response to client
-  client.print("{\"pin\":\""+String(pin)+"\",\"temp\":\""+String(temp)+"\"}");
+  client.print("{\"pin\":\""+String(spin)+String(pin)+"\",\"temp\":\""+String(temp)+"\"}");
 }
 
 void thermistorCommand(YunClient client) {
-  int pin;
-  float temp;
-  pin = client.parseInt();
-  temp = Thermistor(pin);
+  char spin = client.read();
+  int pin = client.parseInt();
+  float temp = Thermistor(pin);
 
   // Send JSON response to client
-  client.print("{\"pin\":\""+String(pin)+"\",\"temp\":\""+String(temp)+"\"}");
+  client.print("{\"pin\":\""+String(spin)+String(pin)+"\",\"temp\":\""+String(temp)+"\"}");
 }
 
 // http://www.instructables.com/id/Temperature-Measurement-Tutorial-Part1/
 void pt100Command(YunClient client) {
-  int pin;
+  char spin = client.read();
+  int pin = client.parseInt();
   float tvoltage;
   float temp;
-  pin = client.parseInt();
 
-  tvoltage = analogRead(pin);
+  if( spin == 'A' )
+    tvoltage = analogRead(pin);
+  else
+    tvoltage = digitalRead(pin);
+
   if (tvoltage>409){
     tvoltage = map(tvoltage,410,1023,0,614);
     temp = (150*tvoltage)/614;
   }
   // Send JSON response to client
-  client.print("{\"pin\":\""+String(pin)+"\",\"temp\":\""+String(temp)+"\"}");
+  client.print("{\"pin\":\""+String(spin)+String(pin)+"\",\"temp\":\""+String(temp)+"\"}");
 }
 
 void setup() {

@@ -1,5 +1,10 @@
 # Change Log
 
+## 2.7.5 - 2017-08-02
+
+### Updated
+- Sketches to check for Analog or Digital for PT100 options
+
 ## 2.7.4 - 2017-08-02
 
 ### Added

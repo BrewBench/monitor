@@ -44,9 +44,9 @@ angular.module('brewbench-monitor')
 
     sensorTypes: function(name){
       var sensors = [
-        {name: 'Thermistor', analog: true}
-        ,{name: 'DS18B20', analog: false}
-        ,{name: 'PT100', analog: false}
+        {name: 'Thermistor', analog: true, digital: false}
+        ,{name: 'DS18B20', analog: false, digital: true}
+        ,{name: 'PT100', analog: true, digital: true}
       ];
       if(name)
         return _.filter(sensors, {'name': name})[0];
