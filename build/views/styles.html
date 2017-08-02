@@ -11,7 +11,7 @@
         <table class="table table-hover">
           <tr ng-repeat="type in styles.styleguide.class | filter:searchStyles">
             <td>
-              <h3 style="display:inline-block;" ng-bind-html="type._type track by $index | highlight:searchStyles">{{type._type}}</h3>
+              <h3 style="display:inline-block;" ng-bind-html="type._type | highlight:searchStyles">{{type._type}}</h3>
               <table class="table table-hover" ng-repeat="style in type.category | filter:searchStyles">
                 <tr>
                   <td>
