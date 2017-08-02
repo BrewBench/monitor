@@ -7,6 +7,7 @@ angular.module('brewbench-monitor')
     clear: function(){
       if(window.localStorage){
         window.localStorage.removeItem('settings');
+        window.localStorage.removeItem('share');
         window.localStorage.removeItem('kettles');
         window.localStorage.removeItem('urls');
       }
@@ -45,7 +46,7 @@ angular.module('brewbench-monitor')
       var sensors = [
         {name: 'Thermistor', analog: true}
         ,{name: 'DS18B20', analog: false}
-        ,{name: 'PT100', analog: true}
+        ,{name: 'PT100', analog: false}
       ];
       if(name)
         return _.filter(sensors, {'name': name})[0];

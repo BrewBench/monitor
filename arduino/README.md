@@ -44,3 +44,26 @@
   * Change or remember the host name or IP address (you will need this later)
   * Save to restart
   * Using the [Arduino IDE](https://www.arduino.cc/en/Main/Software) upload the [BrewBenchUnoWiFi sketch](arduino/BrewBenchUnoWiFi/BrewBenchUnoWiFi.ino)
+
+### Setup with Home Assistant
+This is a cool option for monitoring, check out https://home-assistant.io
+
+Depending on which sensor and pin you are using you would setup the resource in the format, `http://<arduino Domain or IP>/arduino/<sensor>/<pin>`
+
+Sensors are:
+* Thermistor
+* PT100
+* DS18B20
+
+Then add this to your `/home/user/.homeassistant/configuration.yaml`
+
+```yaml
+  sensor:
+    # https://home-assistant.io/components/sensor.rest/    
+    - platform: rest
+      resource: http://arduino.local/arduino/Thermistor/2
+      method: GET
+      name: BrewBench Fermenter
+      unit_of_measurement: "°F"
+      value_template: "{{ ((float(value_json.temp) * 9 / 5 )  +  32) | round(1) }}"
+```

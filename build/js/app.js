@@ -21,6 +21,26 @@ angular.module('brewbench-monitor', ['ui.router', 'nvd3', 'ngTouch', 'duScroll',
 });
 'use strict';
 
+angular.module('brewbench-monitor').factory('BrewBenchAPI', function ($http, $q, $filter) {
+
+  return {
+    apiUrl: 'http://localhost:8081', //'https://api.brewbench.co',
+
+    login: function login(api_key) {
+      var q = $q.defer();
+      var query = '?api_key=' + md5(api_key);
+      $http({ url: this.apiUrl + '/v1/login/' + query, method: 'GET' }).then(function (response) {
+        q.resolve(response.data);
+      }).catch(function (err) {
+        q.reject(err);
+      });
+      return q.promise;
+    }
+
+  };
+});
+'use strict';
+
 angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $stateParams, $state, $filter, $timeout, $interval, $q, BrewService) {
 
   var notification = null,
@@ -227,7 +247,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
 
   $scope.pinInUse = function (pin, analog) {
     var kettle = _.find($scope.kettles, function (kettle) {
-      return analog && kettle.temp.type == 'Thermistor' && kettle.temp.pin == pin || !analog && kettle.temp.type == 'DS18B20' && kettle.temp.pin == pin || analog && kettle.temp.type == 'PT100' && kettle.temp.pin == pin || !analog && kettle.heater.pin == pin || !analog && kettle.cooler && kettle.cooler.pin == pin || !analog && !kettle.cooler && kettle.pump.pin == pin;
+      return analog && kettle.temp.type == 'Thermistor' && kettle.temp.pin == pin || kettle.temp.type == 'DS18B20' && kettle.temp.pin == pin || kettle.temp.type == 'PT100' && kettle.temp.pin == pin || !analog && kettle.heater.pin == pin || !analog && kettle.cooler && kettle.cooler.pin == pin || !analog && !kettle.cooler && kettle.pump.pin == pin;
     });
     return kettle || false;
   };
@@ -1101,6 +1121,7 @@ angular.module('brewbench-monitor').factory('BrewService', function ($http, $q, 
     clear: function clear() {
       if (window.localStorage) {
         window.localStorage.removeItem('settings');
+        window.localStorage.removeItem('share');
         window.localStorage.removeItem('kettles');
         window.localStorage.removeItem('urls');
       }
@@ -1134,7 +1155,7 @@ angular.module('brewbench-monitor').factory('BrewService', function ($http, $q, 
     },
 
     sensorTypes: function sensorTypes(name) {
-      var sensors = [{ name: 'Thermistor', analog: true }, { name: 'DS18B20', analog: false }, { name: 'PT100', analog: true }];
+      var sensors = [{ name: 'Thermistor', analog: true }, { name: 'DS18B20', analog: false }, { name: 'PT100', analog: false }];
       if (name) return _.filter(sensors, { 'name': name })[0];
       return sensors;
     },

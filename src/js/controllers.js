@@ -77,7 +77,7 @@ $scope.share = (!$state.params.file && BrewService.settings('share')) ? BrewServ
       , password: null
       , needPassword: false
       , access: 'readOnly'
-  };  
+  };
 
 $scope.showSettingsSide = function(){
     $scope.showSettings = !$scope.showSettings;
@@ -222,8 +222,8 @@ $scope.kettles = BrewService.settings('kettles') || [{
     var kettle = _.find($scope.kettles, function(kettle){
       return (
         (analog && kettle.temp.type=='Thermistor' && kettle.temp.pin==pin) ||
-        (!analog && kettle.temp.type=='DS18B20' && kettle.temp.pin==pin) ||
-        (analog && kettle.temp.type=='PT100' && kettle.temp.pin==pin) ||
+        (kettle.temp.type=='DS18B20' && kettle.temp.pin==pin) ||
+        (kettle.temp.type=='PT100' && kettle.temp.pin==pin) ||
         (!analog && kettle.heater.pin==pin) ||
         (!analog && kettle.cooler && kettle.cooler.pin==pin) ||
         (!analog && !kettle.cooler && kettle.pump.pin==pin)

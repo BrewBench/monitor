@@ -1,5 +1,13 @@
 # Change Log
 
+## 2.7.4 - 2017-08-02
+
+### Added
+- Analog option for PT100 and DS18B20 sensors
+
+### Fixed
+- Clear settings for fullAccess share
+
 ## 2.7.3 - 2017-08-01
 
 ### Added
