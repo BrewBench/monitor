@@ -21,26 +21,6 @@ angular.module('brewbench-monitor', ['ui.router', 'nvd3', 'ngTouch', 'duScroll',
 });
 'use strict';
 
-angular.module('brewbench-monitor').factory('BrewBenchAPI', function ($http, $q, $filter) {
-
-  return {
-    apiUrl: 'http://localhost:8081', //'https://api.brewbench.co',
-
-    login: function login(api_key) {
-      var q = $q.defer();
-      var query = '?api_key=' + md5(api_key);
-      $http({ url: this.apiUrl + '/v1/login/' + query, method: 'GET' }).then(function (response) {
-        q.resolve(response.data);
-      }).catch(function (err) {
-        q.reject(err);
-      });
-      return q.promise;
-    }
-
-  };
-});
-'use strict';
-
 angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $stateParams, $state, $filter, $timeout, $interval, $q, BrewService) {
 
   var notification = null,
