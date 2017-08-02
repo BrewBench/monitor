@@ -23,14 +23,14 @@
               </button>
               <ul class="dropdown-menu" ng-if="sensorTypes(kettle.temp.type).analog">
                 <li ng-repeat="p in getPortRange(settings.ports.analog) track by $index" ng-class="{'active': kettle.temp.pin=='A'+p}">
-                  <a href="#" ng-click="pinChange(kettle.temp.pin,p,true); kettle.temp.pin='A'+p;">A{{p}}
+                  <a href="" ng-click="pinChange(kettle.temp.pin,p,true); kettle.temp.pin='A'+p;">A{{p}}
                     <span class="pininuse" ng-show="pinInUse('A'+p,true)">(In Use)</span>
                   </a>
                 </li>
               </ul>
               <ul class="dropdown-menu" ng-if="!sensorTypes(kettle.temp.type).analog">
                 <li ng-repeat="p in getPortRange(settings.ports.digital) track by $index" ng-class="{'active': kettle.temp.pin=='D'+p}">
-                  <a href="#" ng-click="pinChange(kettle.temp.pin,p,false); kettle.temp.pin='D'+p;">D{{p}}
+                  <a href="" ng-click="pinChange(kettle.temp.pin,p,false); kettle.temp.pin='D'+p;">D{{p}}
                     <span class="pininuse" ng-show="pinInUse('D'+p,false)">(In Use)</span>
                   </a>
                 </li>
@@ -42,7 +42,7 @@
               </button>
               <ul class="dropdown-menu" ng-init="sensors = sensorTypes()">
                 <li ng-repeat="s in sensors track by $index" ng-class="{'active': kettle.temp.type==s.name}">
-                  <a href="#" ng-click="kettle.temp.type=s.name;">{{s.name}}</a>
+                  <a href="" ng-click="kettle.temp.type=s.name;">{{s.name}}</a>
                 </li>
               </ul>
             </div>
@@ -51,7 +51,7 @@
 
         <div class="kettle-col">
           <label class="adjust" ng-class="{'heating':kettle.heater.running}">Heat
-            <sup><a ng-if="kettle.heater.pin.indexOf('D') !== -1" href="#" ng-click="togglePWM(kettle.heater)">PWM ~</a></sup>
+            <sup><a ng-if="kettle.heater.pin.indexOf('D') !== -1" href="" ng-click="togglePWM(kettle.heater)">PWM ~</a></sup>
           </label>
           <div class="btn-group">
             <div class="btn-group">
@@ -59,12 +59,12 @@
                 {{kettle.heater.pin}} <span class="caret"></span>
               </button>
               <ul class="dropdown-menu">
-                <li class="ssr"><a href="#" ng-class="{'on': kettle.heater.ssr}" ng-click="kettle.heater.ssr = !kettle.heater.ssr">SSR</a></li>
+                <li class="ssr"><a href="" ng-class="{'on': kettle.heater.ssr}" ng-click="kettle.heater.ssr = !kettle.heater.ssr">SSR</a></li>
                 <li ng-repeat="p in getPortRange(settings.ports.analog) track by $index" ng-class="{'active': kettle.heater.pin=='A'+p}">
-                  <a href="#" ng-click="pinChange(kettle.heater.pin,'A'+p,true); kettle.heater.pin='A'+p; kettle.heater.pwm=false;">A{{p}} <span class="pininuse" ng-show="pinInUse('A'+p,true)">(In Use)</span></a>
+                  <a href="" ng-click="pinChange(kettle.heater.pin,'A'+p,true); kettle.heater.pin='A'+p; kettle.heater.pwm=false;">A{{p}} <span class="pininuse" ng-show="pinInUse('A'+p,true)">(In Use)</span></a>
                 </li>
                 <li ng-repeat="p in getPortRange(settings.ports.digital) track by $index" ng-class="{'active': kettle.heater.pin=='D'+p}">
-                  <a href="#" ng-click="pinChange(kettle.heater.pin,'D'+p,false); kettle.heater.pin='D'+p;">D{{p}} <span class="pininuse" ng-show="pinInUse('D'+p,false)">(In Use)</span></a>
+                  <a href="" ng-click="pinChange(kettle.heater.pin,'D'+p,false); kettle.heater.pin='D'+p;">D{{p}} <span class="pininuse" ng-show="pinInUse('D'+p,false)">(In Use)</span></a>
                 </li>
               </ul>
             </div>
@@ -82,7 +82,7 @@
 
         <div class="kettle-col" ng-if="kettle.type !== 'fermenter'">
           <label class="adjust">Pump
-            <sup><a ng-if="kettle.pump.pin.indexOf('D') !== -1" href="#" ng-click="togglePWM(kettle.pump)">PWM ~</a></sup>
+            <sup><a ng-if="kettle.pump.pin.indexOf('D') !== -1" href="" ng-click="togglePWM(kettle.pump)">PWM ~</a></sup>
           </label>
           <div class="btn-group">
             <div class="btn-group">
@@ -90,12 +90,12 @@
                 {{kettle.pump.pin}} <span class="caret"></span>
               </button>
               <ul class="dropdown-menu">
-                <li class="ssr"><a href="#" ng-class="{'on': kettle.pump.ssr}" ng-click="kettle.pump.ssr = !kettle.pump.ssr">SSR</a></li>
+                <li class="ssr"><a href="" ng-class="{'on': kettle.pump.ssr}" ng-click="kettle.pump.ssr = !kettle.pump.ssr">SSR</a></li>
                 <li ng-repeat="p in getPortRange(settings.ports.analog) track by $index" ng-class="{'active': kettle.pump.pin=='A'+p}">
-                  <a href="#" ng-click="pinChange(kettle.pump.pin,'A'+p,true); kettle.pump.pin='A'+p; kettle.pump.pwm=false;">A{{p}} <span class="pininuse" ng-show="pinInUse('A'+p,true)">(In Use)</span></a>
+                  <a href="" ng-click="pinChange(kettle.pump.pin,'A'+p,true); kettle.pump.pin='A'+p; kettle.pump.pwm=false;">A{{p}} <span class="pininuse" ng-show="pinInUse('A'+p,true)">(In Use)</span></a>
                 </li>
                 <li ng-repeat="p in getPortRange(settings.ports.digital) track by $index" ng-class="{'active': kettle.pump.pin=='D'+p}">
-                  <a href="#" ng-click="pinChange(kettle.pump.pin,'D'+p,false); kettle.pump.pin='D'+p;">D{{p}} <span class="pininuse" ng-show="pinInUse('D'+p,false)">(In Use)</span></a>
+                  <a href="" ng-click="pinChange(kettle.pump.pin,'D'+p,false); kettle.pump.pin='D'+p;">D{{p}} <span class="pininuse" ng-show="pinInUse('D'+p,false)">(In Use)</span></a>
                 </li>
               </ul>
             </div>
@@ -113,7 +113,7 @@
 
         <div class="kettle-col" ng-if="kettle.type === 'fermenter' && kettle.cooler">
           <label class="adjust" ng-class="{'cooling':kettle.cooler.running}">Cool
-            <sup><a ng-if="kettle.cooler.pin.indexOf('D') !== -1" href="#" ng-click="togglePWM(kettle.cooler)">PWM ~</a></sup>
+            <sup><a ng-if="kettle.cooler.pin.indexOf('D') !== -1" href="" ng-click="togglePWM(kettle.cooler)">PWM ~</a></sup>
           </label>
           <div class="btn-group">
             <div class="btn-group">
@@ -121,12 +121,12 @@
                 {{kettle.cooler.pin}} <span class="caret"></span>
               </button>
               <ul class="dropdown-menu">
-                <li class="ssr"><a href="#" ng-class="{'on': kettle.cooler.ssr}" ng-click="kettle.cooler.ssr = !kettle.cooler.ssr">SSR</a></li>
+                <li class="ssr"><a href="" ng-class="{'on': kettle.cooler.ssr}" ng-click="kettle.cooler.ssr = !kettle.cooler.ssr">SSR</a></li>
                 <li ng-repeat="p in getPortRange(settings.ports.analog) track by $index" ng-class="{'active': kettle.cooler.pin=='A'+p}">
-                  <a href="#" ng-click="pinChange(kettle.cooler.pin,'A'+p,true); kettle.cooler.pin='A'+p; kettle.cooler.pwm=false;">A{{p}} <span class="pininuse" ng-show="pinInUse('A'+p,true)">(In Use)</span></a>
+                  <a href="" ng-click="pinChange(kettle.cooler.pin,'A'+p,true); kettle.cooler.pin='A'+p; kettle.cooler.pwm=false;">A{{p}} <span class="pininuse" ng-show="pinInUse('A'+p,true)">(In Use)</span></a>
                 </li>
                 <li ng-repeat="p in getPortRange(settings.ports.digital) track by $index" ng-class="{'active': kettle.cooler.pin=='D'+p}">
-                  <a href="#" ng-click="pinChange(kettle.cooler.pin,'D'+p,false); kettle.cooler.pin='D'+p;">D{{p}} <span class="pininuse" ng-show="pinInUse('D'+p,false)">(In Use)</span></a>
+                  <a href="" ng-click="pinChange(kettle.cooler.pin,'D'+p,false); kettle.cooler.pin='D'+p;">D{{p}} <span class="pininuse" ng-show="pinInUse('D'+p,false)">(In Use)</span></a>
                 </li>
               </ul>
             </div>
@@ -172,7 +172,7 @@
               <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></button>
               <ul class="dropdown-menu scrollable-menu">
                 <li ng-repeat="grain in grains">
-                  <a href="#" ng-click="addTimer(kettle,{label:grain.name,min:60})">{{grain.name}}</a>
+                  <a href="" ng-click="addTimer(kettle,{label:grain.name,min:60})">{{grain.name}}</a>
                 </li>
               </ul>
             </div>
@@ -182,9 +182,9 @@
               <button type="button" class="btn btn-default add-timer" ng-click="addTimer(kettle)"><img src="/assets/img/hop.svg" width="32"></button>
               <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></button>
               <ul class="dropdown-menu scrollable-menu">
-                <li><a href="#" ng-click="addTimer(kettle,{label:'Whirlfloc',min:10})">Whirlfloc</a></li>
+                <li><a href="" ng-click="addTimer(kettle,{label:'Whirlfloc',min:10})">Whirlfloc</a></li>
                 <li ng-repeat="hop in hops">
-                  <a href="#" ng-click="addTimer(kettle,{label:hop.name,min:30})">{{hop.name}}</a>
+                  <a href="" ng-click="addTimer(kettle,{label:hop.name,min:30})">{{hop.name}}</a>
                 </li>
               </ul>
             </div>
@@ -195,7 +195,7 @@
               <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></button>
               <ul class="dropdown-menu scrollable-menu">
                 <li ng-repeat="water in water">
-                  <a href="#" ng-click="addTimer(kettle,{label:water.name,min:10})">{{water.name}}</a>
+                  <a href="" ng-click="addTimer(kettle,{label:water.name,min:10})">{{water.name}}</a>
                 </li>
               </ul>
             </div>

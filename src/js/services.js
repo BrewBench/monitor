@@ -26,19 +26,19 @@ angular.module('brewbench-monitor')
     },
 
     settings: function(key,values){
-          if(!window.localStorage)
-            return values;
-          try {
-            if(values){
-              return window.localStorage.setItem(key,JSON.stringify(values));
-            }
-            else if(window.localStorage.getItem(key)){
-              return JSON.parse(window.localStorage.getItem(key));
-            }
-          } catch(e){
-            /*JSON parse error*/
-          }
-          return values;
+      if(!window.localStorage)
+        return values;
+      try {
+        if(values){
+          return window.localStorage.setItem(key,JSON.stringify(values));
+        }
+        else if(window.localStorage.getItem(key)){
+          return JSON.parse(window.localStorage.getItem(key));
+        }
+      } catch(e){
+        /*JSON parse error*/
+      }
+      return values;
     },
 
     sensorTypes: function(name){

@@ -1,5 +1,16 @@
 # Change Log
 
+## 2.7.3 - 2017-08-01
+
+### Added
+- Style Guide reference
+- Reference highlighting
+
+### Fixed
+- All links to not reload the page
+- Share all access showing all controls
+- Error messages
+
 ## 2.7.2 - 2017-07-04
 
 ### Fixed

@@ -26,4 +26,12 @@ angular.module('brewbench-monitor')
   return function(fahrenheit) {
     return Math.round((fahrenheit-32)*5/9);
   };
+})
+.filter('highlight', function($sce) {
+  return function(text, phrase) {
+    if (text && phrase) text = text.replace(new RegExp('('+phrase+')', 'gi'),
+      '<span class="highlighted">$1</span>')
+
+    return $sce.trustAsHtml(text)
+  };
 });

@@ -13,9 +13,10 @@ $scope.kettleTypes = BrewService.kettleTypes();
 $scope.chartOptions = BrewService.chartOptions();
 $scope.sensorTypes = BrewService.sensorTypes;
 $scope.showSettings = true;
-$scope.share = {file: $state.params.file || null, password: null, needPassword: false, access: 'readOnly'};
-$scope.error_message = '';
-$scope.slider = {options: {
+$scope.error = {message: '', type: 'danger'};
+$scope.slider = {
+  min: 0,
+  options: {
     floor: 0,
     ceil: 100,
     step: 5,
@@ -71,9 +72,16 @@ $scope.getLovibondColor = function(range){
 
 //default settings values
 $scope.settings = BrewService.settings('settings') || BrewService.reset();
+$scope.share = (!$state.params.file && BrewService.settings('share')) ? BrewService.settings('share') : {
+      file: $state.params.file || null
+      , password: null
+      , needPassword: false
+      , access: 'readOnly'
+  };  
 
 $scope.showSettingsSide = function(){
     $scope.showSettings = !$scope.showSettings;
+    return false;
 };
 
 $scope.sumValues = function(obj){
@@ -296,10 +304,11 @@ $scope.kettles = BrewService.settings('kettles') || [{
             }
           }
         }
+        $scope.resetError();
         return true;
       })
       .catch(function(err) {
-        return $scope.error_message = "Opps, there was a problem loading the shared session.";
+        return $scope.error.message = "Opps, there was a problem loading the shared session.";
       });
   };
 
@@ -498,13 +507,19 @@ $scope.kettles = BrewService.settings('kettles') || [{
 
   $scope.connectError = function(err){
     if(!!$scope.settings.shared){
-      $scope.error_message = 'The monitor seems to be off-line, re-connecting...';
+      $scope.error.type = 'warning';
+      $scope.error.message = 'The monitor seems to be off-line, re-connecting...';
     } else {
       if(err && typeof err == 'string')
-        $scope.error_message = err;
+        $scope.error.message = err;
       else
-        $scope.error_message = 'Could not connect to the Arduino at '+BrewService.domain();
+        $scope.error.message = 'Could not connect to the Arduino at '+BrewService.domain();
     }
+  };
+
+  $scope.resetError = function(){
+    $scope.error.type = 'danger';
+    $scope.error.message = '';
   };
 
   function updateTemp(response,kettle){
@@ -513,7 +528,8 @@ $scope.kettles = BrewService.settings('kettles') || [{
       return false;
     }
 
-    $scope.error_message = '';
+    $scope.resetError();
+
     var temps = [];
     //chart date
     var date = new Date();
@@ -860,13 +876,13 @@ $scope.kettles = BrewService.settings('kettles') || [{
     if($scope.settings.notifications.slack.indexOf('http')!==-1){
       BrewService.slack($scope.settings.notifications.slack,message,color,icon,kettle)
         .then(function(response){
-          // console.log('Slack',response);
+          $scope.resetError();
         })
         .catch(function(err){
           if(err.message)
-            $scope.error_message = `Failed posting to Slack ${err.message}`;
+            $scope.error.message = `Failed posting to Slack ${err.message}`;
           else
-            $scope.error_message = `Failed posting to Slack ${JSON.stringify(err)}`;
+            $scope.error.message = `Failed posting to Slack ${JSON.stringify(err)}`;
         });
     }
   };
@@ -919,6 +935,10 @@ $scope.kettles = BrewService.settings('kettles') || [{
   };
 
   $scope.changeKettleType = function(kettle){
+    //don't allow changing kettles on shared sessions
+    //this could be dangerous if doing this remotely
+    if($scope.settings.shared)
+      return;
     // find current kettle
     var kettleIndex = _.findIndex($scope.kettleTypes, {type: kettle.type});
     // move to next or first kettle in array
@@ -1069,6 +1089,10 @@ $scope.kettles = BrewService.settings('kettles') || [{
 
   $scope.$watch('kettles',function(newValue,oldValue){
     BrewService.settings('kettles',newValue);
+  },true);
+
+  $scope.$watch('share',function(newValue,oldValue){
+    BrewService.settings('share',newValue);
   },true);
 
 });

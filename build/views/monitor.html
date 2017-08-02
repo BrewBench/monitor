@@ -18,9 +18,9 @@
   <div class="row" ng-disabled="share.needPassword" ng-class="{'disabled':share.needPassword}">
     <div ng-class="{'col-md-8': showSettings, 'col-md-12': !showSettings}">
 
-      <div class="alert alert-danger alert-dismissible" role="alert" ng-if="error_message">
+      <div class="alert alert-{{error.type}} alert-dismissible" role="alert" ng-if="error.message">
         <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <strong>Something is not right!</strong> {{error_message}}
+        <strong>{{error.type}}</strong> {{error.message}}
       </div>
 
       <nvd3 options="chartOptions" data="kettles"></nvd3>

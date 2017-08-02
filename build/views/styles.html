@@ -5,65 +5,65 @@
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
         <h1 class="modal-title"><i class="fa fa-book fa-lg" aria-hidden="true"></i> Style <sup class="ref">Guide</sup></h1>
-        <input ng-model="searchStyles" placeholder="Search Styles">
+        <input ng-model="searchStyles" class="form-control" placeholder="Search Styles">
       </div>
       <div class="modal-body">
         <table class="table table-hover">
-          <tr ng-repeat="type in styles.styleguide.class">
+          <tr ng-repeat="type in styles.styleguide.class | filter:searchStyles">
             <td>
-              <h3>{{type._type}}</h3>
+              <h3 style="display:inline-block;" ng-bind-html="type._type track by $index | highlight:searchStyles">{{type._type}}</h3>
               <table class="table table-hover" ng-repeat="style in type.category | filter:searchStyles">
                 <tr>
                   <td>
-                    <h4>{{style.name}}</h4>
-                    <p>{{style.notes}}</p>
+                    <h4 ng-bind-html="style.name | highlight:searchStyles">{{style.name}}</h4>
+                    <p ng-bind-html="style.notes | highlight:searchStyles">{{style.notes}}</p>
                   </td>
                 </tr>
                 <tr>
                   <td>
                     <table class="table table-hover" ng-repeat="beer in style.subcategory | filter:searchStyles">
                       <tr>
-                        <td colspan="2"><strong>{{beer.name}}</strong></td>
+                        <td colspan="2"><strong ng-bind-html="beer.name | highlight:searchStyles">{{beer.name}}</strong></td>
                       </tr>
                       <tr>
                         <td>History</td>
-                        <td>{{beer.history}}</td>
+                        <td ng-bind-html="beer.history | highlight:searchStyles">{{beer.history}}</td>
                       </tr>
                       <tr>
                         <td>Appearance</td>
-                        <td>{{beer.appearance}}</td>
+                        <td ng-bind-html="beer.appearance | highlight:searchStyles">{{beer.appearance}}</td>
                       </tr>
                       <tr>
                         <td>Aroma</td>
-                        <td>{{beer.aroma}}</td>
+                        <td ng-bind-html="beer.aroma | highlight:searchStyles">{{beer.aroma}}</td>
                       </tr>
                       <tr>
                         <td>Comments</td>
-                        <td>{{beer.comments}}</td>
+                        <td ng-bind-html="beer.comments | highlight:searchStyles">{{beer.comments}}</td>
                       </tr>
                       <tr>
                         <td>Comparison</td>
-                        <td>{{beer.comparison}}</td>
+                        <td ng-bind-html="beer.comparison | highlight:searchStyles">{{beer.comparison}}</td>
                       </tr>
                       <tr>
                         <td>Examples</td>
-                        <td>{{beer.examples}}</td>
+                        <td ng-bind-html="beer.examples | highlight:searchStyles">{{beer.examples}}</td>
                       </tr>
                       <tr>
                         <td>Flavor</td>
-                        <td>{{beer.flavor}}</td>
+                        <td ng-bind-html="beer.flavor | highlight:searchStyles">{{beer.flavor}}</td>
                       </tr>
                       <tr>
                         <td>Impression</td>
-                        <td>{{beer.impression}}</td>
+                        <td ng-bind-html="beer.impression | highlight:searchStyles">{{beer.impression}}</td>
                       </tr>
                       <tr>
                         <td>Ingredients</td>
-                        <td>{{beer.ingredients}}</td>
+                        <td ng-bind-html="beer.ingredients | highlight:searchStyles">{{beer.ingredients}}</td>
                       </tr>
                       <tr>
                         <td>Mouth Feel</td>
-                        <td>{{beer.mouthfeel}}</td>
+                        <td ng-bind-html="beer.mouthfeel | highlight:searchStyles">{{beer.mouthfeel}}</td>
                       </tr>
                     </table>
                   </td>
