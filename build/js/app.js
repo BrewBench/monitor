@@ -1441,6 +1441,7 @@ angular.module('brewbench-monitor').factory('BrewService', function ($http, $q, 
           });
           // hop.F_H_ALPHA
           // hop.F_H_DRY_HOP_TIME
+          // hop.F_H_ORIGIN
         });
       }
 
@@ -1448,18 +1449,18 @@ angular.module('brewbench-monitor').factory('BrewService', function ($http, $q, 
         if (recipe.Ingredients.Data.Misc.length) {
           _.each(recipe.Ingredients.Data.Misc, function (misc) {
             response.misc.push({
-              label: misc.F_M_NAME + ' ' + $filter('number')(misc.F_M_AMOUNT, 2),
+              label: misc.F_M_NAME,
               min: parseInt(misc.F_M_TIME, 10),
-              notes: 'Add ' + $filter('number')(misc.F_H_AMOUNT, 2),
-              amount: $filter('number')(misc.F_H_AMOUNT, 2)
+              notes: $filter('number')(misc.F_M_AMOUNT, 2) + ' g.',
+              amount: $filter('number')(misc.F_M_AMOUNT, 2)
             });
           });
         } else {
           response.misc.push({
-            label: recipe.Ingredients.Data.Misc.F_M_NAME + ' ' + $filter('number')(recipe.Ingredients.Data.Misc.F_M_AMOUNT, 2) + ' oz.',
+            label: recipe.Ingredients.Data.Misc.F_M_NAME,
             min: parseInt(recipe.Ingredients.Data.Misc.F_M_TIME, 10),
-            notes: 'Add ' + $filter('number')(recipe.Ingredients.Data.Misc.F_H_AMOUNT, 2),
-            amount: $filter('number')(recipe.Ingredients.Data.Misc.F_H_AMOUNT, 2)
+            notes: $filter('number')(recipe.Ingredients.Data.Misc.F_M_AMOUNT, 2) + ' g.',
+            amount: $filter('number')(recipe.Ingredients.Data.Misc.F_M_AMOUNT, 2)
           });
         }
       }
@@ -1468,12 +1469,12 @@ angular.module('brewbench-monitor').factory('BrewService', function ($http, $q, 
         if (recipe.Ingredients.Data.Yeast.length) {
           _.each(recipe.Ingredients.Data.Yeast, function (yeast) {
             response.yeast.push({
-              name: yeast.F_Y_LAB + ' ' + yeast.F_Y_PRODUCT_ID
+              name: yeast.F_Y_LAB + ' ' + (yeast.F_Y_PRODUCT_ID ? yeast.F_Y_PRODUCT_ID : yeast.F_Y_NAME)
             });
           });
         } else {
           response.yeast.push({
-            name: recipe.Ingredients.Data.Yeast.F_Y_LAB + ' ' + recipe.Ingredients.Data.Yeast.F_Y_PRODUCT_ID
+            name: recipe.Ingredients.Data.Yeast.F_Y_LAB + ' ' + (recipe.Ingredients.Data.Yeast.F_Y_PRODUCT_ID ? recipe.Ingredients.Data.Yeast.F_Y_PRODUCT_ID : recipe.Ingredients.Data.Yeast.F_Y_NAME)
           });
         }
       }
