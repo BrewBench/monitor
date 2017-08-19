@@ -94,7 +94,7 @@ void responseOkHeader(BridgeClient client){
     client.println();
 }
 
-void digitalCommand(YunClient client) {
+void digitalCommand(BridgeClient client) {
   char spin = client.read();
   int pin = client.parseInt();
   int value;
@@ -117,7 +117,7 @@ void digitalCommand(YunClient client) {
 }
 
 // https://www.arduino.cc/en/Reference/AnalogWrite
-void analogCommand(YunClient client) {
+void analogCommand(BridgeClient client) {
   char spin = client.read();
   int pin = client.parseInt();
   int value;
@@ -135,7 +135,7 @@ void analogCommand(YunClient client) {
   client.print("{\"pin\":\""+String(spin)+String(pin)+"\",\"value\":\""+String(value)+"\"}");
 }
 
-void ds18B20Command(YunClient client) {
+void ds18B20Command(BridgeClient client) {
   char spin = client.read();
   int pin = client.parseInt();
   float temp;
@@ -148,7 +148,7 @@ void ds18B20Command(YunClient client) {
   client.print("{\"pin\":\""+String(spin)+String(pin)+"\",\"temp\":\""+String(temp)+"\"}");
 }
 
-void thermistorCommand(YunClient client) {
+void thermistorCommand(BridgeClient client) {
   char spin = client.read();
   int pin = client.parseInt();
   float temp = Thermistor(pin);
@@ -158,7 +158,7 @@ void thermistorCommand(YunClient client) {
 }
 
 // http://www.instructables.com/id/Temperature-Measurement-Tutorial-Part1/
-void pt100Command(YunClient client) {
+void pt100Command(BridgeClient client) {
   char spin = client.read();
   int pin = client.parseInt();
   float tvoltage;
