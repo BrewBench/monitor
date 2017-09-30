@@ -189,6 +189,17 @@ angular.module('brewbench-monitor')
       return q.promise;
     },
 
+    deleteShareFile: function(file, password){
+      var q = $q.defer();
+      $http({url: 'https://monitor.brewbench.co/share/delete/'+file, method: 'GET'})
+        .then(function(response){
+          q.resolve(response.data);
+        }, function(err){
+          q.reject(err);
+        });
+      return q.promise;
+    },
+
     createShare: function(share){
       var q = $q.defer();
       var settings = this.settings('settings');
