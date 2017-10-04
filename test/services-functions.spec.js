@@ -112,6 +112,13 @@ describe('BrewBench Service', function() {
     });
   });
 
+  describe('.shareTest()', function() {
+    // A simple test to verify the method shareTest exists
+    it('should exist', function() {
+      expect(BrewService.shareTest).toBeDefined();
+    });
+  });
+
   describe('.pkg()', function() {
     // A simple test to verify the method pkg exists
     it('should exist', function() {

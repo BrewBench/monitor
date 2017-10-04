@@ -18,11 +18,14 @@ angular.module('brewbench-monitor')
         pollSeconds: 10
         ,unit: 'F'
         ,shared: false
-        ,arduinoUrl: '192.168.240.1'
-        ,ports: {'analog':5, 'digital':13}
         ,recipe: {'name':'','brewer':{name:'','email':''},'yeast':[],'hops':[],'malt':[],scale:'gravity',method:'papazian','og':1.050,'fg':1.010,'abv':0,'abw':0,'calories':0,'attenuation':0}
-        ,notifications: {on:true,timers:true,high:true,low:true,target:true,slack:'Slack notification webhook Url',last:''}
+        ,notifications: {on:true,timers:true,high:true,low:true,target:true,slack:'Webhook Url',last:''}
         ,sounds: {on:true,alert:'/assets/audio/bike.mp3',timer:'/assets/audio/school.mp3'}
+        ,arduinos: [{
+          url: 'arduino.local',
+          analog: 5,
+          digital: 13
+        }]
       };
     },
 
@@ -43,7 +46,7 @@ angular.module('brewbench-monitor')
     },
 
     sensorTypes: function(name){
-      var sensors = [
+      let sensors = [
         {name: 'Thermistor', analog: true, digital: false}
         ,{name: 'DS18B20', analog: false, digital: true}
         ,{name: 'PT100', analog: true, digital: true}
@@ -54,7 +57,7 @@ angular.module('brewbench-monitor')
     },
 
     kettleTypes: function(type){
-      var kettles = [
+      let kettles = [
         {'name':'Boil','type':'hop','target':200,'diff':5}
         ,{'name':'Mash','type':'grain','target':150,'diff':5}
         ,{'name':'Hot Liquor','type':'water','target':200,'diff':5}
@@ -65,24 +68,28 @@ angular.module('brewbench-monitor')
       return kettles;
     },
 
-    domain: function(format){
-      var settings = this.settings('settings');
-      var domain = '';
+    domain: function(arduino){
+      let settings = this.settings('settings');
+      let domain = 'http://arduino.local';
 
-      if(settings && settings.arduinoUrl)
-        domain = (settings.arduinoUrl.indexOf('//') === -1) ? '//'+settings.arduinoUrl : settings.arduinoUrl;
-      else if(document.location.host == 'localhost')
-        domain = 'http://arduino.local';
+      if(arduino && arduino.url){
+        domain = (arduino.url.indexOf('//') !== -1) ?
+          arduino.url.substr(arduino.url.indexOf('//')+2) :
+          arduino.url;
 
-      if(!!format)
-        return domain.indexOf('//') !== -1 ? domain.substring(domain.indexOf('//')+2) : domain;
+        if(!!arduino.secure)
+          domain = `https://${domain}`;
+        else
+          domain = `http://${domain}`;
+      }
+
       return domain;
     },
 
     slack: function(webhook_url,msg,color,icon,kettle){
-      var q = $q.defer();
+      let q = $q.defer();
 
-      var postObj = {'attachments': [{'fallback': msg,
+      let postObj = {'attachments': [{'fallback': msg,
             'title': kettle.key+' kettle',
             'title_link': 'http://'+document.location.host,
             'fields': [{'value': msg}],
@@ -93,9 +100,10 @@ angular.module('brewbench-monitor')
         };
 
       $http({url: webhook_url, method:'POST', data: 'payload='+JSON.stringify(postObj), headers: { 'Content-Type': 'application/x-www-form-urlencoded' }})
-        .then(function(response){
+        .then(response => {
           q.resolve(response.data);
-        }).catch(function(err){
+        })
+        .catch(err => {
           q.reject(err);
         });
       return q.promise;
@@ -105,18 +113,23 @@ angular.module('brewbench-monitor')
     // https://learn.adafruit.com/thermistor/using-a-thermistor
     // https://www.adafruit.com/product/381)
     // https://www.adafruit.com/product/3290 and https://www.adafruit.com/product/3328
-    temp: function(temp){
-      var q = $q.defer();
-      var url = this.domain()+'/arduino/'+temp.type+'/'+temp.pin;
-      var settings = this.settings('settings');
+    temp: function(kettle){
+      let q = $q.defer();
+      let url = this.domain(kettle.arduino)+'/arduino/'+kettle.temp.type+'/'+kettle.temp.pin;
+      let settings = this.settings('settings');
+      let headers = {};
 
-      $http({url: url, method: 'GET', timeout:  settings.pollSeconds*1000})
-        .then(function(response){
+      if(kettle.arduino.password)
+        headers.Authorization = 'Basic '+btoa('root:'+kettle.arduino.password);
+
+      $http({url: url, method: 'GET', headers: headers, timeout: settings.pollSeconds*10000})
+        .then(response => {
           if(!settings.shared && response.headers('X-Sketch-Version') == null || response.headers('X-Sketch-Version') < settings.sketch_version)
             q.reject('Sketch Version is out of date.  Please Update. Sketch: '+response.headers('X-Sketch-Version')+' BrewBench: '+settings.sketch_version);
           else
             q.resolve(response.data);
-        }, function(err){
+        })
+        .catch(err => {
           q.reject(err);
         });
       return q.promise;
@@ -124,87 +137,105 @@ angular.module('brewbench-monitor')
     // read/write heater
     // http://arduinotronics.blogspot.com/2013/01/working-with-sainsmart-5v-relay-board.html
     // http://myhowtosandprojects.blogspot.com/2014/02/sainsmart-2-channel-5v-relay-arduino.html
-    digital: function(sensor,value){
-      var q = $q.defer();
-      var url = this.domain()+'/arduino/digital/'+sensor+'/'+value;
-      var settings = this.settings('settings');
+    digital: function(kettle,sensor,value){
+      let q = $q.defer();
+      let url = this.domain(kettle.arduino)+'/arduino/digital/'+sensor+'/'+value;
+      let settings = this.settings('settings');
+      let headers = {};
 
-      $http({url: url, method: 'GET', timeout: settings.pollSeconds*1000})
-        .then(function(response){
+      if(kettle.arduino.password)
+        headers.Authorization = 'Basic '+btoa('root:'+kettle.arduino.password);
+
+      $http({url: url, method: 'GET', headers: headers, timeout: settings.pollSeconds*1000})
+        .then(response => {
           if(!settings.shared && response.headers('X-Sketch-Version') == null || response.headers('X-Sketch-Version') < settings.sketch_version)
             q.reject('Sketch Version is out of date.  Please Update. Sketch: '+response.headers('X-Sketch-Version')+' BrewBench: '+settings.sketch_version);
           else
             q.resolve(response.data);
-        }, function(err){
+        })
+        .catch(err => {
           q.reject(err);
         });
       return q.promise;
     },
 
-    analog: function(sensor,value){
-      var q = $q.defer();
-      var url = this.domain()+'/arduino/analog/'+sensor+'/'+value;
-      var settings = this.settings('settings');
+    analog: function(kettle,sensor,value){
+      let q = $q.defer();
+      let url = this.domain(kettle.arduino)+'/arduino/analog/'+sensor+'/'+value;
+      let settings = this.settings('settings');
+      let headers = {};
 
-      $http({url: url, method: 'GET', timeout: settings.pollSeconds*1000})
-        .then(function(response){
+      if(kettle.arduino.password)
+        headers.Authorization = 'Basic '+btoa('root:'+kettle.arduino.password);
+
+      $http({url: url, method: 'GET', headers: headers, timeout: settings.pollSeconds*1000})
+        .then(response => {
           if(!settings.shared && response.headers('X-Sketch-Version') == null || response.headers('X-Sketch-Version') < settings.sketch_version)
             q.reject('Sketch Version is out of date.  Please Update. Sketch: '+response.headers('X-Sketch-Version')+' BrewBench: '+settings.sketch_version);
           else
             q.resolve(response.data);
-        }, function(err){
+        })
+        .catch(err => {
           q.reject(err);
         });
       return q.promise;
     },
 
-    digitalRead: function(sensor, timeout){
-      var q = $q.defer();
-      var url = this.domain()+'/arduino/digital/'+sensor;
-      var settings = this.settings('settings');
+    digitalRead: function(kettle,sensor,timeout){
+      let q = $q.defer();
+      let url = this.domain(kettle.arduino)+'/arduino/digital/'+sensor;
+      let settings = this.settings('settings');
+      let headers = {};
 
-      $http({url: url, method: 'GET', timeout: (timeout || settings.pollSeconds*1000)})
-        .then(function(response){
+      if(kettle.arduino.password)
+        headers.Authorization = 'Basic '+btoa('root:'+kettle.arduino.password);
+
+      $http({url: url, method: 'GET', headers: headers, timeout: (timeout || settings.pollSeconds*1000)})
+        .then(response => {
           if(!settings.shared && response.headers('X-Sketch-Version') == null || response.headers('X-Sketch-Version') < settings.sketch_version)
             q.reject('Sketch Version is out of date.  Please Update. Sketch: '+response.headers('X-Sketch-Version')+' BrewBench: '+settings.sketch_version);
           else
             q.resolve(response.data);
-        }, function(err){
+        })
+        .catch(err => {
           q.reject(err);
         });
       return q.promise;
     },
 
     loadShareFile: function(file, password){
-      var q = $q.defer();
-      var query = '';
+      let q = $q.defer();
+      let query = '';
       if(password)
         query = '?password='+md5(password);
       $http({url: 'https://monitor.brewbench.co/share/get/'+file+query, method: 'GET'})
-        .then(function(response){
+        .then(response => {
           q.resolve(response.data);
-        }, function(err){
+        })
+        .catch(err => {
           q.reject(err);
         });
       return q.promise;
     },
 
-    deleteShareFile: function(file, password){
-      var q = $q.defer();
-      $http({url: 'https://monitor.brewbench.co/share/delete/'+file, method: 'GET'})
-        .then(function(response){
-          q.resolve(response.data);
-        }, function(err){
-          q.reject(err);
-        });
-      return q.promise;
-    },
+    // TODO finish this
+    // deleteShareFile: function(file, password){
+    //   let q = $q.defer();
+    //   $http({url: 'https://monitor.brewbench.co/share/delete/'+file, method: 'GET'})
+    //     .then(response => {
+    //       q.resolve(response.data);
+    //     })
+    //     .catch(err => {
+    //       q.reject(err);
+    //     });
+    //   return q.promise;
+    // },
 
     createShare: function(share){
-      var q = $q.defer();
-      var settings = this.settings('settings');
-      var kettles = this.settings('kettles');
-      var sh = Object.assign({}, {password: share.password, access: share.access});
+      let q = $q.defer();
+      let settings = this.settings('settings');
+      let kettles = this.settings('kettles');
+      let sh = Object.assign({}, {password: share.password, access: share.access});
       //remove some things we don't need to share
       _.each(kettles, (kettle, i) => {
         delete kettles[i].knob;
@@ -214,72 +245,106 @@ angular.module('brewbench-monitor')
       settings.shared = true;
       if(sh.password)
         sh.password = md5(sh.password);
-      $http({url: 'https://monitor.brewbench.co/share/create/', method:'POST', data: {'share': sh, 'settings': settings, 'kettles': kettles}, headers: { 'Content-Type': 'application/json' }})
-        .then(function(response){
+      $http({url: 'https://monitor.brewbench.co/share/create/',
+          method:'POST',
+          data: {'share': sh, 'settings': settings, 'kettles': kettles},
+          headers: {'Content-Type': 'application/json'}
+        })
+        .then(response => {
           q.resolve(response.data);
-        }, function(err){
+        })
+        .catch(err => {
+          q.reject(err);
+        });
+      return q.promise;
+    },
+
+    shareTest: function(arduino){
+      let q = $q.defer();
+      let query = `url=${arduino.url}`
+
+      if(arduino.password)
+        query += '&auth='+btoa('root:'+arduino.password);
+
+      $http({url: 'https://monitor.brewbench.co/share/test/?'+query, method: 'GET'})
+        .then(response => {
+          q.resolve(response.data);
+        })
+        .catch(err => {
           q.reject(err);
         });
       return q.promise;
     },
 
     pkg: function(){
-        var q = $q.defer();
-        $http.get('/package.json').then(function(response){
-          q.resolve(response.data);
-        }).catch(function(err){
-          q.reject(err);
-        });
-        return q.promise;
+        let q = $q.defer();
+        $http.get('/package.json')
+          .then(response => {
+            q.resolve(response.data);
+          })
+          .catch(function(err){
+            q.reject(err);
+          });
+          return q.promise;
     },
 
     grains: function(){
-        var q = $q.defer();
-        $http.get('/assets/data/grains.json').then(function(response){
-          q.resolve(response.data);
-        }).catch(function(err){
-          q.reject(err);
-        });
+        let q = $q.defer();
+        $http.get('/assets/data/grains.json')
+          .then(response => {
+            q.resolve(response.data);
+          })
+          .catch(err => {
+            q.reject(err);
+          });
         return q.promise;
     },
 
     hops: function(){
-        var q = $q.defer();
-        $http.get('/assets/data/hops.json').then(function(response){
-          q.resolve(response.data);
-        }).catch(function(err){
-          q.reject(err);
-        });
+        let q = $q.defer();
+        $http.get('/assets/data/hops.json')
+          .then(response => {
+            q.resolve(response.data);
+          })
+          .catch(err => {
+            q.reject(err);
+          });
         return q.promise;
     },
 
     water: function(){
-        var q = $q.defer();
-        $http.get('/assets/data/water.json').then(function(response){
-          q.resolve(response.data);
-        }).catch(function(err){
-          q.reject(err);
-        });
+        let q = $q.defer();
+        $http.get('/assets/data/water.json')
+          .then(response => {
+            q.resolve(response.data);
+          })
+          .catch(err => {
+            q.reject(err);
+          });
         return q.promise;
     },
 
     styles: function(){
-      var q = $q.defer();
-      $http.get('/assets/data/styleguide.json').then(function(response){
-        q.resolve(response.data);
-      }).catch(function(err){
-        q.reject(err);
-      });
+      let q = $q.defer();
+      $http.get('/assets/data/styleguide.json')
+        .then(response => {
+          q.resolve(response.data);
+        })
+        .catch(err => {
+          q.reject(err);
+        });
       return q.promise;
     },
 
     lovibond: function(){
-        var q = $q.defer();
-        $http.get('/assets/data/lovibond.json').then(function(response){
-          q.resolve(response.data);
-        }).catch(function(err){
-          q.reject(err);
-        });
+        let q = $q.defer();
+        $http.get('/assets/data/lovibond.json')
+          .then(response => {
+            q.resolve(response.data);
+          })
+          .catch(err => {
+            q.reject(err);
+          });
         return q.promise;
     },
 
@@ -367,7 +432,7 @@ angular.module('brewbench-monitor')
       return parseFloat(plato);
     },
     recipeBeerSmith: function(recipe){
-      var response = {name:'', date:'', brewer: {name:''}, category:'', abv:'', og:0.000, fg:0.000, hops:[], grains:[], yeast:[], misc:[]};
+      let response = {name:'', date:'', brewer: {name:''}, category:'', abv:'', og:0.000, fg:0.000, hops:[], grains:[], yeast:[], misc:[]};
       if(!!recipe.F_R_NAME)
         response.name = recipe.F_R_NAME;
       if(!!recipe.F_R_STYLE.F_S_CATEGORY)
@@ -450,8 +515,8 @@ angular.module('brewbench-monitor')
       return response;
     },
     recipeBeerXML: function(recipe){
-      var response = {name:'', date:'', brewer: {name:''}, category:'', abv:'', og:0.000, fg:0.000, hops:[], grains:[], yeast:[], misc:[]};
-      var mash_time = 60;
+      let response = {name:'', date:'', brewer: {name:''}, category:'', abv:'', og:0.000, fg:0.000, hops:[], grains:[], yeast:[], misc:[]};
+      let mash_time = 60;
 
       if(!!recipe.NAME)
         response.name = recipe.NAME;
@@ -478,7 +543,7 @@ angular.module('brewbench-monitor')
       }
 
       if(!!recipe.FERMENTABLES){
-        var grains = (recipe.FERMENTABLES.FERMENTABLE && recipe.FERMENTABLES.FERMENTABLE.length) ? recipe.FERMENTABLES.FERMENTABLE : recipe.FERMENTABLES;
+        let grains = (recipe.FERMENTABLES.FERMENTABLE && recipe.FERMENTABLES.FERMENTABLE.length) ? recipe.FERMENTABLES.FERMENTABLE : recipe.FERMENTABLES;
         _.each(grains,function(grain){
           response.grains.push({
             label: grain.NAME,
@@ -490,7 +555,7 @@ angular.module('brewbench-monitor')
       }
 
       if(!!recipe.HOPS){
-        var hops = (recipe.HOPS.HOP && recipe.HOPS.HOP.length) ? recipe.HOPS.HOP : recipe.HOPS;
+        let hops = (recipe.HOPS.HOP && recipe.HOPS.HOP.length) ? recipe.HOPS.HOP : recipe.HOPS;
         _.each(hops,function(hop){
           response.hops.push({
             label: hop.NAME+' ('+hop.FORM+')',
@@ -504,7 +569,7 @@ angular.module('brewbench-monitor')
       }
 
       if(!!recipe.MISCS){
-        var misc = (recipe.MISCS.MISC && recipe.MISCS.MISC.length) ? recipe.MISCS.MISC : recipe.MISCS;
+        let misc = (recipe.MISCS.MISC && recipe.MISCS.MISC.length) ? recipe.MISCS.MISC : recipe.MISCS;
         _.each(misc,function(misc){
           response.misc.push({
             label: misc.NAME,
@@ -516,7 +581,7 @@ angular.module('brewbench-monitor')
       }
 
       if(!!recipe.YEASTS){
-        var yeast = (recipe.YEASTS.YEAST && recipe.YEASTS.YEAST.length) ? recipe.YEASTS.YEAST : recipe.YEASTS;
+        let yeast = (recipe.YEASTS.YEAST && recipe.YEASTS.YEAST.length) ? recipe.YEASTS.YEAST : recipe.YEASTS;
           _.each(yeast,function(yeast){
             response.yeast.push({
               name: yeast.NAME
@@ -526,7 +591,7 @@ angular.module('brewbench-monitor')
       return response;
     },
     formatXML: function(content){
-      var htmlchars = [
+      let htmlchars = [
         {f: '&Ccedil;', r: 'Ç'},
         {f: '&ccedil;', r: 'ç'},
         {f: '&Euml;', r: 'Ë'},

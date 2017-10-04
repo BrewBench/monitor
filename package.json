@@ -1,7 +1,7 @@
 {
   "name": "brewbench-monitor",
   "version": "2.7.5",
-  "sketch_version": "2.7.0",
+  "sketch_version": "2.7.1",
   "description": "Is an Arduino Yun brew monitor for the home brewer enthusiast that uses the Arduino REST API to interface with thermistors connected to the analog ports.",
   "main": "build/app.js",
   "scripts": {
@@ -23,14 +23,9 @@
   "author": {
     "name": "Andrew Van Tassel",
     "email": "andrew@andrewvantassel.com",
-    "url": "https://github.com/avantassel"
+    "url": "https://andrewvantassel.com"
   },
   "contributors": [
-    {
-      "name": "Andrew Van Tassel",
-      "email": "andrew@andrewvantassel.com",
-      "url": "https://github.com/avantassel"
-    },
     {
       "name": "Lee Kendrick",
       "url": "http://leekendrick.info"
@@ -64,7 +59,7 @@
     "node-sass": "^4.5.3"
   },
   "dependencies": {
-    "angular": "1.5.8",
+    "angular": "1.6.6",
     "angularjs-slider": "^6.2.2"
   }
 }

@@ -6,25 +6,44 @@
         <h1 class="modal-title"><i class="fa fa-share fa-lg" aria-hidden="true"></i> Share <sup class="ref">your session</sup></h1>
       </div>
       <div class="modal-body text-center">
-        <form class="form-horizontal">
+        <div class="alert alert-info">
+          <strong>Public?</strong>  Are your Arduino URLs publically accessible?
+        </div>
+        <table class="table">
+          <tr ng-repeat="arduino in settings.arduinos track by $index">
+            <td class="text-left">{{arduino.url}}</td>
+            <td class="text-right"><i class="fa " ng-class="{'fa-circle-o-notch fa-spin fa-2x':!!arduino.testing, 'fa-check-circle fa-2x':!!arduino.public, 'fa-times-circle fa-2x':arduino.public === false}" aria-hidden="true"></i></td>
+            <td class="text-right"><button class="btn btn-primary" ng-click="shareTest(arduino);" ng-disabled="arduino.testing">Test</button></td>
+          </tr>
+        </table>
+        <form name="shareForm">
           <div class="form-group">
-            <input type="text" class="form-control" ng-model="settings.recipe.brewer.name" placeholder="Name" required="required"/>
+            <input type="text" class="form-control" ng-model="settings.recipe.brewer.name" placeholder="Name" required/>
           </div>
           <div class="form-group">
-            <input type="email" class="form-control" ng-model="settings.recipe.brewer.email" placeholder="Email" required="required"/>
+            <input type="email" class="form-control" ng-model="settings.recipe.brewer.email" placeholder="Email" required/>
           </div>
           <div class="form-group">
             <input type="password" class="form-control" ng-model="share.password" placeholder="Optional share password"/>
           </div>
           <div class="form-group">
+            <input type="number" class="form-control" ng-model="share.deleteAfter" value="14"/>
+            <small class="form-text text-muted pull-left">
+              Days to delete share after
+            </small>
+          </div>
+          <br/>
+          <div class="form-group">
             <select class="form-control" ng-model="share.access">
               <option value="readOnly" selected="selected">Read Only</option>
-              <option value="fullAccess" selected="selected">Full Access</option>
+              <option value="fullAccess">Full Access</option>
             </select>
+            <small class="form-text text-muted pull-left">
+              Share access
+            </small>
           </div>
-          <div class="form-group">
-            <button class="btn btn-primary" ng-click="createShare()">Create Share Link</button>
-          </div>
+          <br/>
+          <button class="btn btn-primary" ng-click="createShare()" ng-disabled="shareForm.$pristine || shareForm.$invalid">Create Share Link</button>
         </form>
 
         <div class="alert alert-danger alert-dismissible" role="alert" ng-if="share_success===false">

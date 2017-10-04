@@ -86,6 +86,7 @@ void process(BridgeClient client) {
 void responseOkHeader(BridgeClient client){
     client.println("Status: 200");
     client.println("Access-Control-Allow-Origin: *");
+    client.println("Access-Control-Allow-Credentials: true");
     client.println("Access-Control-Allow-Methods: GET");
     client.println("Access-Control-Expose-Headers: X-Sketch-Version");
     client.println("X-Sketch-Version: "+String(VERSION));
@@ -180,7 +181,7 @@ void pt100Command(BridgeClient client) {
 void setup() {
 
   Bridge.begin();
-  server.listenOnLocalhost();
+  server.noListenOnLocalhost();
   server.begin();
 
 }
