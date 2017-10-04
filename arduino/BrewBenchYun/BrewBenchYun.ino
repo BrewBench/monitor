@@ -181,7 +181,10 @@ void pt100Command(BridgeClient client) {
 void setup() {
 
   Bridge.begin();
-  server.noListenOnLocalhost();
+  // Uncomment for REST API open
+  server.listenOnLocalhost();
+  // Uncomment for REST API with password
+  // server.noListenOnLocalhost();
   server.begin();
 
 }
