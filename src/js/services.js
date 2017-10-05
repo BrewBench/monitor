@@ -17,14 +17,17 @@ angular.module('brewbench-monitor')
       return {
         pollSeconds: 10
         ,unit: 'F'
+        ,layout: 'card'
         ,shared: false
         ,recipe: {'name':'','brewer':{name:'','email':''},'yeast':[],'hops':[],'malt':[],scale:'gravity',method:'papazian','og':1.050,'fg':1.010,'abv':0,'abw':0,'calories':0,'attenuation':0}
         ,notifications: {on:true,timers:true,high:true,low:true,target:true,slack:'Webhook Url',last:''}
         ,sounds: {on:true,alert:'/assets/audio/bike.mp3',timer:'/assets/audio/school.mp3'}
         ,arduinos: [{
+          id: btoa('brewbench'),
           url: 'arduino.local',
           analog: 5,
-          digital: 13
+          digital: 13,
+          secure: false
         }]
       };
     },
@@ -114,6 +117,7 @@ angular.module('brewbench-monitor')
     // https://www.adafruit.com/product/381)
     // https://www.adafruit.com/product/3290 and https://www.adafruit.com/product/3328
     temp: function(kettle){
+      if(!kettle.arduino) return $q.reject('Select an arduino to use.');
       let q = $q.defer();
       let url = this.domain(kettle.arduino)+'/arduino/'+kettle.temp.type+'/'+kettle.temp.pin;
       let settings = this.settings('settings');
@@ -138,6 +142,7 @@ angular.module('brewbench-monitor')
     // http://arduinotronics.blogspot.com/2013/01/working-with-sainsmart-5v-relay-board.html
     // http://myhowtosandprojects.blogspot.com/2014/02/sainsmart-2-channel-5v-relay-arduino.html
     digital: function(kettle,sensor,value){
+      if(!kettle.arduino) return $q.reject('Select an arduino to use.');
       let q = $q.defer();
       let url = this.domain(kettle.arduino)+'/arduino/digital/'+sensor+'/'+value;
       let settings = this.settings('settings');
@@ -160,6 +165,7 @@ angular.module('brewbench-monitor')
     },
 
     analog: function(kettle,sensor,value){
+      if(!kettle.arduino) return $q.reject('Select an arduino to use.');
       let q = $q.defer();
       let url = this.domain(kettle.arduino)+'/arduino/analog/'+sensor+'/'+value;
       let settings = this.settings('settings');
@@ -182,6 +188,7 @@ angular.module('brewbench-monitor')
     },
 
     digitalRead: function(kettle,sensor,timeout){
+      if(!kettle.arduino) return $q.reject('Select an arduino to use.');
       let q = $q.defer();
       let url = this.domain(kettle.arduino)+'/arduino/digital/'+sensor;
       let settings = this.settings('settings');

@@ -1,8 +1,19 @@
-<div class="kettles col-md-{{kettles.length==5?2:12/kettles.length}}" ng-repeat="kettle in kettles track by $index" id="kettle{{$index}}">
+<div class="kettles" ng-class="{'col-md-12':settings.layout=='list','col-md-{{kettles.length==5?2:12/kettles.length}}':settings.layout=='card'}" ng-repeat="kettle in kettles track by $index" id="kettle{{$index}}">
   <div class="panel panel-default">
     <div class="panel-heading container-fluid">
+      <div class="arduinos">
+        <a class="ui ribbon label dropdown-toggle" ng-class="{'teal':kettle.arduino, 'orange':!kettle.arduino}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <img src="assets/img/arduino.svg" width="15"> {{kettle.arduino ? kettle.arduino.url : 'Select an Arduino'}} <span class="caret"></span>
+        </a>
+        <ul class="dropdown-menu">
+          <li class="text-center"><a href="" data-toggle="modal" data-target="#dataModal-settings" class="modal-link">Add/Edit Arduinos</a></li>
+          <li ng-repeat="arduino in settings.arduinos" ng-class="{'active': kettle.arduino && kettle.arduino.id == arduino.id}">
+            <a href="" ng-click="kettle.arduino=arduino">{{arduino.url}}</a>
+          </li>
+        </ul>
+      </div>
       <div class="alert alert-danger" ng-if="kettle.error">
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close" ng-click="kettle.error=''"><span aria-hidden="true">×</span></button>
         {{kettle.error}}
       </div>
       <div class="kettle-row">
@@ -19,22 +30,11 @@
         <div class="kettle-col">
           <label class="adjust">Temp</label>
           <div class="btn-group">
-            <div class="btn-group">
-              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <img src="assets/img/arduino.svg" width="15"> <span class="caret"></span>
-              </button>
-              <ul class="dropdown-menu">
-                <li><a href="" data-toggle="modal" data-target="#dataModal-settings" class="modal-link">Add Arduino</a></li>
-                <li ng-repeat="arduino in settings.arduinos" ng-class="{'active': kettle.arduino && kettle.arduino.id == arduino.id}">
-                  <a href="" ng-click="kettle.arduino=arduino">{{arduino.url}}</a>
-                </li>
-              </ul>
-            </div>
-            <div class="btn-group">
+            <div class="btn-group" ng-if="kettle.arduino">
               <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 {{kettle.temp.pin}} <span class="caret"></span>
               </button>
-              <ul class="dropdown-menu">
+              <ul class="dropdown-menu" ng-if="kettle.arduino">
                 <li class="ssr" ng-if="sensorTypes(kettle.temp.type).analog">Analog</li>
                 <li ng-if="sensorTypes(kettle.temp.type).analog" ng-repeat="p in getPortRange(kettle.arduino.analog) track by $index" ng-class="{'active': kettle.temp.pin=='A'+p}">
                   <a href="" ng-click="pinChange(kettle.temp.pin,p,true); kettle.temp.pin='A'+p;">A{{p}}
@@ -49,7 +49,7 @@
                 </li>
               </ul>
             </div>
-            <div class="btn-group">
+            <div class="btn-group" ng-if="kettle.arduino">
               <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 {{kettle.temp.type}} <span class="caret"></span>
               </button>
@@ -62,11 +62,11 @@
           </div>
         </div>
 
-        <div class="kettle-col">
+        <div class="kettle-col" ng-if="kettle.arduino">
           <label class="adjust" ng-class="{'heating':kettle.heater.running}">Heat
             <sup><a ng-if="kettle.heater.pin.indexOf('D') !== -1" href="" ng-click="togglePWM(kettle.heater)">PWM ~</a></sup>
           </label>
-          <div class="btn-group">
+          <div class="btn-group" ng-if="kettle.arduino">
             <div class="btn-group">
               <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" ng-disabled="kettle.heater.running">
                 {{kettle.heater.pin}} <span class="caret"></span>
@@ -93,7 +93,7 @@
           </div>
         </div>
 
-        <div class="kettle-col" ng-if="kettle.type !== 'fermenter'">
+        <div class="kettle-col" ng-if="kettle.arduino && kettle.type !== 'fermenter'">
           <label class="adjust">Pump
             <sup><a ng-if="kettle.pump.pin.indexOf('D') !== -1" href="" ng-click="togglePWM(kettle.pump)">PWM ~</a></sup>
           </label>
@@ -124,7 +124,7 @@
           </rzslider>
         </div>
 
-        <div class="kettle-col" ng-if="kettle.type === 'fermenter' && kettle.cooler">
+        <div class="kettle-col" ng-if="kettle.arduino && kettle.type === 'fermenter' && kettle.cooler">
           <label class="adjust" ng-class="{'cooling':kettle.cooler.running}">Cool
             <sup><a ng-if="kettle.cooler.pin.indexOf('D') !== -1" href="" ng-click="togglePWM(kettle.cooler)">PWM ~</a></sup>
           </label>

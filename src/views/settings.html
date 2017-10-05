@@ -26,6 +26,14 @@
         </div>
 
         <div class="col-lg-12">
+          <h3>Layout</h3>
+          <div class="input-group" role="group">
+            <input id="list" class="degree" type="radio" ng-checked="settings.layout=='list'" value="list" ng-click="settings.layout='list'"> <label for="list">List</label>&nbsp;&nbsp;
+            <input id="card" class="degree" type="radio" ng-checked="settings.layout=='card'" value="card" ng-click="settings.layout='card'"> <label for="card">Card</label>
+          </div>
+        </div>
+
+        <div class="col-lg-12">
           <h3>Notifications</h3>
           <button class="btn btn-primary pull-right" ng-click="alert()" ng-disabled="!settings.notifications.on">Test</button>
           <ul class="tg-list">
@@ -78,7 +86,7 @@
 
         <div class="col-lg-12">
           <h3>Arduinos</h3>
-          <button class="btn btn-primary" ng-click="addArduino()">Add Arduino</button>
+          <button class="btn btn-primary" ng-click="arduinos.add()">Add Arduino</button>
 
           <label class="adjust">Poll every</label>
           <div class="input-group" role="group">
@@ -94,26 +102,26 @@
             <tr>
               <th>http(s)</th>
               <th>URL</th>
-              <th>Password</th>
+              <!-- <th>Password</th> -->
               <th>Analog Ports</th>
               <th>Digital Ports</th>
               <th></th>
             </tr>
           </thead>
           <tbody>
-            <tr ng-repeat="arduino in settings.arduinos track by $index">
+            <tr ng-repeat="arduino in settings.arduinos">
               <td class="text-left">
-                <button class="btn btn-default" ng-show="!arduino.secure" ng-click="arduino.secure=true">http</button>
-                <button class="btn btn-success" ng-show="arduino.secure" ng-click="arduino.secure=false">https</button>
+                <button class="btn btn-default" ng-show="!arduino.secure" ng-click="arduino.secure=true; arduinos.update(arduino)">http</button>
+                <button class="btn btn-success" ng-show="arduino.secure" ng-click="arduino.secure=false; arduinos.update(arduino)">https</button>
               </td>
-              <td class="text-left"><editable class="poll" type="text" model="arduino.url"></editable></td>
-              <td class="text-left">
-                <input ng-show="!!arduino.showpass" type="password" ng-model="arduino.password" ng-enter="arduino.showpass=false"></input>
+              <td class="text-left"><editable class="poll" type="text" model="arduino.url" enter="arduinos.update(arduino)"></editable></td>
+              <!-- <td class="text-left">
+                <input ng-show="!!arduino.showpass" type="password" ng-model="arduino.password" ng-enter="arduino.showpass=false; arduinos.update(arduino)"></input>
                 <a href="" ng-show="!arduino.showpass" ng-click="arduino.showpass=true">*******</a>
-              </td>
-              <td class="text-left"><editable class="poll" type="number" model="arduino.analog"></editable></td>
-              <td class="text-left"><editable class="poll" type="number" model="arduino.digital"></editable></td>
-              <td><a href="" ng-click="deleteArduino($index)"><i class="fa fa-trash fa-lg text-danger"></i></a></td>
+              </td> -->
+              <td class="text-left"><editable class="poll" type="number" model="arduino.analog" enter="arduinos.update(arduino)"></editable></td>
+              <td class="text-left"><editable class="poll" type="number" model="arduino.digital" enter="arduinos.update(arduino)"></editable></td>
+              <td><a href="" ng-click="arduinos.delete($index, arduino)"><i class="fa fa-trash fa-lg text-danger"></i></a></td>
             </tr>
           </tbody>
         </table>

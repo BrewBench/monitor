@@ -168,7 +168,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
     values: [],
     timers: [],
     knob: angular.merge($scope.knobOptions, { value: 0, min: 0, max: 200 + 5 }),
-    arduino: { id: 1, url: 'arduino.local', analog: 5, digital: 13 }
+    arduino: { id: btoa('brewbench'), url: 'arduino.local', analog: 5, digital: 13 }
   }, {
     key: 'Hot Liquor',
     type: 'water',
@@ -179,7 +179,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
     values: [],
     timers: [],
     knob: angular.merge($scope.knobOptions, { value: 0, min: 0, max: 200 + 5 }),
-    arduino: { id: 1, url: 'arduino.local', analog: 5, digital: 13 }
+    arduino: { id: btoa('brewbench'), url: 'arduino.local', analog: 5, digital: 13 }
   }, {
     key: 'Mash',
     type: 'grain',
@@ -190,7 +190,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
     values: [],
     timers: [],
     knob: angular.merge($scope.knobOptions, { value: 0, min: 0, max: 150 + 5 }),
-    arduino: { id: 1, url: 'arduino.local', analog: 5, digital: 13 }
+    arduino: { id: btoa('brewbench'), url: 'arduino.local', analog: 5, digital: 13 }
   }];
 
   $scope.getPortRange = function (number) {
@@ -200,14 +200,31 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
     });
   };
 
-  $scope.addArduino = function () {
-    if (!$scope.settings.arduinos) $scope.settings.arduinos = [];
-    $scope.settings.arduinos.push({
-      id: $scope.settings.arduinos.length + 1,
-      url: 'arduino.local',
-      analog: 5,
-      digital: 13
-    });
+  $scope.arduinos = {
+    add: function add() {
+      var now = new Date();
+      if (!$scope.settings.arduinos) $scope.settings.arduinos = [];
+      $scope.settings.arduinos.push({
+        id: btoa(now + '' + $scope.settings.arduinos.length + 1),
+        url: 'arduino.local',
+        analog: 5,
+        digital: 13
+      });
+      _.each($scope.kettles, function (kettle) {
+        if (!kettle.arduino) kettle.arduino = $scope.settings.arduinos[0];
+      });
+    },
+    update: function update(arduino) {
+      _.each($scope.kettles, function (kettle) {
+        if (kettle.arduino && kettle.arduino.id == arduino.id) kettle.arduino = arduino;
+      });
+    },
+    delete: function _delete(index, arduino) {
+      $scope.settings.arduinos.splice(index, 1);
+      _.each($scope.kettles, function (kettle) {
+        if (kettle.arduino && kettle.arduino.id == arduino.id) delete kettle.arduino;
+      });
+    }
   };
 
   $scope.addKettle = function (type) {
@@ -487,7 +504,22 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
       $scope.error.type = 'warning';
       $scope.error.message = 'The monitor seems to be off-line, re-connecting...';
     } else {
-      if (kettle) kettle.error = 'Error connecting to ' + BrewService.domain(kettle.arduino);else if (err && typeof err == 'string') $scope.error.message = 'Connection error: ' + err;else $scope.error.message = 'Connection error: ' + JSON.stringify(err);
+      var message = void 0;
+
+      if (typeof err == 'string' && err.indexOf('{') !== -1) err = JSON.parse(err);
+
+      if (typeof err == 'string') message = err;else if (err.statusText) message = err.statusText;else if (err.config.url) message = err.config.url;else message = JSON.stringify(err);
+
+      if (message) {
+        if (kettle) {
+          kettle.error = 'Connection error: ' + message;
+          $scope.updateKnobCopy(kettle);
+        } else $scope.error.message = 'Connection error: ' + message;
+      } else if (kettle) {
+        kettle.error = 'Error connecting to ' + BrewService.domain(kettle.arduino);
+      } else {
+        $scope.error.message = 'Connection error:';
+      }
     }
   };
 
@@ -755,10 +787,6 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
     }, 1000);
   };
 
-  $scope.deleteArduino = function (index) {
-    $scope.settings.arduinos.splice(index, 1);
-  };
-
   $scope.alert = function (kettle, timer) {
 
     //don't start alerts until we have hit the temp.target
@@ -849,8 +877,18 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
       kettle.knob.barColor = '#777';
       kettle.knob.subText.text = 'not running';
       kettle.knob.subText.color = 'gray';
+      kettle.knob.readOnly = true;
+      return;
+    } else if (kettle.error) {
+      kettle.knob.trackColor = '#ddd';
+      kettle.knob.barColor = '#777';
+      kettle.knob.subText.text = 'error';
+      kettle.knob.subText.color = 'gray';
+      kettle.knob.readOnly = true;
       return;
     }
+
+    kettle.knob.readOnly = false;
 
     //is temp too high?
     if (kettle.temp.current > kettle.temp.target + kettle.temp.diff) {
@@ -984,7 +1022,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
       if (kettle.active) {
         allSensors.push(BrewService.temp(kettle).then(function (response) {
           return updateTemp(response, kettle);
-        }, function error(err) {
+        }).catch(function (err) {
           $scope.connectError(err, kettle);
           return err;
         }));
@@ -1040,7 +1078,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
 angular.module('brewbench-monitor').directive('editable', function () {
     return {
         restrict: 'E',
-        scope: { model: '=', type: '@?', trim: '@?', change: '&?' },
+        scope: { model: '=', type: '@?', trim: '@?', change: '&?', enter: '&?' },
         replace: false,
         template: '<span>' + '<input type="{{type}}" ng-model="model" ng-show="edit" ng-enter="edit=false" ng-change="{{change||false}}" class="editable"></input>' + '<span class="editable" ng-show="!edit">{{(trim) ? (model | limitTo:trim)+"..." : model}}</span>' + '</span>',
         link: function link(scope, element, attrs) {
@@ -1049,6 +1087,7 @@ angular.module('brewbench-monitor').directive('editable', function () {
             element.bind('click', function () {
                 scope.$apply(scope.edit = true);
             });
+            if (scope.enter) scope.enter();
         }
     };
 }).directive('ngEnter', function () {
@@ -1131,14 +1170,17 @@ angular.module('brewbench-monitor').factory('BrewService', function ($http, $q, 
       return {
         pollSeconds: 10,
         unit: 'F',
+        layout: 'card',
         shared: false,
         recipe: { 'name': '', 'brewer': { name: '', 'email': '' }, 'yeast': [], 'hops': [], 'malt': [], scale: 'gravity', method: 'papazian', 'og': 1.050, 'fg': 1.010, 'abv': 0, 'abw': 0, 'calories': 0, 'attenuation': 0 },
         notifications: { on: true, timers: true, high: true, low: true, target: true, slack: 'Webhook Url', last: '' },
         sounds: { on: true, alert: '/assets/audio/bike.mp3', timer: '/assets/audio/school.mp3' },
         arduinos: [{
+          id: btoa('brewbench'),
           url: 'arduino.local',
           analog: 5,
-          digital: 13
+          digital: 13,
+          secure: false
         }]
       };
     },
@@ -1208,6 +1250,7 @@ angular.module('brewbench-monitor').factory('BrewService', function ($http, $q, 
     // https://www.adafruit.com/product/381)
     // https://www.adafruit.com/product/3290 and https://www.adafruit.com/product/3328
     temp: function temp(kettle) {
+      if (!kettle.arduino) return $q.reject('Select an arduino to use.');
       var q = $q.defer();
       var url = this.domain(kettle.arduino) + '/arduino/' + kettle.temp.type + '/' + kettle.temp.pin;
       var settings = this.settings('settings');
@@ -1226,6 +1269,7 @@ angular.module('brewbench-monitor').factory('BrewService', function ($http, $q, 
     // http://arduinotronics.blogspot.com/2013/01/working-with-sainsmart-5v-relay-board.html
     // http://myhowtosandprojects.blogspot.com/2014/02/sainsmart-2-channel-5v-relay-arduino.html
     digital: function digital(kettle, sensor, value) {
+      if (!kettle.arduino) return $q.reject('Select an arduino to use.');
       var q = $q.defer();
       var url = this.domain(kettle.arduino) + '/arduino/digital/' + sensor + '/' + value;
       var settings = this.settings('settings');
@@ -1242,6 +1286,7 @@ angular.module('brewbench-monitor').factory('BrewService', function ($http, $q, 
     },
 
     analog: function analog(kettle, sensor, value) {
+      if (!kettle.arduino) return $q.reject('Select an arduino to use.');
       var q = $q.defer();
       var url = this.domain(kettle.arduino) + '/arduino/analog/' + sensor + '/' + value;
       var settings = this.settings('settings');
@@ -1258,6 +1303,7 @@ angular.module('brewbench-monitor').factory('BrewService', function ($http, $q, 
     },
 
     digitalRead: function digitalRead(kettle, sensor, timeout) {
+      if (!kettle.arduino) return $q.reject('Select an arduino to use.');
       var q = $q.defer();
       var url = this.domain(kettle.arduino) + '/arduino/digital/' + sensor;
       var settings = this.settings('settings');

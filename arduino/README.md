@@ -23,6 +23,7 @@
 1. Power up and connect to the default IP http://192.168.240.1
 1. Set the digital pin or analog pin depending on which temp sensor you're using.
 1. Press play, you can adjust the temp by sliding the temp knob.
+1. Download the [Arduino IDE](https://www.arduino.cc/en/Main/Software) >= 1.8.5
 
 ### Yun setup
   * If the WiFi network starts with Arduino use password: arduino

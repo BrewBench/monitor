@@ -159,7 +159,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
     ,values: []
     ,timers: []
     ,knob: angular.merge($scope.knobOptions,{value:0,min:0,max:200+5})
-    ,arduino: {id: 1, url: 'arduino.local',analog: 5,digital: 13}
+    ,arduino: {id: btoa('brewbench'), url: 'arduino.local',analog: 5,digital: 13}
   },{
     key: 'Hot Liquor'
     ,type: 'water'
@@ -170,7 +170,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
     ,values: []
     ,timers: []
     ,knob: angular.merge($scope.knobOptions,{value:0,min:0,max:200+5})
-    ,arduino: {id: 1, url: 'arduino.local',analog: 5,digital: 13}
+    ,arduino: {id: btoa('brewbench'), url: 'arduino.local',analog: 5,digital: 13}
   },{
     key: 'Mash'
     ,type: 'grain'
@@ -181,7 +181,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
     ,values: []
     ,timers: []
     ,knob: angular.merge($scope.knobOptions,{value:0,min:0,max:150+5})
-    ,arduino: {id: 1, url: 'arduino.local',analog: 5,digital: 13}
+    ,arduino: {id: btoa('brewbench'), url: 'arduino.local',analog: 5,digital: 13}
   }];
 
   $scope.getPortRange = function(number){
@@ -189,14 +189,34 @@ $scope.kettles = BrewService.settings('kettles') || [{
       return Array(number).fill().map((_, idx) => 0 + idx);
   };
 
-  $scope.addArduino = function(){
-    if(!$scope.settings.arduinos) $scope.settings.arduinos = [];
-    $scope.settings.arduinos.push({
-      id: $scope.settings.arduinos.length+1,
-      url: 'arduino.local',
-      analog: 5,
-      digital: 13
-    });
+  $scope.arduinos = {
+    add: () => {
+      let now = new Date();
+      if(!$scope.settings.arduinos) $scope.settings.arduinos = [];
+      $scope.settings.arduinos.push({
+        id: btoa(now+''+$scope.settings.arduinos.length+1),
+        url: 'arduino.local',
+        analog: 5,
+        digital: 13
+      });
+      _.each($scope.kettles, kettle => {
+        if(!kettle.arduino)
+          kettle.arduino = $scope.settings.arduinos[0];
+      });
+    },
+    update: (arduino) => {
+      _.each($scope.kettles, kettle => {
+        if(kettle.arduino && kettle.arduino.id == arduino.id)
+          kettle.arduino = arduino;
+      });
+    },
+    delete: (index, arduino) => {
+      $scope.settings.arduinos.splice(index, 1);
+      _.each($scope.kettles, kettle => {
+        if(kettle.arduino && kettle.arduino.id == arduino.id)
+          delete kettle.arduino;
+      });
+    }
   };
 
   $scope.addKettle = function(type){
@@ -528,12 +548,32 @@ $scope.kettles = BrewService.settings('kettles') || [{
       $scope.error.type = 'warning';
       $scope.error.message = 'The monitor seems to be off-line, re-connecting...';
     } else {
-      if(kettle)
-        kettle.error = `Error connecting to ${BrewService.domain(kettle.arduino)}`;
-      else if(err && typeof err == 'string')
-        $scope.error.message = `Connection error: ${err}`;
+      let message;
+
+      if(typeof err == 'string' && err.indexOf('{') !== -1)
+        err = JSON.parse(err);
+
+      if(typeof err == 'string')
+        message = err;
+      else if(err.statusText)
+        message = err.statusText;
+      else if(err.config.url)
+        message = err.config.url;
       else
-        $scope.error.message = `Connection error: ${JSON.stringify(err)}`;
+        message = JSON.stringify(err);
+
+      if(message){
+        if(kettle){
+          kettle.error = `Connection error: ${message}`;
+          $scope.updateKnobCopy(kettle);
+        }
+        else
+          $scope.error.message = `Connection error: ${message}`;
+      } else if(kettle){
+        kettle.error = `Error connecting to ${BrewService.domain(kettle.arduino)}`;
+      } else {
+        $scope.error.message = `Connection error:`;
+      }
     }
   };
 
@@ -811,10 +851,6 @@ $scope.kettles = BrewService.settings('kettles') || [{
     },1000);
   };
 
-  $scope.deleteArduino = function(index){
-    $scope.settings.arduinos.splice(index, 1);
-  };
-
   $scope.alert = function(kettle,timer){
 
     //don't start alerts until we have hit the temp.target
@@ -928,8 +964,18 @@ $scope.kettles = BrewService.settings('kettles') || [{
       kettle.knob.barColor = '#777';
       kettle.knob.subText.text = 'not running';
       kettle.knob.subText.color = 'gray';
+      kettle.knob.readOnly = true;
       return;
+    } else if(kettle.error){
+        kettle.knob.trackColor = '#ddd';
+        kettle.knob.barColor = '#777';
+        kettle.knob.subText.text = 'error';
+        kettle.knob.subText.color = 'gray';
+        kettle.knob.readOnly = true;
+        return;
     }
+
+    kettle.knob.readOnly = false;
 
     //is temp too high?
     if(kettle.temp.current > kettle.temp.target+kettle.temp.diff){
@@ -1064,26 +1110,30 @@ $scope.kettles = BrewService.settings('kettles') || [{
   $scope.processTemps = function(){
     var allSensors = [];
     //only process active sensors
-    _.each($scope.kettles, function(kettle){
+    _.each($scope.kettles, kettle => {
       if(kettle.active){
-        allSensors.push(BrewService.temp(kettle).then(function(response){
-            return updateTemp(response,kettle);
-          },function error(err){
+        allSensors.push(BrewService.temp(kettle)
+          .then(response => {
+            return updateTemp(response, kettle);
+          })
+          .catch(err => {
             $scope.connectError(err, kettle);
             return err;
           }));
       }
     });
 
-    return $q.all(allSensors).then(function(values){
-      //re process on timeout
-      $timeout(function(){
-          return $scope.processTemps();
-      },(!!$scope.settings.pollSeconds) ? $scope.settings.pollSeconds*1000 : 10000);
-    }).catch(function(err){
-      $timeout(function(){
-          return $scope.processTemps();
-      },(!!$scope.settings.pollSeconds) ? $scope.settings.pollSeconds*1000 : 10000);
+    return $q.all(allSensors)
+      .then(values => {
+        //re process on timeout
+        $timeout(function(){
+            return $scope.processTemps();
+        },(!!$scope.settings.pollSeconds) ? $scope.settings.pollSeconds*1000 : 10000);
+      })
+      .catch(err => {
+        $timeout(function(){
+            return $scope.processTemps();
+        },(!!$scope.settings.pollSeconds) ? $scope.settings.pollSeconds*1000 : 10000);
     });
   };
 
