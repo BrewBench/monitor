@@ -8,7 +8,7 @@
 // http://static.cactus.io/downloads/library/ds18b20/cactus_io_DS18B20.zip
 #include "cactus_io_DS18B20.h"
 
-const char VERSION[] = "2.7.0";
+const char VERSION[] = "2.7.1";
 
 BridgeServer server;
 
@@ -180,7 +180,10 @@ void pt100Command(BridgeClient client) {
 void setup() {
 
   Bridge.begin();
+  // Uncomment for REST API open
   server.listenOnLocalhost();
+  // Uncomment for REST API with password
+  // server.noListenOnLocalhost();
   server.begin();
 
 }

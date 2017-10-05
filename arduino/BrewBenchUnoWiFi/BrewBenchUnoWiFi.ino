@@ -5,7 +5,7 @@
 // http://static.cactus.io/downloads/library/ds18b20/cactus_io_DS18B20.zip
 #include "cactus_io_DS18B20.h"
 
-const char VERSION[] = "2.6.0";
+const char VERSION[] = "2.7.1";
 
 // https://learn.adafruit.com/thermistor/using-a-thermistor
 // resistance at 25 degrees C

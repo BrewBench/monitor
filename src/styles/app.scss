@@ -178,7 +178,7 @@ sup.ref{
   margin-top: 0px;
 }
 
-.recipe h3, .settings h3, .kettles h3{
+.recipe h3, .kettles h3{
     color: #777;
     display: inline-block;
 }
@@ -189,6 +189,11 @@ sup.ref{
 
 .settings ul, .kettles ul{
   padding: 10px;
+}
+
+.settings h3 {
+  color: #777;
+  border-bottom: 1px solid #ccc;
 }
 
 .kettles ul.dropdown-menu{
@@ -204,6 +209,12 @@ sup.ref{
 
 .settings .right label {
     cursor: pointer;
+}
+
+.kettles .alert {
+  position: relative;
+  width: 100%;
+  word-wrap: break-word;
 }
 
 .kettles .kettle-row {
@@ -357,8 +368,9 @@ sup.ref{
   margin: none;
 }
 
-.settings input[type=text], .modal input{
-  font-size: 24px;
+.settings input[type=text], .settings select, .modal input{
+  font-size: 20px;
+  font-weight: lighter;
   color: #777;
   width: 100%;
 }
@@ -416,6 +428,10 @@ label.notes {
 
 .label-success {
   background-color: rgba(73,163,127,1);
+}
+
+.fa-check-circle {
+  color: rgba(73,163,127,1);
 }
 
 .fa-fire.on{
@@ -572,4 +588,199 @@ li.ssr {
 }
 .highlighted {
   background-color: yellow;
+}
+
+ul.tg-list,
+li.tg-list-item {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.tg-list {
+	text-align: left;
+	display: flex;
+	align-items: center;
+}
+
+.tg-list-item {
+	margin: 0 2em;
+}
+
+.tgl {
+	display: none;
+
+	// add default box-sizing for this scope
+	&,
+  &:after,
+  &:before,
+	& *,
+  & *:after,
+  & *:before,
+	& + .tgl-btn {
+		box-sizing: border-box;
+		&::selection {
+			background: none;
+		}
+	}
+
+	+ .tgl-btn {
+		outline: 0;
+		display: block;
+		width: 4em;
+		height: 2em;
+		position: relative;
+		cursor: pointer;
+    user-select: none;
+		&:after,
+    &:before {
+			position: relative;
+			display: block;
+			content: "";
+			width: 50%;
+			height: 100%;
+		}
+
+		&:after {
+			left: 0;
+		}
+
+		&:before {
+			display: none;
+		}
+	}
+
+	&:checked + .tgl-btn:after {
+		left: 50%;
+	}
+}
+
+.tgl-ios {
+	+ .tgl-btn {
+		background: #fbfbfb;
+		border-radius: 2em;
+		padding: 2px;
+		transition: all .4s ease;
+		border: 1px solid #e8eae9;
+		&:after {
+			border-radius: 2em;
+			background: #fbfbfb;
+			transition:
+        left .3s cubic-bezier(
+          0.175, 0.885, 0.320, 1.275
+        ),
+        padding .3s ease, margin .3s ease;
+			box-shadow:
+        0 0 0 1px rgba(0,0,0,.1),
+        0 4px 0 rgba(0,0,0,.08);
+		}
+
+    &:hover:after {
+      will-change: padding;
+    }
+
+		&:active {
+			box-shadow: inset 0 0 0 2em #e8eae9;
+			&:after {
+				padding-right: .8em;
+			}
+		}
+	}
+
+	&:checked + .tgl-btn {
+    background: rgba(73,163,127,1);
+    &:active {
+      box-shadow: none;
+      &:after {
+        margin-left: -.8em;
+      }
+    }
+	}
+}
+
+.ui.orange.ribbon.label {
+    border-color: #cf590c!important;
+}
+
+.ui.orange.label, .ui.orange.labels .label {
+    background-color: #f2711c!important;
+    border-color: #f2711c!important;
+    color: #fff!important;
+}
+
+.ui.teal.ribbon.label {
+    border-color: #00827c!important;
+}
+
+.ui.teal.label, .ui.teal.labels .label {
+    background-color: #00b5ad!important;
+    border-color: #00b5ad!important;
+    color: #fff!important;
+}
+
+.ui.blue.ribbon.label {
+    border-color: #1a69a4!important;
+}
+
+.ui.blue.label, .ui.blue.labels .label {
+    background-color: #2185d0!important;
+    border-color: #2185d0!important;
+    color: #fff!important;
+}
+
+.ui.ribbon.label {
+    left: calc(-1rem - 1.2em);
+    margin-right: -1.2em;
+    padding-left: calc(1rem + 1.2em);
+    padding-right: 1.2em;
+}
+
+.ui.ribbon.label {
+    position: relative;
+    margin: 0;
+    min-width: -webkit-max-content;
+    min-width: -moz-max-content;
+    min-width: max-content;
+    border-radius: 0 .28571429rem .28571429rem 0;
+    border-color: rgba(0,0,0,.15);
+}
+
+a.ui.label {
+    cursor: pointer;
+}
+
+.ui.label {
+    display: inline-block;
+    line-height: 1;
+    vertical-align: baseline;
+    margin: 0 .14285714em;
+    background-color: #e8e8e8;
+    background-image: none;
+    padding: .5833em .833em;
+    color: rgba(0,0,0,.6);
+    text-transform: none;
+    font-weight: 700;
+    border: 0 solid transparent;
+    border-radius: .28571429rem;
+    -webkit-transition: background .1s ease;
+    transition: background .1s ease;
+}
+
+.ui.ribbon.label:after {
+    position: absolute;
+    content: '';
+    top: 100%;
+    left: 0;
+    background-color: transparent!important;
+    border-style: solid;
+    border-width: 0 1.2em 1.2em 0;
+    border-color: transparent;
+    border-right-color: inherit;
+    width: 0;
+    height: 0;
+}
+
+.arduinos {
+  position: relative;
+  padding-bottom: 10px;
 }

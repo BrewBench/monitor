@@ -23,22 +23,17 @@
 1. Power up and connect to the default IP http://192.168.240.1
 1. Set the digital pin or analog pin depending on which temp sensor you're using.
 1. Press play, you can adjust the temp by sliding the temp knob.
+1. Download the [Arduino IDE](https://www.arduino.cc/en/Main/Software) >= 1.8.5
 
-### Yun Arduino.cc setup
+### Yun setup
   * If the WiFi network starts with Arduino use password: arduino
-  * Set REST API access to openÂ
+  * Set REST API access to open
+    * you can password protect the REST API but will need to update the [sketch](arduino/BrewBenchYun/BrewBenchYun.ino#L185)
   * Change or remember the host name or IP address (you will need this later)
   * Save to reboot
   * Using the [Arduino IDE](https://www.arduino.cc/en/Main/Software) upload the [BrewBenchYun sketch](arduino/BrewBenchYun/BrewBenchYun.ino)
 
-### Yun Arduino.org (aka. Linino) setup
-  * If the WiFi network starts with Linino use password: doghunter
-  * Set REST API access to open
-  * Change or remember the board name or IP address (you will need this later)
-  * Save to reboot
-  * Using the [Arduino IDE](https://www.arduino.cc/en/Main/Software) upload the [BrewBenchYunLinino sketch](arduino/BrewBenchYunLinino/BrewBenchYunLinino.ino)
-
-### Uno WiFi Arduino.cc setup
+### Uno WiFi setup
   * If the WiFi network starts with Arduino use password: arduino
   * Set REST API access to open
   * Change or remember the host name or IP address (you will need this later)

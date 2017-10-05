@@ -2,7 +2,7 @@ angular.module('brewbench-monitor')
 .directive('editable', function() {
     return {
         restrict: 'E',
-        scope: {model:'=',type:'@?',trim:'@?',change:'&?'},
+        scope: {model:'=',type:'@?',trim:'@?',change:'&?',enter:'&?'},
         replace: false,
         template:
 '<span>'+
@@ -15,6 +15,7 @@ angular.module('brewbench-monitor')
             element.bind('click', function() {
                 scope.$apply(scope.edit = true);
             });
+            if(scope.enter) scope.enter();            
         }
     };
 })

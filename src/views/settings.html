@@ -1,54 +1,92 @@
-<div id="settings" class="settings" ng-if="shareAccess('fullAccess')">
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <div class="left">
-        <h3>Settings</h3>
-      </div>
-      <div class="row">
-        <div class="col-md-6 col-xs-6">
-          <input id="celsius" class="degree" type="radio" ng-checked="settings.unit=='C'" value="C" ng-click="changeUnits('C')"> <label for="celsius">&deg;C</label>
-          <input id="fahrenheit" class="degree" type="radio" ng-checked="settings.unit=='F'" value="F" ng-click="changeUnits('F')"> <label for="fahrenheit">&deg;F</label>
-        </div>
-        <div class="col-md-6 col-xs-6 right">
-          <div class="btn-group notifications" role="group">
-            <button type="button" class="btn btn-default" style="padding:0 5px 0 5px;" ng-click="settings.notifications.on = !settings.notifications.on">
-              <span class="fa-stack fa-lg" style="top: 3px;">
-                <i class="fa fa-bell fa-stack-1x"></i>
-                <i class="fa fa-ban fa-stack-2x text-danger" ng-show="!settings.notifications.on"></i>
-              </span>
-            </button>
-            <button type="button" class="btn btn-default dropdown-toggle" style="height: 44px;" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></button>
-            <ul class="dropdown-menu dropdown-menu-right">
-              <li><a href="#" ng-class="{'on':settings.sounds.on}" ng-click="settings.sounds.on = !settings.sounds.on">Sounds</a></li>
-              <li><a href="#" ng-class="{'on':settings.notifications.timers}" ng-click="settings.notifications.timers = !settings.notifications.timers">Timers</a></li>
-              <li><a href="#" ng-class="{'on':settings.notifications.high}" ng-click="settings.notifications.high = !settings.notifications.high">High</a></li>
-              <li><a href="#" ng-class="{'on':settings.notifications.low}" ng-click="settings.notifications.low = !settings.notifications.low">Low</a></li>
-              <li><a href="#" ng-class="{'on':settings.notifications.target}" ng-click="settings.notifications.target = !settings.notifications.target">Target</a></li>
-            </ul>
-          </div>
+<div class="modal fade" id="dataModal-settings" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+        <h1 class="modal-title"><i class="fa fa-gear fa-lg" aria-hidden="true"></i> Settings</h1>
+        <div class="btn-group pull-right">
+          <!-- <button class="btn btn-default" ng-click="importSettings($event)">Import Settings</button>
+          <button class="btn btn-default" ng-click="exportSettings($event)">Export Settings</button> -->
+          <button class="btn btn-danger" ng-click="clearSettings($event)">Delete Settings</button>
         </div>
       </div>
-    </div>
+      <div class="modal-body">
+
+<div id="settings" class="settings">
+
     <div class="panel-body">
       <div class="row">
-        <div class="col-md-8 col-xs-8">
-          <label class="adjust">Arduino URL</label>
+
+        <div class="col-lg-12">
+          <h3>Temperature</h3>
           <div class="input-group" role="group">
-            <editable class="poll" model="settings.arduinoUrl" change="saveArduinoUrl()"></editable>
-            <span class="input-group-btn">
-              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <span class="caret"></span>
-              </button>
-              <ul class="dropdown-menu">
-                <li ng-repeat="u in urls"><a href="#" ng-click="settings.arduinoUrl=u">{{u}}</a></li>
-              </ul>
-            </span>
+            <input id="celsius" class="degree" type="radio" ng-checked="settings.unit=='C'" value="C" ng-click="changeUnits('C')"> <label for="celsius">&deg;C</label>&nbsp;&nbsp;
+            <input id="fahrenheit" class="degree" type="radio" ng-checked="settings.unit=='F'" value="F" ng-click="changeUnits('F')"> <label for="fahrenheit">&deg;F</label>
           </div>
-          <label class="adjust">Board Ports</label>
+        </div>
+
+        <div class="col-lg-12">
+          <h3>Layout</h3>
           <div class="input-group" role="group">
-            <editable class="poll" type="number" model="settings.ports.analog"></editable> Analog
-            <editable class="poll" type="number" model="settings.ports.digital"></editable> Digital
+            <input id="list" class="degree" type="radio" ng-checked="settings.layout=='list'" value="list" ng-click="settings.layout='list'"> <label for="list">List</label>&nbsp;&nbsp;
+            <input id="card" class="degree" type="radio" ng-checked="settings.layout=='card'" value="card" ng-click="settings.layout='card'"> <label for="card">Card</label>
           </div>
+        </div>
+
+        <div class="col-lg-12">
+          <h3>Notifications</h3>
+          <button class="btn btn-primary pull-right" ng-click="alert()" ng-disabled="!settings.notifications.on">Test</button>
+          <ul class="tg-list">
+            <li class="tg-list-item">
+              <span>{{settings.notifications.on?'On':'Off'}}</span>
+              <input class="tgl tgl-ios" id="notifications" type="checkbox" ng-checked="settings.notifications.on" ng-click="settings.notifications.on = !settings.notifications.on"/>
+              <label class="tgl-btn" for="notifications"></label>
+            </li>
+            <li class="tg-list-item">
+              <span>Sounds</span>
+              <input class="tgl tgl-ios" id="sounds" type="checkbox" ng-checked="settings.notifications.on && settings.sounds.on" ng-disabled="!settings.notifications.on" ng-click="settings.sounds.on = !settings.sounds.on"/>
+              <label class="tgl-btn" for="sounds"></label>
+            </li>
+            <li class="tg-list-item">
+              <span>Timers</span>
+              <input class="tgl tgl-ios" id="timers" type="checkbox" ng-checked="settings.notifications.on && settings.notifications.timers" ng-disabled="!settings.notifications.on" ng-click="settings.notifications.timers = !settings.notifications.timers"/>
+              <label class="tgl-btn" for="timers"></label>
+            </li>
+            <li class="tg-list-item">
+              <span>High</span>
+              <input class="tgl tgl-ios" id="high" type="checkbox" ng-checked="settings.notifications.on && settings.notifications.high" ng-disabled="!settings.notifications.on" ng-click="settings.notifications.high = !settings.notifications.high"/>
+              <label class="tgl-btn" for="high"></label>
+            </li>
+            <li class="tg-list-item">
+              <span>Low</span>
+              <input class="tgl tgl-ios" id="low" type="checkbox" ng-checked="settings.notifications.on && settings.notifications.low" ng-disabled="!settings.notifications.on" ng-click="settings.notifications.low = !settings.notifications.low"/>
+              <label class="tgl-btn" for="low"></label>
+            </li>
+            <li class="tg-list-item">
+              <span>Target</span>
+              <input class="tgl tgl-ios" id="target" type="checkbox" ng-checked="settings.notifications.on && settings.notifications.target" ng-disabled="!settings.notifications.on" ng-click="settings.notifications.target = !settings.notifications.target"/>
+              <label class="tgl-btn" for="target"></label>
+            </li>
+          </ul>
+
+          <label class="adjust">Slack</label>
+          <a href="https://api.slack.com/incoming-webhooks" title="https://api.slack.com/incoming-webhooks" target="_blank"><img src="/assets/img/Slack_Mark_Web.png" width="45"></a>
+          <editable class="poll" trim="30" model="settings.notifications.slack"></editable>
+        </div>
+
+        <div class="col-lg-12">
+          <h3>Kettles</h3>
+          <div class="btn-group">
+            <label class="adjust">Add a kettle</label>
+            <button ng-repeat="kettle in kettleTypes" class="btn btn-default" ng-click="addKettle(kettle.type)">
+              <img class="type" ng-src="/assets/img/{{kettle.type}}.svg" height="30"/>
+            </button>
+          </div>
+        </div>
+
+        <div class="col-lg-12">
+          <h3>Arduinos</h3>
+          <button class="btn btn-primary" ng-click="arduinos.add()">Add Arduino</button>
 
           <label class="adjust">Poll every</label>
           <div class="input-group" role="group">
@@ -59,17 +97,41 @@
             </span>
           </div>
 
-          <label class="adjust">Slack Notification <a href="https://api.slack.com/incoming-webhooks" title="https://api.slack.com/incoming-webhooks" target="_blank"><img src="/assets/img/Slack_Mark_Web.png" width="45"></a></label>
-          <editable class="poll" trim="30" model="settings.notifications.slack"></editable>
-        </div>
-        <div class="col-md-4 col-xs-4">
-          <div class="btn-group-vertical pull-right" role="group">
-            <button class="btn btn-primary" ng-click="addKettle()">Add Kettle</button>
-            <button class="btn btn-warning" ng-click="alert()">Test Alerts</button>
-            <button class="btn btn-default" ng-click="clearKettles($event)"><i class="fa fa-trash"></i> Settings</button>
-          </div>
+          <table class="table">
+          <thead>
+            <tr>
+              <th>http(s)</th>
+              <th>URL</th>
+              <!-- <th>Password</th> -->
+              <th>Analog Ports</th>
+              <th>Digital Ports</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="arduino in settings.arduinos">
+              <td class="text-left">
+                <button class="btn btn-default" ng-show="!arduino.secure" ng-click="arduino.secure=true; arduinos.update(arduino)">http</button>
+                <button class="btn btn-success" ng-show="arduino.secure" ng-click="arduino.secure=false; arduinos.update(arduino)">https</button>
+              </td>
+              <td class="text-left"><editable class="poll" type="text" model="arduino.url" enter="arduinos.update(arduino)"></editable></td>
+              <!-- <td class="text-left">
+                <input ng-show="!!arduino.showpass" type="password" ng-model="arduino.password" ng-enter="arduino.showpass=false; arduinos.update(arduino)"></input>
+                <a href="" ng-show="!arduino.showpass" ng-click="arduino.showpass=true">*******</a>
+              </td> -->
+              <td class="text-left"><editable class="poll" type="number" model="arduino.analog" enter="arduinos.update(arduino)"></editable></td>
+              <td class="text-left"><editable class="poll" type="number" model="arduino.digital" enter="arduinos.update(arduino)"></editable></td>
+              <td><a href="" ng-click="arduinos.delete($index, arduino)"><i class="fa fa-trash fa-lg text-danger"></i></a></td>
+            </tr>
+          </tbody>
+        </table>
+
         </div>
       </div>
     </div>
   </div>
+
+</div>
+</div>
+</div>
 </div>

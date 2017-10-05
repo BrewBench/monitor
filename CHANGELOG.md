@@ -1,5 +1,15 @@
 # Change Log
 
+## 2.8.0 - 2017-10-05
+
+### Added
+- Support for multiple Arduinos #12
+- Layout Options #10
+
+### Updated
+- Sketch Version 2.7.1
+- Settings moved to a modal and added multiple Arduino support
+
 ## 2.7.5 - 2017-08-02
 
 ### Updated
