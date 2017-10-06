@@ -232,6 +232,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
         ,values: []
         ,timers: []
         ,knob: angular.merge($scope.knobOptions,{value:0,min:0,max:$scope.kettleTypes[0].target+$scope.kettleTypes[0].diff})
+        ,arduino: $scope.settings.arduinos.length ? $scope.settings.arduinos[0] : null
       }
     );
   };

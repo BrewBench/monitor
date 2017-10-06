@@ -240,7 +240,8 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
       temp: { pin: 'A0', type: 'Thermistor', hit: false, current: 0, previous: 0, adjust: 0, target: $scope.kettleTypes[0].target, diff: $scope.kettleTypes[0].diff },
       values: [],
       timers: [],
-      knob: angular.merge($scope.knobOptions, { value: 0, min: 0, max: $scope.kettleTypes[0].target + $scope.kettleTypes[0].diff })
+      knob: angular.merge($scope.knobOptions, { value: 0, min: 0, max: $scope.kettleTypes[0].target + $scope.kettleTypes[0].diff }),
+      arduino: $scope.settings.arduinos.length ? $scope.settings.arduinos[0] : null
     });
   };
 
