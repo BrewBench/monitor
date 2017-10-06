@@ -6,6 +6,8 @@ angular.module('brewbench-monitor', ['ui.router', 'nvd3', 'ngTouch', 'duScroll',
   $httpProvider.defaults.headers.common = 'Content-Type: application/json';
   delete $httpProvider.defaults.headers.common['X-Requested-With'];
 
+  $locationProvider.hashPrefix('');
+
   $stateProvider.state('home', {
     url: '',
     templateUrl: 'views/monitor.html',
