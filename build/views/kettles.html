@@ -1,7 +1,7 @@
 <div class="kettles" ng-class="{'col-md-12':settings.layout=='list','col-md-{{kettles.length==5?2:12/kettles.length}}':settings.layout=='card'}" ng-repeat="kettle in kettles track by $index" id="kettle{{$index}}">
   <div class="panel panel-default">
     <div class="panel-heading container-fluid">
-      <div class="arduinos">
+      <div class="arduinos" ng-if="shareAccess('fullAccess')">
         <a class="ui ribbon label dropdown-toggle" ng-class="{'teal':kettle.arduino, 'orange':!kettle.arduino}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           <img src="assets/img/arduino.svg" width="15"> {{kettle.arduino ? kettle.arduino.url : 'Select an Arduino'}} <span class="caret"></span>
         </a>
