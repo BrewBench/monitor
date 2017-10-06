@@ -614,7 +614,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
   };
 
   $scope.getNavOffset = function () {
-    return 55 + angular.element(document.getElementById('navbar'))[0].offsetHeight;
+    return 80 + angular.element(document.getElementById('navbar'))[0].offsetHeight;
   };
 
   $scope.addTimer = function (kettle, options) {

@@ -1,5 +1,10 @@
 # Change Log
 
+## 2.8.1 - 2017-10-05
+
+### Added
+- Mobile menu #14
+
 ## 2.8.0 - 2017-10-05
 
 ### Added

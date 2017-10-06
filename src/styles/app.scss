@@ -107,7 +107,6 @@ body {
 
 .alert {
   position: absolute;
-  width: 98%;
 }
 
 .modal-header a {
@@ -549,11 +548,11 @@ li.ssr {
   margin-top: 10px;
 }
 
-@media (max-width: 767px) {
+.nav-kettles {
+  display: none;
+}
 
-  .alert {
-    width: 94%;
-  }
+@media (max-width: 767px) {
 
   .main-container.kettles-0{
       padding-top: 80px;
@@ -585,7 +584,12 @@ li.ssr {
     padding: 5px 5px;
   }
 
+  .nav-kettles {
+    display: block;
+  }
+
 }
+
 .highlighted {
   background-color: yellow;
 }
@@ -773,7 +777,7 @@ a.ui.label {
     left: 0;
     background-color: transparent!important;
     border-style: solid;
-    border-width: 0 1.2em 1.2em 0;
+    border-width: 0 0.8em 1.2em 0;
     border-color: transparent;
     border-right-color: inherit;
     width: 0;
@@ -783,4 +787,16 @@ a.ui.label {
 .arduinos {
   position: relative;
   padding-bottom: 10px;
+}
+
+.modal-body {
+    padding: 15px 5px 15px 5px;
+}
+
+.navbar-brand {
+    float: left;
+    height: 50px;
+    padding: 15px 0 15px 0;
+    font-size: 18px;
+    line-height: 20px;
 }

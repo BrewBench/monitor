@@ -666,7 +666,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
   };
 
   $scope.getNavOffset = function(){
-    return 55+angular.element(document.getElementById('navbar'))[0].offsetHeight;
+    return 80+angular.element(document.getElementById('navbar'))[0].offsetHeight;
   };
 
   $scope.addTimer = function(kettle,options){

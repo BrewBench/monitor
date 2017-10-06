@@ -34,14 +34,17 @@
         </div>
 
         <div class="col-lg-12">
-          <h3>Notifications</h3>
-          <button class="btn btn-primary pull-right" ng-click="alert()" ng-disabled="!settings.notifications.on">Test</button>
+          <h3>Notifications
+            <button class="btn btn-primary pull-right" ng-click="alert()" ng-disabled="!settings.notifications.on">Test</button>
+          </h3>
           <ul class="tg-list">
             <li class="tg-list-item">
               <span>{{settings.notifications.on?'On':'Off'}}</span>
               <input class="tgl tgl-ios" id="notifications" type="checkbox" ng-checked="settings.notifications.on" ng-click="settings.notifications.on = !settings.notifications.on"/>
               <label class="tgl-btn" for="notifications"></label>
             </li>
+          </ul>
+          <ul class="tg-list">
             <li class="tg-list-item">
               <span>Sounds</span>
               <input class="tgl tgl-ios" id="sounds" type="checkbox" ng-checked="settings.notifications.on && settings.sounds.on" ng-disabled="!settings.notifications.on" ng-click="settings.sounds.on = !settings.sounds.on"/>
