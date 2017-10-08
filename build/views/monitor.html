@@ -1,6 +1,6 @@
 <ng-include src="'views/header.html'"></ng-include>
-<div class="container-fluid main-container kettles-{{activeKettles()}}">
-  <div class="row share" ng-if="settings.shared">
+<div class="container-fluid">
+  <div class="flex-row share" ng-if="settings.shared">
     <div class="alert alert-info alert-dismissible share">
       <button type="button" class="close" data-dismiss="alert" aria-label="Close" ng-click="clearSettings()"><i class="fa fa-trash"></i></button>
       <h3>Shared Session <sup>from</sup> <a href="mailto: {{settings.recipe.brewer.email}}">{{settings.recipe.brewer.name}}</a></h3>
@@ -15,7 +15,7 @@
       </form>
     </div>
   </div>
-  <div class="row" ng-disabled="share.needPassword" ng-class="{'disabled':share.needPassword}">
+  <div class="flex-row" ng-disabled="share.needPassword" ng-class="{'disabled':share.needPassword}">
     <div class="col-md-12">
 
       <div class="alert alert-{{error.type}} alert-dismissible" role="alert" ng-if="error.message">
@@ -26,10 +26,10 @@
       <nvd3 options="chartOptions" data="kettles"></nvd3>
     </div>
   </div>
-  <div class="row" ng-disabled="share.needPassword" ng-class="{'disabled':share.needPassword}">
+  <div class="flex-row" ng-disabled="share.needPassword" ng-class="{'disabled':share.needPassword}">
     <ng-include src="'views/recipe.html'"></ng-include>
   </div>
-  <div class="row" ng-disabled="share.needPassword" ng-class="{'disabled':share.needPassword}">
+  <div class="flex-row" ng-disabled="share.needPassword" ng-class="{'disabled':share.needPassword}">
     <ng-include src="'views/kettles.html'"></ng-include>
   </div>
 </div>
