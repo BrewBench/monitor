@@ -32,7 +32,7 @@ const paths = {
     dest: `${dirs.dest}/js`
   },
   assets: {
-    src: [`${dirs.src}/assets/**/*`,`./arduino/**/*.ino`],
+    src: [`${dirs.src}/assets/**/*`,'./arduino/**/*.ino'],
     dest: `${dirs.dest}/assets`
   },
   views: {
@@ -88,7 +88,8 @@ gulp.task('views', () => {
 });
 
 gulp.task('index', () => {
-  return gulp.src([`${dirs.src}/index.html`,`${dirs.src}/favicon.ico`,`package.json`])
+  util.log(`Copying root files`);
+  return gulp.src([`${dirs.src}/index.html`,`${dirs.src}/favicon.ico`,'package.json',`${dirs.src}/.htaccess`])
     .pipe(gulp.dest(`${dirs.dest}`));
 });
 
