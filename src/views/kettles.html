@@ -7,7 +7,7 @@
       <div class="col-auto mr-auto">
       <div class="arduinos" ng-if="shareAccess('fullAccess')">
         <a class="ui ribbon label dropdown-toggle" ng-class="{'teal':kettle.arduino, 'orange':!kettle.arduino}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          <img src="assets/img/arduino.svg" width="15"> {{kettle.arduino ? kettle.arduino.url : 'Select an Arduino'}} <span class="caret"></span>
+          <span class="dropdown-toggle"><img src="assets/img/arduino.svg" width="15"> {{kettle.arduino ? kettle.arduino.url : 'Select an Arduino'}}</span>
         </a>
         <div class="dropdown-menu scrollable-menu">
           <button class="text-center modal-link dropdown-item" type="button" data-toggle="modal" data-target="#dataModal-settings">

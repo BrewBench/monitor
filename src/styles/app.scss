@@ -491,7 +491,7 @@ li.ssr {
 
 .label, .digital .heat, .digital .pump{
   cursor: pointer;
-  font-size: 14px;
+  font-size: 16px;
 }
 
 .digital {
@@ -794,4 +794,9 @@ button {
 
 .btn-light {
   border: 1px solid #ccc;
+}
+
+.card {
+  min-width: 350px;
+  margin-bottom: 20px;
 }

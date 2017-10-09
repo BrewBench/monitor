@@ -32,7 +32,7 @@ const paths = {
     dest: `${dirs.dest}/js`
   },
   assets: {
-    src: [`${dirs.src}/assets/**/*`],
+    src: [`${dirs.src}/assets/**/*`,`./arduino/**/*.ino`],
     dest: `${dirs.dest}/assets`
   },
   views: {
@@ -77,7 +77,7 @@ gulp.task('vendor', () => {
 
 gulp.task('assets', () => {
   util.log(`Building Assets ${paths.assets.src}`);
-  return gulp.src(`${paths.assets.src}`)
+  return gulp.src(paths.assets.src)
     .pipe(gulp.dest(`${dirs.dest}/assets`));
 });
 

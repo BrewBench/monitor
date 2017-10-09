@@ -87,7 +87,16 @@
 
         <div>
           <h4>Arduinos</h4>
-          <button class="btn btn-primary" ng-click="arduinos.add()">Add Arduino</button>
+          <div class="btn btn-group">
+            <button class="btn btn-primary" ng-click="arduinos.add()">Add Arduino</button>
+
+            <button type="button" class="btn btn-light dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Download Sketch <span class="caret"></span>
+            </button>
+            <div class="dropdown-menu scrollable-menu">
+              <a href="assets/BrewBenchYun/BrewBenchYun.ino" class="dropdown-item">Arduino Yun</a>              
+            </div>
+          </div>
 
           <label class="adjust">Poll every</label>
           <div class="col pb-4">
