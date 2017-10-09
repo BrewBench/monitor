@@ -1,5 +1,14 @@
 # Change Log
 
+## 2.9.0 - 2017-10-09
+
+### Updated
+- Bootstrap to v4
+
+### Fixed
+- Spacing and flex issues
+- Water data populating dropdowns
+
 ## 2.8.1 - 2017-10-05
 
 ### Added

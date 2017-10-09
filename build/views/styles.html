@@ -3,11 +3,11 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
         <h1 class="modal-title"><i class="fa fa-book fa-lg" aria-hidden="true"></i> Style <sup class="ref">Guide</sup></h1>
-        <input ng-model="searchStyles" class="form-control" placeholder="Search Styles">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
       </div>
       <div class="modal-body">
+        <input ng-model="searchStyles" class="form-control" placeholder="Search Styles">
         <table class="table table-hover">
           <tr ng-repeat="type in styles.styleguide.class | filter:searchStyles">
             <td>

@@ -2,41 +2,39 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
         <h1 class="modal-title"><i class="fa fa-gear fa-lg" aria-hidden="true"></i> Settings</h1>
-        <div class="btn-group pull-right">
-          <!-- <button class="btn btn-default" ng-click="importSettings($event)">Import Settings</button>
-          <button class="btn btn-default" ng-click="exportSettings($event)">Export Settings</button> -->
-          <button class="btn btn-danger" ng-click="clearSettings($event)">Delete Settings</button>
-        </div>
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
       </div>
       <div class="modal-body">
+        <div class="btn-group float-right">
+          <!-- <button class="btn btn-light" ng-click="importSettings($event)">Import Settings</button>
+          <button class="btn btn-light" ng-click="exportSettings($event)">Export Settings</button> -->
+          <button class="btn btn-danger" ng-click="clearSettings($event)">Delete Settings</button>
+        </div>
 
-<div id="settings" class="settings">
+    <div id="settings" class="settings">
 
-    <div class="panel-body">
-      <div class="row">
-
-        <div class="col-lg-12">
-          <h3>Temperature</h3>
+    <div class="card-body">
+        <div class="pb-3">
+          <h4>Temperature</h4>
           <div class="input-group" role="group">
             <input id="celsius" class="degree" type="radio" ng-checked="settings.unit=='C'" value="C" ng-click="changeUnits('C')"> <label for="celsius">&deg;C</label>&nbsp;&nbsp;
             <input id="fahrenheit" class="degree" type="radio" ng-checked="settings.unit=='F'" value="F" ng-click="changeUnits('F')"> <label for="fahrenheit">&deg;F</label>
           </div>
         </div>
 
-        <div class="col-lg-12">
-          <h3>Layout</h3>
+        <div class="pb-3">
+          <h4>Layout</h4>
           <div class="input-group" role="group">
             <input id="list" class="degree" type="radio" ng-checked="settings.layout=='list'" value="list" ng-click="settings.layout='list'"> <label for="list">List</label>&nbsp;&nbsp;
             <input id="card" class="degree" type="radio" ng-checked="settings.layout=='card'" value="card" ng-click="settings.layout='card'"> <label for="card">Card</label>
           </div>
         </div>
 
-        <div class="col-lg-12">
-          <h3>Notifications
+        <div class="pb-3">
+          <h4>Notifications
             <button class="btn btn-primary pull-right" ng-click="alert()" ng-disabled="!settings.notifications.on">Test</button>
-          </h3>
+          </h4>
           <ul class="tg-list">
             <li class="tg-list-item">
               <span>{{settings.notifications.on?'On':'Off'}}</span>
@@ -77,31 +75,31 @@
           <editable class="poll" trim="30" model="settings.notifications.slack"></editable>
         </div>
 
-        <div class="col-lg-12">
-          <h3>Kettles</h3>
+        <div class="pb-3">
+          <h4>Kettles</h4>
+          <label class="adjust">Add a kettle</label>
           <div class="btn-group">
-            <label class="adjust">Add a kettle</label>
-            <button ng-repeat="kettle in kettleTypes" class="btn btn-default" ng-click="addKettle(kettle.type)">
+            <button ng-repeat="kettle in kettleTypes" class="btn btn-light" ng-click="addKettle(kettle.type)">
               <img class="type" ng-src="/assets/img/{{kettle.type}}.svg" height="30"/>
             </button>
           </div>
         </div>
 
-        <div class="col-lg-12">
-          <h3>Arduinos</h3>
+        <div>
+          <h4>Arduinos</h4>
           <button class="btn btn-primary" ng-click="arduinos.add()">Add Arduino</button>
 
           <label class="adjust">Poll every</label>
-          <div class="input-group" role="group">
+          <div class="col pb-4">
             <editable class="poll" type="number" model="settings.pollSeconds" step="1" min="5"></editable> Seconds
-            <span class="input-group-btn">
-              <button type="button" class="btn btn-default"><i class="fa fa-minus fa-lg" ng-click="(settings.pollSeconds > 5) ? settings.pollSeconds=settings.pollSeconds-1 : 5"></i></button>
-              <button type="button" class="btn btn-default"><i class="fa fa-plus fa-lg" ng-click="settings.pollSeconds=settings.pollSeconds+1"></i></button>
+            <span class="btn-group float-right">
+              <button type="button" class="btn btn-light"><i class="fa fa-minus fa-lg" ng-click="(settings.pollSeconds > 5) ? settings.pollSeconds=settings.pollSeconds-1 : 5"></i></button>
+              <button type="button" class="btn btn-light"><i class="fa fa-plus fa-lg" ng-click="settings.pollSeconds=settings.pollSeconds+1"></i></button>
             </span>
           </div>
 
-          <table class="table">
-          <thead>
+          <table class="table table-striped table-responsive">
+          <thead class="thead-inverse">
             <tr>
               <th>http(s)</th>
               <th>URL</th>
@@ -114,7 +112,7 @@
           <tbody>
             <tr ng-repeat="arduino in settings.arduinos">
               <td class="text-left">
-                <button class="btn btn-default" ng-show="!arduino.secure" ng-click="arduino.secure=true; arduinos.update(arduino)">http</button>
+                <button class="btn btn-light" ng-show="!arduino.secure" ng-click="arduino.secure=true; arduinos.update(arduino)">http</button>
                 <button class="btn btn-success" ng-show="arduino.secure" ng-click="arduino.secure=false; arduinos.update(arduino)">https</button>
               </td>
               <td class="text-left"><editable class="poll" type="text" model="arduino.url" enter="arduinos.update(arduino)"></editable></td>
@@ -134,7 +132,6 @@
     </div>
   </div>
 
-</div>
 </div>
 </div>
 </div>

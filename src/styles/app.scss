@@ -19,19 +19,6 @@ body {
   margin-bottom: 20px;
 }
 
-.navbar .fa-calculator, .navbar .fa-book {
-  margin-top: 10px;
-}
-
-.navbar-inverse .navbar-nav>li>a{
-  color: #ffffff;
-}
-
-.navbar-inverse .navbar-nav>li.pull-right{
-  margin-right: 20px;
-  margin-top: 8px;
-}
-
 .navbar-header .navbar-brand img{
   margin-top: -12px;
 }
@@ -190,9 +177,10 @@ sup.ref{
   padding: 10px;
 }
 
-.settings h3 {
+.settings h4 {
   color: #777;
   border-bottom: 1px solid #ccc;
+  padding-bottom: 10px;
 }
 
 .kettles ul.dropdown-menu{
@@ -800,7 +788,10 @@ a.ui.label {
     line-height: 20px;
 }
 
+button {
+  cursor: pointer;
+}
+
 .btn-light {
   border: 1px solid #ccc;
-  cursor: pointer;
 }

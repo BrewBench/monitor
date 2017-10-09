@@ -1,40 +1,30 @@
-<nav class="navbar navbar-inverse navbar-default navbar-fixed-top">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="#" data-toggle="modal" data-target="#aboutModal"><img src="/assets/img/brewbench-logo.png" width="45"/></a>
-
-    <div class="navbar-header">
-        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-        </button>
+<div id="navbar" class="navbar fixed-top navbar-dark bg-dark navbar-expand-lg">
+  <a class="navbar-brand" href="#" data-toggle="modal" data-target="#aboutModal">
+    <img src="/assets/img/brewbench-logo.png" width="45"/>
+  </a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+    <div class="navbar-nav">
+      <a href="" data-toggle="modal" data-target="#dataModal-hops" class="nav-item nav-link" title="Hops"><img src="/assets/img/hop.svg" width="32"></a>
+      <a href="" data-toggle="modal" data-target="#dataModal-grains" class="nav-item nav-link" title="Grains"><img src="/assets/img/grain.svg" width="32"></a>
+      <a href="" data-toggle="modal" data-target="#dataModal-water" class="nav-item nav-link" title="Water"><img src="/assets/img/water.svg" width="32"></a>
+      <a href="" data-toggle="modal" data-target="#dataModal-styles" class="nav-item nav-link" title="Style Guide" ng-click="loadStyles()"><i class="fa fa-book fa-2x" aria-hidden="true"></i>
+      <a href="" data-toggle="modal" data-target="#dataModal-calc" class="nav-item nav-link" title="Calculator"><i class="fa fa-calculator fa-2x" aria-hidden="true"></i></a>
+      <a ng-if="shareAccess('fullAccess')" href="" data-toggle="modal" data-target="#importModal" class="nav-item nav-link" title="Import Recipe"><i class="fa fa-upload fa-2x" aria-hidden="true"></i></a>
+      <a ng-if="shareAccess('fullAccess')" href="" data-toggle="modal" data-target="#shareModal" class="nav-item nav-link" title="Share Session"><i class="fa fa-share fa-2x" aria-hidden="true"></i></a>
+      <a ng-if="showSettings && shareAccess('fullAccess')" href="" data-toggle="modal" data-target="#dataModal-settings" class="nav-item nav-link" title="Settings"><i class="fa fa-gear fa-2x"></i></a>
+      <a href="#kettle{{$index}}"
+        du-smooth-scroll
+        duration="1000"
+        offset="{{getNavOffset()}}"
+        class="navbar-toggler nav-item nav-link"
+        ng-if="kettle.active"
+        ng-repeat="kettle in kettles track by $index"
+        style="border: none;">
+          {{kettle.key}} {{kettle.temp.current}}&deg;{{settings.unit}}
+      </a>
     </div>
-
-     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-        <ul class="nav navbar-nav navitem">
-          <li style="display: inline-block;"><a href="" data-toggle="modal" data-target="#dataModal-hops" class="modal-link" title="Hops"><img src="/assets/img/hop.svg" width="30"></a></li>
-          <li style="display: inline-block;"><a href="" data-toggle="modal" data-target="#dataModal-grains" class="modal-link" title="Grains"><img src="/assets/img/grain.svg" width="30"></a></li>
-          <li style="display: inline-block;"><a href="" data-toggle="modal" data-target="#dataModal-water" class="modal-link" title="Water"><img src="/assets/img/water.svg" width="30"></a></li>
-          <li style="display: inline-block;"><a href="" data-toggle="modal" data-target="#dataModal-styles" class="modal-link" title="Style Guide" ng-click="loadStyles()"><i class="fa fa-book fa-lg" aria-hidden="true"></i></li>
-          <li style="display: inline-block;"><a href="" data-toggle="modal" data-target="#dataModal-calc" class="modal-link" title="Calculator"><i class="fa fa-calculator fa-lg" aria-hidden="true"></i></a></li>
-          <li style="display: inline-block;" ng-if="shareAccess('fullAccess')"><a href="" data-toggle="modal" data-target="#importModal" title="Import Recipe"><i class="fa fa-upload fa-lg" aria-hidden="true"></i></a></li>
-          <li style="display: inline-block;" ng-if="shareAccess('fullAccess')"><a href="" data-toggle="modal" data-target="#shareModal" title="Share Session"><i class="fa fa-share fa-lg" aria-hidden="true"></i></a></li>
-          <li style="display: inline-block;" class="pull-right hidden-sm hidden-md hidden-lg" ng-if="showSettings && shareAccess('fullAccess')"><a href="" data-toggle="modal" data-target="#dataModal-settings" class="modal-link" title="Settings"><i class="fa fa-gear fa-lg"></i></a></li>
-        </ul>
-        <ul class="nav navbar-nav navbar-right navitem hidden-xs">
-          <li><a href="" data-toggle="modal" data-target="#aboutModal" title="About">About</a></li>
-          <li ng-if="showSettings && shareAccess('fullAccess')"><a href="" data-toggle="modal" data-target="#dataModal-settings" class="modal-link" title="Settings"><i class="fa fa-gear fa-2x"></i></a></li>
-        </ul>
-    </div>
-
-    <div id="navbar" class="nav-kettles collapsed">
-      <ul class="nav navbar-nav">
-        <li ng-repeat="kettle in kettles track by $index">
-          <a href="#kettle{{$index}}" du-smooth-scroll duration="1000" offset="{{getNavOffset()}}" ng-if="kettle.active">{{kettle.key}} {{kettle.temp.current}}&deg;{{settings.unit}}</a>
-        </li>
-      </ul>
-    </div>
-
   </div>
-</nav>
+</div>

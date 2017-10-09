@@ -16,13 +16,11 @@
     </div>
   </div>
   <div class="flex-row" ng-disabled="share.needPassword" ng-class="{'disabled':share.needPassword}">
-    <div class="col-md-12">
-
+    <div class="col-auto">
       <div class="alert alert-{{error.type}} alert-dismissible" role="alert" ng-if="error.message">
         <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         <strong>{{error.type}}</strong> {{error.message}}
       </div>
-
       <nvd3 options="chartOptions" data="kettles"></nvd3>
     </div>
   </div>

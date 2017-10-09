@@ -615,7 +615,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
   };
 
   $scope.getNavOffset = function () {
-    return 80 + angular.element(document.getElementById('navbar'))[0].offsetHeight;
+    return 125 + angular.element(document.getElementById('navbar'))[0].offsetHeight;
   };
 
   $scope.addTimer = function (kettle, options) {
@@ -636,12 +636,12 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
     if (btn.hasClass('fa-trash')) btn = btn.parent();
 
     if (!btn.hasClass('btn-danger')) {
-      btn.removeClass('btn-default').addClass('btn-danger');
+      btn.removeClass('btn-light').addClass('btn-danger');
       $timeout(function () {
-        btn.removeClass('btn-danger').addClass('btn-default');
-      }, 1000);
+        btn.removeClass('btn-danger').addClass('btn-light');
+      }, 2000);
     } else {
-      btn.removeClass('btn-danger').addClass('btn-default');
+      btn.removeClass('btn-danger').addClass('btn-light');
       kettle.timers = [];
     }
   };
