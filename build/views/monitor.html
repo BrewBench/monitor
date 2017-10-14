@@ -1,18 +1,20 @@
 <ng-include src="'views/header.html'"></ng-include>
-<div class="container-fluid">
+<div class="container-fluid main">
   <div class="flex-row share" ng-if="settings.shared">
-    <div class="alert alert-info alert-dismissible share">
-      <button type="button" class="close" data-dismiss="alert" aria-label="Close" ng-click="clearSettings()"><i class="fa fa-trash"></i></button>
-      <h3>Shared Session <sup>from</sup> <a href="mailto: {{settings.recipe.brewer.email}}">{{settings.recipe.brewer.name}}</a></h3>
-      <form ng-if="share.needPassword">
-        A password is required to load this session <br>
-        <div class="input-group">
-          <input type="password" class="form-control" ng-model="share.password" placeholder="Enter the share password" ng-enter="loadShareFile()">
-          <span class="input-group-btn">
-            <button class="btn btn-primary" type="button" ng-click="loadShareFile()">Unlock Share</button>
-          </span>
-        </div>
-      </form>
+    <div class="col">
+      <div class="alert alert-info alert-dismissible share">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close" ng-click="clearSettings()"><i class="fa fa-trash"></i></button>
+        <h3>Shared Session <sup>from</sup> <a href="mailto: {{settings.recipe.brewer.email}}">{{settings.recipe.brewer.name}}</a></h3>
+        <form ng-if="share.needPassword">
+          A password is required to load this session <br>
+          <div class="input-group">
+            <input type="password" class="form-control" ng-model="share.password" placeholder="Enter the share password" ng-enter="loadShareFile()">
+            <span class="input-group-btn">
+              <button class="btn btn-primary" type="button" ng-click="loadShareFile()">Unlock Share</button>
+            </span>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
   <div class="flex-row" ng-disabled="share.needPassword" ng-class="{'disabled':share.needPassword}">

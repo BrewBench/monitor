@@ -11,12 +11,14 @@ body {
   margin: 0 0 110px 0;
   color: #161b1f;
 }
+.main {
+  position: relative;
+  top: 80px;
+}
 
 .navbar {
   background-color: #337ab7;
   color: #ffffff;
-  min-height: 50px;
-  margin-bottom: 20px;
 }
 
 .navbar-header .navbar-brand img{
@@ -90,10 +92,6 @@ body {
     opacity: 0.5;
     pointer-events: none;
   }
-}
-
-.alert {
-  position: absolute;
 }
 
 .modal-header a {

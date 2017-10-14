@@ -89,7 +89,9 @@ gulp.task('views', () => {
 
 gulp.task('index', () => {
   util.log(`Copying root files`);
-  return gulp.src([`${dirs.src}/index.html`,`${dirs.src}/favicon.ico`,'package.json',`${dirs.src}/.htaccess`])
+  return gulp.src([`${dirs.src}/index.html`,
+      `${dirs.src}/favicon.ico`,'package.json',
+      `${dirs.src}/.htaccess`])
     .pipe(gulp.dest(`${dirs.dest}`));
 });
 
@@ -99,7 +101,10 @@ gulp.task('serve', () => {
     port: 8080,
     logConnections: true,
     logFileChanges: true,
-    files: [`${dirs.dest}/js/*.js`, `${dirs.dest}/styles/*.css`, `${dirs.dest}/views/*.html`, `${dirs.dest}/assets/*`],
+    files: [`${dirs.dest}/js/*.js`,
+        `${dirs.dest}/styles/*.css`,
+        `${dirs.dest}/views/*.html`,
+        `${dirs.dest}/assets/*`],
     watchEvents: ['add', 'change']
   });
 
