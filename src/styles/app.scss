@@ -189,7 +189,7 @@ sup.ref{
 
 .settings ul>li, .kettles ul>li{
   list-style-type: none;
-  margin: 10px;
+  margin: 4px;
 }
 
 .settings .right label {
@@ -212,7 +212,7 @@ sup.ref{
   flex: auto;
 }
 
-.kettles .kettle-row .kettle-head .type {
+.kettles .type {
     cursor: pointer;
 }
 
@@ -357,6 +357,11 @@ sup.ref{
   font-weight: lighter;
   color: #777;
   width: 100%;
+}
+.settings table td {
+  max-width: 180px;
+  overflow: hidden;
+  word-wrap: break-word;
 }
 
 .kettles input[type=text]{

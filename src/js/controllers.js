@@ -1111,14 +1111,14 @@ $scope.kettles = BrewService.settings('kettles') || [{
   $scope.processTemps = function(){
     var allSensors = [];
     //only process active sensors
-    _.each($scope.kettles, kettle => {
-      if(kettle.active){
-        allSensors.push(BrewService.temp(kettle)
+    _.each($scope.kettles, (k, i) => {
+      if($scope.kettles[i].active){
+        allSensors.push(BrewService.temp($scope.kettles[i])
           .then(response => {
-            return updateTemp(response, kettle);
+            return updateTemp(response, $scope.kettles[i]);
           })
           .catch(err => {
-            $scope.connectError(err, kettle);
+            $scope.connectError(err, $scope.kettles[i]);
             return err;
           }));
       }

@@ -1021,12 +1021,12 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
   $scope.processTemps = function () {
     var allSensors = [];
     //only process active sensors
-    _.each($scope.kettles, function (kettle) {
-      if (kettle.active) {
-        allSensors.push(BrewService.temp(kettle).then(function (response) {
-          return updateTemp(response, kettle);
+    _.each($scope.kettles, function (k, i) {
+      if ($scope.kettles[i].active) {
+        allSensors.push(BrewService.temp($scope.kettles[i]).then(function (response) {
+          return updateTemp(response, $scope.kettles[i]);
         }).catch(function (err) {
-          $scope.connectError(err, kettle);
+          $scope.connectError(err, $scope.kettles[i]);
           return err;
         }));
       }
