@@ -237,6 +237,10 @@ $scope.kettles = BrewService.settings('kettles') || [{
     );
   };
 
+  $scope.kettleCount = function(type){
+    return _.filter($scope.kettles, {type: type}).length;
+  };
+
   $scope.activeKettles = function(){
     return _.filter($scope.kettles,{active:true}).length;
   };

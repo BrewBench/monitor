@@ -78,10 +78,11 @@
         <div class="pb-3">
           <h4>Kettles</h4>
           <label class="adjust">Add a kettle</label>
-          <div class="btn-group">
-            <button ng-repeat="kettle in kettleTypes" class="btn btn-light" ng-click="addKettle(kettle.type)">
+          <div class="btn-group item" ng-repeat="kettle in kettleTypes">
+            <button class="btn btn-light" ng-click="addKettle(kettle.type)">
               <img class="type" ng-src="/assets/img/{{kettle.type}}.svg" height="30"/>
             </button>
+            <div class="floating ui blue circular label">{{kettleCount(kettle.type)}}</div>
           </div>
         </div>
 

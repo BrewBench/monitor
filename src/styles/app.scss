@@ -362,16 +362,81 @@ sup.ref{
   margin: none;
 }
 
-.settings input[type=text], .settings select, .modal input{
+.settings select, .modal input{
   font-size: 20px;
   font-weight: lighter;
   color: #777;
   width: 100%;
 }
-.settings table td {
-  max-width: 180px;
-  overflow: hidden;
-  word-wrap: break-word;
+
+.settings {
+
+  table td {
+    max-width: 180px;
+    overflow: hidden;
+    word-wrap: break-word;
+  }
+
+  input[type=text], .settings select, .modal input{
+    font-size: 20px;
+    font-weight: lighter;
+    color: #777;
+    width: 74%;
+    position: absolute;
+  }
+
+  .item {
+    position: relative;
+    padding-right: 20px;
+  }
+
+  .adjust {
+    padding-bottom: 10px;
+  }
+
+  .ui.circular.label, .ui.circular.labels .label {
+    min-width: 2em;
+    min-height: 2em;
+    padding: .5em!important;
+    line-height: 1em;
+    text-align: center;
+    border-radius: 500rem;
+    position: absolute;
+    left: 50%;
+    top: -10px;
+    z-index: 10;
+  }
+
+  .ui.blue.label, .ui.blue.labels .label {
+    background-color: #2185d0!important;
+    border-color: #2185d0!important;
+    color: #fff!important;
+  }
+
+  a.ui.label {
+    cursor: pointer;
+  }
+
+  .ui.label, .ui.labels .label {
+    font-size: .85714286rem;
+  }
+
+  .ui.label {
+    display: inline-block;
+    line-height: 1;
+    vertical-align: baseline;
+    margin: 0 .14285714em;
+    background-color: #e8e8e8;
+    background-image: none;
+    padding: .5833em .833em;
+    color: rgba(0,0,0,.6);
+    text-transform: none;
+    font-weight: 700;
+    border: 0 solid transparent;
+    border-radius: .28571429rem;
+    -webkit-transition: background .1s ease;
+    transition: background .1s ease;
+  }
 }
 
 .kettles input[type=text]{
