@@ -150,39 +150,39 @@ $scope.knobOptions = {
 
 //default kettle values
 $scope.kettles = BrewService.settings('kettles') || [{
-    key: 'Boil'
-    ,type: 'hop'
-    ,active: false
-    ,heater: {pin:'D2',running:false,auto:false,pwm:false,dutyCycle:100}
-    ,pump: {pin:'D3',running:false,auto:false,pwm:false,dutyCycle:100}
-    ,temp: {pin:'A0',type:'Thermistor',hit:false,current:0,previous:0,adjust:0,target:200,diff:2}
-    ,values: []
-    ,timers: []
-    ,knob: angular.merge($scope.knobOptions,{value:0,min:0,max:200+5})
-    ,arduino: {id: btoa('brewbench'), url: 'arduino.local',analog: 5,digital: 13}
-  },{
     key: 'Hot Liquor'
     ,type: 'water'
     ,active: false
-    ,heater: {pin:'D4',running:false,auto:false,pwm:false,dutyCycle:100}
-    ,pump: {pin:'D5',running:false,auto:false,pwm:false,dutyCycle:100}
-    ,temp: {pin:'A1',type:'Thermistor',hit:false,current:0,previous:0,adjust:0,target:170,diff:2}
+    ,heater: {pin:'D2',running:false,auto:false,pwm:false,dutyCycle:100}
+    ,pump: {pin:'D3',running:false,auto:false,pwm:false,dutyCycle:100}
+    ,temp: {pin:'A0',type:'Thermistor',hit:false,current:0,previous:0,adjust:0,target:170,diff:2}
     ,values: []
     ,timers: []
-    ,knob: angular.merge($scope.knobOptions,{value:0,min:0,max:200+5})
+    ,knob: angular.copy($scope.knobOptions,{value:0,min:0,max:200+5})
     ,arduino: {id: btoa('brewbench'), url: 'arduino.local',analog: 5,digital: 13}
   },{
     key: 'Mash'
     ,type: 'grain'
     ,active: false
-    ,heater: {pin:'D6',running:false,auto:false,pwm:false,dutyCycle:100}
-    ,pump: {pin:'D7',running:false,auto:false,pwm:false,dutyCycle:100}
-    ,temp: {pin:'A2',type:'Thermistor',hit:false,current:0,previous:0,adjust:0,target:152,diff:2}
+    ,heater: {pin:'D4',running:false,auto:false,pwm:false,dutyCycle:100}
+    ,pump: {pin:'D5',running:false,auto:false,pwm:false,dutyCycle:100}
+    ,temp: {pin:'A1',type:'Thermistor',hit:false,current:0,previous:0,adjust:0,target:152,diff:2}
     ,values: []
     ,timers: []
-    ,knob: angular.merge($scope.knobOptions,{value:0,min:0,max:150+5})
+    ,knob: angular.copy($scope.knobOptions,{value:0,min:0,max:150+5})
     ,arduino: {id: btoa('brewbench'), url: 'arduino.local',analog: 5,digital: 13}
-  }];
+  },{
+      key: 'Boil'
+      ,type: 'hop'
+      ,active: false
+      ,heater: {pin:'D6',running:false,auto:false,pwm:false,dutyCycle:100}
+      ,pump: {pin:'D7',running:false,auto:false,pwm:false,dutyCycle:100}
+      ,temp: {pin:'A2',type:'Thermistor',hit:false,current:0,previous:0,adjust:0,target:200,diff:2}
+      ,values: []
+      ,timers: []
+      ,knob: angular.copy($scope.knobOptions,{value:0,min:0,max:200+5})
+      ,arduino: {id: btoa('brewbench'), url: 'arduino.local',analog: 5,digital: 13}
+    }];
 
   $scope.getPortRange = function(number){
       number++;
@@ -231,7 +231,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
         ,temp: {pin:'A0',type:'Thermistor',hit:false,current:0,previous:0,adjust:0,target:$scope.kettleTypes[0].target,diff:$scope.kettleTypes[0].diff}
         ,values: []
         ,timers: []
-        ,knob: angular.merge($scope.knobOptions,{value:0,min:0,max:$scope.kettleTypes[0].target+$scope.kettleTypes[0].diff})
+        ,knob: angular.copy($scope.knobOptions,{value:0,min:0,max:$scope.kettleTypes[0].target+$scope.kettleTypes[0].diff})
         ,arduino: $scope.settings.arduinos.length ? $scope.settings.arduinos[0] : null
       }
     );
@@ -340,7 +340,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
             }
             if(contents.kettles){
               _.each(contents.kettles, kettle => {
-                kettle.knob = angular.merge($scope.knobOptions,{value:0,min:0,max:200+5,subText:{enabled: true,text: 'starting...',color: 'gray',font: 'auto'}});
+                kettle.knob = angular.copy($scope.knobOptions,{value:0,min:0,max:200+5,subText:{enabled: true,text: 'starting...',color: 'gray',font: 'auto'}});
                 kettle.values = [];
               });
               $scope.kettles = contents.kettles;
@@ -358,6 +358,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
 
   $scope.importRecipe = function($fileContent,$ext){
 
+      // parse the imported content
       var formatted_content = BrewService.formatXML($fileContent);
       var jsonObj, recipe = null;
 
@@ -403,7 +404,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
 
       if(recipe.grains.length){
         $scope.settings.recipe.grains = recipe.grains;
-        var kettle = _.filter($scope.kettles,{type:'grain'})[0];
+        let kettle = _.filter($scope.kettles,{type:'grain'})[0];
         if(kettle){
           kettle.timers = [];
           $scope.settings.recipe.grains = {};
@@ -423,7 +424,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
       }
 
       if(recipe.hops.length){
-        var kettle = _.filter($scope.kettles,{type:'hop'})[0];
+        let kettle = _.filter($scope.kettles,{type:'hop'})[0];
         if(kettle){
           kettle.timers = [];
           $scope.settings.recipe.hops = {};
@@ -442,7 +443,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
         }
       }
       if(recipe.misc.length){
-        var kettle = _.filter($scope.kettles,{type:'water'})[0];
+        let kettle = _.filter($scope.kettles,{type:'water'})[0];
         if(kettle){
           kettle.timers = [];
           _.each(recipe.misc,function(misc){
@@ -1034,7 +1035,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
     kettle.type = kettleType.type;
     kettle.temp.target = kettleType.target;
     kettle.temp.diff = kettleType.diff;
-    kettle.knob = angular.merge($scope.knobOptions,{value:kettle.temp.current,min:0,max:kettleType.target+kettleType.diff});
+    kettle.knob = angular.copy($scope.knobOptions,{value:kettle.temp.current,min:0,max:kettleType.target+kettleType.diff});
     if(kettleType.type === 'fermenter')
       kettle.cooler = {pin:'D2',running:false,auto:false,pwm:false,dutyCycle:100};
     else

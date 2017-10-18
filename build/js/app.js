@@ -161,37 +161,37 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
 
   //default kettle values
   $scope.kettles = BrewService.settings('kettles') || [{
-    key: 'Boil',
-    type: 'hop',
-    active: false,
-    heater: { pin: 'D2', running: false, auto: false, pwm: false, dutyCycle: 100 },
-    pump: { pin: 'D3', running: false, auto: false, pwm: false, dutyCycle: 100 },
-    temp: { pin: 'A0', type: 'Thermistor', hit: false, current: 0, previous: 0, adjust: 0, target: 200, diff: 2 },
-    values: [],
-    timers: [],
-    knob: angular.merge($scope.knobOptions, { value: 0, min: 0, max: 200 + 5 }),
-    arduino: { id: btoa('brewbench'), url: 'arduino.local', analog: 5, digital: 13 }
-  }, {
     key: 'Hot Liquor',
     type: 'water',
     active: false,
-    heater: { pin: 'D4', running: false, auto: false, pwm: false, dutyCycle: 100 },
-    pump: { pin: 'D5', running: false, auto: false, pwm: false, dutyCycle: 100 },
-    temp: { pin: 'A1', type: 'Thermistor', hit: false, current: 0, previous: 0, adjust: 0, target: 170, diff: 2 },
+    heater: { pin: 'D2', running: false, auto: false, pwm: false, dutyCycle: 100 },
+    pump: { pin: 'D3', running: false, auto: false, pwm: false, dutyCycle: 100 },
+    temp: { pin: 'A0', type: 'Thermistor', hit: false, current: 0, previous: 0, adjust: 0, target: 170, diff: 2 },
     values: [],
     timers: [],
-    knob: angular.merge($scope.knobOptions, { value: 0, min: 0, max: 200 + 5 }),
+    knob: angular.copy($scope.knobOptions, { value: 0, min: 0, max: 200 + 5 }),
     arduino: { id: btoa('brewbench'), url: 'arduino.local', analog: 5, digital: 13 }
   }, {
     key: 'Mash',
     type: 'grain',
     active: false,
-    heater: { pin: 'D6', running: false, auto: false, pwm: false, dutyCycle: 100 },
-    pump: { pin: 'D7', running: false, auto: false, pwm: false, dutyCycle: 100 },
-    temp: { pin: 'A2', type: 'Thermistor', hit: false, current: 0, previous: 0, adjust: 0, target: 152, diff: 2 },
+    heater: { pin: 'D4', running: false, auto: false, pwm: false, dutyCycle: 100 },
+    pump: { pin: 'D5', running: false, auto: false, pwm: false, dutyCycle: 100 },
+    temp: { pin: 'A1', type: 'Thermistor', hit: false, current: 0, previous: 0, adjust: 0, target: 152, diff: 2 },
     values: [],
     timers: [],
-    knob: angular.merge($scope.knobOptions, { value: 0, min: 0, max: 150 + 5 }),
+    knob: angular.copy($scope.knobOptions, { value: 0, min: 0, max: 150 + 5 }),
+    arduino: { id: btoa('brewbench'), url: 'arduino.local', analog: 5, digital: 13 }
+  }, {
+    key: 'Boil',
+    type: 'hop',
+    active: false,
+    heater: { pin: 'D6', running: false, auto: false, pwm: false, dutyCycle: 100 },
+    pump: { pin: 'D7', running: false, auto: false, pwm: false, dutyCycle: 100 },
+    temp: { pin: 'A2', type: 'Thermistor', hit: false, current: 0, previous: 0, adjust: 0, target: 200, diff: 2 },
+    values: [],
+    timers: [],
+    knob: angular.copy($scope.knobOptions, { value: 0, min: 0, max: 200 + 5 }),
     arduino: { id: btoa('brewbench'), url: 'arduino.local', analog: 5, digital: 13 }
   }];
 
@@ -240,7 +240,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
       temp: { pin: 'A0', type: 'Thermistor', hit: false, current: 0, previous: 0, adjust: 0, target: $scope.kettleTypes[0].target, diff: $scope.kettleTypes[0].diff },
       values: [],
       timers: [],
-      knob: angular.merge($scope.knobOptions, { value: 0, min: 0, max: $scope.kettleTypes[0].target + $scope.kettleTypes[0].diff }),
+      knob: angular.copy($scope.knobOptions, { value: 0, min: 0, max: $scope.kettleTypes[0].target + $scope.kettleTypes[0].diff }),
       arduino: $scope.settings.arduinos.length ? $scope.settings.arduinos[0] : null
     });
   };
@@ -327,7 +327,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
           }
           if (contents.kettles) {
             _.each(contents.kettles, function (kettle) {
-              kettle.knob = angular.merge($scope.knobOptions, { value: 0, min: 0, max: 200 + 5, subText: { enabled: true, text: 'starting...', color: 'gray', font: 'auto' } });
+              kettle.knob = angular.copy($scope.knobOptions, { value: 0, min: 0, max: 200 + 5, subText: { enabled: true, text: 'starting...', color: 'gray', font: 'auto' } });
               kettle.values = [];
             });
             $scope.kettles = contents.kettles;
@@ -344,6 +344,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
 
   $scope.importRecipe = function ($fileContent, $ext) {
 
+    // parse the imported content
     var formatted_content = BrewService.formatXML($fileContent);
     var jsonObj,
         recipe = null;
@@ -393,12 +394,12 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
     }
 
     if (recipe.hops.length) {
-      var kettle = _.filter($scope.kettles, { type: 'hop' })[0];
-      if (kettle) {
-        kettle.timers = [];
+      var _kettle = _.filter($scope.kettles, { type: 'hop' })[0];
+      if (_kettle) {
+        _kettle.timers = [];
         $scope.settings.recipe.hops = {};
         _.each(recipe.hops, function (hop) {
-          $scope.addTimer(kettle, {
+          $scope.addTimer(_kettle, {
             label: hop.label,
             min: hop.min,
             notes: hop.notes
@@ -409,11 +410,11 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
       }
     }
     if (recipe.misc.length) {
-      var kettle = _.filter($scope.kettles, { type: 'water' })[0];
-      if (kettle) {
-        kettle.timers = [];
+      var _kettle2 = _.filter($scope.kettles, { type: 'water' })[0];
+      if (_kettle2) {
+        _kettle2.timers = [];
         _.each(recipe.misc, function (misc) {
-          $scope.addTimer(kettle, {
+          $scope.addTimer(_kettle2, {
             label: misc.label,
             min: misc.min,
             notes: misc.notes
@@ -948,7 +949,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
     kettle.type = kettleType.type;
     kettle.temp.target = kettleType.target;
     kettle.temp.diff = kettleType.diff;
-    kettle.knob = angular.merge($scope.knobOptions, { value: kettle.temp.current, min: 0, max: kettleType.target + kettleType.diff });
+    kettle.knob = angular.copy($scope.knobOptions, { value: kettle.temp.current, min: 0, max: kettleType.target + kettleType.diff });
     if (kettleType.type === 'fermenter') kettle.cooler = { pin: 'D2', running: false, auto: false, pwm: false, dutyCycle: 100 };else delete kettle.cooler;
   };
 
@@ -1121,6 +1122,7 @@ angular.module('brewbench-monitor').directive('editable', function () {
                 reader.onload = function (onLoadEvent) {
                     scope.$apply(function () {
                         fn(scope, { $fileContent: onLoadEvent.target.result, $ext: extension });
+                        element.val(null);
                     });
                 };
                 reader.readAsText(file);

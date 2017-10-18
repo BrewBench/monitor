@@ -15,7 +15,7 @@ angular.module('brewbench-monitor')
             element.bind('click', function() {
                 scope.$apply(scope.edit = true);
             });
-            if(scope.enter) scope.enter();            
+            if(scope.enter) scope.enter();
         }
     };
 })
@@ -45,6 +45,7 @@ angular.module('brewbench-monitor')
 				reader.onload = function(onLoadEvent) {
 					scope.$apply(function() {
             fn(scope, {$fileContent: onLoadEvent.target.result, $ext: extension});
+            element.val(null);
 					});
 				};
 				reader.readAsText(file);
