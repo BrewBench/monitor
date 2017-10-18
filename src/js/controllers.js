@@ -155,7 +155,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
     ,active: false
     ,heater: {pin:'D2',running:false,auto:false,pwm:false,dutyCycle:100}
     ,pump: {pin:'D3',running:false,auto:false,pwm:false,dutyCycle:100}
-    ,temp: {pin:'A0',type:'Thermistor',hit:false,current:0,previous:0,adjust:0,target:200,diff:5}
+    ,temp: {pin:'A0',type:'Thermistor',hit:false,current:0,previous:0,adjust:0,target:200,diff:2}
     ,values: []
     ,timers: []
     ,knob: angular.merge($scope.knobOptions,{value:0,min:0,max:200+5})
@@ -166,7 +166,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
     ,active: false
     ,heater: {pin:'D4',running:false,auto:false,pwm:false,dutyCycle:100}
     ,pump: {pin:'D5',running:false,auto:false,pwm:false,dutyCycle:100}
-    ,temp: {pin:'A1',type:'Thermistor',hit:false,current:0,previous:0,adjust:0,target:200,diff:5}
+    ,temp: {pin:'A1',type:'Thermistor',hit:false,current:0,previous:0,adjust:0,target:170,diff:2}
     ,values: []
     ,timers: []
     ,knob: angular.merge($scope.knobOptions,{value:0,min:0,max:200+5})
@@ -177,7 +177,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
     ,active: false
     ,heater: {pin:'D6',running:false,auto:false,pwm:false,dutyCycle:100}
     ,pump: {pin:'D7',running:false,auto:false,pwm:false,dutyCycle:100}
-    ,temp: {pin:'A2',type:'Thermistor',hit:false,current:0,previous:0,adjust:0,target:150,diff:5}
+    ,temp: {pin:'A2',type:'Thermistor',hit:false,current:0,previous:0,adjust:0,target:152,diff:2}
     ,values: []
     ,timers: []
     ,knob: angular.merge($scope.knobOptions,{value:0,min:0,max:150+5})

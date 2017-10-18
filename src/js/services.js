@@ -61,9 +61,9 @@ angular.module('brewbench-monitor')
 
     kettleTypes: function(type){
       let kettles = [
-        {'name':'Boil','type':'hop','target':200,'diff':5}
-        ,{'name':'Mash','type':'grain','target':150,'diff':5}
-        ,{'name':'Hot Liquor','type':'water','target':200,'diff':5}
+        {'name':'Boil','type':'hop','target':200,'diff':2}
+        ,{'name':'Mash','type':'grain','target':152,'diff':2}
+        ,{'name':'Hot Liquor','type':'water','target':170,'diff':2}
         ,{'name':'Fermenter','type':'fermenter','target':74,'diff':2}
       ];
       if(type)

@@ -166,7 +166,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
     active: false,
     heater: { pin: 'D2', running: false, auto: false, pwm: false, dutyCycle: 100 },
     pump: { pin: 'D3', running: false, auto: false, pwm: false, dutyCycle: 100 },
-    temp: { pin: 'A0', type: 'Thermistor', hit: false, current: 0, previous: 0, adjust: 0, target: 200, diff: 5 },
+    temp: { pin: 'A0', type: 'Thermistor', hit: false, current: 0, previous: 0, adjust: 0, target: 200, diff: 2 },
     values: [],
     timers: [],
     knob: angular.merge($scope.knobOptions, { value: 0, min: 0, max: 200 + 5 }),
@@ -177,7 +177,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
     active: false,
     heater: { pin: 'D4', running: false, auto: false, pwm: false, dutyCycle: 100 },
     pump: { pin: 'D5', running: false, auto: false, pwm: false, dutyCycle: 100 },
-    temp: { pin: 'A1', type: 'Thermistor', hit: false, current: 0, previous: 0, adjust: 0, target: 200, diff: 5 },
+    temp: { pin: 'A1', type: 'Thermistor', hit: false, current: 0, previous: 0, adjust: 0, target: 170, diff: 2 },
     values: [],
     timers: [],
     knob: angular.merge($scope.knobOptions, { value: 0, min: 0, max: 200 + 5 }),
@@ -188,7 +188,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
     active: false,
     heater: { pin: 'D6', running: false, auto: false, pwm: false, dutyCycle: 100 },
     pump: { pin: 'D7', running: false, auto: false, pwm: false, dutyCycle: 100 },
-    temp: { pin: 'A2', type: 'Thermistor', hit: false, current: 0, previous: 0, adjust: 0, target: 150, diff: 5 },
+    temp: { pin: 'A2', type: 'Thermistor', hit: false, current: 0, previous: 0, adjust: 0, target: 152, diff: 2 },
     values: [],
     timers: [],
     knob: angular.merge($scope.knobOptions, { value: 0, min: 0, max: 150 + 5 }),
@@ -1209,7 +1209,7 @@ angular.module('brewbench-monitor').factory('BrewService', function ($http, $q, 
     },
 
     kettleTypes: function kettleTypes(type) {
-      var kettles = [{ 'name': 'Boil', 'type': 'hop', 'target': 200, 'diff': 5 }, { 'name': 'Mash', 'type': 'grain', 'target': 150, 'diff': 5 }, { 'name': 'Hot Liquor', 'type': 'water', 'target': 200, 'diff': 5 }, { 'name': 'Fermenter', 'type': 'fermenter', 'target': 74, 'diff': 2 }];
+      var kettles = [{ 'name': 'Boil', 'type': 'hop', 'target': 200, 'diff': 2 }, { 'name': 'Mash', 'type': 'grain', 'target': 152, 'diff': 2 }, { 'name': 'Hot Liquor', 'type': 'water', 'target': 170, 'diff': 2 }, { 'name': 'Fermenter', 'type': 'fermenter', 'target': 74, 'diff': 2 }];
       if (type) return _.filter(kettles, { 'type': type })[0];
       return kettles;
     },
