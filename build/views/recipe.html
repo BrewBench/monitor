@@ -5,7 +5,8 @@
         <div class="recipe col-md-3 col-xs-12">
           <h2><editable model="settings.recipe.name"></editable>
             <h4>{{settings.recipe.category}}</h4>
-            <h5 ng-if="settings.recipe.abv">{{settings.recipe.abv}}% abv</h5>
+            <h5 ng-if="settings.recipe.abv">{{settings.recipe.abv}}% ABV</h5>
+            <h6 ng-if="settings.recipe.ibu">{{settings.recipe.ibu}} IBU</h6>
             <div ng-if="settings.recipe.date">
               {{settings.recipe.date | moment:'ddd MMM Do'}} {{settings.recipe.date | moment}}
             </div>

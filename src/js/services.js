@@ -439,7 +439,7 @@ angular.module('brewbench-monitor')
       return parseFloat(plato);
     },
     recipeBeerSmith: function(recipe){
-      let response = {name:'', date:'', brewer: {name:''}, category:'', abv:'', og:0.000, fg:0.000, hops:[], grains:[], yeast:[], misc:[]};
+      let response = {name:'', date:'', brewer: {name:''}, category:'', abv:'', og:0.000, fg:0.000, ibu:0, hops:[], grains:[], yeast:[], misc:[]};
       if(!!recipe.F_R_NAME)
         response.name = recipe.F_R_NAME;
       if(!!recipe.F_R_STYLE.F_S_CATEGORY)
@@ -449,10 +449,24 @@ angular.module('brewbench-monitor')
       if(!!recipe.F_R_BREWER)
         response.brewer.name = recipe.F_R_BREWER;
 
+      if(!!recipe.F_R_STYLE.F_S_MAX_OG)
+        response.og = parseFloat(recipe.F_R_STYLE.F_S_MAX_OG).toFixed(3);
+      else if(!!recipe.F_R_STYLE.F_S_MIN_OG)
+        response.og = parseFloat(recipe.F_R_STYLE.F_S_MIN_OG).toFixed(3);
+      if(!!recipe.F_R_STYLE.F_S_MAX_FG)
+        response.fg = parseFloat(recipe.F_R_STYLE.F_S_MAX_FG).toFixed(3);
+      else if(!!recipe.F_R_STYLE.F_S_MIN_FG)
+        response.fg = parseFloat(recipe.F_R_STYLE.F_S_MIN_FG).toFixed(3);
+
       if(!!recipe.F_R_STYLE.F_S_MAX_ABV)
         response.abv = $filter('number')(recipe.F_R_STYLE.F_S_MAX_ABV,2);
       else if(!!recipe.F_R_STYLE.F_S_MIN_ABV)
         response.abv = $filter('number')(recipe.F_R_STYLE.F_S_MIN_ABV,2);
+
+      if(!!recipe.F_R_STYLE.F_S_MAX_IBU)
+        response.ibu = parseInt(recipe.F_R_STYLE.F_S_MAX_IBU,10);
+      else if(!!recipe.F_R_STYLE.F_S_MIN_IBU)
+        response.ibu = parseInt(recipe.F_R_STYLE.F_S_MIN_IBU,10);
 
       if(!!recipe.Ingredients.Data.Grain){
         _.each(recipe.Ingredients.Data.Grain,function(grain){
@@ -522,7 +536,7 @@ angular.module('brewbench-monitor')
       return response;
     },
     recipeBeerXML: function(recipe){
-      let response = {name:'', date:'', brewer: {name:''}, category:'', abv:'', og:0.000, fg:0.000, hops:[], grains:[], yeast:[], misc:[]};
+      let response = {name:'', date:'', brewer: {name:''}, category:'', abv:'', og:0.000, fg:0.000, ibu:0, hops:[], grains:[], yeast:[], misc:[]};
       let mash_time = 60;
 
       if(!!recipe.NAME)
@@ -539,6 +553,9 @@ angular.module('brewbench-monitor')
         response.og = parseFloat(recipe.OG).toFixed(3);
       if(!!recipe.FG)
         response.fg = parseFloat(recipe.FG).toFixed(3);
+
+      if(!!recipe.IBU)
+        response.fg = parseInt(recipe.IBU,10);
 
       if(!!recipe.STYLE.ABV_MAX)
         response.abv = $filter('number')(recipe.STYLE.ABV_MAX,2);

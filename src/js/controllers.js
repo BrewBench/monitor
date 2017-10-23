@@ -399,6 +399,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
       $scope.settings.recipe.name = recipe.name;
       $scope.settings.recipe.category = recipe.category;
       $scope.settings.recipe.abv = recipe.abv;
+      $scope.settings.recipe.ibu = recipe.ibu;
       $scope.settings.recipe.date = recipe.date;
       $scope.settings.recipe.brewer = recipe.brewer;
 
