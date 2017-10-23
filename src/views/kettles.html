@@ -4,27 +4,27 @@
     <div class="card-header container-fluid">
 
       <div class="row">
-      <div class="col-auto mr-auto">
-      <div class="arduinos" ng-if="shareAccess('fullAccess')">
-        <a class="ui ribbon label dropdown-toggle" ng-class="{'teal':kettle.arduino, 'orange':!kettle.arduino}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          <span class="dropdown-toggle"><img src="assets/img/arduino.svg" width="15"> {{kettle.arduino ? kettle.arduino.url : 'Select an Arduino'}}</span>
-        </a>
-        <div class="dropdown-menu scrollable-menu">
-          <button class="text-center modal-link dropdown-item" type="button" data-toggle="modal" data-target="#dataModal-settings">
-            Add/Edit Arduinos
-          </button>
-          <button ng-repeat="arduino in settings.arduinos"
-            ng-class="{'active': kettle.arduino && kettle.arduino.id == arduino.id}"
-            ng-click="kettle.arduino=arduino"
-            class="dropdown-item" type="button">
-            {{arduino.url}}
-          </button>
+        <div class="col-auto mr-auto">
+          <div class="arduinos" ng-if="shareAccess('fullAccess')">
+            <a class="ui ribbon label dropdown-toggle" ng-class="{'teal':kettle.arduino, 'orange':!kettle.arduino}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <span class="dropdown-toggle"><img src="assets/img/arduino.svg" width="15"> {{kettle.arduino ? kettle.arduino.url : 'Select an Arduino'}}</span>
+            </a>
+            <div class="dropdown-menu scrollable-menu">
+              <button class="text-center modal-link dropdown-item" type="button" data-toggle="modal" data-target="#dataModal-settings">
+                Add/Edit Arduinos
+              </button>
+              <button ng-repeat="arduino in settings.arduinos"
+                ng-class="{'active': kettle.arduino && kettle.arduino.id == arduino.id}"
+                ng-click="kettle.arduino=arduino"
+                class="dropdown-item" type="button">
+                {{arduino.url}}
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
-      </div>
-      <div class="col-auto">
-        <i class="fa fa-4x float-right" ng-click="startStopKettle(kettle)" ng-class="{'fa-stop-circle':kettle.active,'fa-play-circle':!kettle.active}"></i>
-      </div>
+        <div ng-if="shareAccess('fullAccess')" class="col-auto">
+          <i class="fa fa-4x float-right" ng-click="startStopKettle(kettle)" ng-class="{'fa-stop-circle':kettle.active,'fa-play-circle':!kettle.active}"></i>
+        </div>
       </div>
 
       <div class="alert alert-danger" ng-if="kettle.error">
@@ -237,7 +237,10 @@
     <div class="card-body">
       <div class="row">
         <div class="col-auto mr-auto" ng-class="{'text-center': !shareAccess('fullAccess')}">
-          <ui-knob value="kettle.temp.current" options="kettle.knob" ng-click="knobClick(kettle)"></ui-knob>
+          <ui-knob ng-click="knobClick(kettle)"
+            value="kettle.temp.current"
+            options="kettle.knob">
+          </ui-knob>
           <div class="adjusted" ng-if="kettle.temp.adjust != 0" ng-click="kettle.temp.adjust=0;kettle.temp.current=kettle.temp.previous;">adjusted {{kettle.temp.adjust}}&deg;</div>
         </div>
         <div class="col-auto" ng-if="shareAccess('fullAccess')">

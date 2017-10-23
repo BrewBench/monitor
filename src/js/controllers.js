@@ -309,8 +309,13 @@ $scope.kettles = BrewService.settings('kettles') || [{
 
   $scope.shareAccess = function(access){
       if($scope.settings.shared){
-        if(access)
-          return !!($scope.share.access && $scope.share.access === access);
+        if(access){
+          if(access == 'embed'){
+            return (window.self !== window.top);
+          } else {
+            return !!($scope.share.access && $scope.share.access === access);
+          }
+        }
         return true;
       }
       return true;

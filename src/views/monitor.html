@@ -1,6 +1,6 @@
 <ng-include src="'views/header.html'"></ng-include>
 <div class="container-fluid main">
-  <div class="flex-row share" ng-if="settings.shared">
+  <div class="flex-row share" ng-if="settings.shared && !shareAccess('embed')">
     <div class="col">
       <div class="alert alert-info alert-dismissible share">
         <button type="button" class="close" data-dismiss="alert" aria-label="Close" ng-click="clearSettings()"><i class="fa fa-trash"></i></button>

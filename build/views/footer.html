@@ -1,6 +1,9 @@
 <footer class="footer">
   <div class="row-fluid">
-    <div class="container">
+    <div ng-if="shareAccess('embed')" class="container">
+      <p><img src="/assets/img/brewbench-logo.png" width="45"> Live now with <a href="https://BrewBench.co">BrewBench.co</a></p>
+    </div>
+    <div ng-if="!shareAccess('embed')" class="container">
       <ul class="links">
         <li><a href="https://brewbench.co">BrewBench</a></li>
         <li><a href="https://github.com/brewbench">GitHub</a></li>

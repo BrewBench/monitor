@@ -298,7 +298,13 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
 
   $scope.shareAccess = function (access) {
     if ($scope.settings.shared) {
-      if (access) return !!($scope.share.access && $scope.share.access === access);
+      if (access) {
+        if (access == 'embed') {
+          return window.self !== window.top;
+        } else {
+          return !!($scope.share.access && $scope.share.access === access);
+        }
+      }
       return true;
     }
     return true;
@@ -1457,7 +1463,7 @@ angular.module('brewbench-monitor').factory('BrewService', function ($http, $q, 
       return {
         chart: {
           type: 'lineChart',
-          noData: 'Press play on a kettle to start graphing.',
+          noData: 'BrewBench Live',
           height: 350,
           margin: {
             top: 20,

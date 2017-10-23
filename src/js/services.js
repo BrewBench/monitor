@@ -359,7 +359,7 @@ angular.module('brewbench-monitor')
       return {
         chart: {
               type: 'lineChart',
-              noData: 'Press play on a kettle to start graphing.',
+              noData: 'BrewBench Live',
               height: 350,
               margin : {
                   top: 20,
