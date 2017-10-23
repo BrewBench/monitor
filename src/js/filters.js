@@ -4,9 +4,9 @@ angular.module('brewbench-monitor')
       if(!date)
         return '';
       if(format)
-        return moment(new Date(date)).format(format);
+        return moment(date.toString()).format(format);
       else
-        return moment(new Date(date)).fromNow();
+        return moment(date.toString()).fromNow();
     };
 })
 .filter('formatDegrees', function($filter) {

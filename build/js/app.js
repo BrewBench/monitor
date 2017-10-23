@@ -379,36 +379,36 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
     if (recipe.grains.length) {
       $scope.settings.recipe.grains = recipe.grains;
       var kettle = _.filter($scope.kettles, { type: 'grain' })[0];
-      if (kettle) {
-        kettle.timers = [];
-        $scope.settings.recipe.grains = {};
-        _.each(recipe.grains, function (grain) {
+      if (kettle) kettle.timers = [];
+      $scope.settings.recipe.grains = {};
+      _.each(recipe.grains, function (grain) {
+        if (kettle) {
           $scope.addTimer(kettle, {
             label: grain.label,
             min: grain.min,
             notes: grain.notes
           });
-          // sum the amounts for the grains
-          if ($scope.settings.recipe.grains[grain.label]) $scope.settings.recipe.grains[grain.label] += Number(grain.amount);else $scope.settings.recipe.grains[grain.label] = Number(grain.amount);
-        });
-      }
+        }
+        // sum the amounts for the grains
+        if ($scope.settings.recipe.grains[grain.label]) $scope.settings.recipe.grains[grain.label] += Number(grain.amount);else $scope.settings.recipe.grains[grain.label] = Number(grain.amount);
+      });
     }
 
     if (recipe.hops.length) {
       var _kettle = _.filter($scope.kettles, { type: 'hop' })[0];
-      if (_kettle) {
-        _kettle.timers = [];
-        $scope.settings.recipe.hops = {};
-        _.each(recipe.hops, function (hop) {
+      if (_kettle) _kettle.timers = [];
+      $scope.settings.recipe.hops = {};
+      _.each(recipe.hops, function (hop) {
+        if (_kettle) {
           $scope.addTimer(_kettle, {
             label: hop.label,
             min: hop.min,
             notes: hop.notes
           });
-          // sum the amounts for the hops
-          if ($scope.settings.recipe.hops[hop.label]) $scope.settings.recipe.hops[hop.label] += Number(hop.amount);else $scope.settings.recipe.hops[hop.label] = Number(hop.amount);
-        });
-      }
+        }
+        // sum the amounts for the hops
+        if ($scope.settings.recipe.hops[hop.label]) $scope.settings.recipe.hops[hop.label] += Number(hop.amount);else $scope.settings.recipe.hops[hop.label] = Number(hop.amount);
+      });
     }
     if (recipe.misc.length) {
       var _kettle2 = _.filter($scope.kettles, { type: 'water' })[0];
@@ -804,11 +804,11 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
     }
 
     // Desktop / Slack Notification
-    var message,
+    var message = void 0,
         icon = '/assets/img/brewbench-logo.png',
         color = 'good';
 
-    if (kettle && ['hop', 'grain', 'water'].indexOf(kettle.type) !== -1) icon = '/assets/img/' + kettle.type + '.png';
+    if (kettle && ['hop', 'grain', 'water', 'fermenter'].indexOf(kettle.type) !== -1) icon = '/assets/img/' + kettle.type + '.png';
 
     //don't alert if the heater is running and temp is too low
     if (kettle && kettle.low && kettle.heater.running) return;
@@ -870,7 +870,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
       }
     }
     // Slack Notification
-    if ($scope.settings.notifications.slack.indexOf('http') !== -1) {
+    if ($scope.settings.notifications.slack.indexOf('http') === 0) {
       BrewService.slack($scope.settings.notifications.slack, message, color, icon, kettle).then(function (response) {
         $scope.resetError();
       }).catch(function (err) {
@@ -1136,7 +1136,7 @@ angular.module('brewbench-monitor').directive('editable', function () {
 angular.module('brewbench-monitor').filter('moment', function () {
   return function (date, format) {
     if (!date) return '';
-    if (format) return moment(new Date(date)).format(format);else return moment(new Date(date)).fromNow();
+    if (format) return moment(date.toString()).format(format);else return moment(date.toString()).fromNow();
   };
 }).filter('formatDegrees', function ($filter) {
   return function (temp, unit) {
@@ -1238,7 +1238,7 @@ angular.module('brewbench-monitor').factory('BrewService', function ($http, $q, 
       var q = $q.defer();
 
       var postObj = { 'attachments': [{ 'fallback': msg,
-          'title': kettle.key + ' kettle',
+          'title': kettle.key,
           'title_link': 'http://' + document.location.host,
           'fields': [{ 'value': msg }],
           'color': color,

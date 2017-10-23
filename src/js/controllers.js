@@ -406,42 +406,42 @@ $scope.kettles = BrewService.settings('kettles') || [{
       if(recipe.grains.length){
         $scope.settings.recipe.grains = recipe.grains;
         let kettle = _.filter($scope.kettles,{type:'grain'})[0];
-        if(kettle){
-          kettle.timers = [];
-          $scope.settings.recipe.grains = {};
-          _.each(recipe.grains,function(grain){
+        if(kettle) kettle.timers = [];
+        $scope.settings.recipe.grains = {};
+        _.each(recipe.grains,function(grain){
+          if(kettle){
             $scope.addTimer(kettle,{
               label: grain.label,
               min: grain.min,
               notes: grain.notes
             });
-            // sum the amounts for the grains
-            if($scope.settings.recipe.grains[grain.label])
-              $scope.settings.recipe.grains[grain.label] += Number(grain.amount);
-            else
-              $scope.settings.recipe.grains[grain.label] = Number(grain.amount);
-          });
-        }
+          }
+          // sum the amounts for the grains
+          if($scope.settings.recipe.grains[grain.label])
+            $scope.settings.recipe.grains[grain.label] += Number(grain.amount);
+          else
+            $scope.settings.recipe.grains[grain.label] = Number(grain.amount);
+        });
       }
 
       if(recipe.hops.length){
         let kettle = _.filter($scope.kettles,{type:'hop'})[0];
-        if(kettle){
-          kettle.timers = [];
-          $scope.settings.recipe.hops = {};
-          _.each(recipe.hops,function(hop){
+        if(kettle) kettle.timers = [];
+        $scope.settings.recipe.hops = {};
+        _.each(recipe.hops,function(hop){
+          if(kettle){
             $scope.addTimer(kettle,{
               label: hop.label,
               min: hop.min,
               notes: hop.notes
             });
-            // sum the amounts for the hops
-            if($scope.settings.recipe.hops[hop.label])
-              $scope.settings.recipe.hops[hop.label] += Number(hop.amount);
-            else
-              $scope.settings.recipe.hops[hop.label] = Number(hop.amount);
-          });
-        }
+          }
+          // sum the amounts for the hops
+          if($scope.settings.recipe.hops[hop.label])
+            $scope.settings.recipe.hops[hop.label] += Number(hop.amount);
+          else
+            $scope.settings.recipe.hops[hop.label] = Number(hop.amount);
+        });
       }
       if(recipe.misc.length){
         let kettle = _.filter($scope.kettles,{type:'water'})[0];
@@ -867,9 +867,11 @@ $scope.kettles = BrewService.settings('kettles') || [{
     }
 
     // Desktop / Slack Notification
-    var message, icon = '/assets/img/brewbench-logo.png', color = 'good';
+    let message,
+      icon = '/assets/img/brewbench-logo.png',
+      color = 'good';
 
-    if(kettle && ['hop','grain','water'].indexOf(kettle.type)!==-1)
+    if(kettle && ['hop','grain','water','fermenter'].indexOf(kettle.type)!==-1)
       icon = '/assets/img/'+kettle.type+'.png';
 
     //don't alert if the heater is running and temp is too low
@@ -950,9 +952,13 @@ $scope.kettles = BrewService.settings('kettles') || [{
       }
     }
     // Slack Notification
-    if($scope.settings.notifications.slack.indexOf('http') !== -1){
-      BrewService.slack($scope.settings.notifications.slack,message,color,icon,kettle)
-        .then(function(response){
+    if($scope.settings.notifications.slack.indexOf('http') === 0){
+      BrewService.slack($scope.settings.notifications.slack,
+          message,
+          color,
+          icon,
+          kettle
+        ).then(function(response){
           $scope.resetError();
         })
         .catch(function(err){

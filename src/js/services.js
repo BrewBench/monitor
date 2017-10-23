@@ -89,11 +89,11 @@ angular.module('brewbench-monitor')
       return domain;
     },
 
-    slack: function(webhook_url,msg,color,icon,kettle){
+    slack: function(webhook_url, msg, color, icon, kettle){
       let q = $q.defer();
 
       let postObj = {'attachments': [{'fallback': msg,
-            'title': kettle.key+' kettle',
+            'title': kettle.key,
             'title_link': 'http://'+document.location.host,
             'fields': [{'value': msg}],
             'color': color,
