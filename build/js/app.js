@@ -169,7 +169,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
     temp: { pin: 'A0', type: 'Thermistor', hit: false, current: 0, previous: 0, adjust: 0, target: 170, diff: 2 },
     values: [],
     timers: [],
-    knob: angular.copy($scope.knobOptions, { value: 0, min: 0, max: 200 + 5 }),
+    knob: angular.copy($scope.knobOptions, { value: 0, min: 0, max: 220 }),
     arduino: { id: btoa('brewbench'), url: 'arduino.local', analog: 5, digital: 13 }
   }, {
     key: 'Mash',
@@ -180,7 +180,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
     temp: { pin: 'A1', type: 'Thermistor', hit: false, current: 0, previous: 0, adjust: 0, target: 152, diff: 2 },
     values: [],
     timers: [],
-    knob: angular.copy($scope.knobOptions, { value: 0, min: 0, max: 150 + 5 }),
+    knob: angular.copy($scope.knobOptions, { value: 0, min: 0, max: 220 }),
     arduino: { id: btoa('brewbench'), url: 'arduino.local', analog: 5, digital: 13 }
   }, {
     key: 'Boil',
@@ -191,7 +191,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
     temp: { pin: 'A2', type: 'Thermistor', hit: false, current: 0, previous: 0, adjust: 0, target: 200, diff: 2 },
     values: [],
     timers: [],
-    knob: angular.copy($scope.knobOptions, { value: 0, min: 0, max: 200 + 5 }),
+    knob: angular.copy($scope.knobOptions, { value: 0, min: 0, max: 220 }),
     arduino: { id: btoa('brewbench'), url: 'arduino.local', analog: 5, digital: 13 }
   }];
 
@@ -300,12 +300,14 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
     if ($scope.settings.shared) {
       if (access) {
         if (access == 'embed') {
-          return window.self !== window.top;
+          return !!window.frameElement;
         } else {
           return !!($scope.share.access && $scope.share.access === access);
         }
       }
       return true;
+    } else if (access && access == 'embed') {
+      return !!window.frameElement;
     }
     return true;
   };
@@ -491,7 +493,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
 
     _.each($scope.kettles, function (kettle) {
       //update max
-      kettle.knob.max = kettle.temp['target'] + kettle.temp['diff'];
+      kettle.knob.max = kettle.temp['target'] + kettle.temp['diff'] + 10;
       // check timers for running
       if (!!kettle.timers && kettle.timers.length) {
         _.each(kettle.timers, function (timer) {
@@ -968,7 +970,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
         kettle.temp.target = $filter('formatDegrees')(kettle.temp.target, unit);
         // update knob
         kettle.knob.value = kettle.temp.current;
-        kettle.knob.max = kettle.temp.target + kettle.temp.diff;
+        kettle.knob.max = kettle.temp.target + kettle.temp.diff + 10;
         $scope.updateKnobCopy(kettle);
       });
       $scope.chartOptions = BrewService.chartOptions(unit);
@@ -1065,7 +1067,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
     //update knob after 1 seconds, otherwise we get a lot of refresh on the knob when clicking plus or minus
     timeout = $timeout(function () {
       //update max
-      kettle.knob.max = kettle.temp['target'] + kettle.temp['diff'];
+      kettle.knob.max = kettle.temp['target'] + kettle.temp['diff'] + 10;
       $scope.updateKnobCopy(kettle);
     }, 1000);
   };

@@ -311,12 +311,14 @@ $scope.kettles = BrewService.settings('kettles') || [{
       if($scope.settings.shared){
         if(access){
           if(access == 'embed'){
-            return !(window.self !== window.top);
+            return !!(window.frameElement);
           } else {
             return !!($scope.share.access && $scope.share.access === access);
           }
         }
         return true;
+      } else if(access && access == 'embed'){
+        return !!(window.frameElement);
       }
       return true;
   };
