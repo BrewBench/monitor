@@ -13,7 +13,7 @@ BrewBench is an Arduino brew monitor, controller and alert system for the home b
 #### RIMS
 You can also connect a relay to the digital ports and add a heater / pump to create a RIMS system.  The software will start/stop the heater/pump based on the target temperature you set.
 
-#### Fermenter
+#### Fermenters
 BrewBench Monitor can also be used with fermenters.  I have an [SS Brewtech Chronical](https://www.ssbrewtech.com/collections/chronicals) that I thread the thermistor into the temperature [thermowell](https://www.ssbrewtech.com/collections/accessories/products/weldless-thermowell-with-lcd-temp-display) along with the digital one provided.
 
 ## Setup the Arduino
@@ -52,7 +52,7 @@ yarn
 yarn run build
 ```
 
-<img src="src/assets/img/screenshot-fermenter.png?raw=true" alt="BrewBench fermenter" align="center" width="400" />
+<img src="src/assets/img/screenshot-fermenter.png?raw=true" alt="BrewBench fermenter" align="center" width="200" />
 
 <img src="src/assets/img/screenshot-desktop.png?raw=true" alt="BrewBench screenshot" align="center" />
 
@@ -71,5 +71,9 @@ yarn run build
 ## About
 
 [BrewBench](https://brewbench.co) is a brew monitor and controller Developed by [Andrew Van Tassel](https://www.andrewvantassel.com) and [Lee Kendrick](http://www.leekendrick.info) &copy;2017.  
+
+## Help
+
+For help look at the [forum](https://forum.brewbench.co) or start a conversation on [gitter](https://gitter.im/BrewBench/Lobby).
 
 Made with <img src="src/assets/img/beer.png" width="45"> from Colorado
