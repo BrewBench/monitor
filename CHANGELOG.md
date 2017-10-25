@@ -1,5 +1,18 @@
 # Change Log
 
+## 2.9.1 - 2017-10-23
+
+### Added
+- Kettle count to settings
+- Added IBUs from recipe
+- Embed display logic for share links
+
+### Updated
+- Kettle default temperatures
+
+### Fixed
+- Recipe import with missing kettles
+
 ## 2.9.0 - 2017-10-09
 
 ### Updated

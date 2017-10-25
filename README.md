@@ -4,8 +4,9 @@ http://monitor.brewbench.co
 
 <img src="src/assets/img/brewbench-logo-265.png?raw=true" alt="BrewBench logo" title="BrewBench" align="right" />
 
-[![Stories in Ready](https://badge.waffle.io/BrewBench/web-controller.png?label=ready&title=Ready)](https://waffle.io/BrewBench/web-controller)
 ![codeship](https://codeship.com/projects/8b6f3bc0-b4fd-0134-65d1-5ed8b845772e/status?branch=master)
+[![Stories in Ready](https://badge.waffle.io/BrewBench/monitor.png?label=ready&title=Ready)](https://waffle.io/BrewBench/monitor)
+[![Join the chat at https://gitter.im/BrewBench/Lobby](https://badges.gitter.im/BrewBench/Lobby.svg)](https://gitter.im/BrewBench/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 BrewBench is an Arduino brew monitor, controller and alert system for the home brewer enthusiast.  It uses the Arduino REST API to interface with temp sensors.
 
@@ -69,6 +70,6 @@ yarn run build
 
 ## About
 
-[BrewBench](//brewbench.co) is a brew monitor and controller Developed by [Andrew Van Tassel](https://www.andrewvantassel.com) and [Lee Kendrick](http://www.leekendrick.info) &copy;2017.
+[BrewBench](https://brewbench.co) is a brew monitor and controller Developed by [Andrew Van Tassel](https://www.andrewvantassel.com) and [Lee Kendrick](http://www.leekendrick.info) &copy;2017.  
 
 Made with <img src="src/assets/img/beer.png" width="45"> from Colorado

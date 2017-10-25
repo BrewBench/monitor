@@ -158,7 +158,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
     ,temp: {pin:'A0',type:'Thermistor',hit:false,current:0,previous:0,adjust:0,target:170,diff:2}
     ,values: []
     ,timers: []
-    ,knob: angular.copy($scope.knobOptions,{value:0,min:0,max:200+5})
+    ,knob: angular.copy($scope.knobOptions,{value:0,min:0,max:220})
     ,arduino: {id: btoa('brewbench'), url: 'arduino.local',analog: 5,digital: 13}
   },{
     key: 'Mash'
@@ -169,7 +169,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
     ,temp: {pin:'A1',type:'Thermistor',hit:false,current:0,previous:0,adjust:0,target:152,diff:2}
     ,values: []
     ,timers: []
-    ,knob: angular.copy($scope.knobOptions,{value:0,min:0,max:150+5})
+    ,knob: angular.copy($scope.knobOptions,{value:0,min:0,max:220})
     ,arduino: {id: btoa('brewbench'), url: 'arduino.local',analog: 5,digital: 13}
   },{
       key: 'Boil'
@@ -180,7 +180,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
       ,temp: {pin:'A2',type:'Thermistor',hit:false,current:0,previous:0,adjust:0,target:200,diff:2}
       ,values: []
       ,timers: []
-      ,knob: angular.copy($scope.knobOptions,{value:0,min:0,max:200+5})
+      ,knob: angular.copy($scope.knobOptions,{value:0,min:0,max:220})
       ,arduino: {id: btoa('brewbench'), url: 'arduino.local',analog: 5,digital: 13}
     }];
 
@@ -532,7 +532,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
 
     _.each($scope.kettles, kettle => {
         //update max
-        kettle.knob.max=kettle.temp['target']+kettle.temp['diff'];
+        kettle.knob.max = kettle.temp['target']+kettle.temp['diff']+10;
         // check timers for running
         if(!!kettle.timers && kettle.timers.length){
           _.each(kettle.timers, timer => {
@@ -1062,7 +1062,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
         kettle.temp.target = $filter('formatDegrees')(kettle.temp.target,unit);
         // update knob
         kettle.knob.value = kettle.temp.current;
-        kettle.knob.max = kettle.temp.target+kettle.temp.diff;
+        kettle.knob.max = kettle.temp.target+kettle.temp.diff+10;
         $scope.updateKnobCopy(kettle);
       });
       $scope.chartOptions = BrewService.chartOptions(unit);
@@ -1168,7 +1168,7 @@ $scope.kettles = BrewService.settings('kettles') || [{
     //update knob after 1 seconds, otherwise we get a lot of refresh on the knob when clicking plus or minus
     timeout = $timeout(function(){
       //update max
-      kettle.knob.max=kettle.temp['target']+kettle.temp['diff'];
+      kettle.knob.max = kettle.temp['target']+kettle.temp['diff']+10;
       $scope.updateKnobCopy(kettle);
     },1000);
   };
