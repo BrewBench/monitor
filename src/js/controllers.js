@@ -1,5 +1,5 @@
 angular.module('brewbench-monitor')
-.controller('mainCtrl', function($scope, $stateParams, $state, $filter, $timeout, $interval, $q, BrewService){
+.controller('mainCtrl', function($scope, $stateParams, $state, $filter, $timeout, $interval, $q, $http, BrewService){
 
 var notification = null
   ,resetChart = 100
@@ -160,6 +160,24 @@ $scope.updateABV();
         if(kettle.arduino && kettle.arduino.id == arduino.id)
           delete kettle.arduino;
       });
+    }
+  };
+
+  $scope.sessions = {
+    add: () => {
+      let now = new Date();
+      if(!$scope.settings.account.sessions) $scope.settings.account.sessions = [];
+      $scope.settings.account.sessions.push({
+        id: btoa(now+''+$scope.settings.arduinos.length+1),
+        name: 'Session Name',
+        created: moment()
+      });
+    },
+    update: (arduino) => {
+
+    },
+    delete: (index, arduino) => {
+
     }
   };
 
@@ -808,6 +826,32 @@ $scope.updateABV();
       kettles[i].active = false;
     });
     return "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({"settings": $scope.settings,"kettles": kettles}));
+  };
+
+  $scope.downloadStreamsSketch = function(sessionId){
+    let kettles = "";
+    _.each($scope.kettles, (kettle, i) => {
+      if( kettle.temp.type = 'Thermistor' )
+        kettles += 'thermistorAPICommand("'+kettle.key+'","'+kettle.temp.pin+'");\n  ';
+      else if( kettle.temp.type = 'DS18B20API' )
+        kettles += 'ds18B20APICommand("'+kettle.key+'","'+kettle.temp.pin+'");\n  ';
+      else if( kettle.temp.type = 'PT100' )
+        kettles += 'pt100APICommand("'+kettle.key+'","'+kettle.temp.pin+'");\n  ';
+    });
+    return $http.get('assets/BrewBenchStreamsYun/BrewBenchStreamsYun.ino')
+      .then(response => {
+        response.data = response.data
+          .replace('// [kettles]', kettles)
+          .replace('[API_KEY]', $scope.settings.account.apiKey)
+          .replace('[SESSION_ID]', sessionId.toLowerCase().trim().replace(/ /g,'-').replace(/[^A-Za-z0-9\-!?]/g,''));
+        let afile = document.createElement('a');
+        afile.setAttribute('download', 'BrewBenchStreamsYun.ino');
+        afile.setAttribute('href', "data:text/ino;charset=utf-8," + encodeURIComponent(response.data));
+        afile.click();
+      })
+      .catch(err => {
+        $scope.error.message = `Failed to download sketch ${err.message}`;
+      });
   };
 
   $scope.clearSettings = function(e){

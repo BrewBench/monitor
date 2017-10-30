@@ -21,6 +21,7 @@ angular.module('brewbench-monitor')
         ,recipe: {'name':'','brewer':{name:'','email':''},'yeast':[],'hops':[],'malt':[],scale:'gravity',method:'papazian','og':1.050,'fg':1.010,'abv':0,'abw':0,'calories':0,'attenuation':0}
         ,notifications: {on:true,timers:true,high:true,low:true,target:true,slack:'Webhook Url',last:''}
         ,sounds: {on:true,alert:'/assets/audio/bike.mp3',timer:'/assets/audio/school.mp3'}
+        ,account: {apiKey: '',sessions: []}
         ,arduinos: [{
           id: btoa('brewbench'),
           url: 'arduino.local',
@@ -305,6 +306,7 @@ angular.module('brewbench-monitor')
         delete kettles[i].knob;
         delete kettles[i].values;
       });
+      delete settings.account;
       delete settings.notifications;
       settings.shared = true;
       if(sh.password)

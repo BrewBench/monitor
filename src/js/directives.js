@@ -2,12 +2,12 @@ angular.module('brewbench-monitor')
 .directive('editable', function() {
     return {
         restrict: 'E',
-        scope: {model:'=',type:'@?',trim:'@?',change:'&?',enter:'&?'},
+        scope: {model:'=',type:'@?',trim:'@?',change:'&?',enter:'&?',placeholder:'@?'},
         replace: false,
         template:
 '<span>'+
     '<input type="{{type}}" ng-model="model" ng-show="edit" ng-enter="edit=false" ng-change="{{change||false}}" class="editable"></input>'+
-        '<span class="editable" ng-show="!edit">{{(trim) ? (model | limitTo:trim)+"..." : model}}</span>'+
+        '<span class="editable" ng-show="!edit">{{(trim) ? (model | limitTo:trim)+(placeholder || "...") : model}}</span>'+
 '</span>',
         link: function(scope, element, attrs) {
             scope.edit = false;

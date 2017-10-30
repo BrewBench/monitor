@@ -24,7 +24,7 @@ angular.module('brewbench-monitor', ['ui.router', 'nvd3', 'ngTouch', 'duScroll',
 });
 'use strict';
 
-angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $stateParams, $state, $filter, $timeout, $interval, $q, BrewService) {
+angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $stateParams, $state, $filter, $timeout, $interval, $q, $http, BrewService) {
 
   var notification = null,
       resetChart = 100,
@@ -172,6 +172,20 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
         if (kettle.arduino && kettle.arduino.id == arduino.id) delete kettle.arduino;
       });
     }
+  };
+
+  $scope.sessions = {
+    add: function add() {
+      var now = new Date();
+      if (!$scope.settings.account.sessions) $scope.settings.account.sessions = [];
+      $scope.settings.account.sessions.push({
+        id: btoa(now + '' + $scope.settings.arduinos.length + 1),
+        name: 'Session Name',
+        created: moment()
+      });
+    },
+    update: function update(arduino) {},
+    delete: function _delete(index, arduino) {}
   };
 
   $scope.addKettle = function (type) {
@@ -754,6 +768,22 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
     return "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ "settings": $scope.settings, "kettles": kettles }));
   };
 
+  $scope.downloadStreamsSketch = function (sessionId) {
+    var kettles = "";
+    _.each($scope.kettles, function (kettle, i) {
+      if (kettle.temp.type = 'Thermistor') kettles += 'thermistorAPICommand("' + kettle.key + '","' + kettle.temp.pin + '");\n  ';else if (kettle.temp.type = 'DS18B20API') kettles += 'ds18B20APICommand("' + kettle.key + '","' + kettle.temp.pin + '");\n  ';else if (kettle.temp.type = 'PT100') kettles += 'pt100APICommand("' + kettle.key + '","' + kettle.temp.pin + '");\n  ';
+    });
+    return $http.get('assets/BrewBenchStreamsYun/BrewBenchStreamsYun.ino').then(function (response) {
+      response.data = response.data.replace('// [kettles]', kettles).replace('[API_KEY]', $scope.settings.account.apiKey).replace('[SESSION_ID]', sessionId.toLowerCase().trim().replace(/ /g, '-').replace(/[^A-Za-z0-9\-!?]/g, ''));
+      var afile = document.createElement('a');
+      afile.setAttribute('download', 'BrewBenchStreamsYun.ino');
+      afile.setAttribute('href', "data:text/ino;charset=utf-8," + encodeURIComponent(response.data));
+      afile.click();
+    }).catch(function (err) {
+      $scope.error.message = 'Failed to download sketch ' + err.message;
+    });
+  };
+
   $scope.clearSettings = function (e) {
     if (e) {
       angular.element(e.target).html('Removing...');
@@ -1055,9 +1085,9 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
 angular.module('brewbench-monitor').directive('editable', function () {
     return {
         restrict: 'E',
-        scope: { model: '=', type: '@?', trim: '@?', change: '&?', enter: '&?' },
+        scope: { model: '=', type: '@?', trim: '@?', change: '&?', enter: '&?', placeholder: '@?' },
         replace: false,
-        template: '<span>' + '<input type="{{type}}" ng-model="model" ng-show="edit" ng-enter="edit=false" ng-change="{{change||false}}" class="editable"></input>' + '<span class="editable" ng-show="!edit">{{(trim) ? (model | limitTo:trim)+"..." : model}}</span>' + '</span>',
+        template: '<span>' + '<input type="{{type}}" ng-model="model" ng-show="edit" ng-enter="edit=false" ng-change="{{change||false}}" class="editable"></input>' + '<span class="editable" ng-show="!edit">{{(trim) ? (model | limitTo:trim)+(placeholder || "...") : model}}</span>' + '</span>',
         link: function link(scope, element, attrs) {
             scope.edit = false;
             scope.type = !!scope.type ? scope.type : 'text';
@@ -1152,6 +1182,7 @@ angular.module('brewbench-monitor').factory('BrewService', function ($http, $q, 
         recipe: { 'name': '', 'brewer': { name: '', 'email': '' }, 'yeast': [], 'hops': [], 'malt': [], scale: 'gravity', method: 'papazian', 'og': 1.050, 'fg': 1.010, 'abv': 0, 'abw': 0, 'calories': 0, 'attenuation': 0 },
         notifications: { on: true, timers: true, high: true, low: true, target: true, slack: 'Webhook Url', last: '' },
         sounds: { on: true, alert: '/assets/audio/bike.mp3', timer: '/assets/audio/school.mp3' },
+        account: { apiKey: '', sessions: [] },
         arduinos: [{
           id: btoa('brewbench'),
           url: 'arduino.local',
@@ -1389,6 +1420,7 @@ angular.module('brewbench-monitor').factory('BrewService', function ($http, $q, 
         delete kettles[i].knob;
         delete kettles[i].values;
       });
+      delete settings.account;
       delete settings.notifications;
       settings.shared = true;
       if (sh.password) sh.password = md5(sh.password);
