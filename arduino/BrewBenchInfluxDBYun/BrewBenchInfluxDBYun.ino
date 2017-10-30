@@ -148,12 +148,17 @@ void ds18B20Command(BridgeClient client) {
   client.print("{\"pin\":\""+String(spin)+String(pin)+"\",\"temp\":\""+String(temp)+"\"}");
 }
 
-void ds18B20InfluxDBCommand(String kettle, String pin) {
+void ds18B20InfluxDBCommand(String source, String pin) {
   DS18B20 ds(pin.substring(1).toInt());
   ds.readSensor();
   float temp = ds.getTemperature_C();
 
-  influxPost("temperature,sensor=DS18B20,pin="+String(pin)+",kettle="+kettle+" value="+String(temp));
+  Process p;
+  String data = "temperature,sensor=DS18B20,pin="+String(pin)+",source="+source+" value="+String(temp);
+  String cmd = "curl -X POST '"+String(INFLUXDB_URL)+":"+String(INFLUXDB_PORT)+"/write?db="+String(SESSION_NAME)+"' --data-binary '"+data+"'";
+  p.runShellCommand(cmd);
+  while (p.running());
+  p.close();
 }
 
 void thermistorCommand(BridgeClient client) {
@@ -165,9 +170,15 @@ void thermistorCommand(BridgeClient client) {
   client.print("{\"pin\":\""+String(spin)+String(pin)+"\",\"temp\":\""+String(temp)+"\"}");
 }
 
-void thermistorInfluxDBCommand(String kettle, String pin) {
+void thermistorInfluxDBCommand(String source, String pin) {
   float temp = Thermistor(pin.substring(1).toInt());
-  influxPost("temperature,sensor=Thermistor,pin="+String(pin)+",kettle="+kettle+" value="+String(temp));
+
+  Process p;
+  String data = "temperature,sensor=Thermistor,pin="+String(pin)+",source="+source+" value="+String(temp);
+  String cmd = "curl -X POST '"+String(INFLUXDB_URL)+":"+String(INFLUXDB_PORT)+"/write?db="+String(SESSION_NAME)+"' --data-binary '"+data+"'";
+  p.runShellCommand(cmd);
+  while (p.running());
+  p.close();
 }
 
 // http://www.instructables.com/id/Temperature-Measurement-Tutorial-Part1/
@@ -190,7 +201,7 @@ void pt100Command(BridgeClient client) {
   client.print("{\"pin\":\""+String(spin)+String(pin)+"\",\"temp\":\""+String(temp)+"\"}");
 }
 
-void pt100InfluxDBCommand(String kettle, String pin) {
+void pt100InfluxDBCommand(String source, String pin) {
   float tvoltage;
   float temp;
 
@@ -203,12 +214,10 @@ void pt100InfluxDBCommand(String kettle, String pin) {
     tvoltage = map(tvoltage,410,1023,0,614);
     temp = (150*tvoltage)/614;
   }
-  influxPost("temperature,sensor=PT100,pin="+String(pin)+",kettle="+kettle+" value="+String(temp));
-}
 
-void influxPost(String data) {
   Process p;
-  String cmd = "curl -X POST 'http://"+String(INFLUXDB_URL)+":"+String(INFLUXDB_PORT)+"/write?db="+String(SESSION_NAME)+"' --data-binary '"+data+"'";
+  String data = "temperature,sensor=PT100,pin="+String(pin)+",source="+source+" value="+String(temp);
+  String cmd = "curl -X POST '"+String(INFLUXDB_URL)+":"+String(INFLUXDB_PORT)+"/write?db="+String(SESSION_NAME)+"' --data-binary '"+data+"'";
   p.runShellCommand(cmd);
   while (p.running());
   p.close();
