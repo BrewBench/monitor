@@ -1,0 +1,15 @@
+<div class="ui one stackable cards">
+  <div class="card" ng-repeat="kettle in kettles" id="kettle-sticky-{{$index}}" ng-if="kettle.sticky">
+    <div class="content">
+      <div class="header">{{kettle.key}}</div>
+      <a href="" class="sticky text-danger" ng-click="kettle.sticky = !!(kettle.sticky) ?  false : true"><i class="fa fa-thumb-tack"></i></a>
+      <div class="description temp" ng-class="{'high':kettle.high, 'low':kettle.low}">
+        {{kettle.temp.current}}
+      </div>
+    </div>
+    <div class="extra content">
+      <span class="low" ng-if="kettle.low">{{kettle.low}}&deg; low</span>
+      <span class="high" ng-if="kettle.high">{{kettle.high}}&deg; high</span>
+    </div>
+  </div>
+</div>

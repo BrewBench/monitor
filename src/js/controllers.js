@@ -187,6 +187,7 @@ $scope.updateABV();
         key: $scope.kettleTypes[0].name
         ,type: type || $scope.kettleTypes[0].type
         ,active: false
+        ,sticky: false
         ,heater: {pin:'D6',running:false,auto:false}
         ,pump: {pin:'D7',running:false,auto:false}
         ,temp: {pin:'A0',type:'Thermistor',hit:false,current:0,previous:0,adjust:0,target:$scope.kettleTypes[0].target,diff:$scope.kettleTypes[0].diff}
@@ -197,12 +198,16 @@ $scope.updateABV();
     });
   };
 
+  $scope.hasStickyKettles = function(type){
+    return _.filter($scope.kettles, {'sticky': true}).length;
+  };
+
   $scope.kettleCount = function(type){
-    return _.filter($scope.kettles, {type: type}).length;
+    return _.filter($scope.kettles, {'type': type}).length;
   };
 
   $scope.activeKettles = function(){
-    return _.filter($scope.kettles,{active:true}).length;
+    return _.filter($scope.kettles,{'active': true}).length;
   };
 
   $scope.pinInUse = function(pin,analog){
@@ -1093,7 +1098,7 @@ $scope.updateABV();
     kettle.temp.target = kettleType.target;
     kettle.temp.diff = kettleType.diff;
     kettle.knob = angular.copy(BrewService.defaultKnobOptions(),{value:kettle.temp.current,min:0,max:kettleType.target+kettleType.diff});
-    if(kettleType.type === 'fermenter')
+    if(kettleType.type == 'fermenter' || kettleType.type == 'air')
       kettle.cooler = {pin:'D2',running:false,auto:false,pwm:false,dutyCycle:100};
     else
       delete kettle.cooler;

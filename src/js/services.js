@@ -59,6 +59,7 @@ angular.module('brewbench-monitor')
           key: 'Hot Liquor'
           ,type: 'water'
           ,active: false
+          ,sticky: false
           ,heater: {pin:'D2',running:false,auto:false,pwm:false,dutyCycle:100}
           ,pump: {pin:'D3',running:false,auto:false,pwm:false,dutyCycle:100}
           ,temp: {pin:'A0',type:'Thermistor',hit:false,current:0,previous:0,adjust:0,target:170,diff:2}
@@ -70,6 +71,7 @@ angular.module('brewbench-monitor')
           key: 'Mash'
           ,type: 'grain'
           ,active: false
+          ,sticky: false
           ,heater: {pin:'D4',running:false,auto:false,pwm:false,dutyCycle:100}
           ,pump: {pin:'D5',running:false,auto:false,pwm:false,dutyCycle:100}
           ,temp: {pin:'A1',type:'Thermistor',hit:false,current:0,previous:0,adjust:0,target:152,diff:2}
@@ -81,6 +83,7 @@ angular.module('brewbench-monitor')
           key: 'Boil'
           ,type: 'hop'
           ,active: false
+          ,sticky: false
           ,heater: {pin:'D6',running:false,auto:false,pwm:false,dutyCycle:100}
           ,pump: {pin:'D7',running:false,auto:false,pwm:false,dutyCycle:100}
           ,temp: {pin:'A2',type:'Thermistor',hit:false,current:0,previous:0,adjust:0,target:200,diff:2}
@@ -124,6 +127,7 @@ angular.module('brewbench-monitor')
         ,{'name':'Mash','type':'grain','target':152,'diff':2}
         ,{'name':'Hot Liquor','type':'water','target':170,'diff':2}
         ,{'name':'Fermenter','type':'fermenter','target':74,'diff':2}
+        ,{'name':'Air','type':'air','target':74,'diff':2}
       ];
       if(type)
         return _.filter(kettles, {'type': type})[0];

@@ -17,8 +17,11 @@
       </div>
     </div>
   </div>
-  <div class="flex-row" ng-disabled="share.needPassword" ng-class="{'disabled':share.needPassword}">
-    <div class="col-auto">
+  <div class="row" ng-disabled="share.needPassword" ng-class="{'disabled':share.needPassword}">
+    <div class="col-2 sticky-layout" ng-if="hasStickyKettles()">
+      <ng-include src="'views/kettles-sticky.html'"></ng-include>
+    </div>
+    <div class="col">
       <div class="alert alert-{{error.type}} alert-dismissible" role="alert" ng-if="error.message">
         <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         <strong>{{error.type}}</strong> {{error.message}}
@@ -30,7 +33,8 @@
     <ng-include src="'views/recipe.html'"></ng-include>
   </div>
   <div class="flex-row" ng-disabled="share.needPassword" ng-class="{'disabled':share.needPassword}">
-    <ng-include src="'views/kettles.html'"></ng-include>
+    <ng-include ng-if="settings.layout=='list'" src="'views/kettles-list.html'"></ng-include>
+    <ng-include ng-if="settings.layout=='card'" src="'views/kettles-card.html'"></ng-include>
   </div>
 </div>
 
