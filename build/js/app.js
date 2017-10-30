@@ -785,14 +785,14 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
   };
 
   $scope.downloadInfluxDBSketch = function () {
-    if (!settings.influxDB.url) return;
+    if (!$scope.settings.influxDB.url) return;
 
     var kettles = "";
     _.each($scope.kettles, function (kettle, i) {
       if (kettle.temp.type == 'Thermistor') kettles += 'thermistorInfluxDBCommand("' + kettle.key + '","' + kettle.temp.pin + '");\n  ';else if (kettle.temp.type == 'DS18B20') kettles += 'ds18B20InfluxDBCommand("' + kettle.key + '","' + kettle.temp.pin + '");\n  ';else if (kettle.temp.type == 'PT100') kettles += 'pt100InfluxDBCommand("' + kettle.key + '","' + kettle.temp.pin + '");\n  ';
     });
     return $http.get('assets/BrewBenchInfluxDBYun/BrewBenchInfluxDBYun.ino').then(function (response) {
-      response.data = response.data.replace('// [kettles]', kettles).replace('[INFLUXDB_URL]', $scope.settings.influxDB.url).replace('[INFLUXDB_PORT]', $scope.settings.influxDB.port).replace('[SESSION_NAME]', 'session-' + moment('YYYY-MM-DD'));
+      response.data = response.data.replace('// [kettles]', kettles).replace('[INFLUXDB_URL]', $scope.settings.influxDB.url).replace('[INFLUXDB_PORT]', $scope.settings.influxDB.port).replace('[SESSION_NAME]', 'session-' + moment().format('YYYY-MM-DD'));
       var streamSketch = document.createElement('a');
       streamSketch.setAttribute('download', 'BrewBenchInfluxDBYun.ino');
       streamSketch.setAttribute('href', "data:text/ino;charset=utf-8," + encodeURIComponent(response.data));

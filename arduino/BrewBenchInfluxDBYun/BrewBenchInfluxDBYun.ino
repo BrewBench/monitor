@@ -208,7 +208,7 @@ void pt100InfluxDBCommand(String kettle, String pin) {
 
 void influxPost(String data) {
   Process p;
-  String cmd = "curl -X POST 'http://"+String(INFLUX_URL)+":"+String(INFLUXDB_PORT)+"/write?db="+String(SESSION_NAME)+"' --data-binary '"+data+"'";
+  String cmd = "curl -X POST 'http://"+String(INFLUXDB_URL)+":"+String(INFLUXDB_PORT)+"/write?db="+String(SESSION_NAME)+"' --data-binary '"+data+"'";
   p.runShellCommand(cmd);
   while (p.running());
   p.close();

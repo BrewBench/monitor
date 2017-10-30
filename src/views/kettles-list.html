@@ -34,7 +34,7 @@
       <div class="row header">
         <div class="col-auto mr-auto">
           <img ng-if="kettle.type != 'air'" class="type" ng-src="/assets/img/{{kettle.type}}.svg" height="30" ng-click="changeKettleType(kettle)"/>
-          <i ng-if="kettle.type == 'air'" class="fa fa-thermometer-quarter fa-2x type" height="30" ng-click="changeKettleType(kettle)"></i>
+          <i ng-if="kettle.type == 'air'" class="fa fa-thermometer-quarter fa-2x type" ng-click="changeKettleType(kettle)"></i>
           <h3><editable type="text" model="kettle.key"></editable></h3>
         </div>
         <div ng-if="shareAccess('fullAccess')" class="col-auto">

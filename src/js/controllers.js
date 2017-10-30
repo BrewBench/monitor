@@ -849,7 +849,7 @@ $scope.updateABV();
   };
 
   $scope.downloadInfluxDBSketch = function(){
-    if(!settings.influxDB.url) return;
+    if(!$scope.settings.influxDB.url) return;
 
     let kettles = "";
     _.each($scope.kettles, (kettle, i) => {
@@ -866,7 +866,7 @@ $scope.updateABV();
           .replace('// [kettles]', kettles)
           .replace('[INFLUXDB_URL]', $scope.settings.influxDB.url)
           .replace('[INFLUXDB_PORT]', $scope.settings.influxDB.port)
-          .replace('[SESSION_NAME]', 'session-'+moment('YYYY-MM-DD'));
+          .replace('[SESSION_NAME]', 'session-'+moment().format('YYYY-MM-DD'));
         let streamSketch = document.createElement('a');
         streamSketch.setAttribute('download', 'BrewBenchInfluxDBYun.ino');
         streamSketch.setAttribute('href', "data:text/ino;charset=utf-8," + encodeURIComponent(response.data));
