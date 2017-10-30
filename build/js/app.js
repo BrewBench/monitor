@@ -255,6 +255,17 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
     });
   };
 
+  $scope.testInfluxDB = function () {
+    $scope.settings.influxDB.testing = true;
+    BrewService.influx().then(function (response) {
+      $scope.settings.influxDB.testing = false;
+      if (response.status == 204) $scope.settings.influxDB.connected = true;else $scope.settings.influxDB.connected = false;
+    }).catch(function (err) {
+      $scope.settings.influxDB.testing = false;
+      $scope.settings.influxDB.connected = false;
+    });
+  };
+
   $scope.shareAccess = function (access) {
     if ($scope.settings.shared) {
       if (access) {
@@ -768,13 +779,31 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
     return "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ "settings": $scope.settings, "kettles": kettles }));
   };
 
+  $scope.downloadInfluxDBSketch = function () {
+    if (!settings.influxDB.url) return;
+
+    var kettles = "";
+    _.each($scope.kettles, function (kettle, i) {
+      if (kettle.temp.type == 'Thermistor') kettles += 'thermistorInfluxDBCommand("' + kettle.key + '","' + kettle.temp.pin + '");\n  ';else if (kettle.temp.type == 'DS18B20') kettles += 'ds18B20InfluxDBCommand("' + kettle.key + '","' + kettle.temp.pin + '");\n  ';else if (kettle.temp.type == 'PT100') kettles += 'pt100InfluxDBCommand("' + kettle.key + '","' + kettle.temp.pin + '");\n  ';
+    });
+    return $http.get('assets/BrewBenchInfluxDBYun/BrewBenchInfluxDBYun.ino').then(function (response) {
+      response.data = response.data.replace('// [kettles]', kettles).replace('[INFLUXDB_URL]', $scope.settings.influxDB.url).replace('[INFLUXDB_PORT]', $scope.settings.influxDB.port).replace('[SESSION_NAME]', 'session-' + moment('YYYY-MM-DD'));
+      var streamSketch = document.createElement('a');
+      streamSketch.setAttribute('download', 'BrewBenchInfluxDBYun.ino');
+      streamSketch.setAttribute('href', "data:text/ino;charset=utf-8," + encodeURIComponent(response.data));
+      streamSketch.click();
+    }).catch(function (err) {
+      $scope.error.message = 'Failed to download sketch ' + err.message;
+    });
+  };
+
   $scope.downloadStreamsSketch = function (sessionId) {
     var kettles = "";
     _.each($scope.kettles, function (kettle, i) {
-      if (kettle.temp.type = 'Thermistor') kettles += 'thermistorAPICommand("' + kettle.key + '","' + kettle.temp.pin + '");\n  ';else if (kettle.temp.type = 'DS18B20API') kettles += 'ds18B20APICommand("' + kettle.key + '","' + kettle.temp.pin + '");\n  ';else if (kettle.temp.type = 'PT100') kettles += 'pt100APICommand("' + kettle.key + '","' + kettle.temp.pin + '");\n  ';
+      if (kettle.temp.type == 'Thermistor') kettles += 'thermistorAPICommand("' + kettle.key + '","' + kettle.temp.pin + '");\n  ';else if (kettle.temp.type == 'DS18B20') kettles += 'ds18B20APICommand("' + kettle.key + '","' + kettle.temp.pin + '");\n  ';else if (kettle.temp.type == 'PT100') kettles += 'pt100APICommand("' + kettle.key + '","' + kettle.temp.pin + '");\n  ';
     });
     return $http.get('assets/BrewBenchStreamsYun/BrewBenchStreamsYun.ino').then(function (response) {
-      response.data = response.data.replace('// [kettles]', kettles).replace('[API_KEY]', $scope.settings.account.apiKey).replace('[SESSION_ID]', sessionId.toLowerCase().trim().replace(/ /g, '-').replace(/[^A-Za-z0-9\-!?]/g, ''));
+      response.data = response.data.replace('// [kettles]', kettles).replace('[API_KEY]', $scope.settings.account.apiKey).replace('[SESSION_ID]', sessionId);
       var streamSketch = document.createElement('a');
       streamSketch.setAttribute('download', 'BrewBenchStreamsYun.ino');
       streamSketch.setAttribute('href', "data:text/ino;charset=utf-8," + encodeURIComponent(response.data));
@@ -1183,6 +1212,7 @@ angular.module('brewbench-monitor').factory('BrewService', function ($http, $q, 
         notifications: { on: true, timers: true, high: true, low: true, target: true, slack: 'Webhook Url', last: '' },
         sounds: { on: true, alert: '/assets/audio/bike.mp3', timer: '/assets/audio/school.mp3' },
         account: { apiKey: '', sessions: [] },
+        influxDB: { url: '', port: 8086, connected: false },
         arduinos: [{
           id: btoa('brewbench'),
           url: 'arduino.local',
@@ -1444,6 +1474,18 @@ angular.module('brewbench-monitor').factory('BrewService', function ($http, $q, 
 
       $http({ url: 'https://monitor.brewbench.co/share/test/?' + query, method: 'GET' }).then(function (response) {
         q.resolve(response.data);
+      }).catch(function (err) {
+        q.reject(err);
+      });
+      return q.promise;
+    },
+
+    influx: function influx() {
+      var q = $q.defer();
+      var settings = this.settings('settings');
+      var influxConnection = settings.influxDB.url + ':' + settings.influxDB.port;
+      $http({ url: influxConnection + '/ping', method: 'GET' }).then(function (response) {
+        q.resolve(response);
       }).catch(function (err) {
         q.reject(err);
       });

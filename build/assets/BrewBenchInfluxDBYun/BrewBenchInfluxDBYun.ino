@@ -6,9 +6,9 @@
 #include "cactus_io_DS18B20.h"
 
 const char VERSION[] = "2.7.1";
-const char SESSION_ID[] = "[SESSION_ID]";
-const char API_KEY[] = "[API_KEY]";
-const char API_HOST[] = "http://api.brewbench.co";
+const char SESSION_NAME[] = "[SESSION_NAME]";
+const char INFLUXDB_URL[] = "[INFLUXDB_URL]";
+const int INFLUXDB_PORT = [INFLUXDB_PORT];
 int secondCounter = 0;
 
 BridgeServer server;
@@ -148,15 +148,12 @@ void ds18B20Command(BridgeClient client) {
   client.print("{\"pin\":\""+String(spin)+String(pin)+"\",\"temp\":\""+String(temp)+"\"}");
 }
 
-void ds18B20APICommand(String kettle, String pin) {
+void ds18B20InfluxDBCommand(String kettle, String pin) {
   DS18B20 ds(pin.substring(1).toInt());
   ds.readSensor();
   float temp = ds.getTemperature_C();
 
-  apiPost("{\"pin\":\""+String(pin)+"\"
-    ,\"sensor\":\"DS18B20\"
-    ,\"kettle\":\""+String(kettle)+"\"
-    ,\"temp\":\""+String(temp)+"\"}");
+  influxPost("temperature,sensor=DS18B20,pin="+String(pin)+",kettle="+kettle+" value="+String(temp));
 }
 
 void thermistorCommand(BridgeClient client) {
@@ -168,12 +165,9 @@ void thermistorCommand(BridgeClient client) {
   client.print("{\"pin\":\""+String(spin)+String(pin)+"\",\"temp\":\""+String(temp)+"\"}");
 }
 
-void thermistorAPICommand(String kettle, String pin) {
+void thermistorInfluxDBCommand(String kettle, String pin) {
   float temp = Thermistor(pin.substring(1).toInt());
-  apiPost("{\"pin\":\""+String(pin)+"\"
-    ,\"sensor\":\"Thermistor\"
-    ,\"kettle\":\""+String(kettle)+"\"
-    ,\"temp\":\""+String(temp)+"\"}");
+  influxPost("temperature,sensor=Thermistor,pin="+String(pin)+",kettle="+kettle+" value="+String(temp));
 }
 
 // http://www.instructables.com/id/Temperature-Measurement-Tutorial-Part1/
@@ -196,7 +190,7 @@ void pt100Command(BridgeClient client) {
   client.print("{\"pin\":\""+String(spin)+String(pin)+"\",\"temp\":\""+String(temp)+"\"}");
 }
 
-void pt100APICommand(String kettle, String pin) {
+void pt100InfluxDBCommand(String kettle, String pin) {
   float tvoltage;
   float temp;
 
@@ -209,25 +203,18 @@ void pt100APICommand(String kettle, String pin) {
     tvoltage = map(tvoltage,410,1023,0,614);
     temp = (150*tvoltage)/614;
   }
-  apiPost("{\"pin\":\""+String(pin)+"\"
-    ,\"sensor\":\"PT100\"
-    ,\"kettle\":\""+String(kettle)+"\"
-    ,\"temp\":\""+String(temp)+"\"}");
+  influxPost("temperature,sensor=PT100,pin="+String(pin)+",kettle="+kettle+" value="+String(temp));
 }
 
-void apiPost(String data) {
+void influxPost(String data) {
   Process p;
-  String cmd = "curl -H \"Content-Type: application/json\"
-    -H \"X-API-KEY: "+String(API_KEY)+"
-    -H \"X-SESSION-ID: "+String(SESSION_ID)+"
-    -X POST '"+String(API_URL)+"'
-    -d '"+data+"'";
+  String cmd = "curl -X POST 'http://"+String(INFLUX_URL)+":"+String(INFLUXDB_PORT)+"/write?db="+String(SESSION_NAME)+"' --data-binary '"+data+"'";
   p.runShellCommand(cmd);
   while (p.running());
   p.close();
 }
 
-void BrewBenchAPI(){
+void InfluxDB(){
   // [kettles]
 }
 
@@ -253,7 +240,7 @@ void loop() {
   if( secondCounter == 60 ){
     // reset the secondCounter
     secondCounter = 0;
-    BrewBenchAPI();
+    InfluxDB();
   }
 
   delay(1000);

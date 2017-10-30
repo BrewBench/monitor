@@ -261,11 +261,30 @@ $scope.updateABV();
           arduino.public = true;
         else
           arduino.public = false;
-      }).catch(err => {
+      })
+      .catch(err => {
         arduino.testing = false;
         arduino.public = false;
       });
   };
+
+  $scope.testInfluxDB = function(){
+    $scope.settings.influxDB.testing = true;
+    BrewService.influx()
+      .then(response => {
+        $scope.settings.influxDB.testing = false;
+        if(response.status == 204)
+          $scope.settings.influxDB.connected = true;
+        else
+          $scope.settings.influxDB.connected = false;
+      })
+      .catch(err => {
+        $scope.settings.influxDB.testing = false;
+        $scope.settings.influxDB.connected = false;
+      });
+  };
+
+
 
   $scope.shareAccess = function(access){
       if($scope.settings.shared){
@@ -824,14 +843,43 @@ $scope.updateABV();
     return "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({"settings": $scope.settings,"kettles": kettles}));
   };
 
+  $scope.downloadInfluxDBSketch = function(){
+    if(!settings.influxDB.url) return;
+
+    let kettles = "";
+    _.each($scope.kettles, (kettle, i) => {
+      if( kettle.temp.type == 'Thermistor' )
+        kettles += 'thermistorInfluxDBCommand("'+kettle.key+'","'+kettle.temp.pin+'");\n  ';
+      else if( kettle.temp.type == 'DS18B20' )
+        kettles += 'ds18B20InfluxDBCommand("'+kettle.key+'","'+kettle.temp.pin+'");\n  ';
+      else if( kettle.temp.type == 'PT100' )
+        kettles += 'pt100InfluxDBCommand("'+kettle.key+'","'+kettle.temp.pin+'");\n  ';
+    });
+    return $http.get('assets/BrewBenchInfluxDBYun/BrewBenchInfluxDBYun.ino')
+      .then(response => {
+        response.data = response.data
+          .replace('// [kettles]', kettles)
+          .replace('[INFLUXDB_URL]', $scope.settings.influxDB.url)
+          .replace('[INFLUXDB_PORT]', $scope.settings.influxDB.port)
+          .replace('[SESSION_NAME]', 'session-'+moment('YYYY-MM-DD'));
+        let streamSketch = document.createElement('a');
+        streamSketch.setAttribute('download', 'BrewBenchInfluxDBYun.ino');
+        streamSketch.setAttribute('href', "data:text/ino;charset=utf-8," + encodeURIComponent(response.data));
+        streamSketch.click();
+      })
+      .catch(err => {
+        $scope.error.message = `Failed to download sketch ${err.message}`;
+      });
+  };
+
   $scope.downloadStreamsSketch = function(sessionId){
     let kettles = "";
     _.each($scope.kettles, (kettle, i) => {
-      if( kettle.temp.type = 'Thermistor' )
+      if( kettle.temp.type == 'Thermistor' )
         kettles += 'thermistorAPICommand("'+kettle.key+'","'+kettle.temp.pin+'");\n  ';
-      else if( kettle.temp.type = 'DS18B20API' )
+      else if( kettle.temp.type == 'DS18B20' )
         kettles += 'ds18B20APICommand("'+kettle.key+'","'+kettle.temp.pin+'");\n  ';
-      else if( kettle.temp.type = 'PT100' )
+      else if( kettle.temp.type == 'PT100' )
         kettles += 'pt100APICommand("'+kettle.key+'","'+kettle.temp.pin+'");\n  ';
     });
     return $http.get('assets/BrewBenchStreamsYun/BrewBenchStreamsYun.ino')
@@ -839,7 +887,7 @@ $scope.updateABV();
         response.data = response.data
           .replace('// [kettles]', kettles)
           .replace('[API_KEY]', $scope.settings.account.apiKey)
-          .replace('[SESSION_ID]', sessionId.toLowerCase().trim().replace(/ /g,'-').replace(/[^A-Za-z0-9\-!?]/g,''));
+          .replace('[SESSION_ID]', sessionId);
         let streamSketch = document.createElement('a');
         streamSketch.setAttribute('download', 'BrewBenchStreamsYun.ino');
         streamSketch.setAttribute('href', "data:text/ino;charset=utf-8," + encodeURIComponent(response.data));

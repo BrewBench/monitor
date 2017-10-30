@@ -1,5 +1,3 @@
-#include <Console.h>
-#include <HttpClient.h>
 #include <Process.h>
 #include <Bridge.h>
 #include <BridgeServer.h>

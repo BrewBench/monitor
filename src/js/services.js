@@ -21,7 +21,8 @@ angular.module('brewbench-monitor')
         ,recipe: {'name':'','brewer':{name:'','email':''},'yeast':[],'hops':[],'malt':[],scale:'gravity',method:'papazian','og':1.050,'fg':1.010,'abv':0,'abw':0,'calories':0,'attenuation':0}
         ,notifications: {on:true,timers:true,high:true,low:true,target:true,slack:'Webhook Url',last:''}
         ,sounds: {on:true,alert:'/assets/audio/bike.mp3',timer:'/assets/audio/school.mp3'}
-        ,account: {apiKey: '',sessions: []}
+        ,account: {apiKey: '', sessions: []}
+        ,influxDB: {url: '', port: 8086, connected: false}
         ,arduinos: [{
           id: btoa('brewbench'),
           url: 'arduino.local',
@@ -340,6 +341,20 @@ angular.module('brewbench-monitor')
           q.reject(err);
         });
       return q.promise;
+    },
+
+    influx: function(){
+        let q = $q.defer();
+        let settings = this.settings('settings');
+        let influxConnection = `${settings.influxDB.url}:${settings.influxDB.port}`;
+        $http({url: influxConnection+'/ping', method: 'GET'})
+          .then(response => {
+            q.resolve(response);
+          })
+          .catch(function(err){
+            q.reject(err);
+          });
+          return q.promise;
     },
 
     pkg: function(){

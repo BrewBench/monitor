@@ -1,10 +1,7 @@
-#include <Console.h>
-#include <HttpClient.h>
 #include <Process.h>
 #include <Bridge.h>
 #include <BridgeServer.h>
 #include <BridgeClient.h>
-// https://www.adafruit.com/product/381
 // http://static.cactus.io/downloads/library/ds18b20/cactus_io_DS18B20.zip
 #include "cactus_io_DS18B20.h"
 

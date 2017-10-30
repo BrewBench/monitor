@@ -98,6 +98,28 @@
             </button>
             <div class="dropdown-menu scrollable-menu">
               <a href="assets/BrewBenchYun/BrewBenchYun.ino" class="dropdown-item">Arduino Yun</a>
+              <a href="" ng-click="downloadInfluxDBSketch()" class="dropdown-item" ng-class="{'disabled':!settings.influxDB.url}">Arduino Yun w/InfluxDB</a>
+            </div>
+          </div>
+
+          <label class="adjust">InfluxDB</label>
+          <div class="row">
+            <div class="col-6">
+              <editable class="poll" type="text" model="settings.influxDB.url" placeholder="http://InfluxDBUrl"></editable>
+            </div>
+            <div class="col-2">
+              <editable class="poll" type="number" model="settings.influxDB.port"></editable>
+            </div>
+            <div class="col-2">
+              <i class="fa" ng-class="{'fa-circle-o-notch fa-spin fa-2x':!!settings.influxDB.testing, 'fa-check-circle fa-2x':!!settings.influxDB.connected, 'fa-times-circle fa-2x':settings.influxDB.connected === false}" aria-hidden="true"></i>
+            </div>
+            <div class="col-2">
+              <button class="btn"
+                ng-click="testInfluxDB()"
+                ng-disabled="!settings.influxDB.url"
+                ng-class="{'btn-light':!settings.influxDB.url, 'btn-primary':settings.influxDB.url}">
+                  Test
+                </button>
             </div>
           </div>
 

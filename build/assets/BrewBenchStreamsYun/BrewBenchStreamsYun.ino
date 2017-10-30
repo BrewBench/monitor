@@ -1,17 +1,15 @@
 #include <Process.h>
 #include <Bridge.h>
-#include <String.h>
 #include <BridgeServer.h>
 #include <BridgeClient.h>
-
 // http://static.cactus.io/downloads/library/ds18b20/cactus_io_DS18B20.zip
 #include "cactus_io_DS18B20.h"
 
 const char VERSION[] = "2.7.1";
-const char API_KEY[] = "[API_KEY]";
 const char SESSION_ID[] = "[SESSION_ID]";
-const char API_HOST[] = "10.0.1.6"; //api.brewbench.co
-const int API_PORT = 8086;
+const char API_KEY[] = "[API_KEY]";
+const char API_HOST[] = "http://api.brewbench.co";
+int secondCounter = 0;
 
 BridgeServer server;
 
@@ -155,7 +153,10 @@ void ds18B20APICommand(String kettle, String pin) {
   ds.readSensor();
   float temp = ds.getTemperature_C();
 
-  apiPost("temperature,sensor=DS18B20,pin="+String(pin)+",kettle="+kettle+" value="+String(temp));
+  apiPost("{\"pin\":\""+String(pin)+"\"
+    ,\"sensor\":\"DS18B20\"
+    ,\"kettle\":\""+String(kettle)+"\"
+    ,\"temp\":\""+String(temp)+"\"}");
 }
 
 void thermistorCommand(BridgeClient client) {
@@ -169,7 +170,10 @@ void thermistorCommand(BridgeClient client) {
 
 void thermistorAPICommand(String kettle, String pin) {
   float temp = Thermistor(pin.substring(1).toInt());
-  apiPost("temperature,sensor=Thermistor,pin="+String(pin)+",kettle="+kettle+" value="+String(temp));
+  apiPost("{\"pin\":\""+String(pin)+"\"
+    ,\"sensor\":\"Thermistor\"
+    ,\"kettle\":\""+String(kettle)+"\"
+    ,\"temp\":\""+String(temp)+"\"}");
 }
 
 // http://www.instructables.com/id/Temperature-Measurement-Tutorial-Part1/
@@ -179,7 +183,7 @@ void pt100Command(BridgeClient client) {
   float tvoltage;
   float temp;
 
-  if( spin == "A" )
+  if( spin == 'A' )
     tvoltage = analogRead(pin);
   else
     tvoltage = digitalRead(pin);
@@ -205,12 +209,19 @@ void pt100APICommand(String kettle, String pin) {
     tvoltage = map(tvoltage,410,1023,0,614);
     temp = (150*tvoltage)/614;
   }
-  apiPost("temperature,sensor=PT100,pin="+String(pin)+",kettle="+kettle+" value="+String(temp));
+  apiPost("{\"pin\":\""+String(pin)+"\"
+    ,\"sensor\":\"PT100\"
+    ,\"kettle\":\""+String(kettle)+"\"
+    ,\"temp\":\""+String(temp)+"\"}");
 }
 
 void apiPost(String data) {
   Process p;
-  String cmd = "curl -i -XPOST 'http://"+String(API_HOST)+":"+String(API_PORT)+"/write?db="+String(SESSION_ID)+"' --data-binary '"+data+"'";
+  String cmd = "curl -H \"Content-Type: application/json\"
+    -H \"X-API-KEY: "+String(API_KEY)+"
+    -H \"X-SESSION-ID: "+String(SESSION_ID)+"
+    -X POST '"+String(API_URL)+"'
+    -d '"+data+"'";
   p.runShellCommand(cmd);
   while (p.running());
   p.close();
@@ -233,14 +244,13 @@ void setup() {
 
 void loop() {
   BridgeClient client = server.accept();
-  int secondCounter = 0;
 
   if (client) {
     process(client);
     client.stop();
   }
   secondCounter+=1;
-  if( secondCounter == 10 ){
+  if( secondCounter == 60 ){
     // reset the secondCounter
     secondCounter = 0;
     BrewBenchAPI();
