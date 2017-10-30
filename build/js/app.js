@@ -66,7 +66,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
 
         if (!k) return;
         if ($scope.kettles[kettle[1]].active && k.pwm && k.running) {
-          return toggleRelay($scope.kettles[kettle[1]], k, true);
+          return $scope.toggleRelay($scope.kettles[kettle[1]], k, true);
         }
       }
     }
@@ -505,8 +505,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
     if (kettle) kettle.error = '';
   };
 
-  function updateTemp(response, kettle) {
-
+  $scope.updateTemp = function (response, kettle) {
     if (!response || !response.temp) {
       return false;
     }
@@ -517,7 +516,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
     //chart date
     var date = new Date();
     // temp response is in C
-    kettle.temp.previous = $scope.settings.unit === 'F' ? $filter('toFahrenheit')(response.temp) : Math.round(response.temp);
+    kettle.temp.previous = $scope.settings.unit == 'F' ? $filter('toFahrenheit')(response.temp) : Math.round(response.temp);
     kettle.temp.current = kettle.temp.previous + kettle.temp.adjust;
 
     //reset all kettles every resetChart
@@ -533,18 +532,17 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
 
     //is temp too high?
     if (kettle.temp.current >= kettle.temp.target + kettle.temp.diff) {
-      $scope.alert(kettle);
       //stop the heating element
       if (kettle.heater.auto && kettle.heater.running) {
-        temps.push(toggleRelay(kettle, kettle.heater, false));
+        temps.push($scope.toggleRelay(kettle, kettle.heater, false));
       }
       //stop the pump
       if (kettle.pump.auto && kettle.pump.running) {
-        temps.push(toggleRelay(kettle, kettle.pump, false));
+        temps.push($scope.toggleRelay(kettle, kettle.pump, false));
       }
       //start the chiller
       if (kettle.cooler && kettle.cooler.auto && !kettle.cooler.running) {
-        temps.push(toggleRelay(kettle, kettle.cooler, true).then(function (cooler) {
+        temps.push($scope.toggleRelay(kettle, kettle.cooler, true).then(function (cooler) {
           kettle.knob.subText.text = 'cooling';
           kettle.knob.subText.color = 'rgba(52,152,219,1)';
         }));
@@ -554,18 +552,18 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
         $scope.alert(kettle);
         //start the heating element
         if (kettle.heater.auto && !kettle.heater.running) {
-          temps.push(toggleRelay(kettle, kettle.heater, true).then(function (heating) {
+          temps.push($scope.toggleRelay(kettle, kettle.heater, true).then(function (heating) {
             kettle.knob.subText.text = 'heating';
             kettle.knob.subText.color = 'rgba(200,47,47,1)';
           }));
         }
         //start the pump
         if (kettle.pump.auto && !kettle.pump.running) {
-          temps.push(toggleRelay(kettle, kettle.pump, true));
+          temps.push($scope.toggleRelay(kettle, kettle.pump, true));
         }
         //stop the cooler
         if (kettle.cooler && kettle.cooler.auto && kettle.cooler.running) {
-          temps.push(toggleRelay(kettle, kettle.cooler, false));
+          temps.push($scope.toggleRelay(kettle, kettle.cooler, false));
         }
       } else {
         // within target!
@@ -573,15 +571,15 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
         $scope.alert(kettle);
         //stop the heater
         if (kettle.heater.auto && kettle.heater.running) {
-          temps.push(toggleRelay(kettle, kettle.heater, false));
+          temps.push($scope.toggleRelay(kettle, kettle.heater, false));
         }
         //stop the pump
         if (kettle.pump.auto && kettle.pump.running) {
-          temps.push(toggleRelay(kettle, kettle.pump, false));
+          temps.push($scope.toggleRelay(kettle, kettle.pump, false));
         }
         //stop the cooler
         if (kettle.cooler && kettle.cooler.auto && kettle.cooler.running) {
-          temps.push(toggleRelay(kettle, kettle.cooler, false));
+          temps.push($scope.toggleRelay(kettle, kettle.cooler, false));
         }
       }
     return $q.all(temps);
@@ -646,10 +644,10 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
 
     if (kettle.active && k.running) {
       //start the relay
-      toggleRelay(kettle, k, true);
+      $scope.toggleRelay(kettle, k, true);
     } else if (!k.running) {
       //stop the relay
-      toggleRelay(kettle, k, false);
+      $scope.toggleRelay(kettle, k, false);
     }
   };
 
@@ -662,71 +660,73 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
 
   $scope.startStopKettle = function (kettle) {
     kettle.active = !kettle.active;
+    $scope.resetError(kettle);
 
     if (kettle.active) {
-      BrewService.temp(kettle).then(function (response) {
-        updateTemp(response, kettle);
-      }).catch(function (err) {
-        $scope.connectError(err, kettle);
-      });
       kettle.knob.subText.text = 'starting...';
       kettle.knob.readOnly = false;
+
+      BrewService.temp(kettle).then(function (response) {
+        return $scope.updateTemp(response, kettle);
+      }).catch(function (err) {
+        return $scope.connectError(err, kettle);
+      });
+
       // start the relays
       if (kettle.heater.running) {
-        toggleRelay(kettle, kettle.heater, true);
+        $scope.toggleRelay(kettle, kettle.heater, true);
       }
       if (kettle.pump.running) {
-        toggleRelay(kettle, kettle.pump, true);
+        $scope.toggleRelay(kettle, kettle.pump, true);
       }
       if (kettle.cooler && kettle.cooler.running) {
-        toggleRelay(kettle, kettle.cooler, true);
+        $scope.toggleRelay(kettle, kettle.cooler, true);
       }
     } else {
       kettle.knob.readOnly = true;
-    }
-
-    //stop the heater
-    if (!kettle.active && kettle.heater.running) {
-      toggleRelay(kettle, kettle.heater, false);
-    }
-    //stop the pump
-    if (!kettle.active && kettle.pump.running) {
-      toggleRelay(kettle, kettle.pump, false);
-    }
-    //stop the cooler
-    if (!kettle.active && kettle.cooler && kettle.cooler.running) {
-      toggleRelay(kettle, kettle.cooler, false);
-    }
-    if (!kettle.active) {
-      kettle.pump.auto = false;
-      kettle.heater.auto = false;
-      if (kettle.cooler) kettle.cooler.auto = false;
-      $scope.updateKnobCopy(kettle);
+      //stop the heater
+      if (!kettle.active && kettle.heater.running) {
+        $scope.toggleRelay(kettle, kettle.heater, false);
+      }
+      //stop the pump
+      if (!kettle.active && kettle.pump.running) {
+        $scope.toggleRelay(kettle, kettle.pump, false);
+      }
+      //stop the cooler
+      if (!kettle.active && kettle.cooler && kettle.cooler.running) {
+        $scope.toggleRelay(kettle, kettle.cooler, false);
+      }
+      if (!kettle.active) {
+        kettle.pump.auto = false;
+        kettle.heater.auto = false;
+        if (kettle.cooler) kettle.cooler.auto = false;
+        $scope.updateKnobCopy(kettle);
+      }
     }
   };
 
-  function toggleRelay(kettle, element, on) {
+  $scope.toggleRelay = function (kettle, element, on) {
     if (on) {
       if (element.pwm) {
         return BrewService.analog(kettle, element.pin, Math.round(255 * element.dutyCycle / 100)).then(function () {
           //started
           element.running = true;
         }).catch(function (err) {
-          $scope.connectError(err, kettle);
+          return $scope.connectError(err, kettle);
         });
       } else if (element.ssr) {
         return BrewService.analog(kettle, element.pin, 255).then(function () {
           //started
           element.running = true;
         }).catch(function (err) {
-          $scope.connectError(err, kettle);
+          return $scope.connectError(err, kettle);
         });
       } else {
         return BrewService.digital(kettle, element.pin, 1).then(function () {
           //started
           element.running = true;
         }).catch(function (err) {
-          $scope.connectError(err, kettle);
+          return $scope.connectError(err, kettle);
         });
       }
     } else {
@@ -735,18 +735,18 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
           element.running = false;
           $scope.updateKnobCopy(kettle);
         }).catch(function (err) {
-          $scope.connectError(err, kettle);
+          return $scope.connectError(err, kettle);
         });
       } else {
         return BrewService.digital(kettle, element.pin, 0).then(function () {
           element.running = false;
           $scope.updateKnobCopy(kettle);
         }).catch(function (err) {
-          $scope.connectError(err, kettle);
+          return $scope.connectError(err, kettle);
         });
       }
     }
-  }
+  };
 
   $scope.importSettings = function ($fileContent, $ext) {
     try {
@@ -760,7 +760,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
   };
 
   $scope.exportSettings = function () {
-    var kettles = $scope.kettles;
+    var kettles = angular.copy($scope.kettles);
     _.each(kettles, function (kettle, i) {
       kettles[i].values = [];
       kettles[i].active = false;
@@ -1028,7 +1028,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
     _.each($scope.kettles, function (k, i) {
       if ($scope.kettles[i].active) {
         allSensors.push(BrewService.temp($scope.kettles[i]).then(function (response) {
-          return updateTemp(response, $scope.kettles[i]);
+          return $scope.updateTemp(response, $scope.kettles[i]);
         }).catch(function (err) {
           $scope.connectError(err, $scope.kettles[i]);
           return err;
