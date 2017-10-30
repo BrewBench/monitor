@@ -5,7 +5,7 @@
 // http://static.cactus.io/downloads/library/ds18b20/cactus_io_DS18B20.zip
 #include "cactus_io_DS18B20.h"
 
-const char VERSION[] = "2.7.1";
+const char VERSION[] = "2.8.0";
 const char SESSION_ID[] = "[SESSION_ID]";
 const char API_KEY[] = "[API_KEY]";
 const char API_HOST[] = "http://api.brewbench.co";
@@ -153,10 +153,12 @@ void ds18B20APICommand(String kettle, String pin) {
   ds.readSensor();
   float temp = ds.getTemperature_C();
 
-  apiPost("{\"pin\":\""+String(pin)+"\"
-    ,\"sensor\":\"DS18B20\"
-    ,\"kettle\":\""+String(kettle)+"\"
-    ,\"temp\":\""+String(temp)+"\"}");
+  Process p;
+  String data = "{\"pin\":\""+String(pin)+"\",\"sensor\":\"DS18B20\",\"source\":\""+String(source)+"\",\"temp\":\""+String(temp)+"\"}";
+  String cmd = "curl -H \"Content-Type: application/json\" -H \"X-API-KEY: "+String(API_KEY)+" -H \"X-SESSION-ID: "+String(SESSION_ID)+" -X POST '"+String(API_URL)+"' -d '"+data+"'";
+  p.runShellCommand(cmd);
+  while (p.running());
+  p.close();
 }
 
 void thermistorCommand(BridgeClient client) {
@@ -170,10 +172,13 @@ void thermistorCommand(BridgeClient client) {
 
 void thermistorAPICommand(String kettle, String pin) {
   float temp = Thermistor(pin.substring(1).toInt());
-  apiPost("{\"pin\":\""+String(pin)+"\"
-    ,\"sensor\":\"Thermistor\"
-    ,\"kettle\":\""+String(kettle)+"\"
-    ,\"temp\":\""+String(temp)+"\"}");
+
+  Process p;
+  String data = "{\"pin\":\""+String(pin)+"\",\"sensor\":\"Thermistor\",\"source\":\""+String(source)+"\",\"temp\":\""+String(temp)+"\"}";
+  String cmd = "curl -H \"Content-Type: application/json\" -H \"X-API-KEY: "+String(API_KEY)+" -H \"X-SESSION-ID: "+String(SESSION_ID)+" -X POST '"+String(API_URL)+"' -d '"+data+"'";
+  p.runShellCommand(cmd);
+  while (p.running());
+  p.close();
 }
 
 // http://www.instructables.com/id/Temperature-Measurement-Tutorial-Part1/
@@ -209,19 +214,10 @@ void pt100APICommand(String kettle, String pin) {
     tvoltage = map(tvoltage,410,1023,0,614);
     temp = (150*tvoltage)/614;
   }
-  apiPost("{\"pin\":\""+String(pin)+"\"
-    ,\"sensor\":\"PT100\"
-    ,\"kettle\":\""+String(kettle)+"\"
-    ,\"temp\":\""+String(temp)+"\"}");
-}
 
-void apiPost(String data) {
   Process p;
-  String cmd = "curl -H \"Content-Type: application/json\"
-    -H \"X-API-KEY: "+String(API_KEY)+"
-    -H \"X-SESSION-ID: "+String(SESSION_ID)+"
-    -X POST '"+String(API_URL)+"'
-    -d '"+data+"'";
+  String data = "{\"pin\":\""+String(pin)+"\",\"sensor\":\"PT100\",\"source\":\""+String(source)+"\",\"temp\":\""+String(temp)+"\"}";
+  String cmd = "curl -H \"Content-Type: application/json\" -H \"X-API-KEY: "+String(API_KEY)+" -H \"X-SESSION-ID: "+String(SESSION_ID)+" -X POST '"+String(API_URL)+"' -d '"+data+"'";
   p.runShellCommand(cmd);
   while (p.running());
   p.close();

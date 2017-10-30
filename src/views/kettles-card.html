@@ -139,7 +139,7 @@
             </rzslider>
         </div>
 
-        <div class="col" ng-if="kettle.arduino && kettle.type !== 'fermenter'">
+        <div class="col" ng-if="kettle.arduino && kettle.type != 'fermenter' && kettle.type != 'air'">
           <label class="adjust">Pump
             <sup><a ng-if="kettle.pump.pin.indexOf('D') !== -1" href="" ng-click="togglePWM(kettle.pump)">PWM ~</a></sup>
           </label>
@@ -186,7 +186,7 @@
           </rzslider>
         </div>
 
-        <div class="col" ng-if="kettle.arduino && kettle.type === 'fermenter' && kettle.cooler">
+        <div class="col" ng-if="kettle.arduino && kettle.cooler && (kettle.type == 'fermenter' || kettle.type == 'air')">
           <label class="adjust" ng-class="{'cooling':kettle.cooler.running}">Cool
             <sup><a ng-if="kettle.cooler.pin.indexOf('D') !== -1" href="" ng-click="togglePWM(kettle.cooler)">PWM ~</a></sup>
           </label>

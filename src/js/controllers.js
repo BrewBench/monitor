@@ -913,6 +913,16 @@ $scope.updateABV();
     },1000);
   };
 
+  $scope.getIPAddress = function(){
+    BrewService.ifconfig()
+      .then(response => {
+        $scope.settings.ipAddress = response.ip;
+      })
+      .catch(err => {
+        $scope.error.message = err;
+      });
+  };
+
   $scope.alert = function(kettle,timer){
 
     //don't start alerts until we have hit the temp.target

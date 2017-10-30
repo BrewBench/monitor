@@ -828,6 +828,14 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
     }, 1000);
   };
 
+  $scope.getIPAddress = function () {
+    BrewService.ifconfig().then(function (response) {
+      $scope.settings.ipAddress = response.ip;
+    }).catch(function (err) {
+      $scope.error.message = err;
+    });
+  };
+
   $scope.alert = function (kettle, timer) {
 
     //don't start alerts until we have hit the temp.target
@@ -1326,6 +1334,16 @@ angular.module('brewbench-monitor').factory('BrewService', function ($http, $q, 
       }
 
       return domain;
+    },
+
+    ifconfig: function ifconfig() {
+      var q = $q.defer();
+      $http.get('https://ifconfig.co/json').then(function (response) {
+        q.resolve(response);
+      }).catch(function (err) {
+        q.reject(err);
+      });
+      return q.promise;
     },
 
     slack: function slack(webhook_url, msg, color, icon, kettle) {

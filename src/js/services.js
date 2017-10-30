@@ -152,6 +152,18 @@ angular.module('brewbench-monitor')
       return domain;
     },
 
+    ifconfig: function(){
+      let q = $q.defer();
+      $http.get('https://ifconfig.co/json')
+        .then(response => {
+          q.resolve(response);
+        })
+        .catch(err => {
+          q.reject(err);
+        });
+      return q.promise;
+    },
+
     slack: function(webhook_url, msg, color, icon, kettle){
       let q = $q.defer();
 

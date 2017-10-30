@@ -7,7 +7,8 @@
       </div>
       <div class="modal-body text-center">
         <div class="alert alert-info">
-          <strong>Public?</strong>  Are your Arduino URLs publically accessible?
+          <strong>Access?</strong>  Are your Arduino URLs remotely accessible?
+          <br>Your IP is <button class="btn btn-light" ng-click="getIPAddress()" ng-if="!settings.ipAddress">Lookup IP Address</button>{{settings.ipAddress}}
         </div>
         <table class="table">
           <tr ng-repeat="arduino in settings.arduinos track by $index">
