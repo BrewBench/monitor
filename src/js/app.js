@@ -6,13 +6,14 @@ angular.module('brewbench-monitor', [
   ,'ui.knob'
   ,'rzModule'
 ])
-.config(function($stateProvider, $urlRouterProvider, $httpProvider, $locationProvider) {
+.config(function($stateProvider, $urlRouterProvider, $httpProvider, $locationProvider, $compileProvider) {
 
   $httpProvider.defaults.useXDomain = true;
   $httpProvider.defaults.headers.common = 'Content-Type: application/json';
   delete $httpProvider.defaults.headers.common['X-Requested-With'];
 
   $locationProvider.hashPrefix('');
+  $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|tel|file|blob|chrome-extension|data|local):/);
 
   $stateProvider
     .state('home', {

@@ -7,9 +7,8 @@ angular.module('brewbench-monitor')
     clear: function(){
       if(window.localStorage){
         window.localStorage.removeItem('settings');
-        window.localStorage.removeItem('share');
         window.localStorage.removeItem('kettles');
-        window.localStorage.removeItem('urls');
+        window.localStorage.removeItem('share');
       }
     },
 
@@ -30,6 +29,64 @@ angular.module('brewbench-monitor')
           secure: false
         }]
       };
+    },
+
+    defaultKnobOptions: function(){
+      return {
+        readOnly: true,
+        unit: '\u00B0',
+        subText: {
+          enabled: true,
+          text: '',
+          color: 'gray',
+          font: 'auto'
+        },
+        trackWidth: 40,
+        barWidth: 25,
+        barCap: 25,
+        trackColor: '#ddd',
+        barColor: '#777',
+        dynamicOptions: true,
+        displayPrevious: true,
+        prevBarColor: '#777'
+      };
+    },
+
+    defaultKettles: function(){
+      return [{
+          key: 'Hot Liquor'
+          ,type: 'water'
+          ,active: false
+          ,heater: {pin:'D2',running:false,auto:false,pwm:false,dutyCycle:100}
+          ,pump: {pin:'D3',running:false,auto:false,pwm:false,dutyCycle:100}
+          ,temp: {pin:'A0',type:'Thermistor',hit:false,current:0,previous:0,adjust:0,target:170,diff:2}
+          ,values: []
+          ,timers: []
+          ,knob: angular.copy(this.defaultKnobOptions(),{value:0,min:0,max:220})
+          ,arduino: {id: btoa('brewbench'), url: 'arduino.local',analog: 5,digital: 13}
+        },{
+          key: 'Mash'
+          ,type: 'grain'
+          ,active: false
+          ,heater: {pin:'D4',running:false,auto:false,pwm:false,dutyCycle:100}
+          ,pump: {pin:'D5',running:false,auto:false,pwm:false,dutyCycle:100}
+          ,temp: {pin:'A1',type:'Thermistor',hit:false,current:0,previous:0,adjust:0,target:152,diff:2}
+          ,values: []
+          ,timers: []
+          ,knob: angular.copy(this.defaultKnobOptions(),{value:0,min:0,max:220})
+          ,arduino: {id: btoa('brewbench'), url: 'arduino.local',analog: 5,digital: 13}
+        },{
+          key: 'Boil'
+          ,type: 'hop'
+          ,active: false
+          ,heater: {pin:'D6',running:false,auto:false,pwm:false,dutyCycle:100}
+          ,pump: {pin:'D7',running:false,auto:false,pwm:false,dutyCycle:100}
+          ,temp: {pin:'A2',type:'Thermistor',hit:false,current:0,previous:0,adjust:0,target:200,diff:2}
+          ,values: []
+          ,timers: []
+          ,knob: angular.copy(this.defaultKnobOptions(),{value:0,min:0,max:220})
+          ,arduino: {id: btoa('brewbench'), url: 'arduino.local',analog: 5,digital: 13}
+        }];
     },
 
     settings: function(key,values){
