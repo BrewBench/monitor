@@ -775,10 +775,10 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
     });
     return $http.get('assets/BrewBenchStreamsYun/BrewBenchStreamsYun.ino').then(function (response) {
       response.data = response.data.replace('// [kettles]', kettles).replace('[API_KEY]', $scope.settings.account.apiKey).replace('[SESSION_ID]', sessionId.toLowerCase().trim().replace(/ /g, '-').replace(/[^A-Za-z0-9\-!?]/g, ''));
-      var afile = document.createElement('a');
-      afile.setAttribute('download', 'BrewBenchStreamsYun.ino');
-      afile.setAttribute('href', "data:text/ino;charset=utf-8," + encodeURIComponent(response.data));
-      afile.click();
+      var streamSketch = document.createElement('a');
+      streamSketch.setAttribute('download', 'BrewBenchStreamsYun.ino');
+      streamSketch.setAttribute('href', "data:text/ino;charset=utf-8," + encodeURIComponent(response.data));
+      streamSketch.click();
     }).catch(function (err) {
       $scope.error.message = 'Failed to download sketch ' + err.message;
     });
@@ -1087,7 +1087,7 @@ angular.module('brewbench-monitor').directive('editable', function () {
         restrict: 'E',
         scope: { model: '=', type: '@?', trim: '@?', change: '&?', enter: '&?', placeholder: '@?' },
         replace: false,
-        template: '<span>' + '<input type="{{type}}" ng-model="model" ng-show="edit" ng-enter="edit=false" ng-change="{{change||false}}" class="editable"></input>' + '<span class="editable" ng-show="!edit">{{(trim) ? (model | limitTo:trim)+(placeholder || "...") : model}}</span>' + '</span>',
+        template: '<span>' + '<input type="{{type}}" ng-model="model" ng-show="edit" ng-enter="edit=false" ng-change="{{change||false}}" class="editable"></input>' + '<span class="editable" ng-show="!edit">{{(trim) ? ((model || placeholder) | limitTo:trim)+"..." : (model || placeholder)}}</span>' + '</span>',
         link: function link(scope, element, attrs) {
             scope.edit = false;
             scope.type = !!scope.type ? scope.type : 'text';

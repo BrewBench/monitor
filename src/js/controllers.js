@@ -844,10 +844,10 @@ $scope.updateABV();
           .replace('// [kettles]', kettles)
           .replace('[API_KEY]', $scope.settings.account.apiKey)
           .replace('[SESSION_ID]', sessionId.toLowerCase().trim().replace(/ /g,'-').replace(/[^A-Za-z0-9\-!?]/g,''));
-        let afile = document.createElement('a');
-        afile.setAttribute('download', 'BrewBenchStreamsYun.ino');
-        afile.setAttribute('href', "data:text/ino;charset=utf-8," + encodeURIComponent(response.data));
-        afile.click();
+        let streamSketch = document.createElement('a');
+        streamSketch.setAttribute('download', 'BrewBenchStreamsYun.ino');
+        streamSketch.setAttribute('href', "data:text/ino;charset=utf-8," + encodeURIComponent(response.data));
+        streamSketch.click();
       })
       .catch(err => {
         $scope.error.message = `Failed to download sketch ${err.message}`;

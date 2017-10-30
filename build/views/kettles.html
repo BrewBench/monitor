@@ -10,7 +10,7 @@
               <span class="dropdown-toggle"><img src="assets/img/arduino.svg" width="15"> {{kettle.arduino ? kettle.arduino.url : 'Select an Arduino'}}</span>
             </a>
             <div class="dropdown-menu scrollable-menu">
-              <button class="text-center modal-link dropdown-item" type="button" data-toggle="modal" data-target="#dataModal-settings">
+              <button class="text-center modal-link dropdown-item" type="button" data-toggle="modal" data-target="#settingsModal">
                 Add/Edit Arduinos
               </button>
               <button ng-repeat="arduino in settings.arduinos"

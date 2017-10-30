@@ -1,8 +1,9 @@
+#include <Console.h>
+#include <HttpClient.h>
 #include <Process.h>
 #include <Bridge.h>
 #include <BridgeServer.h>
 #include <BridgeClient.h>
-
 // http://static.cactus.io/downloads/library/ds18b20/cactus_io_DS18B20.zip
 #include "cactus_io_DS18B20.h"
 
@@ -11,6 +12,7 @@ const char API_KEY[] = "[API_KEY]";
 const char SESSION_ID[] = "[SESSION_ID]";
 const char API_HOST[] = "10.0.1.6"; //api.brewbench.co
 const int API_PORT = 8086;
+int secondCounter = 0;
 
 BridgeServer server;
 
@@ -150,7 +152,7 @@ void ds18B20Command(BridgeClient client) {
 }
 
 void ds18B20APICommand(String kettle, String pin) {
-  DS18B20 ds(pin.parseInt());
+  DS18B20 ds(pin.substring(1).toInt());
   ds.readSensor();
   float temp = ds.getTemperature_C();
 
@@ -167,7 +169,7 @@ void thermistorCommand(BridgeClient client) {
 }
 
 void thermistorAPICommand(String kettle, String pin) {
-  float temp = Thermistor(pin.parseInt());
+  float temp = Thermistor(pin.substring(1).toInt());
   apiPost("temperature,sensor=Thermistor,pin="+String(pin)+",kettle="+kettle+" value="+String(temp));
 }
 
@@ -195,10 +197,10 @@ void pt100APICommand(String kettle, String pin) {
   float tvoltage;
   float temp;
 
-  if( pin[0] == 'A' )
-    tvoltage = analogRead(pin.parseInt());
+  if( pin.substring(0,1) == "A" )
+    tvoltage = analogRead(pin.substring(1).toInt());
   else
-    tvoltage = digitalRead(pin.parseInt());
+    tvoltage = digitalRead(pin.substring(1).toInt());
 
   if (tvoltage>409){
     tvoltage = map(tvoltage,410,1023,0,614);
@@ -232,7 +234,6 @@ void setup() {
 
 void loop() {
   BridgeClient client = server.accept();
-  int secondCounter = 0;
 
   if (client) {
     process(client);

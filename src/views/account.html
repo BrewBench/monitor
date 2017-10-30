@@ -7,7 +7,8 @@
       </div>
       <div class="modal-body">
         <div class="btn-group float-right">
-          <a class="btn btn-primary" href="https://brewbench.co" target="_blank">Sign Up</a>
+          <a ng-if="!settings.account.apiKey" class="btn btn-primary" href="https://brewbench.co" target="_blank">Sign Up</a>
+          <a ng-if="settings.account.apiKey" class="btn btn-primary" href="https://app.brewbench.co/{{settings.account.apiKey}}" target="_blank">My Sessions</a>
         </div>
         <div id="account" class="account">
           <div class="card-body">
@@ -27,6 +28,7 @@
                     <tr>
                       <th>Name</th>
                       <th>Created</th>
+                      <th>Download</th>
                       <th></th>
                     </tr>
                   </thead>

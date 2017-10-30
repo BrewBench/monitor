@@ -1,5 +1,6 @@
 #include <Process.h>
 #include <Bridge.h>
+#include <String.h>
 #include <BridgeServer.h>
 #include <BridgeClient.h>
 
@@ -150,7 +151,7 @@ void ds18B20Command(BridgeClient client) {
 }
 
 void ds18B20APICommand(String kettle, String pin) {
-  DS18B20 ds(pin.parseInt());
+  DS18B20 ds(pin.substring(1).toInt());
   ds.readSensor();
   float temp = ds.getTemperature_C();
 
@@ -167,7 +168,7 @@ void thermistorCommand(BridgeClient client) {
 }
 
 void thermistorAPICommand(String kettle, String pin) {
-  float temp = Thermistor(pin.parseInt());
+  float temp = Thermistor(pin.substring(1).toInt());
   apiPost("temperature,sensor=Thermistor,pin="+String(pin)+",kettle="+kettle+" value="+String(temp));
 }
 
@@ -178,7 +179,7 @@ void pt100Command(BridgeClient client) {
   float tvoltage;
   float temp;
 
-  if( spin == 'A' )
+  if( spin == "A" )
     tvoltage = analogRead(pin);
   else
     tvoltage = digitalRead(pin);
@@ -195,10 +196,10 @@ void pt100APICommand(String kettle, String pin) {
   float tvoltage;
   float temp;
 
-  if( pin[0] == 'A' )
-    tvoltage = analogRead(pin.parseInt());
+  if( pin.substring(0,1) == "A" )
+    tvoltage = analogRead(pin.substring(1).toInt());
   else
-    tvoltage = digitalRead(pin.parseInt());
+    tvoltage = digitalRead(pin.substring(1).toInt());
 
   if (tvoltage>409){
     tvoltage = map(tvoltage,410,1023,0,614);
