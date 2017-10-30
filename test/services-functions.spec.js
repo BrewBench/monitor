@@ -14,13 +14,6 @@ describe('BrewBench Service', function() {
     expect(BrewService).toBeDefined();
   });
 
-  describe('.reset()', function() {
-    // A simple test to verify the method reset exists
-    it('should exist', function() {
-      expect(BrewService.reset).toBeDefined();
-    });
-  });
-
   describe('.clear()', function() {
     // A simple test to verify the method clear exists
     it('should exist', function() {
@@ -32,6 +25,20 @@ describe('BrewBench Service', function() {
     // A simple test to verify the method reset exists
     it('should exist', function() {
       expect(BrewService.reset).toBeDefined();
+    });
+  });
+
+  describe('.defaultKnobOptions()', function() {
+    // A simple test to verify the method defaultKnobOptions exists
+    it('should exist', function() {
+      expect(BrewService.defaultKnobOptions).toBeDefined();
+    });
+  });
+
+  describe('.defaultKettles()', function() {
+    // A simple test to verify the method defaultKettles exists
+    it('should exist', function() {
+      expect(BrewService.defaultKettles).toBeDefined();
     });
   });
 
