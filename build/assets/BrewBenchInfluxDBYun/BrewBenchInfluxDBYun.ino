@@ -8,6 +8,8 @@
 const char VERSION[] = "2.8.0";
 const char SESSION_NAME[] = "[SESSION_NAME]";
 const char INFLUXDB_URL[] = "[INFLUXDB_URL]";
+const char INFLUXDB_USER[] = "[INFLUXDB_USER]";
+const char INFLUXDB_PASS[] = "[INFLUXDB_PASS]";
 const int INFLUXDB_PORT = [INFLUXDB_PORT];
 int secondCounter = 0;
 
@@ -154,8 +156,11 @@ void ds18B20InfluxDBCommand(String source, String pin) {
   float temp = ds.getTemperature_C();
 
   Process p;
+  String login = "";
+  if(INFLUXDB_USER != "" && INFLUXDB_PASS != "")
+    login = "u="+String(INFLUXDB_USER)+"&p="+String(INFLUXDB_PASS)+"&";
   String data = "temperature,sensor=DS18B20,pin="+String(pin)+",source="+source+" value="+String(temp);
-  String cmd = "curl -X POST '"+String(INFLUXDB_URL)+":"+String(INFLUXDB_PORT)+"/write?db="+String(SESSION_NAME)+"' --data-binary '"+data+"'";
+  String cmd = "curl -X POST '"+String(INFLUXDB_URL)+":"+String(INFLUXDB_PORT)+"/write?"+login+"db="+String(SESSION_NAME)+"' --data-binary '"+data+"'";
   p.runShellCommand(cmd);
   while (p.running());
   p.close();
@@ -174,8 +179,11 @@ void thermistorInfluxDBCommand(String source, String pin) {
   float temp = Thermistor(pin.substring(1).toInt());
 
   Process p;
+  String login = "";
+  if(INFLUXDB_USER != "" && INFLUXDB_PASS != "")
+    login = "u="+String(INFLUXDB_USER)+"&p="+String(INFLUXDB_PASS)+"&";
   String data = "temperature,sensor=Thermistor,pin="+String(pin)+",source="+source+" value="+String(temp);
-  String cmd = "curl -X POST '"+String(INFLUXDB_URL)+":"+String(INFLUXDB_PORT)+"/write?db="+String(SESSION_NAME)+"' --data-binary '"+data+"'";
+  String cmd = "curl -X POST '"+String(INFLUXDB_URL)+":"+String(INFLUXDB_PORT)+"/write?"+login+"db="+String(SESSION_NAME)+"' --data-binary '"+data+"'";
   p.runShellCommand(cmd);
   while (p.running());
   p.close();
@@ -216,8 +224,11 @@ void pt100InfluxDBCommand(String source, String pin) {
   }
 
   Process p;
+  String login = "";
+  if(INFLUXDB_USER != "" && INFLUXDB_PASS != "")
+    login = "u="+String(INFLUXDB_USER)+"&p="+String(INFLUXDB_PASS)+"&";
   String data = "temperature,sensor=PT100,pin="+String(pin)+",source="+source+" value="+String(temp);
-  String cmd = "curl -X POST '"+String(INFLUXDB_URL)+":"+String(INFLUXDB_PORT)+"/write?db="+String(SESSION_NAME)+"' --data-binary '"+data+"'";
+  String cmd = "curl -X POST '"+String(INFLUXDB_URL)+":"+String(INFLUXDB_PORT)+"/write?"+login+"db="+String(SESSION_NAME)+"' --data-binary '"+data+"'";
   p.runShellCommand(cmd);
   while (p.running());
   p.close();

@@ -1,5 +1,10 @@
 # Change Log
 
+## 2.9.6 - 2017-10-30
+
+### Added
+- InfluxDB user/pass login option
+
 ## 2.9.5 - 2017-10-30
 
 ### Added

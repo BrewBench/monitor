@@ -306,13 +306,19 @@ $scope.updateABV();
     var db = $scope.settings.influxdb.db || 'session-'+moment().format('YYYY-MM-DD');
     BrewService.influxdb().createDB(db)
       .then(response => {
-        if(response.results && response.results.length)
+        // prompt for password
+        if(response.data && response.data.results && response.data.results.length){
           $scope.settings.influxdb.db = db;
-        else
-          $scope.error.message = $scope.setErrorMessage("Opps, there was a problem creating the database.");
+        } else {
+          $scope.setErrorMessage("Opps, there was a problem creating the database.");
+        }
       })
       .catch(err => {
-        $scope.error.message = $scope.setErrorMessage("Opps, there was a problem creating the database.");
+        if(err.status == 401 || err.status == 403){
+          $scope.setErrorMessage("Enter your Username and Password for InfluxDB");
+        } else {
+          $scope.setErrorMessage("Opps, there was a problem creating the database.");
+        }
       });
   };
 
@@ -368,7 +374,7 @@ $scope.updateABV();
         }
       })
       .catch(function(err) {
-        return $scope.error.message = $scope.setErrorMessage("Opps, there was a problem loading the shared session.");
+        $scope.setErrorMessage("Opps, there was a problem loading the shared session.");
       });
   };
 
@@ -501,7 +507,7 @@ $scope.updateABV();
             $scope.settings.bb_version = response.version;
           } else if($scope.settings.bb_version != response.version){
             $scope.error.type = 'info';
-            $scope.error.message = $scope.setErrorMessage('There is a new version available for BrewBench. Please <a href="#/reset">clear</a> your settings.');
+            $scope.setErrorMessage('There is a new version available for BrewBench. Please <a href="#/reset">clear</a> your settings.');
           }
         })
       );
@@ -895,10 +901,13 @@ $scope.updateABV();
     });
     return $http.get('assets/BrewBenchInfluxDBYun/BrewBenchInfluxDBYun.ino')
       .then(response => {
+
         response.data = response.data
           .replace('// [kettles]', kettles)
           .replace('[INFLUXDB_URL]', $scope.settings.influxdb.url)
           .replace('[INFLUXDB_PORT]', $scope.settings.influxdb.port)
+          .replace('[INFLUXDB_USER]', $scope.settings.influxdb.user || '')
+          .replace('[INFLUXDB_PASS]', $scope.settings.influxdb.pass || '')
           .replace('[SESSION_NAME]', $scope.settings.influxdb.db || 'session-'+moment().format('YYYY-MM-DD'));
         let streamSketch = document.createElement('a');
         streamSketch.setAttribute('download', 'BrewBenchInfluxDBYun.ino');
@@ -1051,9 +1060,9 @@ $scope.updateABV();
         })
         .catch(function(err){
           if(err.message)
-            $scope.error.message = $scope.setErrorMessage(`Failed posting to Slack ${err.message}`);
+            $scope.setErrorMessage(`Failed posting to Slack ${err.message}`);
           else
-            $scope.error.message = $scope.setErrorMessage(`Failed posting to Slack ${JSON.stringify(err)}`);
+            $scope.setErrorMessage(`Failed posting to Slack ${JSON.stringify(err)}`);
         });
     }
   };

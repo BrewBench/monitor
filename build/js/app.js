@@ -290,9 +290,18 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
   $scope.createInfluxDB = function () {
     var db = $scope.settings.influxdb.db || 'session-' + moment().format('YYYY-MM-DD');
     BrewService.influxdb().createDB(db).then(function (response) {
-      if (response.results && response.results.length) $scope.settings.influxdb.db = db;else $scope.error.message = $scope.setErrorMessage("Opps, there was a problem creating the database.");
+      // prompt for password
+      if (response.data && response.data.results && response.data.results.length) {
+        $scope.settings.influxdb.db = db;
+      } else {
+        $scope.setErrorMessage("Opps, there was a problem creating the database.");
+      }
     }).catch(function (err) {
-      $scope.error.message = $scope.setErrorMessage("Opps, there was a problem creating the database.");
+      if (err.status == 401 || err.status == 403) {
+        $scope.setErrorMessage("Enter your Username and Password for InfluxDB");
+      } else {
+        $scope.setErrorMessage("Opps, there was a problem creating the database.");
+      }
     });
   };
 
@@ -346,7 +355,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
         return false;
       }
     }).catch(function (err) {
-      return $scope.error.message = $scope.setErrorMessage("Opps, there was a problem loading the shared session.");
+      $scope.setErrorMessage("Opps, there was a problem loading the shared session.");
     });
   };
 
@@ -460,7 +469,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
           $scope.settings.bb_version = response.version;
         } else if ($scope.settings.bb_version != response.version) {
           $scope.error.type = 'info';
-          $scope.error.message = $scope.setErrorMessage('There is a new version available for BrewBench. Please <a href="#/reset">clear</a> your settings.');
+          $scope.setErrorMessage('There is a new version available for BrewBench. Please <a href="#/reset">clear</a> your settings.');
         }
       }));
     }
@@ -826,7 +835,8 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
       if (kettle.temp.type == 'Thermistor') kettles += 'thermistorInfluxDBCommand("' + kettle.key + '","' + kettle.temp.pin + '");\n  ';else if (kettle.temp.type == 'DS18B20') kettles += 'ds18B20InfluxDBCommand("' + kettle.key + '","' + kettle.temp.pin + '");\n  ';else if (kettle.temp.type == 'PT100') kettles += 'pt100InfluxDBCommand("' + kettle.key + '","' + kettle.temp.pin + '");\n  ';
     });
     return $http.get('assets/BrewBenchInfluxDBYun/BrewBenchInfluxDBYun.ino').then(function (response) {
-      response.data = response.data.replace('// [kettles]', kettles).replace('[INFLUXDB_URL]', $scope.settings.influxdb.url).replace('[INFLUXDB_PORT]', $scope.settings.influxdb.port).replace('[SESSION_NAME]', 'session-' + moment().format('YYYY-MM-DD'));
+
+      response.data = response.data.replace('// [kettles]', kettles).replace('[INFLUXDB_URL]', $scope.settings.influxdb.url).replace('[INFLUXDB_PORT]', $scope.settings.influxdb.port).replace('[INFLUXDB_USER]', $scope.settings.influxdb.user || '').replace('[INFLUXDB_PASS]', $scope.settings.influxdb.pass || '').replace('[SESSION_NAME]', $scope.settings.influxdb.db || 'session-' + moment().format('YYYY-MM-DD'));
       var streamSketch = document.createElement('a');
       streamSketch.setAttribute('download', 'BrewBenchInfluxDBYun.ino');
       streamSketch.setAttribute('href', "data:text/ino;charset=utf-8," + encodeURIComponent(response.data));
@@ -938,7 +948,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
       BrewService.slack($scope.settings.notifications.slack, message, color, icon, kettle).then(function (response) {
         $scope.resetError();
       }).catch(function (err) {
-        if (err.message) $scope.error.message = $scope.setErrorMessage('Failed posting to Slack ' + err.message);else $scope.error.message = $scope.setErrorMessage('Failed posting to Slack ' + JSON.stringify(err));
+        if (err.message) $scope.setErrorMessage('Failed posting to Slack ' + err.message);else $scope.setErrorMessage('Failed posting to Slack ' + JSON.stringify(err));
       });
     }
   };
@@ -1153,7 +1163,7 @@ angular.module('brewbench-monitor').directive('editable', function () {
         restrict: 'E',
         scope: { model: '=', type: '@?', trim: '@?', change: '&?', enter: '&?', placeholder: '@?' },
         replace: false,
-        template: '<span>' + '<input type="{{type}}" ng-model="model" ng-show="edit" ng-enter="edit=false" ng-change="{{change||false}}" class="editable"></input>' + '<span class="editable" ng-show="!edit">{{(trim) ? ((model || placeholder) | limitTo:trim)+"..." : (model || placeholder)}}</span>' + '</span>',
+        template: '<span>' + '<input type="{{type}}" ng-model="model" ng-show="edit" ng-enter="edit=false" ng-change="{{change||false}}" class="editable"></input>' + '<span class="editable" ng-show="!edit">{{(trim) ? ((type=="password") ? "*******" : ((model || placeholder) | limitTo:trim)+"...") :' + ' ((type=="password") ? "*******" : (model || placeholder))}}</span>' + '</span>',
         link: function link(scope, element, attrs) {
             scope.edit = false;
             scope.type = !!scope.type ? scope.type : 'text';
@@ -1546,7 +1556,7 @@ angular.module('brewbench-monitor').factory('BrewService', function ($http, $q, 
         },
         createDB: function createDB(name) {
           $http({ url: influxConnection + '/query?u=' + settings.influxdb.user + '&p=' + settings.influxdb.pass + '&q=' + encodeURIComponent('CREATE DATABASE "' + name + '"'), method: 'POST' }).then(function (response) {
-            q.resolve(response.data);
+            q.resolve(response);
           }).catch(function (err) {
             q.reject(err);
           });

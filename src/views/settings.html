@@ -94,25 +94,25 @@
           <h4>InfluxDB</h4>
 
             <div class="btn-group float-right">
-            <button class="btn"
-              ng-click="testInfluxDB()"
-              ng-disabled="!settings.influxdb.url"
-              ng-class="{'btn-light':!settings.influxdb.url, 'btn-primary':settings.influxdb.url}">
-                Test
-            </button>
-            <button class="btn"
-              ng-click="createInfluxDB()"
-              ng-disabled="!settings.influxdb.connected"
-              ng-class="{'btn-light':!settings.influxdb.connected, 'btn-primary':settings.influxdb.connected}">
-                Create
-            </button>
+              <button class="btn"
+                ng-click="testInfluxDB()"
+                ng-disabled="!settings.influxdb.url"
+                ng-class="{'btn-light':!settings.influxdb.url, 'btn-primary':settings.influxdb.url}">
+                  Test
+              </button>
+              <button class="btn"
+                ng-click="createInfluxDB()"
+                ng-disabled="!settings.influxdb.connected"
+                ng-class="{'btn-light':!settings.influxdb.connected, 'btn-primary':settings.influxdb.connected}">
+                  Create
+              </button>
             </div>
 
           <div class="row-new"></div>
           <div class="row">
             <div class="col-10">
               <label class="adjust">Url</label>
-              <i class="fa" ng-class="{'fa-circle-o-notch fa-spin fa-2x':!!settings.influxdb.testing, 'fa-check-circle fa-2x':!!settings.influxdb.connected, 'fa-times-circle fa-2x':settings.influxdb.connected === false}" aria-hidden="true"></i>
+              <i class="fa" ng-class="{'fa-circle-o-notch fa-spin fa-2x':!!settings.influxdb.testing, 'fa-check-circle fa-2x':!!settings.influxdb.connected, 'fa-times-circle fa-2x':settings.influxdb.connected === false}" aria-hidden="true"></i>&nbsp;
               <editable class="poll" type="text" model="settings.influxdb.url" placeholder="http://InfluxDBUrl"></editable>
             </div>
             <div class="col-2">
@@ -124,6 +124,16 @@
             <div class="col-12">
               <label class="adjust">Database</label>
               <editable class="poll" type="text" model="settings.influxdb.db" placeholder="Database Name"></editable>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-6">
+              <label class="adjust">Username</label>
+              <editable class="poll" type="text" model="settings.influxdb.user" placeholder="Username"></editable>
+            </div>
+            <div class="col-6">
+              <label class="adjust">Password</label>
+              <editable class="poll" type="password" model="settings.influxdb.pass" placeholder="Password"></editable>
             </div>
           </div>
         </div>

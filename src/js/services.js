@@ -378,7 +378,7 @@ angular.module('brewbench-monitor')
         createDB: (name) => {
           $http({url: `${influxConnection}/query?u=${settings.influxdb.user}&p=${settings.influxdb.pass}&q=${encodeURIComponent(`CREATE DATABASE "${name}"`)}`, method: 'POST'})
             .then(response => {
-              q.resolve(response.data);
+              q.resolve(response);
             })
             .catch(err => {
               q.reject(err);
