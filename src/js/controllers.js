@@ -899,7 +899,7 @@ $scope.updateABV();
           .replace('// [kettles]', kettles)
           .replace('[INFLUXDB_URL]', $scope.settings.influxdb.url)
           .replace('[INFLUXDB_PORT]', $scope.settings.influxdb.port)
-          .replace('[SESSION_NAME]', 'session-'+moment().format('YYYY-MM-DD'));
+          .replace('[SESSION_NAME]', $scope.settings.influxdb.db || 'session-'+moment().format('YYYY-MM-DD'));
         let streamSketch = document.createElement('a');
         streamSketch.setAttribute('download', 'BrewBenchInfluxDBYun.ino');
         streamSketch.setAttribute('href', "data:text/ino;charset=utf-8," + encodeURIComponent(response.data));
