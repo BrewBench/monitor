@@ -17,6 +17,10 @@ angular.module('brewbench-monitor', ['ui.router', 'nvd3', 'ngTouch', 'duScroll',
     url: '/sh/:file',
     templateUrl: 'views/monitor.html',
     controller: 'mainCtrl'
+  }).state('reset', {
+    url: '/reset',
+    templateUrl: 'views/monitor.html',
+    controller: 'mainCtrl'
   }).state('otherwise', {
     url: '*path',
     templateUrl: 'views/not-found.html'
@@ -24,7 +28,19 @@ angular.module('brewbench-monitor', ['ui.router', 'nvd3', 'ngTouch', 'duScroll',
 });
 'use strict';
 
-angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $stateParams, $state, $filter, $timeout, $interval, $q, $http, BrewService) {
+angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $state, $filter, $timeout, $interval, $q, $http, $sce, BrewService) {
+
+  $scope.clearSettings = function (e) {
+    if (e) {
+      angular.element(e.target).html('Removing...');
+    }
+    BrewService.clear();
+    $timeout(function () {
+      window.location.href = '/';
+    }, 1000);
+  };
+
+  if ($state.current.name == 'reset') $scope.clearSettings();
 
   var notification = null,
       resetChart = 100,
@@ -191,7 +207,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
   $scope.addKettle = function (type) {
     if (!$scope.kettles) $scope.kettles = [];
     $scope.kettles.push({
-      key: $scope.kettleTypes[0].name,
+      key: type ? _.find($scope.kettleTypes, { type: type }).name : $scope.kettleTypes[0].name,
       type: type || $scope.kettleTypes[0].type,
       active: false,
       sticky: false,
@@ -261,13 +277,22 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
   };
 
   $scope.testInfluxDB = function () {
-    $scope.settings.influxDB.testing = true;
-    BrewService.influx().then(function (response) {
-      $scope.settings.influxDB.testing = false;
-      if (response.status == 204) $scope.settings.influxDB.connected = true;else $scope.settings.influxDB.connected = false;
+    $scope.settings.influxdb.testing = true;
+    BrewService.influxdb().ping().then(function (response) {
+      $scope.settings.influxdb.testing = false;
+      if (response.status == 204) $scope.settings.influxdb.connected = true;else $scope.settings.influxdb.connected = false;
     }).catch(function (err) {
-      $scope.settings.influxDB.testing = false;
-      $scope.settings.influxDB.connected = false;
+      $scope.settings.influxdb.testing = false;
+      $scope.settings.influxdb.connected = false;
+    });
+  };
+
+  $scope.createInfluxDB = function () {
+    var db = $scope.settings.influxdb.db || 'session-' + moment().format('YYYY-MM-DD');
+    BrewService.influxdb().createDB(db).then(function (response) {
+      if (response.results && response.results.length) $scope.settings.influxdb.db = db;else $scope.error.message = $scope.setErrorMessage("Opps, there was a problem creating the database.");
+    }).catch(function (err) {
+      $scope.error.message = $scope.setErrorMessage("Opps, there was a problem creating the database.");
     });
   };
 
@@ -321,7 +346,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
         return false;
       }
     }).catch(function (err) {
-      return $scope.error.message = "Opps, there was a problem loading the shared session.";
+      return $scope.error.message = $scope.setErrorMessage("Opps, there was a problem loading the shared session.");
     });
   };
 
@@ -430,7 +455,13 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
     if (!$scope.pkg) {
       config.push(BrewService.pkg().then(function (response) {
         $scope.pkg = response;
-        return $scope.settings.sketch_version = response.sketch_version;
+        $scope.settings.sketch_version = response.sketch_version;
+        if (!$scope.settings.bb_version) {
+          $scope.settings.bb_version = response.version;
+        } else if ($scope.settings.bb_version != response.version) {
+          $scope.error.type = 'info';
+          $scope.error.message = $scope.setErrorMessage('There is a new version available for BrewBench. Please <a href="#/reset">clear</a> your settings.');
+        }
       }));
     }
 
@@ -491,26 +522,29 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
     return true;
   };
 
-  $scope.connectError = function (err, kettle) {
+  $scope.setErrorMessage = function (err, kettle) {
     if (!!$scope.settings.shared) {
       $scope.error.type = 'warning';
-      $scope.error.message = 'The monitor seems to be off-line, re-connecting...';
+      $scope.error.message = $sce.trustAsHtml('The monitor seems to be off-line, re-connecting...');
     } else {
       var message = void 0;
 
-      if (typeof err == 'string' && err.indexOf('{') !== -1) err = JSON.parse(err);
+      if (typeof err == 'string' && err.indexOf('{') !== -1) {
+        if (!Object.keys(err).length) return;
+        err = JSON.parse(err);
+      }
 
       if (typeof err == 'string') message = err;else if (err.statusText) message = err.statusText;else if (err.config.url) message = err.config.url;else message = JSON.stringify(err);
 
       if (message) {
         if (kettle) {
-          kettle.error = 'Connection error: ' + message;
+          kettle.error = $sce.trustAsHtml('Connection error: ' + message);
           $scope.updateKnobCopy(kettle);
-        } else $scope.error.message = 'Connection error: ' + message;
+        } else $scope.error.message = $sce.trustAsHtml('Error: ' + message);
       } else if (kettle) {
         kettle.error = 'Error connecting to ' + BrewService.domain(kettle.arduino);
       } else {
-        $scope.error.message = 'Connection error:';
+        $scope.error.message = $sce.trustAsHtml('Connection error:');
       }
     }
   };
@@ -518,7 +552,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
   $scope.resetError = function (kettle) {
     $scope.error.type = 'danger';
     // $scope.error.message = '';
-    if (kettle) kettle.error = '';
+    if (kettle) kettle.error = $sce.trustAsHtml('');
   };
 
   $scope.updateTemp = function (response, kettle) {
@@ -685,7 +719,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
       BrewService.temp(kettle).then(function (response) {
         return $scope.updateTemp(response, kettle);
       }).catch(function (err) {
-        return $scope.connectError(err, kettle);
+        return $scope.setErrorMessage(err, kettle);
       });
 
       // start the relays
@@ -728,21 +762,21 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
           //started
           element.running = true;
         }).catch(function (err) {
-          return $scope.connectError(err, kettle);
+          return $scope.setErrorMessage(err, kettle);
         });
       } else if (element.ssr) {
         return BrewService.analog(kettle, element.pin, 255).then(function () {
           //started
           element.running = true;
         }).catch(function (err) {
-          return $scope.connectError(err, kettle);
+          return $scope.setErrorMessage(err, kettle);
         });
       } else {
         return BrewService.digital(kettle, element.pin, 1).then(function () {
           //started
           element.running = true;
         }).catch(function (err) {
-          return $scope.connectError(err, kettle);
+          return $scope.setErrorMessage(err, kettle);
         });
       }
     } else {
@@ -751,14 +785,14 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
           element.running = false;
           $scope.updateKnobCopy(kettle);
         }).catch(function (err) {
-          return $scope.connectError(err, kettle);
+          return $scope.setErrorMessage(err, kettle);
         });
       } else {
         return BrewService.digital(kettle, element.pin, 0).then(function () {
           element.running = false;
           $scope.updateKnobCopy(kettle);
         }).catch(function (err) {
-          return $scope.connectError(err, kettle);
+          return $scope.setErrorMessage(err, kettle);
         });
       }
     }
@@ -767,11 +801,11 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
   $scope.importSettings = function ($fileContent, $ext) {
     try {
       var profileContent = JSON.parse($fileContent);
-      console.log(profileContent);
       $scope.settings = profileContent.settings || BrewService.reset();
       $scope.kettles = profileContent.kettles || BrewService.defaultKettles();
     } catch (e) {
       // error importing
+      $scope.setErrorMessage(e);
     }
   };
 
@@ -785,20 +819,20 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
   };
 
   $scope.downloadInfluxDBSketch = function () {
-    if (!$scope.settings.influxDB.url) return;
+    if (!$scope.settings.influxdb.url) return;
 
     var kettles = "";
     _.each($scope.kettles, function (kettle, i) {
       if (kettle.temp.type == 'Thermistor') kettles += 'thermistorInfluxDBCommand("' + kettle.key + '","' + kettle.temp.pin + '");\n  ';else if (kettle.temp.type == 'DS18B20') kettles += 'ds18B20InfluxDBCommand("' + kettle.key + '","' + kettle.temp.pin + '");\n  ';else if (kettle.temp.type == 'PT100') kettles += 'pt100InfluxDBCommand("' + kettle.key + '","' + kettle.temp.pin + '");\n  ';
     });
     return $http.get('assets/BrewBenchInfluxDBYun/BrewBenchInfluxDBYun.ino').then(function (response) {
-      response.data = response.data.replace('// [kettles]', kettles).replace('[INFLUXDB_URL]', $scope.settings.influxDB.url).replace('[INFLUXDB_PORT]', $scope.settings.influxDB.port).replace('[SESSION_NAME]', 'session-' + moment().format('YYYY-MM-DD'));
+      response.data = response.data.replace('// [kettles]', kettles).replace('[INFLUXDB_URL]', $scope.settings.influxdb.url).replace('[INFLUXDB_PORT]', $scope.settings.influxdb.port).replace('[SESSION_NAME]', 'session-' + moment().format('YYYY-MM-DD'));
       var streamSketch = document.createElement('a');
       streamSketch.setAttribute('download', 'BrewBenchInfluxDBYun.ino');
       streamSketch.setAttribute('href', "data:text/ino;charset=utf-8," + encodeURIComponent(response.data));
       streamSketch.click();
     }).catch(function (err) {
-      $scope.error.message = 'Failed to download sketch ' + err.message;
+      $scope.setErrorMessage('Failed to download sketch ' + err.message);
     });
   };
 
@@ -814,25 +848,15 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
       streamSketch.setAttribute('href', "data:text/ino;charset=utf-8," + encodeURIComponent(response.data));
       streamSketch.click();
     }).catch(function (err) {
-      $scope.error.message = 'Failed to download sketch ' + err.message;
+      $scope.setErrorMessage('Failed to download sketch ' + err.message);
     });
-  };
-
-  $scope.clearSettings = function (e) {
-    if (e) {
-      angular.element(e.target).html('Removing...');
-    }
-    BrewService.clear();
-    $timeout(function () {
-      window.location.href = '/';
-    }, 1000);
   };
 
   $scope.getIPAddress = function () {
     BrewService.ifconfig().then(function (response) {
       $scope.settings.ipAddress = response.ip;
     }).catch(function (err) {
-      $scope.error.message = err;
+      $scope.error.message = $scope.setErrorMessage(err);
     });
   };
 
@@ -914,7 +938,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
       BrewService.slack($scope.settings.notifications.slack, message, color, icon, kettle).then(function (response) {
         $scope.resetError();
       }).catch(function (err) {
-        if (err.message) $scope.error.message = 'Failed posting to Slack ' + err.message;else $scope.error.message = 'Failed posting to Slack ' + JSON.stringify(err);
+        if (err.message) $scope.error.message = $scope.setErrorMessage('Failed posting to Slack ' + err.message);else $scope.error.message = $scope.setErrorMessage('Failed posting to Slack ' + JSON.stringify(err));
       });
     }
   };
@@ -1072,7 +1096,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
         allSensors.push(BrewService.temp($scope.kettles[i]).then(function (response) {
           return $scope.updateTemp(response, $scope.kettles[i]);
         }).catch(function (err) {
-          $scope.connectError(err, $scope.kettles[i]);
+          $scope.setErrorMessage(err, $scope.kettles[i]);
           return err;
         }));
       }
@@ -1225,7 +1249,7 @@ angular.module('brewbench-monitor').factory('BrewService', function ($http, $q, 
         notifications: { on: true, timers: true, high: true, low: true, target: true, slack: 'Webhook Url', last: '' },
         sounds: { on: true, alert: '/assets/audio/bike.mp3', timer: '/assets/audio/school.mp3' },
         account: { apiKey: '', sessions: [] },
-        influxDB: { url: '', port: 8086, connected: false },
+        influxdb: { url: '', port: 8086, user: '', pass: '', db: '', connected: false },
         arduinos: [{
           id: btoa('brewbench'),
           url: 'arduino.local',
@@ -1381,7 +1405,7 @@ angular.module('brewbench-monitor').factory('BrewService', function ($http, $q, 
       if (kettle.arduino.password) headers.Authorization = 'Basic ' + btoa('root:' + kettle.arduino.password);
 
       $http({ url: url, method: 'GET', headers: headers, timeout: settings.pollSeconds * 10000 }).then(function (response) {
-        if (!settings.shared && response.headers('X-Sketch-Version') == null || response.headers('X-Sketch-Version') < settings.sketch_version) q.reject('Sketch Version is out of date.  Please Update. Sketch: ' + response.headers('X-Sketch-Version') + ' BrewBench: ' + settings.sketch_version);else q.resolve(response.data);
+        if (!settings.shared && response.headers('X-Sketch-Version') == null || response.headers('X-Sketch-Version') < settings.sketch_version) q.reject('Sketch Version is out of date.  Please <a href="" data-toggle="modal" data-target="#settingsModal">Update</a>. Sketch: ' + response.headers('X-Sketch-Version') + ' BrewBench: ' + settings.sketch_version);else q.resolve(response.data);
       }).catch(function (err) {
         q.reject(err);
       });
@@ -1400,7 +1424,7 @@ angular.module('brewbench-monitor').factory('BrewService', function ($http, $q, 
       if (kettle.arduino.password) headers.Authorization = 'Basic ' + btoa('root:' + kettle.arduino.password);
 
       $http({ url: url, method: 'GET', headers: headers, timeout: settings.pollSeconds * 1000 }).then(function (response) {
-        if (!settings.shared && response.headers('X-Sketch-Version') == null || response.headers('X-Sketch-Version') < settings.sketch_version) q.reject('Sketch Version is out of date.  Please Update. Sketch: ' + response.headers('X-Sketch-Version') + ' BrewBench: ' + settings.sketch_version);else q.resolve(response.data);
+        if (!settings.shared && response.headers('X-Sketch-Version') == null || response.headers('X-Sketch-Version') < settings.sketch_version) q.reject('Sketch Version is out of date.  Please <a href="" data-toggle="modal" data-target="#settingsModal">Update</a>. Sketch: ' + response.headers('X-Sketch-Version') + ' BrewBench: ' + settings.sketch_version);else q.resolve(response.data);
       }).catch(function (err) {
         q.reject(err);
       });
@@ -1417,7 +1441,7 @@ angular.module('brewbench-monitor').factory('BrewService', function ($http, $q, 
       if (kettle.arduino.password) headers.Authorization = 'Basic ' + btoa('root:' + kettle.arduino.password);
 
       $http({ url: url, method: 'GET', headers: headers, timeout: settings.pollSeconds * 1000 }).then(function (response) {
-        if (!settings.shared && response.headers('X-Sketch-Version') == null || response.headers('X-Sketch-Version') < settings.sketch_version) q.reject('Sketch Version is out of date.  Please Update. Sketch: ' + response.headers('X-Sketch-Version') + ' BrewBench: ' + settings.sketch_version);else q.resolve(response.data);
+        if (!settings.shared && response.headers('X-Sketch-Version') == null || response.headers('X-Sketch-Version') < settings.sketch_version) q.reject('Sketch Version is out of date.  Please <a href="" data-toggle="modal" data-target="#settingsModal">Update</a>. Sketch: ' + response.headers('X-Sketch-Version') + ' BrewBench: ' + settings.sketch_version);else q.resolve(response.data);
       }).catch(function (err) {
         q.reject(err);
       });
@@ -1434,7 +1458,7 @@ angular.module('brewbench-monitor').factory('BrewService', function ($http, $q, 
       if (kettle.arduino.password) headers.Authorization = 'Basic ' + btoa('root:' + kettle.arduino.password);
 
       $http({ url: url, method: 'GET', headers: headers, timeout: timeout || settings.pollSeconds * 1000 }).then(function (response) {
-        if (!settings.shared && response.headers('X-Sketch-Version') == null || response.headers('X-Sketch-Version') < settings.sketch_version) q.reject('Sketch Version is out of date.  Please Update. Sketch: ' + response.headers('X-Sketch-Version') + ' BrewBench: ' + settings.sketch_version);else q.resolve(response.data);
+        if (!settings.shared && response.headers('X-Sketch-Version') == null || response.headers('X-Sketch-Version') < settings.sketch_version) q.reject('Sketch Version is out of date.  Please <a href="" data-toggle="modal" data-target="#settingsModal">Update</a>. Sketch: ' + response.headers('X-Sketch-Version') + ' BrewBench: ' + settings.sketch_version);else q.resolve(response.data);
       }).catch(function (err) {
         q.reject(err);
       });
@@ -1506,16 +1530,29 @@ angular.module('brewbench-monitor').factory('BrewService', function ($http, $q, 
       return q.promise;
     },
 
-    influx: function influx() {
+    influxdb: function influxdb() {
       var q = $q.defer();
       var settings = this.settings('settings');
-      var influxConnection = settings.influxDB.url + ':' + settings.influxDB.port;
-      $http({ url: influxConnection + '/ping', method: 'GET' }).then(function (response) {
-        q.resolve(response);
-      }).catch(function (err) {
-        q.reject(err);
-      });
-      return q.promise;
+      var influxConnection = settings.influxdb.url + ':' + settings.influxdb.port;
+
+      return {
+        ping: function ping() {
+          $http({ url: influxConnection + '/ping', method: 'GET' }).then(function (response) {
+            q.resolve(response);
+          }).catch(function (err) {
+            q.reject(err);
+          });
+          return q.promise;
+        },
+        createDB: function createDB(name) {
+          $http({ url: influxConnection + '/query?u=' + settings.influxdb.user + '&p=' + settings.influxdb.pass + '&q=' + encodeURIComponent('CREATE DATABASE "' + name + '"'), method: 'POST' }).then(function (response) {
+            q.resolve(response.data);
+          }).catch(function (err) {
+            q.reject(err);
+          });
+          return q.promise;
+        }
+      };
     },
 
     pkg: function pkg() {

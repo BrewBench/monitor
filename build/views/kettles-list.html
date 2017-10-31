@@ -45,7 +45,7 @@
       <div class="description">
         <div class="alert alert-danger" ng-if="kettle.error">
           <button type="button" class="close" data-dismiss="alert" aria-label="Close" ng-click="kettle.error=''"><span aria-hidden="true">×</span></button>
-          {{kettle.error}}
+          <span ng-bind-html="kettle.error">{{kettle.error}}</span>
         </div>
         <div class="row" ng-if="shareAccess('fullAccess')">
 

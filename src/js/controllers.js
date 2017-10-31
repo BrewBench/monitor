@@ -1,5 +1,18 @@
 angular.module('brewbench-monitor')
-.controller('mainCtrl', function($scope, $stateParams, $state, $filter, $timeout, $interval, $q, $http, BrewService){
+.controller('mainCtrl', function($scope, $state, $filter, $timeout, $interval, $q, $http, $sce, BrewService){
+
+$scope.clearSettings = function(e){
+  if(e){
+    angular.element(e.target).html('Removing...');
+  }
+  BrewService.clear();
+  $timeout(function(){
+    window.location.href='/';
+  },1000);
+};
+
+if( $state.current.name == 'reset')
+  $scope.clearSettings();
 
 var notification = null
   ,resetChart = 100
@@ -184,7 +197,7 @@ $scope.updateABV();
   $scope.addKettle = function(type){
     if(!$scope.kettles) $scope.kettles = [];
     $scope.kettles.push({
-        key: $scope.kettleTypes[0].name
+        key: type ? _.find($scope.kettleTypes,{type: type}).name : $scope.kettleTypes[0].name
         ,type: type || $scope.kettleTypes[0].type
         ,active: false
         ,sticky: false
@@ -274,22 +287,34 @@ $scope.updateABV();
   };
 
   $scope.testInfluxDB = function(){
-    $scope.settings.influxDB.testing = true;
-    BrewService.influx()
+    $scope.settings.influxdb.testing = true;
+    BrewService.influxdb().ping()
       .then(response => {
-        $scope.settings.influxDB.testing = false;
+        $scope.settings.influxdb.testing = false;
         if(response.status == 204)
-          $scope.settings.influxDB.connected = true;
+          $scope.settings.influxdb.connected = true;
         else
-          $scope.settings.influxDB.connected = false;
+          $scope.settings.influxdb.connected = false;
       })
       .catch(err => {
-        $scope.settings.influxDB.testing = false;
-        $scope.settings.influxDB.connected = false;
+        $scope.settings.influxdb.testing = false;
+        $scope.settings.influxdb.connected = false;
       });
   };
 
-
+  $scope.createInfluxDB = function(){
+    var db = $scope.settings.influxdb.db || 'session-'+moment().format('YYYY-MM-DD');
+    BrewService.influxdb().createDB(db)
+      .then(response => {
+        if(response.results && response.results.length)
+          $scope.settings.influxdb.db = db;
+        else
+          $scope.error.message = $scope.setErrorMessage("Opps, there was a problem creating the database.");
+      })
+      .catch(err => {
+        $scope.error.message = $scope.setErrorMessage("Opps, there was a problem creating the database.");
+      });
+  };
 
   $scope.shareAccess = function(access){
       if($scope.settings.shared){
@@ -343,7 +368,7 @@ $scope.updateABV();
         }
       })
       .catch(function(err) {
-        return $scope.error.message = "Opps, there was a problem loading the shared session.";
+        return $scope.error.message = $scope.setErrorMessage("Opps, there was a problem loading the shared session.");
       });
   };
 
@@ -471,7 +496,13 @@ $scope.updateABV();
     if(!$scope.pkg){
       config.push(BrewService.pkg().then(function(response){
           $scope.pkg = response;
-          return $scope.settings.sketch_version = response.sketch_version;
+          $scope.settings.sketch_version = response.sketch_version;
+          if(!$scope.settings.bb_version){
+            $scope.settings.bb_version = response.version;
+          } else if($scope.settings.bb_version != response.version){
+            $scope.error.type = 'info';
+            $scope.error.message = $scope.setErrorMessage('There is a new version available for BrewBench. Please <a href="#/reset">clear</a> your settings.');
+          }
         })
       );
     }
@@ -541,15 +572,17 @@ $scope.updateABV();
       return true;
   };
 
-  $scope.connectError = function(err, kettle){
+  $scope.setErrorMessage = function(err, kettle){
     if(!!$scope.settings.shared){
       $scope.error.type = 'warning';
-      $scope.error.message = 'The monitor seems to be off-line, re-connecting...';
+      $scope.error.message = $sce.trustAsHtml('The monitor seems to be off-line, re-connecting...');
     } else {
       let message;
 
-      if(typeof err == 'string' && err.indexOf('{') !== -1)
+      if(typeof err == 'string' && err.indexOf('{') !== -1){
+        if(!Object.keys(err).length) return;
         err = JSON.parse(err);
+      }
 
       if(typeof err == 'string')
         message = err;
@@ -562,15 +595,15 @@ $scope.updateABV();
 
       if(message){
         if(kettle){
-          kettle.error = `Connection error: ${message}`;
+          kettle.error = $sce.trustAsHtml(`Connection error: ${message}`);
           $scope.updateKnobCopy(kettle);
         }
         else
-          $scope.error.message = `Connection error: ${message}`;
+          $scope.error.message = $sce.trustAsHtml(`Error: ${message}`);
       } else if(kettle){
         kettle.error = `Error connecting to ${BrewService.domain(kettle.arduino)}`;
       } else {
-        $scope.error.message = `Connection error:`;
+        $scope.error.message = $sce.trustAsHtml(`Connection error:`);
       }
     }
   };
@@ -578,7 +611,7 @@ $scope.updateABV();
   $scope.resetError = function(kettle){
     $scope.error.type = 'danger';
     // $scope.error.message = '';
-    if(kettle) kettle.error = '';
+    if(kettle) kettle.error = $sce.trustAsHtml('');
   };
 
   $scope.updateTemp = function(response, kettle){
@@ -749,7 +782,7 @@ $scope.updateABV();
 
         BrewService.temp(kettle)
           .then(response => $scope.updateTemp(response, kettle))
-          .catch(err => $scope.connectError(err, kettle));
+          .catch(err => $scope.setErrorMessage(err, kettle));
 
         // start the relays
         if(kettle.heater.running){
@@ -793,21 +826,21 @@ $scope.updateABV();
             //started
             element.running=true;
           })
-          .catch((err) => $scope.connectError(err, kettle));
+          .catch((err) => $scope.setErrorMessage(err, kettle));
       } else if(element.ssr){
         return BrewService.analog(kettle, element.pin,255)
           .then(() => {
             //started
             element.running=true;
           })
-          .catch((err) => $scope.connectError(err, kettle));
+          .catch((err) => $scope.setErrorMessage(err, kettle));
       } else {
         return BrewService.digital(kettle, element.pin,1)
           .then(() => {
             //started
             element.running=true;
           })
-          .catch((err) => $scope.connectError(err, kettle));
+          .catch((err) => $scope.setErrorMessage(err, kettle));
       }
     } else {
       if(element.pwm || element.ssr){
@@ -816,14 +849,14 @@ $scope.updateABV();
             element.running=false;
             $scope.updateKnobCopy(kettle);
           })
-          .catch((err) => $scope.connectError(err, kettle));
+          .catch((err) => $scope.setErrorMessage(err, kettle));
       } else {
         return BrewService.digital(kettle, element.pin,0)
           .then(() => {
             element.running=false;
             $scope.updateKnobCopy(kettle);
           })
-          .catch((err) => $scope.connectError(err, kettle));
+          .catch((err) => $scope.setErrorMessage(err, kettle));
       }
     }
   }
@@ -831,11 +864,11 @@ $scope.updateABV();
   $scope.importSettings = function($fileContent,$ext){
     try {
       let profileContent = JSON.parse($fileContent);
-      console.log(profileContent)
       $scope.settings = profileContent.settings || BrewService.reset();
       $scope.kettles = profileContent.kettles || BrewService.defaultKettles();
     } catch(e){
       // error importing
+      $scope.setErrorMessage(e);
     }
   };
 
@@ -849,7 +882,7 @@ $scope.updateABV();
   };
 
   $scope.downloadInfluxDBSketch = function(){
-    if(!$scope.settings.influxDB.url) return;
+    if(!$scope.settings.influxdb.url) return;
 
     let kettles = "";
     _.each($scope.kettles, (kettle, i) => {
@@ -864,8 +897,8 @@ $scope.updateABV();
       .then(response => {
         response.data = response.data
           .replace('// [kettles]', kettles)
-          .replace('[INFLUXDB_URL]', $scope.settings.influxDB.url)
-          .replace('[INFLUXDB_PORT]', $scope.settings.influxDB.port)
+          .replace('[INFLUXDB_URL]', $scope.settings.influxdb.url)
+          .replace('[INFLUXDB_PORT]', $scope.settings.influxdb.port)
           .replace('[SESSION_NAME]', 'session-'+moment().format('YYYY-MM-DD'));
         let streamSketch = document.createElement('a');
         streamSketch.setAttribute('download', 'BrewBenchInfluxDBYun.ino');
@@ -873,7 +906,7 @@ $scope.updateABV();
         streamSketch.click();
       })
       .catch(err => {
-        $scope.error.message = `Failed to download sketch ${err.message}`;
+        $scope.setErrorMessage(`Failed to download sketch ${err.message}`);
       });
   };
 
@@ -899,18 +932,8 @@ $scope.updateABV();
         streamSketch.click();
       })
       .catch(err => {
-        $scope.error.message = `Failed to download sketch ${err.message}`;
+        $scope.setErrorMessage(`Failed to download sketch ${err.message}`);
       });
-  };
-
-  $scope.clearSettings = function(e){
-    if(e){
-      angular.element(e.target).html('Removing...');
-    }
-    BrewService.clear();
-    $timeout(function(){
-      window.location.href='/';
-    },1000);
   };
 
   $scope.getIPAddress = function(){
@@ -919,7 +942,7 @@ $scope.updateABV();
         $scope.settings.ipAddress = response.ip;
       })
       .catch(err => {
-        $scope.error.message = err;
+        $scope.error.message = $scope.setErrorMessage(err);
       });
   };
 
@@ -1028,9 +1051,9 @@ $scope.updateABV();
         })
         .catch(function(err){
           if(err.message)
-            $scope.error.message = `Failed posting to Slack ${err.message}`;
+            $scope.error.message = $scope.setErrorMessage(`Failed posting to Slack ${err.message}`);
           else
-            $scope.error.message = `Failed posting to Slack ${JSON.stringify(err)}`;
+            $scope.error.message = $scope.setErrorMessage(`Failed posting to Slack ${JSON.stringify(err)}`);
         });
     }
   };
@@ -1193,7 +1216,7 @@ $scope.updateABV();
         allSensors.push(BrewService.temp($scope.kettles[i])
           .then(response => $scope.updateTemp(response, $scope.kettles[i]))
           .catch(err => {
-            $scope.connectError(err, $scope.kettles[i]);
+            $scope.setErrorMessage(err, $scope.kettles[i]);
             return err;
           }));
       }

@@ -22,7 +22,7 @@ angular.module('brewbench-monitor')
         ,notifications: {on:true,timers:true,high:true,low:true,target:true,slack:'Webhook Url',last:''}
         ,sounds: {on:true,alert:'/assets/audio/bike.mp3',timer:'/assets/audio/school.mp3'}
         ,account: {apiKey: '', sessions: []}
-        ,influxDB: {url: '', port: 8086, connected: false}
+        ,influxdb: {url: '', port: 8086, user: '', pass: '', db: '', connected: false}
         ,arduinos: [{
           id: btoa('brewbench'),
           url: 'arduino.local',
@@ -204,7 +204,7 @@ angular.module('brewbench-monitor')
       $http({url: url, method: 'GET', headers: headers, timeout: settings.pollSeconds*10000})
         .then(response => {
           if(!settings.shared && response.headers('X-Sketch-Version') == null || response.headers('X-Sketch-Version') < settings.sketch_version)
-            q.reject('Sketch Version is out of date.  Please Update. Sketch: '+response.headers('X-Sketch-Version')+' BrewBench: '+settings.sketch_version);
+            q.reject('Sketch Version is out of date.  Please <a href="" data-toggle="modal" data-target="#settingsModal">Update</a>. Sketch: '+response.headers('X-Sketch-Version')+' BrewBench: '+settings.sketch_version);
           else
             q.resolve(response.data);
         })
@@ -229,7 +229,7 @@ angular.module('brewbench-monitor')
       $http({url: url, method: 'GET', headers: headers, timeout: settings.pollSeconds*1000})
         .then(response => {
           if(!settings.shared && response.headers('X-Sketch-Version') == null || response.headers('X-Sketch-Version') < settings.sketch_version)
-            q.reject('Sketch Version is out of date.  Please Update. Sketch: '+response.headers('X-Sketch-Version')+' BrewBench: '+settings.sketch_version);
+            q.reject('Sketch Version is out of date.  Please <a href="" data-toggle="modal" data-target="#settingsModal">Update</a>. Sketch: '+response.headers('X-Sketch-Version')+' BrewBench: '+settings.sketch_version);
           else
             q.resolve(response.data);
         })
@@ -252,7 +252,7 @@ angular.module('brewbench-monitor')
       $http({url: url, method: 'GET', headers: headers, timeout: settings.pollSeconds*1000})
         .then(response => {
           if(!settings.shared && response.headers('X-Sketch-Version') == null || response.headers('X-Sketch-Version') < settings.sketch_version)
-            q.reject('Sketch Version is out of date.  Please Update. Sketch: '+response.headers('X-Sketch-Version')+' BrewBench: '+settings.sketch_version);
+            q.reject('Sketch Version is out of date.  Please <a href="" data-toggle="modal" data-target="#settingsModal">Update</a>. Sketch: '+response.headers('X-Sketch-Version')+' BrewBench: '+settings.sketch_version);
           else
             q.resolve(response.data);
         })
@@ -275,7 +275,7 @@ angular.module('brewbench-monitor')
       $http({url: url, method: 'GET', headers: headers, timeout: (timeout || settings.pollSeconds*1000)})
         .then(response => {
           if(!settings.shared && response.headers('X-Sketch-Version') == null || response.headers('X-Sketch-Version') < settings.sketch_version)
-            q.reject('Sketch Version is out of date.  Please Update. Sketch: '+response.headers('X-Sketch-Version')+' BrewBench: '+settings.sketch_version);
+            q.reject('Sketch Version is out of date.  Please <a href="" data-toggle="modal" data-target="#settingsModal">Update</a>. Sketch: '+response.headers('X-Sketch-Version')+' BrewBench: '+settings.sketch_version);
           else
             q.resolve(response.data);
         })
@@ -359,18 +359,33 @@ angular.module('brewbench-monitor')
       return q.promise;
     },
 
-    influx: function(){
-        let q = $q.defer();
-        let settings = this.settings('settings');
-        let influxConnection = `${settings.influxDB.url}:${settings.influxDB.port}`;
-        $http({url: influxConnection+'/ping', method: 'GET'})
-          .then(response => {
-            q.resolve(response);
-          })
-          .catch(function(err){
-            q.reject(err);
-          });
-          return q.promise;
+    influxdb: function(){
+      let q = $q.defer();
+      let settings = this.settings('settings');
+      let influxConnection = `${settings.influxdb.url}:${settings.influxdb.port}`;
+
+      return {
+        ping: () => {
+          $http({url: `${influxConnection}/ping`, method: 'GET'})
+            .then(response => {
+              q.resolve(response);
+            })
+            .catch(err => {
+              q.reject(err);
+            });
+            return q.promise;
+        },
+        createDB: (name) => {
+          $http({url: `${influxConnection}/query?u=${settings.influxdb.user}&p=${settings.influxdb.pass}&q=${encodeURIComponent(`CREATE DATABASE "${name}"`)}`, method: 'POST'})
+            .then(response => {
+              q.resolve(response.data);
+            })
+            .catch(err => {
+              q.reject(err);
+            });
+            return q.promise;
+        }
+      };
     },
 
     pkg: function(){
@@ -379,7 +394,7 @@ angular.module('brewbench-monitor')
           .then(response => {
             q.resolve(response.data);
           })
-          .catch(function(err){
+          .catch(err => {
             q.reject(err);
           });
           return q.promise;

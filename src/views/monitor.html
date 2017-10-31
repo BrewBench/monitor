@@ -24,7 +24,7 @@
     <div class="col">
       <div class="alert alert-{{error.type}} alert-dismissible" role="alert" ng-if="error.message">
         <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <strong>{{error.type}}</strong> {{error.message}}
+        <strong>{{error.type}}</strong> <span ng-bind-html="error.message">{{error.message}}</span>
       </div>
       <nvd3 options="chartOptions" data="kettles"></nvd3>
     </div>

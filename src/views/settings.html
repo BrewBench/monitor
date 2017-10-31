@@ -5,7 +5,7 @@
         <h1 class="modal-title"><i class="fa fa-gear fa-lg" aria-hidden="true"></i> Settings</h1>
         <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
       </div>
-      <div class="modal-body">
+      <div class="modal-body settings">
         <div class="btn-group float-right">
           <span class="btn btn-light btn-file">
             Import <input type="file" on-read-file="importSettings($fileContent,$ext)" accept=".json"/>
@@ -13,8 +13,8 @@
           <a class="btn btn-light" href="{{exportSettings()}}" download="brewbench-profile.json">Export</a>
           <a class="btn btn-danger" href="" ng-click="clearSettings($event)">Delete Settings</a>
         </div>
-
-    <div id="settings" class="settings">
+        <div class="row-new"></div>
+    <div id="settings">
 
     <div class="card-body">
         <div class="pb-3">
@@ -34,9 +34,10 @@
         </div>
 
         <div class="pb-3">
-          <h4>Notifications
-            <button class="btn btn-primary pull-right" ng-click="alert()" ng-disabled="!settings.notifications.on">Test</button>
-          </h4>
+          <h4>Notifications</h4>
+
+          <button class="btn btn-primary pull-right" ng-click="alert()" ng-disabled="!settings.notifications.on">Test</button>
+          <div class="row-new"></div>
           <ul class="tg-list">
             <li class="tg-list-item">
               <span>{{settings.notifications.on?'On':'Off'}}</span>
@@ -90,8 +91,46 @@
         </div>
 
         <div class="pb-3">
+          <h4>InfluxDB</h4>
+
+            <div class="btn-group float-right">
+            <button class="btn"
+              ng-click="testInfluxDB()"
+              ng-disabled="!settings.influxdb.url"
+              ng-class="{'btn-light':!settings.influxdb.url, 'btn-primary':settings.influxdb.url}">
+                Test
+            </button>
+            <button class="btn"
+              ng-click="createInfluxDB()"
+              ng-disabled="!settings.influxdb.connected"
+              ng-class="{'btn-light':!settings.influxdb.connected, 'btn-primary':settings.influxdb.connected}">
+                Create
+            </button>
+            </div>
+
+          <div class="row-new"></div>
+          <div class="row">
+            <div class="col-10">
+              <label class="adjust">Url</label>
+              <i class="fa" ng-class="{'fa-circle-o-notch fa-spin fa-2x':!!settings.influxdb.testing, 'fa-check-circle fa-2x':!!settings.influxdb.connected, 'fa-times-circle fa-2x':settings.influxdb.connected === false}" aria-hidden="true"></i>
+              <editable class="poll" type="text" model="settings.influxdb.url" placeholder="http://InfluxDBUrl"></editable>
+            </div>
+            <div class="col-2">
+              <label class="adjust">Port</label>
+              <editable class="poll" type="number" model="settings.influxdb.port"></editable>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12">
+              <label class="adjust">Database</label>
+              <editable class="poll" type="text" model="settings.influxdb.db" placeholder="Database Name"></editable>
+            </div>
+          </div>
+        </div>
+        <div class="row-new"></div>
+        <div class="pb-3">
           <h4>Arduinos</h4>
-          <div class="btn btn-group">
+          <div class="btn-group pull-right">
             <button class="btn btn-primary" ng-click="arduinos.add()">Add Arduino</button>
 
             <button type="button" class="btn btn-light dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -99,31 +138,10 @@
             </button>
             <div class="dropdown-menu scrollable-menu">
               <a href="assets/BrewBenchYun/BrewBenchYun.ino" class="dropdown-item">Arduino Yun</a>
-              <a href="" ng-click="downloadInfluxDBSketch()" class="dropdown-item" ng-class="{'disabled':!settings.influxDB.url}">Arduino Yun w/InfluxDB</a>
+              <a href="" ng-click="downloadInfluxDBSketch()" class="dropdown-item" ng-class="{'disabled':!settings.influxdb.url}">Arduino Yun w/InfluxDB</a>
             </div>
           </div>
-
-          <label class="adjust">InfluxDB</label>
-          <div class="row">
-            <div class="col-6">
-              <editable class="poll" type="text" model="settings.influxDB.url" placeholder="http://InfluxDBUrl"></editable>
-            </div>
-            <div class="col-2">
-              <editable class="poll" type="number" model="settings.influxDB.port"></editable>
-            </div>
-            <div class="col-2">
-              <i class="fa" ng-class="{'fa-circle-o-notch fa-spin fa-2x':!!settings.influxDB.testing, 'fa-check-circle fa-2x':!!settings.influxDB.connected, 'fa-times-circle fa-2x':settings.influxDB.connected === false}" aria-hidden="true"></i>
-            </div>
-            <div class="col-2">
-              <button class="btn"
-                ng-click="testInfluxDB()"
-                ng-disabled="!settings.influxDB.url"
-                ng-class="{'btn-light':!settings.influxDB.url, 'btn-primary':settings.influxDB.url}">
-                  Test
-                </button>
-            </div>
-          </div>
-
+          <div class="row-new"></div>
           <label class="adjust">Poll every</label>
           <div class="col pb-4">
             <editable class="poll" type="number" model="settings.pollSeconds" step="1" min="5"></editable> Seconds

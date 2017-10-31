@@ -5,7 +5,7 @@
 // http://static.cactus.io/downloads/library/ds18b20/cactus_io_DS18B20.zip
 #include "cactus_io_DS18B20.h"
 
-const char VERSION[] = "2.7.1";
+const char VERSION[] = "2.8.0";
 
 BridgeServer server;
 

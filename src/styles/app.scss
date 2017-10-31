@@ -569,7 +569,9 @@ sup.ref{
 }
 
 .settings {
-
+  .row-new {
+    clear: both;
+  }
   .fa-thermometer-quarter {
     padding: 0 5px 0 5px;
   }

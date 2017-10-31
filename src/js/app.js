@@ -26,6 +26,11 @@ angular.module('brewbench-monitor', [
       templateUrl: 'views/monitor.html',
       controller: 'mainCtrl'
     })
+    .state('reset', {
+      url: '/reset',
+      templateUrl: 'views/monitor.html',
+      controller: 'mainCtrl'
+    })
     .state('otherwise', {
      url: '*path',
      templateUrl: 'views/not-found.html'
