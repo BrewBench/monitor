@@ -72,3 +72,17 @@ Then add this to your `/home/user/.homeassistant/configuration.yaml`
       unit_of_measurement: "°F"
       value_template: "{{ ((float(value_json.temp) * 9 / 5 )  +  32) | round(1) }}"
 ```
+
+### Setup with InfluxDB
+
+Use the [InfluxDB]() sketch, download from the app and it will create the kettles you have connected.  Then use docker and  [Grafana](https://grafana.com/grafana/download?platform=docker) for graphs.
+
+```sh
+brew update
+brew install influxdb
+
+#then use grafana for the graphs
+docker run -d --name=grafana -p 3000:3000 grafana/grafana
+```
+
+<img src="../src/assets/img/screenshot-influxdb.png?raw=true" alt="BrewBench" align="center" width="100%" />
