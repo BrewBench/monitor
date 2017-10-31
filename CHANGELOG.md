@@ -1,8 +1,21 @@
 # Change Log
 
+## 2.9.5 - 2017-10-30
+
+### Added
+- InfluxDB integration for alternate data store #16
+- Sticky kettles
+- Air type monitor
+- Import/Export Settings #15
+
+### Updated
+- Layout options for list and cards
+- Settings for InfluxDB
+
 ## 2.9.1 - 2017-10-23
 
 ### Added
+- Mobile styles and menu #14
 - Kettle count to settings
 - Added IBUs from recipe
 - Embed display logic for share links
