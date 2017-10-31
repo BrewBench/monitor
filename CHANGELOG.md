@@ -3,10 +3,10 @@
 ## 2.9.5 - 2017-10-30
 
 ### Added
-- InfluxDB integration for alternate data store #16
+- InfluxDB integration for alternate data store [#16](https://github.com/BrewBench/monitor/issues/16)
 - Sticky kettles
 - Air type monitor
-- Import/Export Settings #15
+- Import/Export Settings [#15](https://github.com/BrewBench/monitor/issues/15)
 
 ### Updated
 - Layout options for list and cards
@@ -15,7 +15,6 @@
 ## 2.9.1 - 2017-10-23
 
 ### Added
-- Mobile styles and menu #14
 - Kettle count to settings
 - Added IBUs from recipe
 - Embed display logic for share links
@@ -38,13 +37,13 @@
 ## 2.8.1 - 2017-10-05
 
 ### Added
-- Mobile menu #14
+- Mobile styles and menu [#14](https://github.com/BrewBench/monitor/issues/14)
 
 ## 2.8.0 - 2017-10-05
 
 ### Added
-- Support for multiple Arduinos #12
-- Layout Options #10
+- Support for multiple Arduinos [#12](https://github.com/BrewBench/monitor/issues/12)
+- Layout Options [#10](https://github.com/BrewBench/monitor/issues/10)
 
 ### Updated
 - Sketch Version 2.7.1
