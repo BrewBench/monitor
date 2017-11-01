@@ -165,8 +165,8 @@
             <div class="input-group">
               <input class="form-control" type="number" ng-model="settings.pollSeconds" step="1" min="5">
               <span class="input-group-btn">
-                <button type="button" class="btn btn-light"><i class="fa fa-minus fa-2x" ng-click="(settings.pollSeconds > 5) ? settings.pollSeconds=settings.pollSeconds-1 : 5"></i></button>
-                <button type="button" class="btn btn-light"><i class="fa fa-plus fa-2x" ng-click="settings.pollSeconds=settings.pollSeconds+1"></i></button>
+                <button type="button" class="btn btn-light"><i class="fa fa-minus fa-lg" ng-click="(settings.pollSeconds > 5) ? settings.pollSeconds=settings.pollSeconds-1 : 5"></i></button>
+                <button type="button" class="btn btn-light"><i class="fa fa-plus fa-lg" ng-click="settings.pollSeconds=settings.pollSeconds+1"></i></button>
               </span>
             </div>
             <small class="form-text text-muted">Every {{settings.pollSeconds}} seconds</small>
@@ -191,7 +191,7 @@
                     <button class="btn btn-success" ng-show="arduino.secure" ng-click="arduino.secure=false; arduinos.update(arduino)">https</button>
                   </span>
                   <input class="form-control" type="text" ng-model="arduino.url" ng-change="arduinos.update(arduino)" placeholder="URL">
-                </div>  
+                </div>
               </td>
               <!-- <td class="text-left">
                 <input ng-show="!!arduino.showpass" type="password" ng-model="arduino.password" ng-change="arduino.showpass=false; arduinos.update(arduino)"></input>
