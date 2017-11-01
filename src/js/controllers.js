@@ -309,6 +309,8 @@ $scope.updateABV();
         // prompt for password
         if(response.data && response.data.results && response.data.results.length){
           $scope.settings.influxdb.db = db;
+          $scope.settings.influxdb.created = true;
+          $scope.resetError();
         } else {
           $scope.setErrorMessage("Opps, there was a problem creating the database.");
         }
@@ -358,7 +360,7 @@ $scope.updateABV();
             }
             if(contents.settings){
               $scope.settings = contents.settings;
-              $scope.settings.notifications = {on:false,timers:true,high:true,low:true,target:true,slack:'Webhook Url',last:''};
+              $scope.settings.notifications = {on:false,timers:true,high:true,low:true,target:true,slack:'',last:''};
             }
             if(contents.kettles){
               _.each(contents.kettles, kettle => {
@@ -616,7 +618,7 @@ $scope.updateABV();
 
   $scope.resetError = function(kettle){
     $scope.error.type = 'danger';
-    // $scope.error.message = '';
+    $scope.error.message = $sce.trustAsHtml('');
     if(kettle) kettle.error = $sce.trustAsHtml('');
   };
 
@@ -891,6 +893,13 @@ $scope.updateABV();
     if(!$scope.settings.influxdb.url) return;
 
     let kettles = "";
+    let connection_string = `${$scope.settings.influxdb.url}:${$scope.settings.influxdb.port}/write?`;
+    // add user/pass
+    if(!!$scope.settings.influxdb.user && !!$scope.settings.influxdb.pass)
+      connection_string += `u=${$scope.settings.influxdb.user}&p=${$scope.settings.influxdb.pass}&`
+    // add db
+    connection_string += 'db='+($scope.settings.influxdb.db || 'session-'+moment().format('YYYY-MM-DD'));
+
     _.each($scope.kettles, (kettle, i) => {
       if( kettle.temp.type == 'Thermistor' )
         kettles += 'thermistorInfluxDBCommand("'+kettle.key+'","'+kettle.temp.pin+'");\n  ';
@@ -901,14 +910,11 @@ $scope.updateABV();
     });
     return $http.get('assets/BrewBenchInfluxDBYun/BrewBenchInfluxDBYun.ino')
       .then(response => {
-
+        // replace variables
         response.data = response.data
           .replace('// [kettles]', kettles)
-          .replace('[INFLUXDB_URL]', $scope.settings.influxdb.url)
-          .replace('[INFLUXDB_PORT]', $scope.settings.influxdb.port)
-          .replace('[INFLUXDB_USER]', $scope.settings.influxdb.user || '')
-          .replace('[INFLUXDB_PASS]', $scope.settings.influxdb.pass || '')
-          .replace('[SESSION_NAME]', $scope.settings.influxdb.db || 'session-'+moment().format('YYYY-MM-DD'));
+          .replace('[INFLUXDB_CONNECTION]', connection_string)
+          .replace('[FREQUENCY_SECONDS]', $scope.settings.influxdb.frequency ? parseInt($scope.settings.influxdb.frequency,10) : 60);
         let streamSketch = document.createElement('a');
         streamSketch.setAttribute('download', 'BrewBenchInfluxDBYun.ino');
         streamSketch.setAttribute('href', "data:text/ino;charset=utf-8," + encodeURIComponent(response.data));

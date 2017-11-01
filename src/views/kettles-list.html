@@ -54,9 +54,9 @@
               <div class="col">
                 <label class="adjust">Target</label>
                 <div class="btn-group" role="group">
-                  <button type="button" class="btn btn-light" style="width:62px;"><editable type="number" model="kettle.temp.target">{{kettle.temp.target}}</editable>&deg;{{settings.unit}}</button>
-                  <button type="button" class="btn btn-light" ng-click="changeValue(kettle,'target',false)"><i class="fa fa-minus fa-lg"></i></button>
-                  <button type="button" class="btn btn-light" ng-click="changeValue(kettle,'target',true)"><i class="fa fa-plus fa-lg"></i></button>
+                  <a class="btn btn-light"><editable type="number" model="kettle.temp.target">{{kettle.temp.target}}</editable>&deg;{{settings.unit}}</a>
+                  <a class="btn btn-light" ng-click="changeValue(kettle,'target',false)"><i class="fa fa-minus fa-lg"></i></a>
+                  <a class="btn btn-light" ng-click="changeValue(kettle,'target',true)"><i class="fa fa-plus fa-lg"></i></a>
                 </div>
               </div>
             </div>
@@ -64,9 +64,9 @@
               <div class="col">
                 <label class="adjust">Diff</label>
                 <div class="btn-group" role="group">
-                  <button type="button" class="btn btn-light" style="width:62px;"><editable type="number" model="kettle.temp.diff">{{kettle.temp.diff}}</editable>&deg;{{settings.unit}}</button>
-                  <button type="button" class="btn btn-light" ng-click="changeValue(kettle,'diff',false)"><i class="fa fa-minus fa-lg"></i></button>
-                  <button type="button" class="btn btn-light" ng-click="changeValue(kettle,'diff',true)"><i class="fa fa-plus fa-lg"></i></button>
+                  <a class="btn btn-light"><editable type="number" model="kettle.temp.diff">{{kettle.temp.diff}}</editable>&deg;{{settings.unit}}</a>
+                  <a class="btn btn-light" ng-click="changeValue(kettle,'diff',false)"><i class="fa fa-minus fa-lg"></i></a>
+                  <a class="btn btn-light" ng-click="changeValue(kettle,'diff',true)"><i class="fa fa-plus fa-lg"></i></a>
                 </div>
               </div>
             </div>

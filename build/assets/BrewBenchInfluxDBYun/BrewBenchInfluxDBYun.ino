@@ -5,12 +5,9 @@
 // http://static.cactus.io/downloads/library/ds18b20/cactus_io_DS18B20.zip
 #include "cactus_io_DS18B20.h"
 
-const char VERSION[] = "2.8.0";
-const char SESSION_NAME[] = "[SESSION_NAME]";
-const char INFLUXDB_URL[] = "[INFLUXDB_URL]";
-const char INFLUXDB_USER[] = "[INFLUXDB_USER]";
-const char INFLUXDB_PASS[] = "[INFLUXDB_PASS]";
-const int INFLUXDB_PORT = [INFLUXDB_PORT];
+const String VERSION = "2.8.2";
+const String INFLUXDB_CONNECTION = "[INFLUXDB_CONNECTION]";
+const int FREQUENCY_SECONDS = [FREQUENCY_SECONDS];
 int secondCounter = 0;
 
 BridgeServer server;
@@ -91,7 +88,7 @@ void responseOkHeader(BridgeClient client){
     client.println("Access-Control-Allow-Origin: *");
     client.println("Access-Control-Allow-Methods: GET");
     client.println("Access-Control-Expose-Headers: X-Sketch-Version");
-    client.println("X-Sketch-Version: "+String(VERSION));
+    client.println("X-Sketch-Version: "+VERSION);
     client.println("Content-Type: application/json");
     client.println("Connection: close");
     client.println();
@@ -155,15 +152,14 @@ void ds18B20InfluxDBCommand(String source, String pin) {
   ds.readSensor();
   float temp = ds.getTemperature_C();
 
+  String data = "temperature,sensor=DS18B20,pin="+pin+",source="+source+" temp="+String(temp);
   Process p;
-  String login = "";
-  if(INFLUXDB_USER != "" && INFLUXDB_PASS != "")
-    login = "u="+String(INFLUXDB_USER)+"&p="+String(INFLUXDB_PASS)+"&";
-  String data = "temperature,sensor=DS18B20,pin="+String(pin)+",source="+source+" value="+String(temp);
-  String cmd = "curl -X POST '"+String(INFLUXDB_URL)+":"+String(INFLUXDB_PORT)+"/write?"+login+"db="+String(SESSION_NAME)+"' --data-binary '"+data+"'";
-  p.runShellCommand(cmd);
-  while (p.running());
-  p.close();
+  p.begin("curl");
+  p.addParameter("-XPOST");
+  p.addParameter(INFLUXDB_CONNECTION);
+  p.addParameter("--data-binary");
+  p.addParameter(data);
+  p.run();
 }
 
 void thermistorCommand(BridgeClient client) {
@@ -178,15 +174,14 @@ void thermistorCommand(BridgeClient client) {
 void thermistorInfluxDBCommand(String source, String pin) {
   float temp = Thermistor(pin.substring(1).toInt());
 
+  String data = "temperature,sensor=Thermistor,pin="+pin+",source="+source+" temp="+String(temp);
   Process p;
-  String login = "";
-  if(INFLUXDB_USER != "" && INFLUXDB_PASS != "")
-    login = "u="+String(INFLUXDB_USER)+"&p="+String(INFLUXDB_PASS)+"&";
-  String data = "temperature,sensor=Thermistor,pin="+String(pin)+",source="+source+" value="+String(temp);
-  String cmd = "curl -X POST '"+String(INFLUXDB_URL)+":"+String(INFLUXDB_PORT)+"/write?"+login+"db="+String(SESSION_NAME)+"' --data-binary '"+data+"'";
-  p.runShellCommand(cmd);
-  while (p.running());
-  p.close();
+  p.begin("curl");
+  p.addParameter("-XPOST");
+  p.addParameter(INFLUXDB_CONNECTION);
+  p.addParameter("--data-binary");
+  p.addParameter(data);
+  p.run();
 }
 
 // http://www.instructables.com/id/Temperature-Measurement-Tutorial-Part1/
@@ -223,15 +218,14 @@ void pt100InfluxDBCommand(String source, String pin) {
     temp = (150*tvoltage)/614;
   }
 
+  String data = "temperature,sensor=PT100,pin="+pin+",source="+source+" temp="+String(temp);
   Process p;
-  String login = "";
-  if(INFLUXDB_USER != "" && INFLUXDB_PASS != "")
-    login = "u="+String(INFLUXDB_USER)+"&p="+String(INFLUXDB_PASS)+"&";
-  String data = "temperature,sensor=PT100,pin="+String(pin)+",source="+source+" value="+String(temp);
-  String cmd = "curl -X POST '"+String(INFLUXDB_URL)+":"+String(INFLUXDB_PORT)+"/write?"+login+"db="+String(SESSION_NAME)+"' --data-binary '"+data+"'";
-  p.runShellCommand(cmd);
-  while (p.running());
-  p.close();
+  p.begin("curl");
+  p.addParameter("-XPOST");
+  p.addParameter(INFLUXDB_CONNECTION);
+  p.addParameter("--data-binary");
+  p.addParameter(data);
+  p.run();
 }
 
 void InfluxDB(){
@@ -257,7 +251,7 @@ void loop() {
     client.stop();
   }
   secondCounter+=1;
-  if( secondCounter == 60 ){
+  if( secondCounter == FREQUENCY_SECONDS ){
     // reset the secondCounter
     secondCounter = 0;
     InfluxDB();

@@ -1,9 +1,16 @@
 # Change Log
 
-## 2.9.6 - 2017-10-30
+## 2.9.6 - 2017-10-31
 
 ### Added
-- InfluxDB user/pass login option
+- InfluxDB user/pass login option [#17](https://github.com/BrewBench/monitor/issues/17)
+- InfluxDB frequency seconds option
+
+### Updated
+- Sketches
+
+### Fixed
+- InfluxDB posting from Arduino to AWS
 
 ## 2.9.5 - 2017-10-30
 

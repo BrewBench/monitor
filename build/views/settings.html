@@ -18,18 +18,23 @@
 
     <div class="card-body">
         <div class="pb-3">
-          <h4>Temperature</h4>
-          <div class="input-group" role="group">
-            <input id="celsius" class="degree" type="radio" ng-checked="settings.unit=='C'" value="C" ng-click="changeUnits('C')"> <label for="celsius">&deg;C</label>&nbsp;&nbsp;
-            <input id="fahrenheit" class="degree" type="radio" ng-checked="settings.unit=='F'" value="F" ng-click="changeUnits('F')"> <label for="fahrenheit">&deg;F</label>
-          </div>
-        </div>
+          <h4>General</h4>
 
-        <div class="pb-3">
-          <h4>Layout</h4>
-          <div class="input-group" role="group">
-            <input id="list" class="degree" type="radio" ng-checked="settings.layout=='list'" value="list" ng-click="settings.layout='list'"> <label for="list">List</label>&nbsp;&nbsp;
-            <input id="card" class="degree" type="radio" ng-checked="settings.layout=='card'" value="card" ng-click="settings.layout='card'"> <label for="card">Card</label>
+          <div class="row">
+            <div class="col-6">
+              <label class="adjust">Temperature</label>
+              <div class="input-group" role="group">
+                <input id="celsius" class="degree" type="radio" ng-checked="settings.unit=='C'" value="C" ng-click="changeUnits('C')"> <label for="celsius">&deg;C</label>&nbsp;&nbsp;
+                <input id="fahrenheit" class="degree" type="radio" ng-checked="settings.unit=='F'" value="F" ng-click="changeUnits('F')"> <label for="fahrenheit">&deg;F</label>
+              </div>
+            </div>
+            <div class="col-6">
+              <label class="adjust">Layout</label>
+              <div class="input-group" role="group">
+                <input id="list" class="degree" type="radio" ng-checked="settings.layout=='list'" value="list" ng-click="settings.layout='list'"> <label for="list">List</label>&nbsp;&nbsp;
+                <input id="card" class="degree" type="radio" ng-checked="settings.layout=='card'" value="card" ng-click="settings.layout='card'"> <label for="card">Card</label>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -74,15 +79,19 @@
           </ul>
 
           <label class="adjust">Slack</label>
-          <a href="https://api.slack.com/incoming-webhooks" title="https://api.slack.com/incoming-webhooks" target="_blank"><img src="/assets/img/Slack_Mark_Web.png" width="45"></a>
-          <editable class="poll" trim="30" model="settings.notifications.slack"></editable>
+          <div class="input-group">
+            <span class="input-group-addon" style="padding: 0;">
+              <a href="https://api.slack.com/incoming-webhooks" title="https://api.slack.com/incoming-webhooks" target="_blank"><img src="/assets/img/Slack_Mark_Web.png" width="45"></a>
+            </span>
+            <input class="form-control" trim="30" ng-model="settings.notifications.slack" placeholder="Webhook URL">
+          </div>
         </div>
 
         <div class="pb-3">
           <h4>Kettles</h4>
           <label class="adjust">Add a kettle</label>
           <div class="btn-group item" ng-repeat="kettle in kettleTypes">
-            <button class="btn btn-light" ng-click="addKettle(kettle.type)">
+            <button class="btn btn-light {{kettle.type}}" ng-click="addKettle(kettle.type)">
               <img ng-if="kettle.type != 'air'" class="type" ng-src="/assets/img/{{kettle.type}}.svg" height="30"/>
               <i ng-if="kettle.type == 'air'" class="fa fa-thermometer-quarter fa-2x type"></i>
             </button>
@@ -92,48 +101,47 @@
 
         <div class="pb-3">
           <h4>InfluxDB</h4>
-
-            <div class="btn-group float-right">
-              <button class="btn"
-                ng-click="testInfluxDB()"
-                ng-disabled="!settings.influxdb.url"
-                ng-class="{'btn-light':!settings.influxdb.url, 'btn-primary':settings.influxdb.url}">
-                  Test
-              </button>
-              <button class="btn"
-                ng-click="createInfluxDB()"
-                ng-disabled="!settings.influxdb.connected"
-                ng-class="{'btn-light':!settings.influxdb.connected, 'btn-primary':settings.influxdb.connected}">
-                  Create
-              </button>
-            </div>
-
-          <div class="row-new"></div>
           <div class="row">
-            <div class="col-10">
+            <div class="col-9">
               <label class="adjust">Url</label>
-              <i class="fa" ng-class="{'fa-circle-o-notch fa-spin fa-2x':!!settings.influxdb.testing, 'fa-check-circle fa-2x':!!settings.influxdb.connected, 'fa-times-circle fa-2x':settings.influxdb.connected === false}" aria-hidden="true"></i>&nbsp;
-              <editable class="poll" type="text" model="settings.influxdb.url" placeholder="http://InfluxDBUrl"></editable>
+              <div class="input-group">
+                <input class="form-control" type="text" ng-model="settings.influxdb.url" placeholder="http://InfluxDBUrl">
+                <span class="input-group-btn">
+                  <button class="btn btn-light" ng-click="testInfluxDB()" ng-disabled="!settings.influxdb.url">Test</button>
+                </span>
+              </div>
+              <small ng-if="settings.influxdb.connected" class="form-text text-success">Connected</small>
             </div>
-            <div class="col-2">
+            <div class="col-3">
               <label class="adjust">Port</label>
-              <editable class="poll" type="number" model="settings.influxdb.port"></editable>
+              <input class="form-control" style="width: 100%;" type="number" ng-model="settings.influxdb.port">
             </div>
           </div>
           <div class="row">
-            <div class="col-12">
+            <div class="col-9">
               <label class="adjust">Database</label>
-              <editable class="poll" type="text" model="settings.influxdb.db" placeholder="Database Name"></editable>
+              <div class="input-group">
+                <input class="form-control" type="text" ng-model="settings.influxdb.db" placeholder="Database Name">
+                <span class="input-group-btn">
+                  <button class="btn btn-light" ng-click="createInfluxDB()" ng-disabled="!settings.influxdb.connected">Create</button>
+                </span>
+              </div>
+              <small ng-if="settings.influxdb.created" class="form-text text-success">Created</small>
+            </div>
+            <div class="col-3">
+              <label class="adjust">Frequency</label>
+              <input class="form-control" style="width: 100%;" type="number" ng-model="settings.influxdb.frequency">
+              <small class="form-text text-muted">Every {{settings.influxdb.frequency}} seconds</small>
             </div>
           </div>
           <div class="row">
             <div class="col-6">
               <label class="adjust">Username</label>
-              <editable class="poll" type="text" model="settings.influxdb.user" placeholder="Username"></editable>
+              <input class="form-control" type="text" ng-model="settings.influxdb.user" placeholder="Username">
             </div>
             <div class="col-6">
               <label class="adjust">Password</label>
-              <editable class="poll" type="password" model="settings.influxdb.pass" placeholder="Password"></editable>
+              <input class="form-control" type="password" ng-model="settings.influxdb.pass" placeholder="Password">
             </div>
           </div>
         </div>
@@ -148,23 +156,25 @@
             </button>
             <div class="dropdown-menu scrollable-menu">
               <a href="assets/BrewBenchYun/BrewBenchYun.ino" class="dropdown-item">Arduino Yun</a>
-              <a href="" ng-click="downloadInfluxDBSketch()" class="dropdown-item" ng-class="{'disabled':!settings.influxdb.url}">Arduino Yun w/InfluxDB</a>
+              <a href="" ng-click="downloadInfluxDBSketch()" class="dropdown-item" ng-class="{'disabled':!settings.influxdb.connected}">Arduino Yun w/InfluxDB</a>
             </div>
           </div>
           <div class="row-new"></div>
-          <label class="adjust">Poll every</label>
+          <label class="adjust">Poll</label>
           <div class="col pb-4">
-            <editable class="poll" type="number" model="settings.pollSeconds" step="1" min="5"></editable> Seconds
-            <span class="btn-group float-right">
-              <button type="button" class="btn btn-light"><i class="fa fa-minus fa-lg" ng-click="(settings.pollSeconds > 5) ? settings.pollSeconds=settings.pollSeconds-1 : 5"></i></button>
-              <button type="button" class="btn btn-light"><i class="fa fa-plus fa-lg" ng-click="settings.pollSeconds=settings.pollSeconds+1"></i></button>
-            </span>
+            <div class="input-group">
+              <input class="form-control" type="number" ng-model="settings.pollSeconds" step="1" min="5">
+              <span class="input-group-btn">
+                <button type="button" class="btn btn-light"><i class="fa fa-minus fa-2x" ng-click="(settings.pollSeconds > 5) ? settings.pollSeconds=settings.pollSeconds-1 : 5"></i></button>
+                <button type="button" class="btn btn-light"><i class="fa fa-plus fa-2x" ng-click="settings.pollSeconds=settings.pollSeconds+1"></i></button>
+              </span>
+            </div>
+            <small class="form-text text-muted">Every {{settings.pollSeconds}} seconds</small>
           </div>
 
           <table class="table table-striped table-responsive">
           <thead class="thead-inverse">
             <tr>
-              <th>http(s)</th>
               <th>URL</th>
               <!-- <th>Password</th> -->
               <th>Analog Ports</th>
@@ -175,17 +185,21 @@
           <tbody>
             <tr ng-repeat="arduino in settings.arduinos">
               <td class="text-left">
-                <button class="btn btn-light" ng-show="!arduino.secure" ng-click="arduino.secure=true; arduinos.update(arduino)">http</button>
-                <button class="btn btn-success" ng-show="arduino.secure" ng-click="arduino.secure=false; arduinos.update(arduino)">https</button>
+                <div class="input-group">
+                  <span class="input-group-btn">
+                    <button class="btn btn-light" ng-show="!arduino.secure" ng-click="arduino.secure=true; arduinos.update(arduino)">http</button>
+                    <button class="btn btn-success" ng-show="arduino.secure" ng-click="arduino.secure=false; arduinos.update(arduino)">https</button>
+                  </span>
+                  <input class="form-control" type="text" ng-model="arduino.url" ng-change="arduinos.update(arduino)" placeholder="URL">
+                </div>  
               </td>
-              <td class="text-left"><editable class="poll" type="text" model="arduino.url" enter="arduinos.update(arduino)"></editable></td>
               <!-- <td class="text-left">
-                <input ng-show="!!arduino.showpass" type="password" ng-model="arduino.password" ng-enter="arduino.showpass=false; arduinos.update(arduino)"></input>
+                <input ng-show="!!arduino.showpass" type="password" ng-model="arduino.password" ng-change="arduino.showpass=false; arduinos.update(arduino)"></input>
                 <a href="" ng-show="!arduino.showpass" ng-click="arduino.showpass=true">*******</a>
               </td> -->
-              <td class="text-left"><editable class="poll" type="number" model="arduino.analog" enter="arduinos.update(arduino)"></editable></td>
-              <td class="text-left"><editable class="poll" type="number" model="arduino.digital" enter="arduinos.update(arduino)"></editable></td>
-              <td><a href="" ng-click="arduinos.delete($index, arduino)"><i class="fa fa-trash fa-lg text-danger"></i></a></td>
+              <td class="text-left"><input class="form-control" type="number" ng-model="arduino.analog" ng-change="arduinos.update(arduino)"></td>
+              <td class="text-left"><input class="form-control" type="number" ng-model="arduino.digital" ng-change="arduinos.update(arduino)"></td>
+              <td><a href="" ng-click="arduinos.delete($index, arduino)"><i class="fa fa-trash fa-2x text-danger"></i></a></td>
             </tr>
           </tbody>
         </table>

@@ -5,10 +5,10 @@
 // http://static.cactus.io/downloads/library/ds18b20/cactus_io_DS18B20.zip
 #include "cactus_io_DS18B20.h"
 
-const char VERSION[] = "2.8.0";
-const char SESSION_ID[] = "[SESSION_ID]";
-const char API_KEY[] = "[API_KEY]";
-const char API_HOST[] = "http://api.brewbench.co";
+const String VERSION = "2.8.2";
+const String SESSION_ID = "[SESSION_ID]";
+const String API_KEY = "[API_KEY]";
+const String API_HOST = "http://api.brewbench.co/v1/temps";
 int secondCounter = 0;
 
 BridgeServer server;
@@ -89,7 +89,7 @@ void responseOkHeader(BridgeClient client){
     client.println("Access-Control-Allow-Origin: *");
     client.println("Access-Control-Allow-Methods: GET");
     client.println("Access-Control-Expose-Headers: X-Sketch-Version");
-    client.println("X-Sketch-Version: "+String(VERSION));
+    client.println("X-Sketch-Version: "+VERSION);
     client.println("Content-Type: application/json");
     client.println("Connection: close");
     client.println();
@@ -153,12 +153,20 @@ void ds18B20APICommand(String kettle, String pin) {
   ds.readSensor();
   float temp = ds.getTemperature_C();
 
+  String data = "{\"pin\":\""+pin+"\",\"sensor\":\"DS18B20\",\"source\":\""+String(source)+"\",\"temp\":\""+String(temp)+"\"}";
   Process p;
-  String data = "{\"pin\":\""+String(pin)+"\",\"sensor\":\"DS18B20\",\"source\":\""+String(source)+"\",\"temp\":\""+String(temp)+"\"}";
-  String cmd = "curl -H \"Content-Type: application/json\" -H \"X-API-KEY: "+String(API_KEY)+" -H \"X-SESSION-ID: "+String(SESSION_ID)+" -X POST '"+String(API_URL)+"' -d '"+data+"'";
-  p.runShellCommand(cmd);
-  while (p.running());
-  p.close();
+  p.begin("curl");
+  p.addParameter("-H")
+  p.addParameter("Content-Type: application/json");
+  p.addParameter("-H")
+  p.addParameter("X-API-KEY: "+API_KEY);
+  p.addParameter("-H")
+  p.addParameter("X-SESSION-ID: "+SESSION_ID);
+  p.addParameter("-XPOST");
+  p.addParameter(API_URL);
+  p.addParameter("-d");
+  p.addParameter(data);
+  p.run();
 }
 
 void thermistorCommand(BridgeClient client) {
@@ -173,12 +181,20 @@ void thermistorCommand(BridgeClient client) {
 void thermistorAPICommand(String kettle, String pin) {
   float temp = Thermistor(pin.substring(1).toInt());
 
+  String data = "{\"pin\":\""+pin+"\",\"sensor\":\"Thermistor\",\"source\":\""+String(source)+"\",\"temp\":\""+String(temp)+"\"}";
   Process p;
-  String data = "{\"pin\":\""+String(pin)+"\",\"sensor\":\"Thermistor\",\"source\":\""+String(source)+"\",\"temp\":\""+String(temp)+"\"}";
-  String cmd = "curl -H \"Content-Type: application/json\" -H \"X-API-KEY: "+String(API_KEY)+" -H \"X-SESSION-ID: "+String(SESSION_ID)+" -X POST '"+String(API_URL)+"' -d '"+data+"'";
-  p.runShellCommand(cmd);
-  while (p.running());
-  p.close();
+  p.begin("curl");
+  p.addParameter("-H")
+  p.addParameter("Content-Type: application/json");
+  p.addParameter("-H")
+  p.addParameter("X-API-KEY: "+API_KEY);
+  p.addParameter("-H")
+  p.addParameter("X-SESSION-ID: "+SESSION_ID);
+  p.addParameter("-XPOST");
+  p.addParameter(API_URL);
+  p.addParameter("-d");
+  p.addParameter(data);
+  p.run();
 }
 
 // http://www.instructables.com/id/Temperature-Measurement-Tutorial-Part1/
@@ -215,12 +231,20 @@ void pt100APICommand(String kettle, String pin) {
     temp = (150*tvoltage)/614;
   }
 
+  String data = "{\"pin\":\""+pin+"\",\"sensor\":\"PT100\",\"source\":\""+String(source)+"\",\"temp\":\""+String(temp)+"\"}";
   Process p;
-  String data = "{\"pin\":\""+String(pin)+"\",\"sensor\":\"PT100\",\"source\":\""+String(source)+"\",\"temp\":\""+String(temp)+"\"}";
-  String cmd = "curl -H \"Content-Type: application/json\" -H \"X-API-KEY: "+String(API_KEY)+" -H \"X-SESSION-ID: "+String(SESSION_ID)+" -X POST '"+String(API_URL)+"' -d '"+data+"'";
-  p.runShellCommand(cmd);
-  while (p.running());
-  p.close();
+  p.begin("curl");
+  p.addParameter("-H")
+  p.addParameter("Content-Type: application/json");
+  p.addParameter("-H")
+  p.addParameter("X-API-KEY: "+API_KEY);
+  p.addParameter("-H")
+  p.addParameter("X-SESSION-ID: "+SESSION_ID);
+  p.addParameter("-XPOST");
+  p.addParameter(API_URL);
+  p.addParameter("-d");
+  p.addParameter(data);
+  p.run();
 }
 
 void BrewBenchAPI(){

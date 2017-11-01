@@ -293,6 +293,8 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
       // prompt for password
       if (response.data && response.data.results && response.data.results.length) {
         $scope.settings.influxdb.db = db;
+        $scope.settings.influxdb.created = true;
+        $scope.resetError();
       } else {
         $scope.setErrorMessage("Opps, there was a problem creating the database.");
       }
@@ -340,7 +342,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
           }
           if (contents.settings) {
             $scope.settings = contents.settings;
-            $scope.settings.notifications = { on: false, timers: true, high: true, low: true, target: true, slack: 'Webhook Url', last: '' };
+            $scope.settings.notifications = { on: false, timers: true, high: true, low: true, target: true, slack: '', last: '' };
           }
           if (contents.kettles) {
             _.each(contents.kettles, function (kettle) {
@@ -560,7 +562,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
 
   $scope.resetError = function (kettle) {
     $scope.error.type = 'danger';
-    // $scope.error.message = '';
+    $scope.error.message = $sce.trustAsHtml('');
     if (kettle) kettle.error = $sce.trustAsHtml('');
   };
 
@@ -831,12 +833,18 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
     if (!$scope.settings.influxdb.url) return;
 
     var kettles = "";
+    var connection_string = $scope.settings.influxdb.url + ':' + $scope.settings.influxdb.port + '/write?';
+    // add user/pass
+    if (!!$scope.settings.influxdb.user && !!$scope.settings.influxdb.pass) connection_string += 'u=' + $scope.settings.influxdb.user + '&p=' + $scope.settings.influxdb.pass + '&';
+    // add db
+    connection_string += 'db=' + ($scope.settings.influxdb.db || 'session-' + moment().format('YYYY-MM-DD'));
+
     _.each($scope.kettles, function (kettle, i) {
       if (kettle.temp.type == 'Thermistor') kettles += 'thermistorInfluxDBCommand("' + kettle.key + '","' + kettle.temp.pin + '");\n  ';else if (kettle.temp.type == 'DS18B20') kettles += 'ds18B20InfluxDBCommand("' + kettle.key + '","' + kettle.temp.pin + '");\n  ';else if (kettle.temp.type == 'PT100') kettles += 'pt100InfluxDBCommand("' + kettle.key + '","' + kettle.temp.pin + '");\n  ';
     });
     return $http.get('assets/BrewBenchInfluxDBYun/BrewBenchInfluxDBYun.ino').then(function (response) {
-
-      response.data = response.data.replace('// [kettles]', kettles).replace('[INFLUXDB_URL]', $scope.settings.influxdb.url).replace('[INFLUXDB_PORT]', $scope.settings.influxdb.port).replace('[INFLUXDB_USER]', $scope.settings.influxdb.user || '').replace('[INFLUXDB_PASS]', $scope.settings.influxdb.pass || '').replace('[SESSION_NAME]', $scope.settings.influxdb.db || 'session-' + moment().format('YYYY-MM-DD'));
+      // replace variables
+      response.data = response.data.replace('// [kettles]', kettles).replace('[INFLUXDB_CONNECTION]', connection_string).replace('[FREQUENCY_SECONDS]', $scope.settings.influxdb.frequency ? parseInt($scope.settings.influxdb.frequency, 10) : 60);
       var streamSketch = document.createElement('a');
       streamSketch.setAttribute('download', 'BrewBenchInfluxDBYun.ino');
       streamSketch.setAttribute('href', "data:text/ino;charset=utf-8," + encodeURIComponent(response.data));
@@ -1256,10 +1264,10 @@ angular.module('brewbench-monitor').factory('BrewService', function ($http, $q, 
         layout: 'card',
         shared: false,
         recipe: { 'name': '', 'brewer': { name: '', 'email': '' }, 'yeast': [], 'hops': [], 'malt': [], scale: 'gravity', method: 'papazian', 'og': 1.050, 'fg': 1.010, 'abv': 0, 'abw': 0, 'calories': 0, 'attenuation': 0 },
-        notifications: { on: true, timers: true, high: true, low: true, target: true, slack: 'Webhook Url', last: '' },
+        notifications: { on: true, timers: true, high: true, low: true, target: true, slack: '', last: '' },
         sounds: { on: true, alert: '/assets/audio/bike.mp3', timer: '/assets/audio/school.mp3' },
         account: { apiKey: '', sessions: [] },
-        influxdb: { url: '', port: 8086, user: '', pass: '', db: '', connected: false },
+        influxdb: { url: '', port: 8086, user: '', pass: '', db: '', connected: false, frequency: 60 },
         arduinos: [{
           id: btoa('brewbench'),
           url: 'arduino.local',

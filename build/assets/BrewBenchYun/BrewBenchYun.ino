@@ -5,7 +5,7 @@
 // http://static.cactus.io/downloads/library/ds18b20/cactus_io_DS18B20.zip
 #include "cactus_io_DS18B20.h"
 
-const char VERSION[] = "2.8.0";
+const String VERSION = "2.8.2";
 
 BridgeServer server;
 
@@ -85,7 +85,7 @@ void responseOkHeader(BridgeClient client){
     client.println("Access-Control-Allow-Origin: *");
     client.println("Access-Control-Allow-Methods: GET");
     client.println("Access-Control-Expose-Headers: X-Sketch-Version");
-    client.println("X-Sketch-Version: "+String(VERSION));
+    client.println("X-Sketch-Version: "+VERSION);
     client.println("Content-Type: application/json");
     client.println("Connection: close");
     client.println();

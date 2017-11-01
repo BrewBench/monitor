@@ -333,6 +333,7 @@ sup.ref{
 
   .editable {
     height: 34px;
+    max-width: 50px;
   }
 }
 
@@ -552,8 +553,7 @@ sup.ref{
   font-size: 16px;
 }
 
-.settings input[type=number],
-.kettles input[type=number],
+.kettles input[type=number]
 .kettles .temp, .kettles .timer, .settings .poll
  {
   font-size: 20px;
@@ -569,6 +569,15 @@ sup.ref{
 }
 
 .settings {
+
+  input[type=number]{
+    font-size: 20px;
+    color: #777;
+    width: 65px;
+  }
+  .btn.fermenter {
+    padding: 8px 5px 8px 5px;
+  }
   .row-new {
     clear: both;
   }
@@ -582,7 +591,7 @@ sup.ref{
   h4 {
     color: #777;
     border-bottom: 1px solid #ccc;
-    padding-bottom: 10px;
+    padding: 12px 0 12px 0;
   }
 
   ul>li{
@@ -592,12 +601,6 @@ sup.ref{
 
   .right label {
       cursor: pointer;
-  }
-
-  table td {
-    max-width: 180px;
-    overflow: hidden;
-    word-wrap: break-word;
   }
 
   .modal input{
