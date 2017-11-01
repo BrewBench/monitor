@@ -14,7 +14,7 @@ BrewBench is an Arduino brew monitor, controller and alert system for the home b
 You can also connect a relay to the digital ports and add a heater / pump to create a RIMS system.  The software will start/stop the heater/pump based on the target temperature you set.
 
 #### Fermenters
-BrewBench Monitor can also be used with fermenters.  I have an [SS Brewtech Chronical](https://www.ssbrewtech.com/collections/chronicals) that I thread the thermistor into the temperature [thermowell](https://www.ssbrewtech.com/collections/accessories/products/weldless-thermowell-with-lcd-temp-display) along with the digital one provided.
+BrewBench Monitor can easily be used with fermenters with a thermowell.
 
 ## Setup the Arduino
 
@@ -22,19 +22,17 @@ See the Arduino sketches [README](arduino/)
 
 ## Open BrewBench
 
-Go to [brewbench.co](http://brewbench.co) or clone this repo and follow dev instructions below
+Go to [BrewBench monitor](http://monitor.brewbench.co) or clone this repo and follow dev instructions below.
 
 ## Development
 
 Install [NodeJS](https://nodejs.org)
 
 ```sh
-# install yarn
-npm install -g yarn
-# install dependencies
-yarn
+# install
+npm install
 # run tests
-yarn test
+npm test
 # start dev web server
 gulp
 ```
@@ -44,12 +42,10 @@ gulp
 Code is compiled to a `build` directory, build the code and copy that to your web server.
 
 ```sh
-# install yarn
-npm install -g yarn
-# install dependencies
-yarn
+# install
+npm install
 # build files for deployment
-yarn run build
+npm run build
 ```
 
 <img src="src/assets/img/screenshot-fermenter.png?raw=true" alt="BrewBench fermenter" align="center" width="200" />
