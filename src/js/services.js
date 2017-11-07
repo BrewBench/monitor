@@ -152,18 +152,6 @@ angular.module('brewbench-monitor')
       return domain;
     },
 
-    ifconfig: function(){
-      let q = $q.defer();
-      $http.get('https://ifconfig.co/json')
-        .then(response => {
-          q.resolve(response);
-        })
-        .catch(err => {
-          q.reject(err);
-        });
-      return q.promise;
-    },
-
     slack: function(webhook_url, msg, color, icon, kettle){
       let q = $q.defer();
 
@@ -350,6 +338,19 @@ angular.module('brewbench-monitor')
         query += '&auth='+btoa('root:'+arduino.password);
 
       $http({url: 'https://monitor.brewbench.co/share/test/?'+query, method: 'GET'})
+        .then(response => {
+          q.resolve(response.data);
+        })
+        .catch(err => {
+          q.reject(err);
+        });
+      return q.promise;
+    },
+
+    ip: function(arduino){
+      let q = $q.defer();
+
+      $http({url: 'https://monitor.brewbench.co/share/ip', method: 'GET'})
         .then(response => {
           q.resolve(response.data);
         })

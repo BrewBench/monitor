@@ -952,7 +952,7 @@ $scope.updateABV();
   };
 
   $scope.getIPAddress = function(){
-    BrewService.ifconfig()
+    BrewService.ip()
       .then(response => {
         $scope.settings.ipAddress = response.ip;
       })

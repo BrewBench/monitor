@@ -70,13 +70,6 @@ describe('BrewBench Service', function() {
     });
   });
 
-  describe('.ifconfig()', function() {
-    // A simple test to verify the method ifconfig exists
-    it('should exist', function() {
-      expect(BrewService.ifconfig).toBeDefined();
-    });
-  });
-
   describe('.slack()', function() {
     // A simple test to verify the method slack exists
     it('should exist', function() {
@@ -130,6 +123,13 @@ describe('BrewBench Service', function() {
     // A simple test to verify the method shareTest exists
     it('should exist', function() {
       expect(BrewService.shareTest).toBeDefined();
+    });
+  });
+
+  describe('.ip()', function() {
+    // A simple test to verify the method ip exists
+    it('should exist', function() {
+      expect(BrewService.ip).toBeDefined();
     });
   });
 

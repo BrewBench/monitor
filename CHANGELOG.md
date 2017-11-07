@@ -1,5 +1,10 @@
 # Change Log
 
+## 2.9.7 - 2017-11-06
+
+### Fixed
+- IP lookup for share
+
 ## 2.9.6 - 2017-10-31
 
 ### Added
