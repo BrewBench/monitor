@@ -278,6 +278,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
 
   $scope.testInfluxDB = function () {
     $scope.settings.influxdb.testing = true;
+    $scope.settings.influxdb.connected = false;
     BrewService.influxdb().ping().then(function (response) {
       $scope.settings.influxdb.testing = false;
       if (response.status == 204) $scope.settings.influxdb.connected = true;else $scope.settings.influxdb.connected = false;
@@ -289,6 +290,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
 
   $scope.createInfluxDB = function () {
     var db = $scope.settings.influxdb.db || 'session-' + moment().format('YYYY-MM-DD');
+    $scope.settings.influxdb.created = false;
     BrewService.influxdb().createDB(db).then(function (response) {
       // prompt for password
       if (response.data && response.data.results && response.data.results.length) {
@@ -871,6 +873,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
   };
 
   $scope.getIPAddress = function () {
+    $scope.settings.ipAddress = "";
     BrewService.ip().then(function (response) {
       $scope.settings.ipAddress = response.ip;
     }).catch(function (err) {

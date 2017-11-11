@@ -8,7 +8,7 @@
       <div class="modal-body text-center">
         <div class="alert alert-info">
           <strong>Access?</strong>  Are your Arduino URLs remotely accessible?
-          <br>Your IP is <button class="btn btn-light" ng-click="getIPAddress()" ng-if="!settings.ipAddress">Lookup IP Address</button>{{settings.ipAddress}}
+          <br>Your IP address is <strong>{{settings.ipAddress}}</strong> <a href="" class="txt-link" ng-click="getIPAddress()">Lookup IP Address</a>
         </div>
         <table class="table">
           <tr ng-repeat="arduino in settings.arduinos track by $index">

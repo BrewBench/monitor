@@ -288,6 +288,7 @@ $scope.updateABV();
 
   $scope.testInfluxDB = function(){
     $scope.settings.influxdb.testing = true;
+    $scope.settings.influxdb.connected = false;
     BrewService.influxdb().ping()
       .then(response => {
         $scope.settings.influxdb.testing = false;
@@ -304,6 +305,7 @@ $scope.updateABV();
 
   $scope.createInfluxDB = function(){
     var db = $scope.settings.influxdb.db || 'session-'+moment().format('YYYY-MM-DD');
+    $scope.settings.influxdb.created = false;
     BrewService.influxdb().createDB(db)
       .then(response => {
         // prompt for password
@@ -952,6 +954,7 @@ $scope.updateABV();
   };
 
   $scope.getIPAddress = function(){
+    $scope.settings.ipAddress = "";
     BrewService.ip()
       .then(response => {
         $scope.settings.ipAddress = response.ip;
