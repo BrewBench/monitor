@@ -39,7 +39,9 @@
         </div>
 
         <div class="pb-3">
-          <h4>Notifications</h4>
+          <h4>Notifications
+            <i class="fa fa-bell fa-lg float-right" aria-hidden="true"></i>
+          </h4>
 
           <button class="btn btn-primary pull-right" ng-click="alert()" ng-disabled="!settings.notifications.on">Test</button>
           <div class="row-new"></div>
@@ -88,7 +90,9 @@
         </div>
 
         <div class="pb-3">
-          <h4>Kettles</h4>
+          <h4>Kettles
+            <i class="fa fa-cubes fa-lg float-right" aria-hidden="true"></i>
+          </h4>
           <label class="adjust">Add a kettle</label>
           <div class="btn-group item" ng-repeat="kettle in kettleTypes">
             <button class="btn btn-light {{kettle.type}}" ng-click="addKettle(kettle.type)">
@@ -100,7 +104,10 @@
         </div>
 
         <div class="pb-3">
-          <h4>InfluxDB</h4>
+          <h4>InfluxDB
+            <i class="fa fa-area-chart fa-lg float-right" aria-hidden="true"></i>
+          </h4>
+
           <div class="row">
             <div class="col-9">
               <label class="adjust">Url</label>
@@ -147,7 +154,10 @@
         </div>
         <div class="row-new"></div>
         <div class="pb-3">
-          <h4>Arduinos</h4>
+          <h4>Arduinos
+            <i class="fa fa-microchip fa-lg float-right" aria-hidden="true"></i>
+          </h4>
+
           <div class="btn-group pull-right">
             <button class="btn btn-primary" ng-click="arduinos.add()">Add Arduino</button>
 
