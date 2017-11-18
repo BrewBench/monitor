@@ -177,17 +177,15 @@
           </div>
           <div class="row-new"></div>
           <label class="adjust">Poll</label>
-          <div class="col pb-4">
-            <div class="input-group">
-              <input class="form-control" type="number" ng-model="settings.pollSeconds" step="1" min="5">
-              <span class="input-group-btn">
-                <button type="button" class="btn btn-light"><i class="fa fa-minus fa-lg" ng-click="(settings.pollSeconds > 5) ? settings.pollSeconds=settings.pollSeconds-1 : 5"></i></button>
-                <button type="button" class="btn btn-light"><i class="fa fa-plus fa-lg" ng-click="settings.pollSeconds=settings.pollSeconds+1"></i></button>
-              </span>
-            </div>
-            <small class="form-text text-muted">Every {{settings.pollSeconds}} seconds</small>
+          <div class="input-group">
+            <input class="form-control" type="number" ng-model="settings.pollSeconds" step="1" min="5">
+            <span class="input-group-btn">
+              <button type="button" class="btn btn-light"><i class="fa fa-minus fa-lg" ng-click="(settings.pollSeconds > 5) ? settings.pollSeconds=settings.pollSeconds-1 : 5"></i></button>
+              <button type="button" class="btn btn-light"><i class="fa fa-plus fa-lg" ng-click="settings.pollSeconds=settings.pollSeconds+1"></i></button>
+            </span>
           </div>
-
+          <small class="form-text text-muted">Every {{settings.pollSeconds}} seconds</small>
+          <br>
           <table class="table table-striped table-responsive">
           <thead class="thead-inverse">
             <tr>
