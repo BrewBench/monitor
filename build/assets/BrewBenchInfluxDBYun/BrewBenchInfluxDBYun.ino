@@ -69,10 +69,6 @@ void process(BridgeClient client) {
     responseOkHeader(client);
     analogCommand(client);
   }
-  if (command == "settings") {
-    responseOkHeader(client);
-    settingsCommand(client);
-  }
   if (command == "DS18B20") {
     responseOkHeader(client);
     ds18B20Command(client);
@@ -137,17 +133,6 @@ void analogCommand(BridgeClient client) {
 
   // Send JSON response to client
   client.print("{\"pin\":\""+String(spin)+String(pin)+"\",\"value\":\""+String(value)+"\"}");
-}
-
-void settingsCommand(BridgeClient client) {
-  char spin = client.read();
-  String value = '';
-  
-  if (client.read() == '/') {
-
-  }
-  // Send JSON response to client
-  client.print("{\"setting\":\""+String(spin)+"\",\"value\":\""+String(value)+"\"}");
 }
 
 void ds18B20Command(BridgeClient client) {

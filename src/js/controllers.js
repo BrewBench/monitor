@@ -292,12 +292,16 @@ $scope.updateABV();
     BrewService.influxdb().ping()
       .then(response => {
         $scope.settings.influxdb.testing = false;
-        if(response.status == 204)
+        if(response.status == 204){
+          $('#influxdbUrl').removeClass('is-invalid');
           $scope.settings.influxdb.connected = true;
-        else
+        } else {
+          $('#influxdbUrl').addClass('is-invalid');
           $scope.settings.influxdb.connected = false;
+        }
       })
       .catch(err => {
+        $('#influxdbUrl').addClass('is-invalid');
         $scope.settings.influxdb.testing = false;
         $scope.settings.influxdb.connected = false;
       });
@@ -312,6 +316,8 @@ $scope.updateABV();
         if(response.data && response.data.results && response.data.results.length){
           $scope.settings.influxdb.db = db;
           $scope.settings.influxdb.created = true;
+          $('#influxdbUser').removeClass('is-invalid');
+          $('#influxdbPass').removeClass('is-invalid');
           $scope.resetError();
         } else {
           $scope.setErrorMessage("Opps, there was a problem creating the database.");
@@ -319,6 +325,8 @@ $scope.updateABV();
       })
       .catch(err => {
         if(err.status == 401 || err.status == 403){
+          $('#influxdbUser').addClass('is-invalid');
+          $('#influxdbPass').addClass('is-invalid');
           $scope.setErrorMessage("Enter your Username and Password for InfluxDB");
         } else {
           $scope.setErrorMessage("Opps, there was a problem creating the database.");

@@ -281,8 +281,15 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
     $scope.settings.influxdb.connected = false;
     BrewService.influxdb().ping().then(function (response) {
       $scope.settings.influxdb.testing = false;
-      if (response.status == 204) $scope.settings.influxdb.connected = true;else $scope.settings.influxdb.connected = false;
+      if (response.status == 204) {
+        $('#influxdbUrl').removeClass('is-invalid');
+        $scope.settings.influxdb.connected = true;
+      } else {
+        $('#influxdbUrl').addClass('is-invalid');
+        $scope.settings.influxdb.connected = false;
+      }
     }).catch(function (err) {
+      $('#influxdbUrl').addClass('is-invalid');
       $scope.settings.influxdb.testing = false;
       $scope.settings.influxdb.connected = false;
     });
@@ -296,12 +303,16 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
       if (response.data && response.data.results && response.data.results.length) {
         $scope.settings.influxdb.db = db;
         $scope.settings.influxdb.created = true;
+        $('#influxdbUser').removeClass('is-invalid');
+        $('#influxdbPass').removeClass('is-invalid');
         $scope.resetError();
       } else {
         $scope.setErrorMessage("Opps, there was a problem creating the database.");
       }
     }).catch(function (err) {
       if (err.status == 401 || err.status == 403) {
+        $('#influxdbUser').addClass('is-invalid');
+        $('#influxdbPass').addClass('is-invalid');
         $scope.setErrorMessage("Enter your Username and Password for InfluxDB");
       } else {
         $scope.setErrorMessage("Opps, there was a problem creating the database.");

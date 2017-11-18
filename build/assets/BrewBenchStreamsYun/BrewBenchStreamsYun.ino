@@ -8,7 +8,7 @@
 const String VERSION = "2.8.2";
 const String SESSION_ID = "[SESSION_ID]";
 const String API_KEY = "[API_KEY]";
-const String API_HOST = "http://api.brewbench.co/v1/temps";
+const String API_HOST = "http://api.brewbench.co/v1/";
 int secondCounter = 0;
 
 BridgeServer server;
@@ -69,6 +69,10 @@ void process(BridgeClient client) {
   if (command == "analog") {
     responseOkHeader(client);
     analogCommand(client);
+  }
+  if (command == "settings") {
+    responseOkHeader(client);
+    settingsCommand(client);
   }
   if (command == "DS18B20") {
     responseOkHeader(client);
@@ -163,7 +167,7 @@ void ds18B20APICommand(String kettle, String pin) {
   p.addParameter("-H")
   p.addParameter("X-SESSION-ID: "+SESSION_ID);
   p.addParameter("-XPOST");
-  p.addParameter(API_URL);
+  p.addParameter(API_URL+"temp");
   p.addParameter("-d");
   p.addParameter(data);
   p.run();
@@ -191,7 +195,7 @@ void thermistorAPICommand(String kettle, String pin) {
   p.addParameter("-H")
   p.addParameter("X-SESSION-ID: "+SESSION_ID);
   p.addParameter("-XPOST");
-  p.addParameter(API_URL);
+  p.addParameter(API_URL+"temp");
   p.addParameter("-d");
   p.addParameter(data);
   p.run();
@@ -241,10 +245,32 @@ void pt100APICommand(String kettle, String pin) {
   p.addParameter("-H")
   p.addParameter("X-SESSION-ID: "+SESSION_ID);
   p.addParameter("-XPOST");
-  p.addParameter(API_URL);
+  p.addParameter(API_URL+"temp");
   p.addParameter("-d");
   p.addParameter(data);
   p.run();
+}
+
+// Update settings command
+void settingsCommand(BridgeClient client) {
+  String settings = "";
+  Process p;
+  p.begin("curl");
+  p.addParameter("-H")
+  p.addParameter("Content-Type: application/json");
+  p.addParameter("-H")
+  p.addParameter("X-API-KEY: "+API_KEY);
+  p.addParameter("-H")
+  p.addParameter("X-SESSION-ID: "+SESSION_ID);
+  p.addParameter(API_URL+"settings");
+  p.run();
+
+  while (p.available() > 0) {
+    char c = p.read();
+    settings += String(c);
+  }
+  // Send JSON response to client
+  client.print("{\"settings\":\""+String(settings)+"\"}");
 }
 
 void BrewBenchAPI(){

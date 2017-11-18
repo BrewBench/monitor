@@ -17,6 +17,12 @@
     <div id="settings">
 
     <div class="card-body">
+
+        <div class="alert alert-{{error.type}} alert-dismissible" role="alert" ng-if="error.message">
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <strong>{{error.type}}</strong> <span ng-bind-html="error.message">{{error.message}}</span>
+        </div>
+
         <div class="pb-3">
           <h4>General</h4>
 
@@ -112,7 +118,7 @@
             <div class="col-9">
               <label class="adjust">Url</label>
               <div class="input-group">
-                <input class="form-control" type="text" ng-model="settings.influxdb.url" placeholder="http://InfluxDBUrl">
+                <input id="influxdbUrl" class="form-control" type="text" ng-model="settings.influxdb.url" placeholder="http://InfluxDBUrl">
                 <span class="input-group-btn">
                   <button class="btn btn-light" ng-click="testInfluxDB()" ng-disabled="!settings.influxdb.url">Test</button>
                 </span>
@@ -144,11 +150,11 @@
           <div class="row">
             <div class="col-6">
               <label class="adjust">Username</label>
-              <input class="form-control" type="text" ng-model="settings.influxdb.user" placeholder="Username">
+              <input id="influxdbUser" class="form-control" type="text" ng-model="settings.influxdb.user" placeholder="Username">
             </div>
             <div class="col-6">
               <label class="adjust">Password</label>
-              <input class="form-control" type="password" ng-model="settings.influxdb.pass" placeholder="Password">
+              <input id="influxdbPass" class="form-control" type="password" ng-model="settings.influxdb.pass" placeholder="Password">
             </div>
           </div>
         </div>
