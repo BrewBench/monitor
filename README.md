@@ -52,6 +52,10 @@ npm run build
 
 <img src="src/assets/img/screenshot-desktop.png?raw=true" alt="BrewBench screenshot" align="center" />
 
+<img src="src/assets/img/brewbench-wiring-diagram.png?raw=true" alt="BrewBench wired up" align="center" />
+
+[Download the Fritzing Diagram here](src/assets/brewbench-wiring-diagram.fzz)
+
 <img src="src/assets/img/brewbench-wiredup.jpg?raw=true" alt="BrewBench wired up" align="center" />
 
 ## Thanks
