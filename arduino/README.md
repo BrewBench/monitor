@@ -41,13 +41,18 @@
 1. Press play, you can adjust the temp by sliding the temp knob.
 1. Download the [Arduino IDE](https://www.arduino.cc/en/Main/Software) >= 1.8.5
 
-### Yun setup
+### Arduino Yun
   * If the WiFi network starts with Arduino use password: arduino
   * Set REST API access to open
     * you can password protect the REST API but will need to update the [sketch](arduino/BrewBenchYun/BrewBenchYun.ino#L185)
   * Change or remember the host name or IP address (you will need this later)
   * Save to reboot
   * Using the [Arduino IDE](https://www.arduino.cc/en/Main/Software) upload the [BrewBenchYun sketch](arduino/BrewBenchYun/BrewBenchYun.ino)
+
+### Arduino Leonardo, Arduino Uno, Arduino Mega 2560 with a Dragino Yun Shield
+  * Add the boards following these instructions
+
+    * http://wiki.dragino.com/index.php?title=Getting_Start_with_Arduino_Yun#Automatically_Add_Board_Profile_in_Arduino_IDE
 
 
 ### Setup with Home Assistant
@@ -76,6 +81,8 @@ Then add this to your `/home/user/.homeassistant/configuration.yaml`
 ### Setup with InfluxDB
 
 Use the [InfluxDB]() sketch, download from the app and it will create the kettles you have connected.  Then use docker and  [Grafana](https://grafana.com/grafana/download?platform=docker) for graphs.
+
+Download the fermentation dashboard https://grafana.com/dashboards/3957
 
 ```sh
 brew update

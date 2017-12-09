@@ -142,7 +142,7 @@
               <small ng-if="settings.influxdb.created" class="form-text text-success">Created</small>
             </div>
             <div class="col-3">
-              <label class="adjust">Frequency</label>
+              <label class="adjust">Poll Frequency</label>
               <input class="form-control" style="width: 100%;" type="number" ng-model="settings.influxdb.frequency">
               <small class="form-text text-muted">Every {{settings.influxdb.frequency}} seconds</small>
             </div>
@@ -165,18 +165,18 @@
           </h4>
 
           <div class="btn-group pull-right">
-            <button class="btn btn-primary" ng-click="arduinos.add()">Add Arduino</button>
-
             <button type="button" class="btn btn-light dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              Download Sketch <span class="caret"></span>
+              Download <span class="caret"></span>
             </button>
             <div class="dropdown-menu scrollable-menu">
               <a href="assets/BrewBenchYun/BrewBenchYun.ino" class="dropdown-item">Arduino Yun</a>
               <a href="" ng-click="downloadInfluxDBSketch()" class="dropdown-item" ng-class="{'disabled':!settings.influxdb.connected}">Arduino Yun w/InfluxDB</a>
+              <a href="https://grafana.com/dashboards/3960" class="dropdown-item" target="_blank">Grafana Session Dashboard</a>
+              <a href="https://grafana.com/dashboards/3957" class="dropdown-item" target="_blank">Grafana Fermentation Dashboard</a>
             </div>
           </div>
           <div class="row-new"></div>
-          <label class="adjust">Poll</label>
+          <label class="adjust">Poll Frequency</label>
           <div class="input-group">
             <input class="form-control" type="number" ng-model="settings.pollSeconds" step="1" min="5">
             <span class="input-group-btn">
@@ -186,6 +186,7 @@
           </div>
           <small class="form-text text-muted">Every {{settings.pollSeconds}} seconds</small>
           <br>
+          <button class="btn btn-primary" ng-click="arduinos.add()">Add Arduino</button>
           <table class="table table-striped table-responsive">
           <thead class="thead-inverse">
             <tr>
