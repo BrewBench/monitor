@@ -167,7 +167,7 @@
                 {
                   "key": "source",
                   "operator": "=",
-                  "value": "Hot Liquor"
+                  "value": "HotLiquor"
                 }
               ]
             }
@@ -537,7 +537,7 @@
                 {
                   "key": "source",
                   "operator": "=",
-                  "value": "Hot Liquor"
+                  "value": "HotLiquor"
                 }
               ]
             },
