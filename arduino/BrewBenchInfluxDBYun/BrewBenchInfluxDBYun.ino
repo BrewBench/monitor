@@ -157,6 +157,7 @@ void ds18B20InfluxDBCommand(String source, String pin) {
   p.begin("curl");
   p.addParameter("-XPOST");
   p.addParameter(INFLUXDB_CONNECTION);
+  p.addParameter("--insecure");
   p.addParameter("--data-binary");
   p.addParameter(data);
   p.run();
@@ -179,6 +180,7 @@ void thermistorInfluxDBCommand(String source, String pin) {
   p.begin("curl");
   p.addParameter("-XPOST");
   p.addParameter(INFLUXDB_CONNECTION);
+  p.addParameter("--insecure");
   p.addParameter("--data-binary");
   p.addParameter(data);
   p.run();
@@ -223,6 +225,7 @@ void pt100InfluxDBCommand(String source, String pin) {
   p.begin("curl");
   p.addParameter("-XPOST");
   p.addParameter(INFLUXDB_CONNECTION);
+  p.addParameter("--insecure");
   p.addParameter("--data-binary");
   p.addParameter(data);
   p.run();
