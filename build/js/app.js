@@ -846,7 +846,9 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
     if (!$scope.settings.influxdb.url) return;
 
     var kettles = "";
-    var connection_string = $scope.settings.influxdb.url + ':' + $scope.settings.influxdb.port + '/write?';
+    var connection_string = '' + $scope.settings.influxdb.url;
+    if (!!$scope.settings.influxdb.port) connection_string += ':' + $scope.settings.influxdb.port;
+    connection_string += '/write?';
     // add user/pass
     if (!!$scope.settings.influxdb.user && !!$scope.settings.influxdb.pass) connection_string += 'u=' + $scope.settings.influxdb.user + '&p=' + $scope.settings.influxdb.pass + '&';
     // add db
@@ -1566,7 +1568,8 @@ angular.module('brewbench-monitor').factory('BrewService', function ($http, $q, 
     influxdb: function influxdb() {
       var q = $q.defer();
       var settings = this.settings('settings');
-      var influxConnection = settings.influxdb.url + ':' + settings.influxdb.port;
+      var influxConnection = '' + settings.influxdb.url;
+      if (!!settings.influxdb.port) influxConnection += ':' + settings.influxdb.port;
 
       return {
         ping: function ping() {

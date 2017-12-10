@@ -903,7 +903,10 @@ $scope.updateABV();
     if(!$scope.settings.influxdb.url) return;
 
     let kettles = "";
-    let connection_string = `${$scope.settings.influxdb.url}:${$scope.settings.influxdb.port}/write?`;
+    let connection_string = `${$scope.settings.influxdb.url}`;
+    if( !!$scope.settings.influxdb.port )
+      connection_string += `:${$scope.settings.influxdb.port}`;
+    connection_string += '/write?';
     // add user/pass
     if(!!$scope.settings.influxdb.user && !!$scope.settings.influxdb.pass)
       connection_string += `u=${$scope.settings.influxdb.user}&p=${$scope.settings.influxdb.pass}&`

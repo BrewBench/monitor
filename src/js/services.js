@@ -363,7 +363,9 @@ angular.module('brewbench-monitor')
     influxdb: function(){
       let q = $q.defer();
       let settings = this.settings('settings');
-      let influxConnection = `${settings.influxdb.url}:${settings.influxdb.port}`;
+      let influxConnection = `${settings.influxdb.url}`;
+      if( !!settings.influxdb.port )
+        influxConnection += `:${settings.influxdb.port}`
 
       return {
         ping: () => {
