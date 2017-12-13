@@ -2,7 +2,9 @@
 #include <Bridge.h>
 #include <BridgeServer.h>
 #include <BridgeClient.h>
-// http://static.cactus.io/downloads/library/ds18b20/cactus_io_DS18B20.zip
+// https://www.brewbench.co/libs/DHTLib.zip
+#include <dht.h>
+// https://www.brewbench.co/libs/cactus_io_DS18B20.zip
 #include "cactus_io_DS18B20.h"
 
 const String VERSION = "2.8.2";
@@ -11,6 +13,7 @@ const int FREQUENCY_SECONDS = [FREQUENCY_SECONDS];
 int secondCounter = 0;
 
 BridgeServer server;
+dht DHT;
 
 // https://learn.adafruit.com/thermistor/using-a-thermistor
 // resistance at 25 degrees C
@@ -80,6 +83,10 @@ void process(BridgeClient client) {
   if (command == "PT100") {
     responseOkHeader(client);
     pt100Command(client);
+  }
+  if (command == "DHT11") {
+    responseOkHeader(client);
+    dht11Command(client);
   }
 }
 
@@ -221,6 +228,34 @@ void pt100InfluxDBCommand(String source, String pin) {
   }
 
   String data = "temperature,sensor=PT100,pin="+pin+",source="+source+" temp="+String(temp);
+  Process p;
+  p.begin("curl");
+  p.addParameter("-XPOST");
+  p.addParameter(INFLUXDB_CONNECTION);
+  p.addParameter("--insecure");
+  p.addParameter("--data-binary");
+  p.addParameter(data);
+  p.run();
+}
+
+void dht11Command(BridgeClient client) {
+  char spin = client.read();
+  int pin = client.parseInt();
+  int chk = DHT.read11(pin);
+  float temp = DHT.temperature;;
+  float humidity = DHT.humidity;
+  // Send JSON response to client
+  client.print("{\"pin\":\""+String(spin)+String(pin)+"\",\"temp\":\""+String(temp)+"\",\"humidity\":\""+String(humidity)+"\"}");
+}
+
+void dht11Command(BridgeClient client) {
+  char spin = client.read();
+  int pin = client.parseInt();
+  int chk = DHT.read11(pin);
+  float temp = DHT.temperature;
+  float humidity = DHT.humidity;
+  // Send JSON response to client
+  String data = "temperature,sensor=DHT11,pin="+pin+",source="+source+" temp="+String(temp)+" humidity="+String(humidity);
   Process p;
   p.begin("curl");
   p.addParameter("-XPOST");

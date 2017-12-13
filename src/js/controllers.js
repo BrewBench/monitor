@@ -655,6 +655,11 @@ $scope.updateABV();
       });
     }
 
+    //DHT11 sensor has humidity
+    if( response.humidity ){
+      kettle.humidity = response.humidity;
+    }
+
     kettle.values.push([date.getTime(),kettle.temp.current]);
 
     $scope.updateKnobCopy(kettle);
@@ -1141,6 +1146,11 @@ $scope.updateABV();
       kettle.knob.subText.color = 'gray';
       kettle.low = null;
       kettle.high = null;
+    }
+    // update subtext to include humidity
+    if(kettle.humidity){
+      kettle.knob.subText.text = kettle.humidity+'%';
+      kettle.knob.subText.color = 'gray';
     }
   };
 
