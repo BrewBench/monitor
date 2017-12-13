@@ -920,11 +920,13 @@ $scope.updateABV();
 
     _.each($scope.kettles, (kettle, i) => {
       if( kettle.temp.type == 'Thermistor' )
-        kettles += 'thermistorInfluxDBCommand("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.temp.pin+'");\n  ';
+        kettles += 'thermistorInfluxDBCommand("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.temp.pin+'");\n';
       else if( kettle.temp.type == 'DS18B20' )
-        kettles += 'ds18B20InfluxDBCommand("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.temp.pin+'");\n  ';
+        kettles += 'ds18B20InfluxDBCommand("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.temp.pin+'");\n';
       else if( kettle.temp.type == 'PT100' )
-        kettles += 'pt100InfluxDBCommand("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.temp.pin+'");\n  ';
+        kettles += 'pt100InfluxDBCommand("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.temp.pin+'");\n';
+      else if( kettle.temp.type == 'DHT11' )
+        kettles += 'dht11InfluxDBCommand("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.temp.pin+'");\n';
     });
     return $http.get('assets/BrewBenchInfluxDBYun/BrewBenchInfluxDBYun.ino')
       .then(response => {

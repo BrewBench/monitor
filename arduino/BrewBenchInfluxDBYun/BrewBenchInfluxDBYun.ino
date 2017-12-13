@@ -248,9 +248,7 @@ void dht11Command(BridgeClient client) {
   client.print("{\"pin\":\""+String(spin)+String(pin)+"\",\"temp\":\""+String(temp)+"\",\"humidity\":\""+String(humidity)+"\"}");
 }
 
-void dht11Command(BridgeClient client) {
-  char spin = client.read();
-  int pin = client.parseInt();
+void dht11InfluxDBCommand(String source, String pin) {
   int chk = DHT.read11(pin);
   float temp = DHT.temperature;
   float humidity = DHT.humidity;
