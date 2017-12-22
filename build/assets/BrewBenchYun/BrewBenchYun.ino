@@ -2,12 +2,15 @@
 #include <Bridge.h>
 #include <BridgeServer.h>
 #include <BridgeClient.h>
-// http://static.cactus.io/downloads/library/ds18b20/cactus_io_DS18B20.zip
+// https://www.brewbench.co/libs/DHTLib.zip
+#include <dht.h>
+// https://www.brewbench.co/libs/cactus_io_DS18B20.zip
 #include "cactus_io_DS18B20.h"
 
-const String VERSION = "2.8.2";
+const String VERSION = "2.8.3";
 
 BridgeServer server;
+dht DHT;
 
 // https://learn.adafruit.com/thermistor/using-a-thermistor
 // resistance at 25 degrees C
@@ -77,6 +80,14 @@ void process(BridgeClient client) {
   if (command == "PT100") {
     responseOkHeader(client);
     pt100Command(client);
+  }
+  if (command == "DHT11") {
+    responseOkHeader(client);
+    dht11Command(client);
+  }
+  if (command == "DHT22") {
+    responseOkHeader(client);
+    dht22Command(client);
   }
 }
 
@@ -172,6 +183,48 @@ void pt100Command(BridgeClient client) {
   }
   // Send JSON response to client
   client.print("{\"pin\":\""+String(spin)+String(pin)+"\",\"temp\":\""+String(temp)+"\"}");
+}
+
+void dht11Command(BridgeClient client) {
+  char spin = client.read();
+  int pin = client.parseInt();
+  int chk = DHT.read11(pin);
+  if( chk == DHTLIB_OK ){
+    float temp = DHT.temperature;
+    float humidity = DHT.humidity;
+    // Send JSON response to client
+    client.print("{\"pin\":\""+String(spin)+String(pin)+"\",\"temp\":\""+String(temp)+"\",\"humidity\":\""+String(humidity)+"\"}");
+  } else {
+    client.print("{\"error\":\""+String(chk)+"\"}");
+  }
+}
+
+void dht21Command(BridgeClient client) {
+  char spin = client.read();
+  int pin = client.parseInt();
+  int chk = DHT.read21(pin);
+  if( chk == DHTLIB_OK ){
+    float temp = DHT.temperature;
+    float humidity = DHT.humidity;
+    // Send JSON response to client
+    client.print("{\"pin\":\""+String(spin)+String(pin)+"\",\"temp\":\""+String(temp)+"\",\"humidity\":\""+String(humidity)+"\"}");
+  } else {
+    client.print("{\"error\":\""+String(chk)+"\"}");
+  }
+}
+
+void dht22Command(BridgeClient client) {
+  char spin = client.read();
+  int pin = client.parseInt();
+  int chk = DHT.read22(pin);
+  if( chk == DHTLIB_OK ){
+    float temp = DHT.temperature;
+    float humidity = DHT.humidity;
+    // Send JSON response to client
+    client.print("{\"pin\":\""+String(spin)+String(pin)+"\",\"temp\":\""+String(temp)+"\",\"humidity\":\""+String(humidity)+"\"}");
+  } else {
+    client.print("{\"error\":\""+String(chk)+"\"}");
+  }
 }
 
 void setup() {

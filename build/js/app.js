@@ -600,6 +600,11 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
       });
     }
 
+    //DHT11 sensor has humidity
+    if (response.humidity) {
+      kettle.humidity = response.humidity;
+    }
+
     kettle.values.push([date.getTime(), kettle.temp.current]);
 
     $scope.updateKnobCopy(kettle);
@@ -855,7 +860,7 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
     connection_string += 'db=' + ($scope.settings.influxdb.db || 'session-' + moment().format('YYYY-MM-DD'));
 
     _.each($scope.kettles, function (kettle, i) {
-      if (kettle.temp.type == 'Thermistor') kettles += 'thermistorInfluxDBCommand("' + kettle.key.replace(/[^a-zA-Z0-9-.]/g, "") + '","' + kettle.temp.pin + '");\n  ';else if (kettle.temp.type == 'DS18B20') kettles += 'ds18B20InfluxDBCommand("' + kettle.key.replace(/[^a-zA-Z0-9-.]/g, "") + '","' + kettle.temp.pin + '");\n  ';else if (kettle.temp.type == 'PT100') kettles += 'pt100InfluxDBCommand("' + kettle.key.replace(/[^a-zA-Z0-9-.]/g, "") + '","' + kettle.temp.pin + '");\n  ';
+      if (kettle.temp.type == 'Thermistor') kettles += 'thermistorInfluxDBCommand("' + kettle.key.replace(/[^a-zA-Z0-9-.]/g, "") + '","' + kettle.temp.pin + '");\n';else if (kettle.temp.type == 'DS18B20') kettles += 'ds18B20InfluxDBCommand("' + kettle.key.replace(/[^a-zA-Z0-9-.]/g, "") + '","' + kettle.temp.pin + '");\n';else if (kettle.temp.type == 'PT100') kettles += 'pt100InfluxDBCommand("' + kettle.key.replace(/[^a-zA-Z0-9-.]/g, "") + '","' + kettle.temp.pin + '");\n';else if (kettle.temp.type == 'DHT11') kettles += 'dht11InfluxDBCommand("' + kettle.key.replace(/[^a-zA-Z0-9-.]/g, "") + '","' + kettle.temp.pin + '");\n';else if (kettle.temp.type == 'DHT21') kettles += 'dht21InfluxDBCommand("' + kettle.key.replace(/[^a-zA-Z0-9-.]/g, "") + '","' + kettle.temp.pin + '");\n';else if (kettle.temp.type == 'DHT22') kettles += 'dht22InfluxDBCommand("' + kettle.key.replace(/[^a-zA-Z0-9-.]/g, "") + '","' + kettle.temp.pin + '");\n';
     });
     return $http.get('assets/BrewBenchInfluxDBYun/BrewBenchInfluxDBYun.ino').then(function (response) {
       // replace variables
@@ -1031,6 +1036,11 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
       kettle.knob.subText.color = 'gray';
       kettle.low = null;
       kettle.high = null;
+    }
+    // update subtext to include humidity
+    if (kettle.humidity) {
+      kettle.knob.subText.text = kettle.humidity + '%';
+      kettle.knob.subText.color = 'gray';
     }
   };
 
@@ -1370,7 +1380,7 @@ angular.module('brewbench-monitor').factory('BrewService', function ($http, $q, 
     },
 
     sensorTypes: function sensorTypes(name) {
-      var sensors = [{ name: 'Thermistor', analog: true, digital: false }, { name: 'DS18B20', analog: false, digital: true }, { name: 'PT100', analog: true, digital: true }];
+      var sensors = [{ name: 'Thermistor', analog: true, digital: false }, { name: 'DS18B20', analog: false, digital: true }, { name: 'PT100', analog: true, digital: true }, { name: 'DHT11', analog: false, digital: true }, { name: 'DHT21', analog: false, digital: true }, { name: 'DHT22', analog: false, digital: true }];
       if (name) return _.filter(sensors, { 'name': name })[0];
       return sensors;
     },
