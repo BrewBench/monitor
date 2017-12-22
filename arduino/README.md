@@ -6,20 +6,20 @@
 
   * [Thermistors](https://learn.adafruit.com/thermistor/using-a-thermistor) (Analog) 10K or 100K resistor
 
-    <img src="../src/assets/img/thermistor.png?raw=true" alt="BrewBench fermenter" align="center" width="400" />
+    <img src="../src/assets/img/thermistor.png?raw=true" alt="BrewBench thermistor" align="center" width="400" />
 
   * [DS18B20](https://www.adafruit.com/product/381) (Digital) 4.7K resistor
     * Will need the [cactus](http://static.cactus.io/downloads/library/ds18b20/cactus_io_DS18B20.zip) library
 
-    <img src="../src/assets/img/DS18S20.png?raw=true" alt="BrewBench fermenter" align="center" width="400" />
+    <img src="../src/assets/img/DS18S20.png?raw=true" alt="BrewBench DS18B20" align="center" width="400" />
 
   * [PT100](https://www.adafruit.com/product/3290) (Analog)
 
-    <img src="../src/assets/img/PT100.png?raw=true" alt="BrewBench fermenter" align="center" width="400" />
+    <img src="../src/assets/img/PT100.png?raw=true" alt="BrewBench PT100" align="center" width="400" />
 
   * DHT11, DHT21, DHT22 Temperature and Humidity great addition for brew house monitoring.
 
-    <img src="../src/assets/img/DHT11.png?raw=true" alt="BrewBench fermenter" align="center" width="400" />
+    <img src="../src/assets/img/DHT11.png?raw=true" alt="BrewBench DHT" align="center" width="400" />
 
   * Ranco temperature controller (Uses a thermistor)
 
@@ -33,7 +33,7 @@
     * Arduino GRD -> Relay DC Negative
     * Arduino Digital (D3) PWM ~ Port -> Relay DC Positive
 
-      <img src="../src/assets/img/ssr-relay.jpg?raw=true" alt="BrewBench fermenter" align="center" width="300" />
+      <img src="../src/assets/img/ssr-relay.jpg?raw=true" alt="BrewBench SSR" align="center" width="300" />
 
   * [Sainsmart 2 channel relay](http://www.sainsmart.com/arduino-pro-mini.html)
     * Arduino GND -> Relay GND
@@ -42,7 +42,7 @@
     * Arduino Digital (D2) Port -> Relay IN1 (heater)
     * Arduino Digital (D4) Port -> Relay IN2 (pump)
 
-      <img src="../src/assets/img/sainsmart.png?raw=true" alt="BrewBench fermenter" align="center" width="300" />
+      <img src="../src/assets/img/sainsmart.png?raw=true" alt="BrewBench relay" align="center" width="300" />
 
 ## Arduino Boards
 
@@ -54,10 +54,10 @@
 ### Arduino Yun
   * If the WiFi network starts with Arduino use password: arduino
   * Set REST API access to open
-    * you can password protect the REST API but will need to update the [sketch](arduino/BrewBenchYun/BrewBenchYun.ino#L185)
+    * you can password protect the REST API but will need to update the [sketch](BrewBenchYun/BrewBenchYun.ino)
   * Change or remember the host name or IP address (you will need this later)
   * Save to reboot
-  * Using the [Arduino IDE](https://www.arduino.cc/en/Main/Software) upload the [BrewBenchYun sketch](arduino/BrewBenchYun/BrewBenchYun.ino)
+  * Using the [Arduino IDE](https://www.arduino.cc/en/Main/Software) upload the [BrewBenchYun sketch](BrewBenchYun/BrewBenchYun.ino)
 
 ### Arduino Leonardo, Arduino Uno, Arduino Mega 2560 with a Dragino Yun Shield
   * Add the boards following these instructions
@@ -103,4 +103,4 @@ brew install influxdb
 docker run -d --name=grafana -p 3000:3000 grafana/grafana
 ```
 
-<img src="../src/assets/img/screenshot-influxdb.png?raw=true" alt="BrewBench" align="center" width="100%" />
+<img src="../src/assets/img/screenshot-influxdb.png?raw=true" alt="BrewBench InfluxDB" align="center" width="100%" />

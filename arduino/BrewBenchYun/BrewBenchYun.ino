@@ -7,7 +7,7 @@
 // https://www.brewbench.co/libs/cactus_io_DS18B20.zip
 #include "cactus_io_DS18B20.h"
 
-const String VERSION = "2.8.2";
+const String VERSION = "2.8.3";
 
 BridgeServer server;
 dht DHT;
