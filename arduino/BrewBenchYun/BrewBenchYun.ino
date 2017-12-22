@@ -85,6 +85,10 @@ void process(BridgeClient client) {
     responseOkHeader(client);
     dht11Command(client);
   }
+  if (command == "DHT22") {
+    responseOkHeader(client);
+    dht22Command(client);
+  }
 }
 
 void responseOkHeader(BridgeClient client){
@@ -185,10 +189,42 @@ void dht11Command(BridgeClient client) {
   char spin = client.read();
   int pin = client.parseInt();
   int chk = DHT.read11(pin);
-  float temp = DHT.temperature;
-  float humidity = DHT.humidity;
-  // Send JSON response to client
-  client.print("{\"pin\":\""+String(spin)+String(pin)+"\",\"temp\":\""+String(temp)+"\",\"humidity\":\""+String(humidity)+"\"}");
+  if( chk == DHTLIB_OK ){
+    float temp = DHT.temperature;
+    float humidity = DHT.humidity;
+    // Send JSON response to client
+    client.print("{\"pin\":\""+String(spin)+String(pin)+"\",\"temp\":\""+String(temp)+"\",\"humidity\":\""+String(humidity)+"\"}");
+  } else {
+    client.print("{\"error\":\""+String(chk)+"\"}");
+  }
+}
+
+void dht21Command(BridgeClient client) {
+  char spin = client.read();
+  int pin = client.parseInt();
+  int chk = DHT.read21(pin);
+  if( chk == DHTLIB_OK ){
+    float temp = DHT.temperature;
+    float humidity = DHT.humidity;
+    // Send JSON response to client
+    client.print("{\"pin\":\""+String(spin)+String(pin)+"\",\"temp\":\""+String(temp)+"\",\"humidity\":\""+String(humidity)+"\"}");
+  } else {
+    client.print("{\"error\":\""+String(chk)+"\"}");
+  }
+}
+
+void dht22Command(BridgeClient client) {
+  char spin = client.read();
+  int pin = client.parseInt();
+  int chk = DHT.read22(pin);
+  if( chk == DHTLIB_OK ){
+    float temp = DHT.temperature;
+    float humidity = DHT.humidity;
+    // Send JSON response to client
+    client.print("{\"pin\":\""+String(spin)+String(pin)+"\",\"temp\":\""+String(temp)+"\",\"humidity\":\""+String(humidity)+"\"}");
+  } else {
+    client.print("{\"error\":\""+String(chk)+"\"}");
+  }
 }
 
 void setup() {

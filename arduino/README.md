@@ -17,6 +17,16 @@
 
     <img src="../src/assets/img/PT100.png?raw=true" alt="BrewBench fermenter" align="center" width="400" />
 
+  * DHT11, DHT21, DHT22 Temperature and Humidity great addition for brew house monitoring.
+
+    <img src="../src/assets/img/DHT11.png?raw=true" alt="BrewBench fermenter" align="center" width="400" />
+
+  * Ranco temperature controller (Uses a thermistor)
+
+      Modify an existing temperature controller
+      - White wire (data)
+      - Black wire (ground)
+
 ### Choose a Relay
 
   * [Solid State Relay (SSR)](https://www.sparkfun.com/products/13015)
@@ -64,6 +74,7 @@ Sensors are:
 * Thermistor
 * DS18B20
 * PT100
+* DHT11
 
 Then add this to your `/home/user/.homeassistant/configuration.yaml`
 
@@ -71,9 +82,9 @@ Then add this to your `/home/user/.homeassistant/configuration.yaml`
   sensor:
     # https://home-assistant.io/components/sensor.rest/    
     - platform: rest
-      resource: http://arduino.local/arduino/Thermistor/2
+      resource: http://arduino.local/arduino/Thermistor/A2
       method: GET
-      name: BrewBench Fermenter
+      name: BrewBench
       unit_of_measurement: "°F"
       value_template: "{{ ((float(value_json.temp) * 9 / 5 )  +  32) | round(1) }}"
 ```

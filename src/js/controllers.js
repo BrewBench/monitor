@@ -927,6 +927,10 @@ $scope.updateABV();
         kettles += 'pt100InfluxDBCommand("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.temp.pin+'");\n';
       else if( kettle.temp.type == 'DHT11' )
         kettles += 'dht11InfluxDBCommand("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.temp.pin+'");\n';
+      else if( kettle.temp.type == 'DHT21' )
+        kettles += 'dht21InfluxDBCommand("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.temp.pin+'");\n';
+      else if( kettle.temp.type == 'DHT22' )
+        kettles += 'dht22InfluxDBCommand("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.temp.pin+'");\n';
     });
     return $http.get('assets/BrewBenchInfluxDBYun/BrewBenchInfluxDBYun.ino')
       .then(response => {

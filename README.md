@@ -18,7 +18,7 @@ BrewBench Monitor can easily be used with fermenters with a thermowell.
 
 ## Setup the Arduino
 
-See the Arduino sketches [README](arduino/)
+See the Arduino sketches [README](arduino/).  Also contains a list of sensors.  Works with Thermistors, DS18B20, PT100, DHT11 and Ranco temperature controls.
 
 ## Open BrewBench
 
