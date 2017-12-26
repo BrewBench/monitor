@@ -34,7 +34,7 @@ npm install
 # run tests
 npm test
 # start dev web server
-gulp
+npm start
 ```
 
 ## Deployment

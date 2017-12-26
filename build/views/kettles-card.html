@@ -101,13 +101,20 @@
               <button type="button" class="btn btn-light dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" ng-disabled="kettle.heater.running">
                 {{kettle.heater.pin}} <span class="caret"></span>
               </button>
-              <div class="dropdown-menu scrollable-menu">
+              <div class="dropdown-menu scrollable-menu" ng-click="tpScan();">
                 <button ng-click="kettle.heater.ssr = !kettle.heater.ssr"
                   class="ssr dropdown-item" type="button">
                   Solid State Relay
                   <i class="fa fa-lg" ng-class="{'fa-check text-success':kettle.heater.ssr,'fa-circle-o':!kettle.heater.ssr}"></i> <span ng-show="kettle.heater.ssr" class="text-muted">{{kettle.heater.dutyCycle}}%</span>
                 </button>
                 <div class="dropdown-divider"></div>
+                <h6 class="dropdown-header">TP-Link</h6>
+                <div class="dropdown-divider"></div>
+                <button ng-if="settings.tplinks"
+                     ng-repeat="tp in settings.tplinks track by $index"
+                     class="dropdown-item" type="button">
+                   {{ tp.alias }}
+                </button>
                 <h6 class="dropdown-header">Analog</h6>
                 <div class="dropdown-divider"></div>
                 <button ng-repeat="p in getPortRange(kettle.arduino.analog) track by $index"

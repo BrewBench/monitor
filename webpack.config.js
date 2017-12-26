@@ -1,0 +1,97 @@
+const webpack = require('webpack');
+const WebpackMd5Hash = require('webpack-md5-hash');
+const AssetsPlugin = require('assets-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+
+const path = require('path');
+const pkg = require('./package.json');
+
+module.exports = {
+    entry: {
+      main: [
+        './src/js/app.js',
+        './src/js/controllers.js',
+        './src/js/directives.js',
+        './src/js/filters.js',
+        './src/js/services.js'
+      ],
+      vendor: [
+        './src/js/vendor/md5.min.js',
+        './src/js/vendor/ng-knob.min.js',
+        './src/js/vendor/xml2json.min.js',
+        './src/js/vendor/yaml.min.js'
+      ],
+      vendor_node: Object.keys(pkg.dependencies)
+    },
+    output: {
+      path: path.resolve('./build'),
+      filename: 'js/[name].js',
+      chunkFilename: 'js/[name]-[chunkhash].js',
+      jsonpFunction: 'webpackJsonp'
+    },
+    plugins: [
+      // Extract all 3rd party modules into a separate 'vendor' chunk
+      new webpack.optimize.CommonsChunkPlugin({
+        name: 'vendor_node',
+        minChunks: ({ resource }) => /node_modules/.test(resource)
+      }),
+
+      // Generate a 'manifest' chunk to be inlined in the HTML template
+      new webpack.optimize.CommonsChunkPlugin('manifest'),
+
+      // Need this plugin for deterministic hashing
+      // until this issue is resolved: https://github.com/webpack/webpack/issues/1315
+      // for more info: https://webpack.js.org/how-to/cache/
+      new WebpackMd5Hash(),
+
+      // Creates a 'webpack-assets.json' file with all of the
+      // generated chunk names so you can reference them
+      new AssetsPlugin(),
+
+      new CopyWebpackPlugin([
+            {from:'src/views',to:'views'},
+            {from:'src/assets',to:'assets'},
+            {from:'src/index.html',to:'index.html'},
+            {from:'src/favicon.ico',to:'favicon.ico'},
+            {from:'package.json',to:'package.json'},
+        ]),
+
+      new webpack.ProvidePlugin({
+        $: 'jquery',
+        jQuery: 'jquery',
+        'window.jQuery': 'jquery',
+        Popper: ['popper.js', 'default'],
+        // In case you imported plugins individually, you must also require them here:
+        Util: "exports-loader?Util!bootstrap/js/dist/util",
+        Dropdown: "exports-loader?Dropdown!bootstrap/js/dist/dropdown",
+      }),
+    ],
+    module: {
+        loaders: [
+          {
+            test: /\.js$/,
+            exclude: /node_modules/,
+            loader: 'babel-loader'
+        },
+        {
+          test: /\.html$/,
+          include: [
+            path.resolve('./src'),
+            path.resolve('./src/views')
+          ],
+          loader: "html"
+        },
+        {
+          test: /\.scss$/,
+          include: path.resolve('./src/styles'),
+          loader: "style!css"
+        }
+      ]
+    },
+    node: {
+      dns: 'mock',
+      net: 'empty',
+      dgram: 'empty'
+    },
+    devtool: '#inline-source-map'
+};

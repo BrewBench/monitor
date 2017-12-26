@@ -194,6 +194,10 @@ $scope.updateABV();
     }
   };
 
+  $scope.tpScan = function(){
+      BrewService.tplink().scan();
+  };
+
   $scope.addKettle = function(type){
     if(!$scope.kettles) $scope.kettles = [];
     $scope.kettles.push({

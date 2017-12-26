@@ -30,6 +30,7 @@ angular.module('brewbench-monitor')
           digital: 13,
           secure: false
         }]
+        ,tplinks: []
       };
     },
 
@@ -361,6 +362,21 @@ angular.module('brewbench-monitor')
           q.reject(err);
         });
       return q.promise;
+    },
+
+    tplink: function(){
+
+      return {
+        scan: () => {
+
+        },
+        on: () => {
+
+        },
+        off: () => {
+
+        }
+      };
     },
 
     influxdb: function(){

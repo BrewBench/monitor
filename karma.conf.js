@@ -15,18 +15,11 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      'https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js',
-      'https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular-touch.min.js',
-      'https://cdnjs.cloudflare.com/ajax/libs/angular-nvd3/1.0.5/angular-nvd3.min.js',
-      'https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/1.0.0/angular-ui-router.min.js',
-      'https://cdnjs.cloudflare.com/ajax/libs/angular-scroll/1.0.0/angular-scroll.min.js',
-      'https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.12/d3.min.js',
-      'https://cdnjs.cloudflare.com/ajax/libs/nvd3/1.8.1/nv.d3.min.js',
-      'https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js',
-      'https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js',
-      './node_modules/angular-mocks/angular-mocks.js',                 // loads our modules for tests
+      './build/js/manifest.js',
+      './build/js/vendor_node.js',
       './build/js/vendor.js',
-      './build/js/app.js',
+      './node_modules/angular-mocks/angular-mocks.js',
+      './build/js/main.js',
       './test/*.spec.js'
   ],
 
