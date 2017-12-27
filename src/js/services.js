@@ -30,7 +30,7 @@ angular.module('brewbench-monitor')
           digital: 13,
           secure: false
         }]
-        ,tplinks: []
+        ,tplink: {user: '', pass: '', token:'', plugs: []}
       };
     },
 
@@ -365,16 +365,105 @@ angular.module('brewbench-monitor')
     },
 
     tplink: function(){
-
+      const url = "https://wap.tplinkcloud.com";
+      let params = {
+        appName: 'Kasa_Android',
+        termID: 'BrewBench',
+        appVer: '1.4.4.607',
+        ospf: 'Android+6.0.1',
+        netType: 'wifi',
+        locale: 'es_EN'
+      };
       return {
-        scan: () => {
-
+        login: (user,pass) => {
+          let q = $q.defer();
+          if(!user || !pass)
+            return q.reject('Invalid Login');
+          const login_payload = {
+            "method": "login",
+            "url": url,
+            "params": {
+              "appType": "Kasa_Android",
+              "cloudPassword": pass,
+              "cloudUserName": user,
+              "terminalUUID": params.termID
+            }
+          };
+          $http({url: url,
+              method: 'POST',
+              params: params,
+              data: JSON.stringify(login_payload),
+              headers: {'Content-Type': 'application/json'}
+            })
+            .then(response => {
+              // save the token
+              if(response.data.result){
+                q.resolve(response.data.result);
+              } else {
+                q.reject('No response');
+              }
+            })
+            .catch(err => {
+              q.reject(err);
+            });
+          return q.promise;
         },
-        on: () => {
-
+        scan: (token) => {
+          let q = $q.defer();
+          let settings = this.settings('settings');
+          token = token || settings.tplink.token;
+          if(!token)
+            return q.reject('Invalid token');
+          $http({url: url,
+              method: 'POST',
+              params: {token: token},
+              data: JSON.stringify({ method: "getDeviceList" }),
+              headers: {'Content-Type': 'application/json'}
+            })
+            .then(response => {
+              q.resolve(response.data.result);
+            })
+            .catch(err => {
+              q.reject(err);
+            });
+          return q.promise;
         },
-        off: () => {
-
+        command: (device, command) => {
+          let q = $q.defer();
+          let settings = this.settings('settings');
+          let token = settings.tplink.token;
+          let payload = {
+            "method":"passthrough",
+            "params": {
+              "deviceId": device.deviceId,
+              "requestData": JSON.stringify( command )
+            }
+          };
+          // set the token
+          if(!token)
+            return q.reject('Invalid token');
+          params.token = token;
+          $http({url: device.appServerUrl,
+              method: 'POST',
+              params: params,
+              data: JSON.stringify(payload),
+              headers: {'Cache-Control': 'no-cache', 'Content-Type': 'application/json'}
+            })
+            .then(response => {
+              q.resolve(response.data.result);
+            })
+            .catch(err => {
+              q.reject(err);
+            });
+          return q.promise;
+        },
+        on: (device) => {
+          let command = {"system":{"set_relay_state":{"state": 1 }}};
+          return this.tplink().command(device, command);
+        },
+        off: (device) => {
+          let command = {"system":{"set_relay_state":{"state": 0 }}};
+          return this.tplink().command(device, command);
         }
       };
     },

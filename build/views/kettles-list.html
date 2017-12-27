@@ -85,7 +85,7 @@
                   <button ng-if="sensorTypes(kettle.temp.type).analog"
                       ng-repeat="p in getPortRange(kettle.arduino.analog) track by $index"
                       ng-class="{'active': kettle.temp.pin=='A'+p}"
-                      ng-click="pinChange(kettle.temp.pin,p,true); kettle.temp.pin='A'+p;"
+                      ng-click="kettle.temp.pin='A'+p;"
                       class="dropdown-item" type="button">
                     A{{p}} <span class="pininuse" ng-show="pinInUse('A'+p,true)">(In Use)</span>
                   </button>
@@ -95,7 +95,7 @@
                   <button ng-if="sensorTypes(kettle.temp.type).digital"
                       ng-repeat="p in getPortRange(kettle.arduino.digital) track by $index"
                       ng-class="{'active': kettle.temp.pin=='D'+p}"
-                      ng-click="pinChange(kettle.temp.pin,p,false); kettle.temp.pin='D'+p;"
+                      ng-click="kettle.temp.pin='D'+p;"
                       class="dropdown-item" type="button">
                     D{{p}} <span class="pininuse" ng-show="pinInUse('D'+p,false)">(In Use)</span>
                   </button>
@@ -119,12 +119,12 @@
         <div class="row">
         <div class="col" ng-if="kettle.arduino">
           <label class="adjust" ng-class="{'heating':kettle.heater.running}">Heat
-            <sup><a ng-if="kettle.heater.pin.indexOf('D') !== -1" href="" ng-click="togglePWM(kettle.heater)">PWM ~</a></sup>
+            <sup><a ng-if="kettle.heater.pin.indexOf('D') === 0" href="" ng-click="togglePWM(kettle.heater)">PWM ~</a></sup>
           </label>
           <div class="btn-group pb-3">
             <div class="btn-group">
               <button type="button" class="btn btn-light dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" ng-disabled="kettle.heater.running">
-                {{kettle.heater.pin}} <span class="caret"></span>
+                {{ pinDisplay(kettle.heater.pin) }} <span class="caret"></span>
               </button>
               <div class="dropdown-menu scrollable-menu">
                 <button ng-click="kettle.heater.ssr = !kettle.heater.ssr"
@@ -133,11 +133,21 @@
                   <i class="fa fa-lg" ng-class="{'fa-check text-success':kettle.heater.ssr,'fa-circle-o':!kettle.heater.ssr}"></i> <span ng-show="kettle.heater.ssr" class="text-muted">{{kettle.heater.dutyCycle}}%</span>
                 </button>
                 <div class="dropdown-divider"></div>
+                <h6 class="dropdown-header" ng-if="settings.tplink.token">TP-Link</h6>
+                <div class="dropdown-divider" ng-if="settings.tplink.token"></div>
+                <button ng-if="settings.tplink.plugs"
+                     ng-repeat="tp in settings.tplink.plugs track by $index"
+                     ng-class="{'active': kettle.heater.pin=='TP-'+tp.deviceId}"
+                     ng-click="kettle.heater.pin='TP-'+tp.deviceId; kettle.heater.pwm=false;"
+                     class="dropdown-item" type="button">
+                   {{ tp.alias }} <span class="pininuse" ng-show="pinInUse('TP-'+tp.deviceId,false)">(In Use)</span>
+                </button>
+                <div class="dropdown-divider" ng-if="settings.tplink.token"></div>
                 <h6 class="dropdown-header">Analog</h6>
                 <div class="dropdown-divider"></div>
                 <button ng-repeat="p in getPortRange(kettle.arduino.analog) track by $index"
                     ng-class="{'active': kettle.heater.pin=='A'+p}"
-                    ng-click="pinChange(kettle.heater.pin,'A'+p,true); kettle.heater.pin='A'+p; kettle.heater.pwm=false;"
+                    ng-click="kettle.heater.pin='A'+p; kettle.heater.pwm=false;"
                     class="dropdown-item" type="button">
                   A{{p}} <span class="pininuse" ng-show="pinInUse('A'+p,true)">(In Use)</span>
                 </button>
@@ -146,14 +156,14 @@
                 <div class="dropdown-divider"></div>
                 <button ng-repeat="p in getPortRange(kettle.arduino.digital) track by $index"
                     ng-class="{'active': kettle.heater.pin=='D'+p}"
-                    ng-click="pinChange(kettle.heater.pin,'D'+p,false); kettle.heater.pin='D'+p;"
+                    ng-click="kettle.heater.pin='D'+p;"
                     class="dropdown-item" type="button">
                   D{{p}} <span class="pininuse" ng-show="pinInUse('D'+p,false)">(In Use)</span>
                 </button>
               </div>
             </div>
             <div class="btn-group relay">
-              <button type="button" class="btn" ng-class="{'btn-light':!kettle.heater.running&&!kettle.heater.auto,'btn-success':kettle.heater.running,'btn-warning':!kettle.heater.running&&kettle.heater.auto}" ng-click="toggleKettle('heat',kettle)">{{kettle.heater.running ? 'On' : (kettle.heater.auto ? 'Wait' :'Off')}}</button>
+              <button type="button" class="btn" ng-class="{'btn-light':!kettle.heater.running && !kettle.heater.auto,'btn-success':kettle.heater.running,'btn-warning':!kettle.heater.running && kettle.heater.auto}" ng-click="toggleKettle('heat',kettle)">{{kettle.heater.running ? 'On' : (kettle.heater.auto ? 'Wait' :'Off')}}</button>
               <button type="button" class="btn" ng-class="{'btn-light':!kettle.heater.auto,'btn-success':kettle.heater.auto}" ng-click="kettle.heater.auto=!kettle.heater.auto">Auto</button>
             </div>
             </div>
@@ -166,12 +176,12 @@
 
         <div class="col" ng-if="kettle.arduino && kettle.type != 'fermenter' && kettle.type != 'air'">
           <label class="adjust">Pump
-            <sup><a ng-if="kettle.pump.pin.indexOf('D') !== -1" href="" ng-click="togglePWM(kettle.pump)">PWM ~</a></sup>
+            <sup><a ng-if="kettle.pump.pin.indexOf('D') === 0" href="" ng-click="togglePWM(kettle.pump)">PWM ~</a></sup>
           </label>
           <div class="btn-group pb-3">
             <div class="btn-group">
               <button type="button" class="btn btn-light dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" ng-disabled="kettle.pump.running">
-                {{kettle.pump.pin}} <span class="caret"></span>
+                {{ pinDisplay(kettle.pump.pin) }} <span class="caret"></span>
               </button>
               <div class="dropdown-menu scrollable-menu">
                 <button ng-click="kettle.pump.ssr = !kettle.pump.ssr"
@@ -180,11 +190,21 @@
                   <i class="fa fa-lg" ng-class="{'fa-check text-success':kettle.pump.ssr,'fa-circle-o':!kettle.pump.ssr}"></i> <span ng-show="kettle.pump.ssr" class="text-muted">{{kettle.pump.dutyCycle}}%</span>
                 </button>
                 <div class="dropdown-divider"></div>
+                <h6 class="dropdown-header" ng-if="settings.tplink.token">TP-Link</h6>
+                <div class="dropdown-divider" ng-if="settings.tplink.token"></div>
+                <button ng-if="settings.tplink.plugs"
+                     ng-repeat="tp in settings.tplink.plugs track by $index"
+                     ng-class="{'active': kettle.pump.pin=='TP-'+tp.deviceId}"
+                     ng-click="kettle.pump.pin='TP-'+tp.deviceId; kettle.pump.pwm=false;"
+                     class="dropdown-item" type="button">
+                   {{ tp.alias }} <span class="pininuse" ng-show="pinInUse('TP-'+tp.deviceId,false)">(In Use)</span>
+                </button>
+                <div class="dropdown-divider" ng-if="settings.tplink.token"></div>
                 <h6 class="dropdown-header">Analog</h6>
                 <div class="dropdown-divider"></div>
                 <button ng-repeat="p in getPortRange(kettle.arduino.analog) track by $index"
                     ng-class="{'active': kettle.pump.pin=='A'+p}"
-                    ng-click="pinChange(kettle.pump.pin,'A'+p,true); kettle.pump.pin='A'+p; kettle.pump.pwm=false;"
+                    ng-click="kettle.pump.pin='A'+p; kettle.pump.pwm=false;"
                     class="dropdown-item" type="button">
                   A{{p}} <span class="pininuse" ng-show="pinInUse('A'+p,true)">(In Use)</span>
                 </button>
@@ -193,14 +213,14 @@
                 <div class="dropdown-divider"></div>
                 <button ng-repeat="p in getPortRange(kettle.arduino.digital) track by $index"
                     ng-class="{'active': kettle.pump.pin=='D'+p}"
-                    ng-click="pinChange(kettle.pump.pin,'D'+p,false); kettle.pump.pin='D'+p;"
+                    ng-click="kettle.pump.pin='D'+p;"
                     class="dropdown-item" type="button">
                   D{{p}} <span class="pininuse" ng-show="pinInUse('D'+p,false)">(In Use)</span>
                 </button>
               </div>
             </div>
             <div class="btn-group relay">
-              <button type="button" class="btn" ng-class="{'btn-light':!kettle.pump.running&&!kettle.pump.auto,'btn-success':kettle.pump.running,'btn-warning':!kettle.pump.running&&kettle.pump.auto}" ng-click="toggleKettle('pump',kettle)">{{kettle.pump.running ? 'On' : (kettle.pump.auto ? 'Wait' :'Off')}}</button>
+              <button type="button" class="btn" ng-class="{'btn-light':!kettle.pump.running && !kettle.pump.auto,'btn-success':kettle.pump.running,'btn-warning':!kettle.pump.running && kettle.pump.auto}" ng-click="toggleKettle('pump',kettle)">{{kettle.pump.running ? 'On' : (kettle.pump.auto ? 'Wait' :'Off')}}</button>
               <button type="button" class="btn" ng-class="{'btn-light':!kettle.pump.auto,'btn-success':kettle.pump.auto}" ng-click="kettle.pump.auto=!kettle.pump.auto">Auto</button>
             </div>
           </div>
@@ -213,12 +233,12 @@
 
         <div class="col" ng-if="kettle.arduino && kettle.cooler && (kettle.type == 'fermenter' || kettle.type == 'air')">
           <label class="adjust" ng-class="{'cooling':kettle.cooler.running}">Cool
-            <sup><a ng-if="kettle.cooler.pin.indexOf('D') !== -1" href="" ng-click="togglePWM(kettle.cooler)">PWM ~</a></sup>
+            <sup><a ng-if="kettle.cooler.pin.indexOf('D') === 0" href="" ng-click="togglePWM(kettle.cooler)">PWM ~</a></sup>
           </label>
           <div class="btn-group">
             <div class="btn-group">
               <button type="button" class="btn btn-light dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" ng-disabled="kettle.cooler.running">
-                {{kettle.cooler.pin}} <span class="caret"></span>
+                {{ pinDisplay(kettle.cooler.pin) }} <span class="caret"></span>
               </button>
               <div class="dropdown-menu scrollable-menu">
                 <button ng-click="kettle.cooler.ssr = !kettle.cooler.ssr"
@@ -227,11 +247,21 @@
                   <i class="fa fa-lg" ng-class="{'fa-check text-success':kettle.cooler.ssr,'fa-circle-o':!kettle.cooler.ssr}"></i> <span ng-show="kettle.cooler.ssr" class="text-muted">{{kettle.cooler.dutyCycle}}%</span>
                 </button>
                 <div class="dropdown-divider"></div>
+                <h6 class="dropdown-header" ng-if="settings.tplink.token">TP-Link</h6>
+                <div class="dropdown-divider" ng-if="settings.tplink.token"></div>
+                <button ng-if="settings.tplink.plugs"
+                     ng-repeat="tp in settings.tplink.plugs track by $index"
+                     ng-class="{'active': kettle.cooler.pin=='TP-'+tp.deviceId}"
+                     ng-click="kettle.cooler.pin='TP-'+tp.deviceId; kettle.cooler.pwm=false;"
+                     class="dropdown-item" type="button">
+                   {{ tp.alias }} <span class="pininuse" ng-show="pinInUse('TP-'+tp.deviceId,false)">(In Use)</span>
+                </button>
+                <div class="dropdown-divider" ng-if="settings.tplink.token"></div>
                 <h6 class="dropdown-header">Analog</h6>
                 <div class="dropdown-divider"></div>
                 <button ng-repeat="p in getPortRange(kettle.arduino.analog) track by $index"
                     ng-class="{'active': kettle.cooler.pin=='A'+p}"
-                    ng-click="pinChange(kettle.cooler.pin,'A'+p,true); kettle.cooler.pin='A'+p; kettle.cooler.pwm=false;"
+                    ng-click="kettle.cooler.pin='A'+p; kettle.cooler.pwm=false;"
                     class="dropdown-item" type="button">
                   A{{p}} <span class="pininuse" ng-show="pinInUse('A'+p,true)">(In Use)</span>
                 </button>
@@ -240,14 +270,14 @@
                 <div class="dropdown-divider"></div>
                 <button ng-repeat="p in getPortRange(kettle.arduino.digital) track by $index"
                     ng-class="{'active': kettle.cooler.pin=='D'+p}"
-                    ng-click="pinChange(kettle.cooler.pin,'D'+p,false); kettle.cooler.pin='D'+p;"
+                    ng-click="kettle.cooler.pin='D'+p;"
                     class="dropdown-item" type="button">
                   D{{p}} <span class="pininuse" ng-show="pinInUse('D'+p,false)">(In Use)</span>
                 </button>
               </div>
             </div>
             <div class="btn-group relay">
-              <button type="button" class="btn" ng-class="{'btn-light':!kettle.cooler.running&&!kettle.cooler.auto,'btn-success':kettle.cooler.running,'btn-warning':!kettle.cooler.running&&kettle.cooler.auto}" ng-click="toggleKettle('cool',kettle)">{{kettle.cooler.running ? 'On' : (kettle.cooler.auto ? 'Wait' :'Off')}}</button>
+              <button type="button" class="btn" ng-class="{'btn-light':!kettle.cooler.running && !kettle.cooler.auto,'btn-success':kettle.cooler.running,'btn-warning':!kettle.cooler.running && kettle.cooler.auto}" ng-click="toggleKettle('cool',kettle)">{{kettle.cooler.running ? 'On' : (kettle.cooler.auto ? 'Wait' :'Off')}}</button>
               <button type="button" class="btn" ng-class="{'btn-light':!kettle.cooler.auto,'btn-success':kettle.cooler.auto}" ng-click="kettle.cooler.auto=!kettle.cooler.auto">Auto</button>
             </div>
           </div>

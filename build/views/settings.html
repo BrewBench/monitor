@@ -158,6 +158,25 @@
             </div>
           </div>
         </div>
+
+        <div class="pb-3">
+          <h4>TP-Link
+            <i class="fa fa-plug fa-lg float-right" aria-hidden="true"></i>
+          </h4>
+          <div class="row">
+            <div class="col-6">
+              <label class="adjust">Username</label>
+              <input class="form-control" type="text" ng-model="settings.tplink.user" placeholder="Username">
+            </div>
+            <div class="col-6">
+              <label class="adjust">Password</label>
+              <input class="form-control" type="password" ng-model="settings.tplink.pass" placeholder="Password">
+            </div>
+          </div>
+          <small ng-if="settings.tplink.token" class="form-text text-success float-left">Connected</small>
+          <button class="btn btn-primary float-right" style="margin-top: 5px;" ng-click="tplink.login()">Login</button>
+        </div>
+
         <div class="row-new"></div>
         <div class="pb-3">
           <h4>Arduinos

@@ -194,8 +194,22 @@ $scope.updateABV();
     }
   };
 
-  $scope.tpScan = function(){
-      BrewService.tplink().scan();
+  $scope.tplink = {
+    login: () => {
+      BrewService.tplink().login($scope.settings.tplink.user,$scope.settings.tplink.pass)
+        .then(response => {
+          if(response.token){
+            $scope.settings.tplink.token = response.token;
+            $scope.tplink.scan(response.token);
+          }
+        });
+    },
+    scan: () => {
+      BrewService.tplink().scan().then(response => {
+        if(response.deviceList)
+          $scope.settings.tplink.plugs = response.deviceList;
+      });
+    }
   };
 
   $scope.addKettle = function(type){
@@ -227,6 +241,13 @@ $scope.updateABV();
     return _.filter($scope.kettles,{'active': true}).length;
   };
 
+  $scope.pinDisplay = function(pin){
+      if( pin.indexOf('TP-')===0 )
+        return _.filter($scope.settings.tplink.plugs,{deviceId: pin.substr(3)})[0].alias;
+      else
+        return pin;
+  };
+
   $scope.pinInUse = function(pin,analog){
     var kettle = _.find($scope.kettles, function(kettle){
       return (
@@ -239,19 +260,6 @@ $scope.updateABV();
       );
     });
     return kettle || false;
-  };
-
-  $scope.pinChange = function(old_pin,new_pin,analog){
-    //find kettle with new pin and replace it with old pin
-    var kettle = $scope.pinInUse(new_pin,analog);
-    if(kettle){
-      if(kettle.temp.pin == new_pin)
-        kettle.temp.pin = old_pin;
-      else if(kettle.heater.pin == new_pin)
-        kettle.heater.pin = old_pin;
-      else if(kettle.pump.pin == new_pin)
-        kettle.pump.pin = old_pin;
-    }
   };
 
   $scope.createShare = function(){
@@ -847,7 +855,16 @@ $scope.updateABV();
 
   $scope.toggleRelay = function(kettle, element, on){
     if(on) {
-      if(element.pwm){
+      if(element.pin.indexOf('TP-')===0){
+        let device = _.filter($scope.settings.tplink.plugs,{deviceId: element.pin.substr(3)})[0];
+        return BrewService.tplink().on(device)
+          .then(() => {
+            //started
+            element.running=true;
+          })
+          .catch((err) => $scope.setErrorMessage(err, kettle));
+      }
+      else if(element.pwm){
         return BrewService.analog(kettle, element.pin,Math.round(255*element.dutyCycle/100))
           .then(() => {
             //started
@@ -870,7 +887,16 @@ $scope.updateABV();
           .catch((err) => $scope.setErrorMessage(err, kettle));
       }
     } else {
-      if(element.pwm || element.ssr){
+      if(element.pin.indexOf('TP-')===0){
+        let device = _.filter($scope.settings.tplink.plugs,{deviceId: element.pin.substr(3)})[0];
+        return BrewService.tplink().off(device)
+          .then(() => {
+            //started
+            element.running=false;
+          })
+          .catch((err) => $scope.setErrorMessage(err, kettle));
+      }
+      else if(element.pwm || element.ssr){
         return BrewService.analog(kettle, element.pin,0)
           .then(() => {
             element.running=false;

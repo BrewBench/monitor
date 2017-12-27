@@ -2,6 +2,7 @@ const webpack = require('webpack');
 const WebpackMd5Hash = require('webpack-md5-hash');
 const AssetsPlugin = require('assets-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const BrowserSyncPlugin = require('browser-sync-webpack-plugin');
 
 const path = require('path');
 const pkg = require('./package.json');
@@ -24,7 +25,7 @@ module.exports = {
       vendor_node: Object.keys(pkg.dependencies)
     },
     output: {
-      path: path.resolve('./build'),
+      path: path.resolve(__dirname, 'build'),
       filename: 'js/[name].js',
       chunkFilename: 'js/[name]-[chunkhash].js',
       jsonpFunction: 'webpackJsonp'
@@ -65,6 +66,25 @@ module.exports = {
         Util: "exports-loader?Util!bootstrap/js/dist/util",
         Dropdown: "exports-loader?Dropdown!bootstrap/js/dist/dropdown",
       }),
+
+      new BrowserSyncPlugin(
+        // BrowserSync options
+        {
+          // browse to http://localhost:3000/ during development
+          host: 'localhost',
+          port: 8000,
+          // proxy the Webpack Dev Server endpoint
+          // (which should be serving on http://localhost:3100/)
+          // through BrowserSync
+          // proxy: 'http://localhost:3100/',
+          server: { baseDir: ['build'] }
+        },
+        // plugin options
+        {
+          // prevent BrowserSync from reloading the page
+          // and let Webpack Dev Server take care of this
+          reload: false
+        }),
     ],
     module: {
         loaders: [

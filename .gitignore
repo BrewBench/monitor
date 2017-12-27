@@ -3,3 +3,4 @@ node_modules
 NOTES.md
 # share code
 src/share
+*.log
