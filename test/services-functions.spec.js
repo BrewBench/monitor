@@ -133,6 +133,55 @@ describe('BrewBench Service', function() {
     });
   });
 
+  describe('.tplink()', function() {
+    // A simple test to verify the method tplink exists
+    it('should exist', function() {
+      expect(BrewService.tplink).toBeDefined();
+    });
+  });
+
+  describe('.tplink().login()', function() {
+    // A simple test to verify the method tplink exists
+    it('should exist', function() {
+      expect(BrewService.tplink().login).toBeDefined();
+    });
+  });
+
+  describe('.tplink().scan()', function() {
+    // A simple test to verify the method tplink exists
+    it('should exist', function() {
+      expect(BrewService.tplink().scan).toBeDefined();
+    });
+  });
+
+  describe('.tplink().on()', function() {
+    // A simple test to verify the method tplink exists
+    it('should exist', function() {
+      expect(BrewService.tplink().on).toBeDefined();
+    });
+  });
+
+  describe('.tplink().off()', function() {
+    // A simple test to verify the method tplink exists
+    it('should exist', function() {
+      expect(BrewService.tplink().off).toBeDefined();
+    });
+  });
+
+  describe('.tplink().info()', function() {
+    // A simple test to verify the method tplink exists
+    it('should exist', function() {
+      expect(BrewService.tplink().info).toBeDefined();
+    });
+  });
+
+  describe('.tplink().command()', function() {
+    // A simple test to verify the method tplink exists
+    it('should exist', function() {
+      expect(BrewService.tplink().command).toBeDefined();
+    });
+  });
+
   describe('.pkg()', function() {
     // A simple test to verify the method pkg exists
     it('should exist', function() {

@@ -1,5 +1,10 @@
 # Change Log
 
+## 3.0.0 - 2017-12-27
+
+### Added
+- [TP-Link integration](http://www.tp-link.com/us/home-networking/smart-home/smart-plugs)
+
 ## 2.9.7 - 2017-11-06
 
 ### Fixed
