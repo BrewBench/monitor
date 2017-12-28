@@ -205,10 +205,37 @@ $scope.updateABV();
         });
     },
     scan: () => {
+      $scope.settings.tplink.plugs = [];
       BrewService.tplink().scan().then(response => {
-        if(response.deviceList)
+        if(response.deviceList){
           $scope.settings.tplink.plugs = response.deviceList;
+          // get device info
+          _.each($scope.settings.tplink.plugs, plug => {
+            BrewService.tplink().info(plug).then(info => {
+              let sysinfo = JSON.parse(info.responseData).system.get_sysinfo;
+              plug.info = sysinfo;
+            });
+          });
+        }
       });
+    },
+    info: (device) => {
+      BrewService.tplink().info(device).then(response => {
+        return response;
+      });
+    },
+    toggle: (device) => {
+      if(device.info.relay_state == 1){
+        BrewService.tplink().off(device).then(response => {
+          device.info.relay_state = 0;
+          return response;
+        });
+      } else {
+        BrewService.tplink().on(device).then(response => {
+          device.info.relay_state = 1;
+          return response;
+        });
+      }
     }
   };
 
@@ -242,9 +269,10 @@ $scope.updateABV();
   };
 
   $scope.pinDisplay = function(pin){
-      if( pin.indexOf('TP-')===0 )
-        return _.filter($scope.settings.tplink.plugs,{deviceId: pin.substr(3)})[0].alias;
-      else
+      if( pin.indexOf('TP-')===0 ){
+        let device = _.filter($scope.settings.tplink.plugs,{deviceId: pin.substr(3)})[0];
+        return device ? device.alias : '';
+      } else
         return pin;
   };
 

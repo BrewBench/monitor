@@ -464,6 +464,10 @@ angular.module('brewbench-monitor')
         off: (device) => {
           let command = {"system":{"set_relay_state":{"state": 0 }}};
           return this.tplink().command(device, command);
+        },
+        info: (device) => {
+          let command = {"system":{"get_sysinfo":null},"emeter":{"get_realtime":null}};
+          return this.tplink().command(device, command);
         }
       };
     },

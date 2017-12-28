@@ -174,7 +174,27 @@
             </div>
           </div>
           <small ng-if="settings.tplink.token" class="form-text text-success float-left">Connected</small>
-          <button class="btn btn-primary float-right" style="margin-top: 5px;" ng-click="tplink.login()">Login</button>
+          <div class="btn-group float-right">
+            <button ng-if="settings.tplink.token" class="btn btn-light" style="margin-top: 5px;" ng-click="tplink.scan()">Scan</button>
+            <button class="btn btn-primary" style="margin-top: 5px;" ng-click="tplink.login()">Login</button>
+          </div>
+          <table class="table table-striped table-responsive">
+            <thead class="thead-inverse">
+              <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr ng-repeat="tp in settings.tplink.plugs">
+                <td>{{ tp.alias }}</td>
+                <td>{{ tp.deviceModel }}</td>
+                <td><button class="btn btn-light" ng-click="tplink.toggle(tp)" ng-class="{'on':!!tp.info.relay_state,'off':!tp.info.relay_state}">{{ tp.info.relay_state ? 'On' : 'Off' }}</button></td>
+              </tr>
+            </tbody>
+          </table>
+
         </div>
 
         <div class="row-new"></div>

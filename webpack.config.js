@@ -3,6 +3,8 @@ const WebpackMd5Hash = require('webpack-md5-hash');
 const AssetsPlugin = require('assets-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const BrowserSyncPlugin = require('browser-sync-webpack-plugin');
+const WriteFilePlugin = require('write-file-webpack-plugin');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 const path = require('path');
 const pkg = require('./package.json');
@@ -24,11 +26,15 @@ module.exports = {
       ],
       vendor_node: Object.keys(pkg.dependencies)
     },
+    devServer: {
+      inline: true
+    },
     output: {
       path: path.resolve(__dirname, 'build'),
       filename: 'js/[name].js',
       chunkFilename: 'js/[name]-[chunkhash].js',
-      jsonpFunction: 'webpackJsonp'
+      jsonpFunction: 'webpackJsonp',
+      // publicPath: '/js/'
     },
     plugins: [
       // Extract all 3rd party modules into a separate 'vendor' chunk
@@ -55,6 +61,7 @@ module.exports = {
             {from:'src/index.html',to:'index.html'},
             {from:'src/favicon.ico',to:'favicon.ico'},
             {from:'package.json',to:'package.json'},
+            {from:'src/styles/app.css',to:'styles/app.css'},
         ]),
 
       new webpack.ProvidePlugin({
@@ -83,8 +90,12 @@ module.exports = {
         {
           // prevent BrowserSync from reloading the page
           // and let Webpack Dev Server take care of this
-          reload: false
+          reload: true
         }),
+
+        new ExtractTextPlugin("styles/[name].css"),
+
+        new WriteFilePlugin(),
     ],
     module: {
         loaders: [
@@ -104,7 +115,7 @@ module.exports = {
         {
           test: /\.scss$/,
           include: path.resolve('./src/styles'),
-          loader: "style!css"
+          loader: ExtractTextPlugin.extract("style-loader", "css-loader!sass-loader")
         }
       ]
     },
