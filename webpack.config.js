@@ -27,7 +27,8 @@ module.exports = {
       vendor_node: Object.keys(pkg.dependencies)
     },
     devServer: {
-      inline: true
+      inline: true,
+      hot: false
     },
     output: {
       path: path.resolve(__dirname, 'build'),

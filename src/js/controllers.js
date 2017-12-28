@@ -204,9 +204,9 @@ $scope.updateABV();
           }
         });
     },
-    scan: () => {
+    scan: (token) => {
       $scope.settings.tplink.plugs = [];
-      BrewService.tplink().scan().then(response => {
+      BrewService.tplink().scan(token).then(response => {
         if(response.deviceList){
           $scope.settings.tplink.plugs = response.deviceList;
           // get device info
