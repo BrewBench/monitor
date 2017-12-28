@@ -4,6 +4,7 @@
 
 ### Added
 - [TP-Link integration](http://www.tp-link.com/us/home-networking/smart-home/smart-plugs)
+- Webpack for dev (replaced gulp)
 
 ## 2.9.7 - 2017-11-06
 
