@@ -527,9 +527,6 @@ sup.ref {
   position: relative;
   padding-right: 20px;
 }
-.settings .adjust {
-  padding-bottom: 10px;
-}
 .settings .ui.circular.label, .settings .ui.circular.labels .label {
   min-width: 2em;
   min-height: 2em;
@@ -595,11 +592,11 @@ label.notes {
   letter-spacing: 0.2em;
   font-size: 13px;
 }
-.fa-stop-circle, .fa-times-circle {
+.fa-stop-circle, .fa-times-circle, .chart-toggle.on {
   color: rgba(200, 47, 47, 1);
   cursor: pointer;
 }
-.fa-play-circle {
+.fa-play-circle, .chart-toggle.off {
   color: rgba(73, 163, 127, 1);
   cursor: pointer;
 }

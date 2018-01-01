@@ -646,9 +646,13 @@ $scope.updateABV();
         message = err;
       else if(err.statusText)
         message = err.statusText;
-      else if(err.config.url)
+      else if(err.config && err.config.url)
         message = err.config.url;
-      else
+      else if(err.version){
+        message = 'Sketch Version is out of date.  <a href="" data-toggle="modal" data-target="#settingsModal">Download here</a>.'+
+          '<br/>Your Version: '+err.version+
+          '<br/>Current Version: '+$scope.settings.sketch_version;
+      } else
         message = JSON.stringify(err);
 
       if(message){
@@ -962,6 +966,42 @@ $scope.updateABV();
     return "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({"settings": $scope.settings,"kettles": kettles}));
   };
 
+  $scope.ignoreVersionError = function(kettle){
+    $scope.settings.sketches.ignore_version_error = true;
+    $scope.resetError(kettle);
+  };
+
+  $scope.downloadAutoSketch = function(){
+    _.each($scope.kettles, (kettle, i) => {
+      if( kettle.temp.type == 'Thermistor' )
+        kettles += 'thermistorAutoCommand("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.temp.pin+'");\n';
+      else if( kettle.temp.type == 'DS18B20' )
+        kettles += 'ds18B20AutoCommand("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.temp.pin+'");\n';
+      else if( kettle.temp.type == 'PT100' )
+        kettles += 'pt100AutoCommand("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.temp.pin+'");\n';
+      else if( kettle.temp.type == 'DHT11' )
+        kettles += 'dht11AutoCommand("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.temp.pin+'");\n';
+      else if( kettle.temp.type == 'DHT21' )
+        kettles += 'dht21AutoCommand("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.temp.pin+'");\n';
+      else if( kettle.temp.type == 'DHT22' )
+        kettles += 'dht22AutoCommand("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.temp.pin+'");\n';
+    });
+    return $http.get('assets/BrewBenchAutoYun/BrewBenchAutoYun.ino')
+      .then(response => {
+        // replace variables
+        response.data = response.data
+          .replace('// [kettles]', kettles)
+          .replace('[FREQUENCY_SECONDS]', $scope.settings.sketches.frequency ? parseInt($scope.settings.sketches.frequency,10) : 60);
+        let streamSketch = document.createElement('a');
+        streamSketch.setAttribute('download', 'BrewBenchAutoYun.ino');
+        streamSketch.setAttribute('href', "data:text/ino;charset=utf-8," + encodeURIComponent(response.data));
+        streamSketch.click();
+      })
+      .catch(err => {
+        $scope.setErrorMessage(`Failed to download sketch ${err.message}`);
+      });
+  };
+
   $scope.downloadInfluxDBSketch = function(){
     if(!$scope.settings.influxdb.url) return;
 
@@ -996,7 +1036,7 @@ $scope.updateABV();
         response.data = response.data
           .replace('// [kettles]', kettles)
           .replace('[INFLUXDB_CONNECTION]', connection_string)
-          .replace('[FREQUENCY_SECONDS]', $scope.settings.influxdb.frequency ? parseInt($scope.settings.influxdb.frequency,10) : 60);
+          .replace('[FREQUENCY_SECONDS]', $scope.settings.sketches.frequency ? parseInt($scope.settings.sketches.frequency,10) : 60);
         let streamSketch = document.createElement('a');
         streamSketch.setAttribute('download', 'BrewBenchInfluxDBYun.ino');
         streamSketch.setAttribute('href', "data:text/ino;charset=utf-8," + encodeURIComponent(response.data));
@@ -1040,7 +1080,7 @@ $scope.updateABV();
         $scope.settings.ipAddress = response.ip;
       })
       .catch(err => {
-        $scope.error.message = $scope.setErrorMessage(err);
+        $scope.setErrorMessage(err);
       });
   };
 

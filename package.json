@@ -1,12 +1,12 @@
 {
   "name": "brewbench-monitor",
-  "version": "3.0.0",
-  "sketch_version": "2.8.3",
+  "version": "3.0.1",
+  "sketch_version": "3.0.1",
   "description": "Is an Arduino Yun brew monitor for the home brewer enthusiast that uses the Arduino REST API to interface with thermistors connected to the analog ports.",
   "main": "build/app.js",
   "scripts": {
     "test": "webpack && karma start karma.conf.js --single-run",
-    "dev": "webpack-dev-server --progress --watch --inline --hot --content-base ./build",
+    "dev": "webpack-dev-server --progress --watch --inline --content-base ./build",
     "start": "webpack && npm run dev",
     "build": "webpack --progress --profile --colors --display-error-details --display-cached --display-entrypoints"
   },

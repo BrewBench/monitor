@@ -17,12 +17,13 @@ angular.module('brewbench-monitor')
         pollSeconds: 10
         ,unit: 'F'
         ,layout: 'card'
+        ,chart: true
         ,shared: false
         ,recipe: {'name':'','brewer':{name:'','email':''},'yeast':[],'hops':[],'malt':[],scale:'gravity',method:'papazian','og':1.050,'fg':1.010,'abv':0,'abw':0,'calories':0,'attenuation':0}
         ,notifications: {on:true,timers:true,high:true,low:true,target:true,slack:'',last:''}
         ,sounds: {on:true,alert:'/assets/audio/bike.mp3',timer:'/assets/audio/school.mp3'}
         ,account: {apiKey: '', sessions: []}
-        ,influxdb: {url: '', port: 8086, user: '', pass: '', db: '', connected: false, frequency: 60}
+        ,influxdb: {url: '', port: 8086, user: '', pass: '', db: '', connected: false}
         ,arduinos: [{
           id: btoa('brewbench'),
           url: 'arduino.local',
@@ -31,6 +32,7 @@ angular.module('brewbench-monitor')
           secure: false
         }]
         ,tplink: {user: '', pass: '', token:'', plugs: []}
+        ,sketches: {include_triggers: false, frequency: 60, ignore_version_error: false}
       };
     },
 
@@ -195,10 +197,13 @@ angular.module('brewbench-monitor')
 
       $http({url: url, method: 'GET', headers: headers, timeout: settings.pollSeconds*10000})
         .then(response => {
-          if(!settings.shared && response.headers('X-Sketch-Version') == null || response.headers('X-Sketch-Version') < settings.sketch_version)
-            q.reject('Sketch Version is out of date.  Please <a href="" data-toggle="modal" data-target="#settingsModal">Update</a>. Sketch: '+response.headers('X-Sketch-Version')+' BrewBench: '+settings.sketch_version);
-          else
+          if(!settings.shared &&
+            !settings.sketches.ignore_version_error &&
+            (response.headers('X-Sketch-Version') == null || response.headers('X-Sketch-Version') < settings.sketch_version)){
+            q.reject({version: response.headers('X-Sketch-Version')});
+          } else {
             q.resolve(response.data);
+          }
         })
         .catch(err => {
           q.reject(err);
@@ -220,10 +225,13 @@ angular.module('brewbench-monitor')
 
       $http({url: url, method: 'GET', headers: headers, timeout: settings.pollSeconds*1000})
         .then(response => {
-          if(!settings.shared && response.headers('X-Sketch-Version') == null || response.headers('X-Sketch-Version') < settings.sketch_version)
-            q.reject('Sketch Version is out of date.  Please <a href="" data-toggle="modal" data-target="#settingsModal">Update</a>. Sketch: '+response.headers('X-Sketch-Version')+' BrewBench: '+settings.sketch_version);
-          else
+          if(!settings.shared &&
+            !settings.sketches.ignore_version_error &&
+            (response.headers('X-Sketch-Version') == null || response.headers('X-Sketch-Version') < settings.sketch_version)){
+            q.reject({version: response.headers('X-Sketch-Version')});
+          } else {
             q.resolve(response.data);
+          }
         })
         .catch(err => {
           q.reject(err);
@@ -243,10 +251,13 @@ angular.module('brewbench-monitor')
 
       $http({url: url, method: 'GET', headers: headers, timeout: settings.pollSeconds*1000})
         .then(response => {
-          if(!settings.shared && response.headers('X-Sketch-Version') == null || response.headers('X-Sketch-Version') < settings.sketch_version)
-            q.reject('Sketch Version is out of date.  Please <a href="" data-toggle="modal" data-target="#settingsModal">Update</a>. Sketch: '+response.headers('X-Sketch-Version')+' BrewBench: '+settings.sketch_version);
-          else
+          if(!settings.shared &&
+            !settings.sketches.ignore_version_error &&
+            (response.headers('X-Sketch-Version') == null || response.headers('X-Sketch-Version') < settings.sketch_version)){
+            q.reject({version: response.headers('X-Sketch-Version')});
+          } else {
             q.resolve(response.data);
+          }
         })
         .catch(err => {
           q.reject(err);
@@ -266,10 +277,13 @@ angular.module('brewbench-monitor')
 
       $http({url: url, method: 'GET', headers: headers, timeout: (timeout || settings.pollSeconds*1000)})
         .then(response => {
-          if(!settings.shared && response.headers('X-Sketch-Version') == null || response.headers('X-Sketch-Version') < settings.sketch_version)
-            q.reject('Sketch Version is out of date.  Please <a href="" data-toggle="modal" data-target="#settingsModal">Update</a>. Sketch: '+response.headers('X-Sketch-Version')+' BrewBench: '+settings.sketch_version);
-          else
+          if(!settings.shared &&
+            !settings.sketches.ignore_version_error &&
+            (response.headers('X-Sketch-Version') == null || response.headers('X-Sketch-Version') < settings.sketch_version)){
+            q.reject({version: response.headers('X-Sketch-Version')});
+          } else {
             q.resolve(response.data);
+          }
         })
         .catch(err => {
           q.reject(err);

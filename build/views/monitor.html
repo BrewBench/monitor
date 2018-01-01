@@ -24,10 +24,15 @@
     </div>
     <div class="col">
       <div class="alert alert-{{error.type}} alert-dismissible" role="alert" ng-if="error.message">
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close" ng-click="resetError()"><span aria-hidden="true">&times;</span></button>
         <strong>{{error.type}}</strong> <span ng-bind-html="error.message">{{error.message}}</span>
       </div>
-      <nvd3 options="chartOptions" data="kettles"></nvd3>
+      <div class="pb-4">
+        <i class="chart-toggle fa fa-area-chart fa-lg float-right"
+          ng-class="{'on':settings.chart,'off':!settings.chart}"
+          ng-click="settings.chart=!settings.chart" aria-hidden="true"></i>
+      </div>
+      <nvd3 options="chartOptions" data="kettles" ng-show="settings.chart"></nvd3>
     </div>
   </div>
   <div class="flex-row" ng-disabled="share.needPassword" ng-class="{'disabled':share.needPassword}">

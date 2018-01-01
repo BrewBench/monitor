@@ -7,7 +7,7 @@
 // https://www.brewbench.co/libs/cactus_io_DS18B20.zip
 #include "cactus_io_DS18B20.h"
 
-const String VERSION = "2.8.3";
+const String VERSION = "3.0.1";
 const String INFLUXDB_CONNECTION = "[INFLUXDB_CONNECTION]";
 const int FREQUENCY_SECONDS = [FREQUENCY_SECONDS];
 int secondCounter = 0;

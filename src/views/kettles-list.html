@@ -44,8 +44,9 @@
 
       <div class="description">
         <div class="alert alert-danger" ng-if="kettle.error">
-          <button type="button" class="close" data-dismiss="alert" aria-label="Close" ng-click="kettle.error=''"><span aria-hidden="true">×</span></button>
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close" ng-click="resetError(kettle)"><span aria-hidden="true">×</span></button>
           <span ng-bind-html="kettle.error">{{kettle.error}}</span>
+          <a ng-show="kettle.error.indexOf('Sketch Version') != -1" href="" ng-click="ignoreVersionError(kettle)"><br>Ignore Version Updates</a>
         </div>
         <div class="row" ng-if="shareAccess('fullAccess')">
 

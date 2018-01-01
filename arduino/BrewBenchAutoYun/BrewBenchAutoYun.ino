@@ -8,6 +8,8 @@
 #include "cactus_io_DS18B20.h"
 
 const String VERSION = "3.0.1";
+const int FREQUENCY_SECONDS = [FREQUENCY_SECONDS];
+int secondCounter = 0;
 
 BridgeServer server;
 dht DHT;
@@ -85,10 +87,6 @@ void process(BridgeClient client) {
     responseOkHeader(client);
     dht11Command(client);
   }
-  if (command == "DHT22") {
-    responseOkHeader(client);
-    dht22Command(client);
-  }
 }
 
 void responseOkHeader(BridgeClient client){
@@ -146,14 +144,29 @@ void analogCommand(BridgeClient client) {
 void ds18B20Command(BridgeClient client) {
   char spin = client.read();
   int pin = client.parseInt();
-  float temp;
 
   DS18B20 ds(pin);
   ds.readSensor();
-  temp = ds.getTemperature_C();
+  float temp = ds.getTemperature_C();
 
   // Send JSON response to client
   client.print("{\"pin\":\""+String(spin)+String(pin)+"\",\"temp\":\""+String(temp)+"\"}");
+}
+
+void ds18B20AutoCommand(String source, String pin, int temp, int diff) {
+  DS18B20 ds(pin.substring(1).toInt());
+  ds.readSensor();
+  float temp = ds.getTemperature_C();
+
+  String data = "temperature,sensor=DS18B20,pin="+pin+",source="+source+" temp="+String(temp);
+  Process p;
+  p.begin("curl");
+  p.addParameter("-XPOST");
+  p.addParameter(INFLUXDB_CONNECTION);
+  p.addParameter("--insecure");
+  p.addParameter("--data-binary");
+  p.addParameter(data);
+  p.run();
 }
 
 void thermistorCommand(BridgeClient client) {
@@ -163,6 +176,20 @@ void thermistorCommand(BridgeClient client) {
 
   // Send JSON response to client
   client.print("{\"pin\":\""+String(spin)+String(pin)+"\",\"temp\":\""+String(temp)+"\"}");
+}
+
+void thermistorAutoCommand(String source, String pin, int temp, int diff) {
+  float temp = Thermistor(pin.substring(1).toInt());
+
+  String data = "temperature,sensor=Thermistor,pin="+pin+",source="+source+" temp="+String(temp);
+  Process p;
+  p.begin("curl");
+  p.addParameter("-XPOST");
+  p.addParameter(INFLUXDB_CONNECTION);
+  p.addParameter("--insecure");
+  p.addParameter("--data-binary");
+  p.addParameter(data);
+  p.run();
 }
 
 // http://www.instructables.com/id/Temperature-Measurement-Tutorial-Part1/
@@ -185,6 +212,31 @@ void pt100Command(BridgeClient client) {
   client.print("{\"pin\":\""+String(spin)+String(pin)+"\",\"temp\":\""+String(temp)+"\"}");
 }
 
+void pt100AutoCommand(String source, String pin, int temp, int diff) {
+  float tvoltage;
+  float temp;
+
+  if( pin.substring(0,1) == "A" )
+    tvoltage = analogRead(pin.substring(1).toInt());
+  else
+    tvoltage = digitalRead(pin.substring(1).toInt());
+
+  if (tvoltage>409){
+    tvoltage = map(tvoltage,410,1023,0,614);
+    temp = (150*tvoltage)/614;
+  }
+
+  String data = "temperature,sensor=PT100,pin="+pin+",source="+source+" temp="+String(temp);
+  Process p;
+  p.begin("curl");
+  p.addParameter("-XPOST");
+  p.addParameter(INFLUXDB_CONNECTION);
+  p.addParameter("--insecure");
+  p.addParameter("--data-binary");
+  p.addParameter(data);
+  p.run();
+}
+
 void dht11Command(BridgeClient client) {
   char spin = client.read();
   int pin = client.parseInt();
@@ -196,6 +248,24 @@ void dht11Command(BridgeClient client) {
     client.print("{\"pin\":\""+String(spin)+String(pin)+"\",\"temp\":\""+String(temp)+"\",\"humidity\":\""+String(humidity)+"\"}");
   } else {
     client.print("{\"error\":\""+String(chk)+"\"}");
+  }
+}
+
+void dht11AutoCommand(String source, String pin, int temp, int diff) {
+  int chk = DHT.read11(pin);
+  if( chk == DHTLIB_OK ){
+    float temp = DHT.temperature;
+    float humidity = DHT.humidity;
+    // Send JSON response to client
+    String data = "temperature,sensor=DHT11,pin="+pin+",source="+source+" temp="+String(temp)+" humidity="+String(humidity);
+    Process p;
+    p.begin("curl");
+    p.addParameter("-XPOST");
+    p.addParameter(INFLUXDB_CONNECTION);
+    p.addParameter("--insecure");
+    p.addParameter("--data-binary");
+    p.addParameter(data);
+    p.run();
   }
 }
 
@@ -213,6 +283,24 @@ void dht21Command(BridgeClient client) {
   }
 }
 
+void dht21AutoCommand(String source, String pin, int temp, int diff) {
+  int chk = DHT.read21(pin);
+  if( chk == DHTLIB_OK ){
+    float temp = DHT.temperature;
+    float humidity = DHT.humidity;
+    // Send JSON response to client
+    String data = "temperature,sensor=DHT11,pin="+pin+",source="+source+" temp="+String(temp)+" humidity="+String(humidity);
+    Process p;
+    p.begin("curl");
+    p.addParameter("-XPOST");
+    p.addParameter(INFLUXDB_CONNECTION);
+    p.addParameter("--insecure");
+    p.addParameter("--data-binary");
+    p.addParameter(data);
+    p.run();
+  }
+}
+
 void dht22Command(BridgeClient client) {
   char spin = client.read();
   int pin = client.parseInt();
@@ -225,6 +313,28 @@ void dht22Command(BridgeClient client) {
   } else {
     client.print("{\"error\":\""+String(chk)+"\"}");
   }
+}
+
+void dht22AutoCommand(String source, String pin, int temp, int diff) {
+  int chk = DHT.read22(pin);
+  if( chk == DHTLIB_OK ){
+    float temp = DHT.temperature;
+    float humidity = DHT.humidity;
+    // Send JSON response to client
+    String data = "temperature,sensor=DHT22,pin="+pin+",source="+source+" temp="+String(temp)+" humidity="+String(humidity);
+    Process p;
+    p.begin("curl");
+    p.addParameter("-XPOST");
+    p.addParameter(INFLUXDB_CONNECTION);
+    p.addParameter("--insecure");
+    p.addParameter("--data-binary");
+    p.addParameter(data);
+    p.run();
+  }
+}
+
+void Auto(){
+  // [kettles]
 }
 
 void setup() {
@@ -244,6 +354,12 @@ void loop() {
   if (client) {
     process(client);
     client.stop();
+  }
+  secondCounter+=1;
+  if( secondCounter == FREQUENCY_SECONDS ){
+    // reset the secondCounter
+    secondCounter = 0;
+    Auto();
   }
 
   delay(1000);
