@@ -1,0 +1,117 @@
+<div class="modal fade" id="sketchesModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title"><i class="fa fa-gear fa-lg" aria-hidden="true"></i> Sketches</h1>
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+      </div>
+      <div class="modal-body settings">
+      <div id="settings">
+      <a href="" data-dismiss="modal" data-toggle="modal" data-target="#settingsModal">&larr; Settings</a>
+      <div class="card-body">
+        <div class="pb-3">
+          <h4>Arduino
+            <i class="fa fa-microchip fa-lg float-right" aria-hidden="true"></i>
+          </h4>
+
+          <div class="row new">
+
+            <div class="col-4">
+              <span class="badge badge-pill badge-info">Auto</span>
+              <label class="adjust">Fermenter <sup>*</sup><br>Heat/Cool</label>
+              <ul class="tg-list">
+                <li class="tg-list-item">
+                  <input class="tgl tgl-ios" id="triggers" type="checkbox" ng-checked="settings.sketches.include_triggers" ng-click="settings.sketches.include_triggers = !settings.sketches.include_triggers"/>
+                  <label class="tgl-btn" for="triggers"></label>
+                </li>
+              </ul>
+            </div>
+            <div class="col-4">
+              <span class="badge badge-pill badge-info">Auto</span>
+              <label class="adjust">Poll Frequency</label>
+              <div class="input-group">
+                <input class="form-control" type="number" ng-model="settings.sketches.frequency" step="1" min="5">
+                <span class="input-group-btn">
+                  <button type="button" class="btn btn-light"><i class="fa fa-minus fa-lg" ng-click="(settings.sketches.frequency > 5) ? settings.sketches.frequency=settings.sketches.frequency-1 : 5"></i></button>
+                  <button type="button" class="btn btn-light"><i class="fa fa-plus fa-lg" ng-click="settings.sketches.frequency=settings.sketches.frequency+1"></i></button>
+                </span>
+              </div>
+              <small class="form-text text-muted">Every {{settings.sketches.frequency}} seconds</small>
+            </div>
+            <div class="col-4">
+              <div class="btn-group float-right">
+                <button type="button" class="btn btn-light dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Download <span class="caret"></span>
+                </button>
+                <div class="dropdown-menu scrollable-menu">
+                  <a href="assets/arduino/BrewBenchYun/BrewBenchYun.ino" class="dropdown-item">Arduino Yun Sketch</a>
+                  <a href="" ng-click="downloadAutoSketch()" class="dropdown-item" ng-class="{'disabled': !hasSketches()}">Arduino Yun Auto Sketch <span class="badge badge-pill badge-info">Auto</span></a>
+                  <a href="" ng-click="downloadInfluxDBSketch()" class="dropdown-item" ng-class="{'disabled':!settings.influxdb.connected}">Arduino Yun InfluxDB Sketch <span class="badge badge-pill badge-info">Auto</span></a>
+                  <hr>
+                  <a href="https://grafana.com/dashboards/3960" class="dropdown-item" target="_blank">Grafana Session Dashboard</a>
+                  <a href="https://grafana.com/dashboards/3957" class="dropdown-item" target="_blank">Grafana Fermentation Dashboard</a>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="row new" ng-if="settings.sketches.include_triggers">
+            <table class="table table-striped table-responsive">
+              <thead class="thead-inverse">
+                <tr>
+                  <th>Name</th>
+                  <th>Heat</th>
+                  <th>Cool</th>
+                  <th>Temp</th>
+                  <th>Diff</th>
+                  <th>Include</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr ng-repeat="kettle in kettles track by $index">
+                  <td>{{kettle.key}}</td>
+                  <td>
+                    <span ng-if="kettle.heater && kettle.heater.pin.indexOf('TP-')===0">Not Supported</span>
+                    <ul class="tg-list" ng-if="kettle.heater && kettle.heater.pin.indexOf('TP-')===-1">
+                      <li class="tg-list-item">
+                        <span>{{pinDisplay(kettle.heater.pin)}}</span>
+                        <input class="tgl tgl-ios" id="triggerHeater{{$index}}" type="checkbox" ng-checked="kettle.heater.sketch" ng-disabled="!kettle.sketch" ng-click="kettle.heater.sketch = !kettle.heater.sketch;"/>
+                        <label class="tgl-btn" for="triggerHeater{{$index}}"></label>
+                      </li>
+                    </ul>
+                  </td>
+                  <td>
+                    <span ng-if="kettle.cooler && kettle.cooler.pin.indexOf('TP-')===0">Not Supported</span>
+                    <ul class="tg-list" ng-if="kettle.cooler && kettle.cooler.pin.indexOf('TP-')===-1">
+                      <li class="tg-list-item">
+                        <span>{{pinDisplay(kettle.cooler.pin)}}</span>
+                        <input class="tgl tgl-ios" id="triggerCooler{{$index}}" type="checkbox" ng-checked="kettle.cooler.sketch" ng-disabled="!kettle.sketch" ng-click="kettle.cooler.sketch = !kettle.cooler.sketch;"/>
+                        <label class="tgl-btn" for="triggerCooler{{$index}}"></label>
+                      </li>
+                    </ul>
+                  </td>
+                  <td>{{kettle.temp.target}}&deg;{{settings.unit}}</td>
+                  <td>{{kettle.temp.diff}}&deg;{{settings.unit}}</td>
+                  <td>
+                    <ul class="tg-list">
+                      <li class="tg-list-item">
+                        <input class="tgl tgl-ios" id="trigger{{$index}}" type="checkbox" ng-checked="kettle.sketch" ng-click="updateKettleSketches(kettle)"/>
+                        <label class="tgl-btn" for="trigger{{$index}}"></label>
+                      </li>
+                    </ul>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <p>
+              * Please test your heat and cool pins before installing the sketch.  Relay's will automatically be triggered if the temperature raises or falls.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>

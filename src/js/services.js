@@ -63,37 +63,43 @@ angular.module('brewbench-monitor')
           ,type: 'water'
           ,active: false
           ,sticky: false
-          ,heater: {pin:'D2',running:false,auto:false,pwm:false,dutyCycle:100}
-          ,pump: {pin:'D3',running:false,auto:false,pwm:false,dutyCycle:100}
+          ,sketch:false
+          ,heater: {pin:'D2',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
+          ,pump: {pin:'D3',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
           ,temp: {pin:'A0',type:'Thermistor',hit:false,current:0,previous:0,adjust:0,target:170,diff:2}
           ,values: []
           ,timers: []
           ,knob: angular.copy(this.defaultKnobOptions(),{value:0,min:0,max:220})
           ,arduino: {id: btoa('brewbench'), url: 'arduino.local',analog: 5,digital: 13}
+          ,error: {message:'',version:''}
         },{
           key: 'Mash'
           ,type: 'grain'
           ,active: false
           ,sticky: false
-          ,heater: {pin:'D4',running:false,auto:false,pwm:false,dutyCycle:100}
-          ,pump: {pin:'D5',running:false,auto:false,pwm:false,dutyCycle:100}
+          ,sketch:false
+          ,heater: {pin:'D4',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
+          ,pump: {pin:'D5',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
           ,temp: {pin:'A1',type:'Thermistor',hit:false,current:0,previous:0,adjust:0,target:152,diff:2}
           ,values: []
           ,timers: []
           ,knob: angular.copy(this.defaultKnobOptions(),{value:0,min:0,max:220})
           ,arduino: {id: btoa('brewbench'), url: 'arduino.local',analog: 5,digital: 13}
+          ,error: {message:'',version:''}
         },{
           key: 'Boil'
           ,type: 'hop'
           ,active: false
           ,sticky: false
-          ,heater: {pin:'D6',running:false,auto:false,pwm:false,dutyCycle:100}
-          ,pump: {pin:'D7',running:false,auto:false,pwm:false,dutyCycle:100}
+          ,sketch:false
+          ,heater: {pin:'D6',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
+          ,pump: {pin:'D7',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
           ,temp: {pin:'A2',type:'Thermistor',hit:false,current:0,previous:0,adjust:0,target:200,diff:2}
           ,values: []
           ,timers: []
           ,knob: angular.copy(this.defaultKnobOptions(),{value:0,min:0,max:220})
           ,arduino: {id: btoa('brewbench'), url: 'arduino.local',analog: 5,digital: 13}
+          ,error: {message:'',version:''}
         }];
     },
 
@@ -389,6 +395,14 @@ angular.module('brewbench-monitor')
         locale: 'es_EN'
       };
       return {
+        connection: () => {
+          let settings = this.settings('settings');
+          if(settings.tplink.token){
+            params.token = settings.tplink.token;
+            return url+'?'+jQuery.param(params);
+          }
+          return '';
+        },
         login: (user,pass) => {
           let q = $q.defer();
           if(!user || !pass)
@@ -414,7 +428,7 @@ angular.module('brewbench-monitor')
               if(response.data.result){
                 q.resolve(response.data.result);
               } else {
-                q.reject('No response');
+                q.reject(response.data);
               }
             })
             .catch(err => {
@@ -456,6 +470,7 @@ angular.module('brewbench-monitor')
           // set the token
           if(!token)
             return q.reject('Invalid token');
+          console.log(JSON.stringify(payload))
           params.token = token;
           $http({url: device.appServerUrl,
               method: 'POST',

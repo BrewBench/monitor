@@ -1,5 +1,14 @@
 # Change Log
 
+## 3.1.0 - 2018-01-03
+
+### Added
+- New Sketches config page under settings
+- New Sketch for auto triggering heat and cool
+
+### Fixed
+- Sketches for DHT11, DHT21, DHT22
+
 ## 3.0.0 - 2017-12-27
 
 ### Added

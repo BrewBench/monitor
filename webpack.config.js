@@ -59,6 +59,7 @@ module.exports = {
       new CopyWebpackPlugin([
             {from:'src/views',to:'views'},
             {from:'src/assets',to:'assets'},
+            {from:'arduino/',to:'assets/arduino'},
             {from:'src/index.html',to:'index.html'},
             {from:'src/favicon.ico',to:'favicon.ico'},
             {from:'package.json',to:'package.json'},

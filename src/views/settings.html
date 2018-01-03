@@ -50,7 +50,7 @@
           </h4>
 
           <button class="btn btn-primary float-right" ng-click="alert()" ng-disabled="!settings.notifications.on">Test</button>
-          <div class="row-new"></div>
+
           <ul class="tg-list">
             <li class="tg-list-item">
               <span>{{settings.notifications.on?'On':'Off'}}</span>
@@ -160,8 +160,8 @@
           </h4>
           <div class="row">
             <div class="col-6">
-              <label class="adjust">Username</label>
-              <input class="form-control" type="text" ng-model="settings.tplink.user" placeholder="Username">
+              <label class="adjust">Email</label>
+              <input class="form-control" type="text" ng-model="settings.tplink.user" placeholder="Email">
             </div>
             <div class="col-6">
               <label class="adjust">Password</label>
@@ -194,53 +194,11 @@
 
         <div class="row-new"></div>
         <div class="pb-3">
-          <h4>Arduinos
+          <h4>Arduino
             <i class="fa fa-microchip fa-lg float-right" aria-hidden="true"></i>
           </h4>
 
-          <h5>Sketches Config</h5>
-
-          <div class="row new">
-
-            <div class="col-4">
-              <label class="adjust">Heat/Cool/Pump <span class="badge badge-pill badge-info">Auto</span></label>
-              <ul class="tg-list">
-                <li class="tg-list-item">
-                  <input class="tgl tgl-ios" id="triggers" type="checkbox" ng-checked="settings.sketches.include_triggers" ng-click="settings.sketches.include_triggers = !settings.sketches.include_triggers"/>
-                  <label class="tgl-btn" for="triggers"></label>
-                </li>
-              </ul>
-            </div>
-            <div class="col-4">
-              <label class="adjust">Poll Frequency <span class="badge badge-pill badge-info">Auto</span></label>
-              <div class="input-group">
-                <input class="form-control" type="number" ng-model="settings.sketches.frequency" step="1" min="5">
-                <span class="input-group-btn">
-                  <button type="button" class="btn btn-light"><i class="fa fa-minus fa-lg" ng-click="(settings.sketches.frequency > 5) ? settings.sketches.frequency=settings.sketches.frequency-1 : 5"></i></button>
-                  <button type="button" class="btn btn-light"><i class="fa fa-plus fa-lg" ng-click="settings.sketches.frequency=settings.sketches.frequency+1"></i></button>
-                </span>
-              </div>
-              <small class="form-text text-muted">Every {{settings.sketches.frequency}} seconds</small>
-            </div>
-            <div class="col-4">
-              <div class="btn-group float-right">
-                <button type="button" class="btn btn-light dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  Download <span class="caret"></span>
-                </button>
-                <div class="dropdown-menu scrollable-menu">
-                  <a href="assets/BrewBenchYun/BrewBenchYun.ino" class="dropdown-item">Arduino Yun Sketch</a>
-                  <a href="" ng-click="downloadAutoSketch()" class="dropdown-item">Arduino Yun Auto Sketch <span class="badge badge-pill badge-info">Auto</span></a>
-                  <a href="" ng-click="downloadInfluxDBSketch()" class="dropdown-item" ng-class="{'disabled':!settings.influxdb.connected}">Arduino Yun InfluxDB Sketch <span class="badge badge-pill badge-info">Auto</span></a>
-                  <hr>
-                  <a href="https://grafana.com/dashboards/3960" class="dropdown-item" target="_blank">Grafana Session Dashboard</a>
-                  <a href="https://grafana.com/dashboards/3957" class="dropdown-item" target="_blank">Grafana Fermentation Dashboard</a>
-                </div>
-              </div>
-            </div>
-
-          </div>
-
-          <h5>App Config</h5>
+          <a href="" class="btn btn-light pull-right" data-dismiss="modal" data-toggle="modal" data-target="#sketchesModal">Sketches</a>
 
           <div class="row new">
 

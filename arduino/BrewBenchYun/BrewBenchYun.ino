@@ -7,7 +7,7 @@
 // https://www.brewbench.co/libs/cactus_io_DS18B20.zip
 #include "cactus_io_DS18B20.h"
 
-const String VERSION = "3.0.1";
+const String VERSION = "3.1.0";
 
 BridgeServer server;
 dht DHT;
@@ -84,6 +84,10 @@ void process(BridgeClient client) {
   if (command == "DHT11") {
     responseOkHeader(client);
     dht11Command(client);
+  }
+  if (command == "DHT21") {
+    responseOkHeader(client);
+    dht21Command(client);
   }
   if (command == "DHT22") {
     responseOkHeader(client);

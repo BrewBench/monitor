@@ -176,24 +176,6 @@ $scope.updateABV();
     }
   };
 
-  $scope.sessions = {
-    add: () => {
-      let now = new Date();
-      if(!$scope.settings.account.sessions) $scope.settings.account.sessions = [];
-      $scope.settings.account.sessions.push({
-        id: btoa(now+''+$scope.settings.arduinos.length+1),
-        name: 'Session Name',
-        created: moment()
-      });
-    },
-    update: (arduino) => {
-
-    },
-    delete: (index, arduino) => {
-
-    }
-  };
-
   $scope.tplink = {
     login: () => {
       BrewService.tplink().login($scope.settings.tplink.user,$scope.settings.tplink.pass)
@@ -202,6 +184,9 @@ $scope.updateABV();
             $scope.settings.tplink.token = response.token;
             $scope.tplink.scan(response.token);
           }
+        })
+        .catch(err => {
+          $scope.setErrorMessage(err.msg || err);
         });
     },
     scan: (token) => {
@@ -246,13 +231,15 @@ $scope.updateABV();
         ,type: type || $scope.kettleTypes[0].type
         ,active: false
         ,sticky: false
-        ,heater: {pin:'D6',running:false,auto:false}
-        ,pump: {pin:'D7',running:false,auto:false}
+        ,sketch:false
+        ,heater: {pin:'D6',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
+        ,pump: {pin:'D7',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
         ,temp: {pin:'A0',type:'Thermistor',hit:false,current:0,previous:0,adjust:0,target:$scope.kettleTypes[0].target,diff:$scope.kettleTypes[0].diff}
         ,values: []
         ,timers: []
         ,knob: angular.copy(BrewService.defaultKnobOptions(),{value:0,min:0,max:$scope.kettleTypes[0].target+$scope.kettleTypes[0].diff})
         ,arduino: $scope.settings.arduinos.length ? $scope.settings.arduinos[0] : null
+        ,error: {message:'',version:''}
     });
   };
 
@@ -649,6 +636,7 @@ $scope.updateABV();
       else if(err.config && err.config.url)
         message = err.config.url;
       else if(err.version){
+        if(kettle) kettle.error.version = err.version;
         message = 'Sketch Version is out of date.  <a href="" data-toggle="modal" data-target="#settingsModal">Download here</a>.'+
           '<br/>Your Version: '+err.version+
           '<br/>Current Version: '+$scope.settings.sketch_version;
@@ -657,13 +645,13 @@ $scope.updateABV();
 
       if(message){
         if(kettle){
-          kettle.error = $sce.trustAsHtml(`Connection error: ${message}`);
+          kettle.error.message = $sce.trustAsHtml(`Connection error: ${message}`);
           $scope.updateKnobCopy(kettle);
         }
         else
           $scope.error.message = $sce.trustAsHtml(`Error: ${message}`);
       } else if(kettle){
-        kettle.error = `Error connecting to ${BrewService.domain(kettle.arduino)}`;
+        kettle.error.message = `Error connecting to ${BrewService.domain(kettle.arduino)}`;
       } else {
         $scope.error.message = $sce.trustAsHtml(`Connection error:`);
       }
@@ -671,9 +659,12 @@ $scope.updateABV();
   };
 
   $scope.resetError = function(kettle){
-    $scope.error.type = 'danger';
-    $scope.error.message = $sce.trustAsHtml('');
-    if(kettle) kettle.error = $sce.trustAsHtml('');
+    if(kettle) {
+      kettle.error.message = $sce.trustAsHtml('');
+    } else {
+      $scope.error.type = 'danger';
+      $scope.error.message = $sce.trustAsHtml('');
+    }
   };
 
   $scope.updateTemp = function(response, kettle){
@@ -715,7 +706,7 @@ $scope.updateABV();
         temps.push($scope.toggleRelay(kettle, kettle.heater, false));
       }
       //stop the pump
-      if(kettle.pump.auto && kettle.pump.running){
+      if(kettle.pump && kettle.pump.auto && kettle.pump.running){
         temps.push($scope.toggleRelay(kettle, kettle.pump, false));
       }
       //start the chiller
@@ -736,7 +727,7 @@ $scope.updateABV();
         }));
       }
       //start the pump
-      if(kettle.pump.auto && !kettle.pump.running){
+      if(kettle.pump && kettle.pump.auto && !kettle.pump.running){
         temps.push($scope.toggleRelay(kettle, kettle.pump, true));
       }
       //stop the cooler
@@ -752,7 +743,7 @@ $scope.updateABV();
         temps.push($scope.toggleRelay(kettle, kettle.heater, false));
       }
       //stop the pump
-      if(kettle.pump.auto && kettle.pump.running){
+      if(kettle.pump && kettle.pump.auto && kettle.pump.running){
         temps.push($scope.toggleRelay(kettle, kettle.pump, false));
       }
       //stop the cooler
@@ -832,6 +823,27 @@ $scope.updateABV();
     }
   };
 
+  $scope.hasSketches = function(kettle){
+    let hasASketch = false;
+    _.each($scope.kettles, kettle => {
+      if(kettle.sketch && kettle.heater && kettle.heater.sketch)
+        hasASketch = true;
+      else if(kettle.sketch && kettle.cooler && kettle.cooler.sketch)
+        hasASketch = true;
+    });
+    return hasASketch;
+  };
+
+  $scope.updateKettleSketches = function(kettle){
+    kettle.sketch = !kettle.sketch;
+    if(!kettle.sketch){
+      if(kettle.heater)
+        kettle.heater.sketch = kettle.sketch;
+      if(kettle.cooler)
+        kettle.cooler.sketch = kettle.sketch;
+    }
+  };
+
   $scope.knobClick = function(kettle){
       //set adjustment amount
       if(!!kettle.temp.previous){
@@ -855,7 +867,7 @@ $scope.updateABV();
         if(kettle.heater.running){
           $scope.toggleRelay(kettle, kettle.heater, true);
         }
-        if(kettle.pump.running){
+        if(kettle.pump && kettle.pump.running){
           $scope.toggleRelay(kettle, kettle.pump, true);
         }
         if(kettle.cooler && kettle.cooler.running){
@@ -868,7 +880,7 @@ $scope.updateABV();
           $scope.toggleRelay(kettle, kettle.heater, false);
         }
         //stop the pump
-        if(!kettle.active && kettle.pump.running){
+        if(!kettle.active && kettle.pump && kettle.pump.running){
           $scope.toggleRelay(kettle, kettle.pump, false);
         }
         //stop the cooler
@@ -876,10 +888,9 @@ $scope.updateABV();
           $scope.toggleRelay(kettle, kettle.cooler, false);
         }
         if(!kettle.active){
-          kettle.pump.auto=false;
-          kettle.heater.auto=false;
-          if(kettle.cooler)
-            kettle.cooler.auto=false;
+          if(kettle.pump) kettle.pump.auto=false;
+          if(kettle.heater) kettle.heater.auto=false;
+          if(kettle.cooler) kettle.cooler.auto=false;
           $scope.updateKnobCopy(kettle);
         }
       }
@@ -972,25 +983,37 @@ $scope.updateABV();
   };
 
   $scope.downloadAutoSketch = function(){
-    _.each($scope.kettles, (kettle, i) => {
+    let actions = '';
+    let tplink_connection_string = BrewService.tplink().connection();
+    let kettles = _.filter($scope.kettles,{sketch:true});
+    _.each(kettles, (kettle, i) => {
       if( kettle.temp.type == 'Thermistor' )
-        kettles += 'thermistorAutoCommand("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.temp.pin+'");\n';
+        actions += 'temp = thermistorAutoCommand("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.temp.pin+'");\n';
       else if( kettle.temp.type == 'DS18B20' )
-        kettles += 'ds18B20AutoCommand("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.temp.pin+'");\n';
+        actions += 'temp = ds18B20AutoCommand("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.temp.pin+'");\n';
       else if( kettle.temp.type == 'PT100' )
-        kettles += 'pt100AutoCommand("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.temp.pin+'");\n';
+        actions += 'temp = pt100AutoCommand("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.temp.pin+'");\n';
       else if( kettle.temp.type == 'DHT11' )
-        kettles += 'dht11AutoCommand("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.temp.pin+'");\n';
+        actions += 'temp = dht11AutoCommand("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.temp.pin+'");\n';
       else if( kettle.temp.type == 'DHT21' )
-        kettles += 'dht21AutoCommand("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.temp.pin+'");\n';
+        actions += 'temp = dht21AutoCommand("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.temp.pin+'");\n';
       else if( kettle.temp.type == 'DHT22' )
-        kettles += 'dht22AutoCommand("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.temp.pin+'");\n';
+        actions += 'temp = dht22AutoCommand("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.temp.pin+'");\n';
+      //look for triggers
+      if(kettle.sketch){
+        let target = ($scope.settings.unit=='F') ? $filter('toCelsius')(kettle.temp.target) : kettle.temp.target;
+        if(kettle.heater && kettle.heater.sketch)
+          actions += 'trigger("heat","'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.heater.pin+'",temp,'+target+','+kettle.temp.diff+');\n';
+        if(kettle.cooler && kettle.cooler.sketch)
+          actions += 'trigger("cool","'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.cooler.pin+'",temp,'+target+','+kettle.temp.diff+');\n';
+      }
     });
-    return $http.get('assets/BrewBenchAutoYun/BrewBenchAutoYun.ino')
+    return $http.get('assets/arduino/BrewBenchAutoYun/BrewBenchAutoYun.ino')
       .then(response => {
         // replace variables
         response.data = response.data
-          .replace('// [kettles]', kettles)
+          .replace('// [actions]', actions)
+          .replace('[TPLINK_CONNECTION]', tplink_connection_string)
           .replace('[FREQUENCY_SECONDS]', $scope.settings.sketches.frequency ? parseInt($scope.settings.sketches.frequency,10) : 60);
         let streamSketch = document.createElement('a');
         streamSketch.setAttribute('download', 'BrewBenchAutoYun.ino');
@@ -1005,7 +1028,7 @@ $scope.updateABV();
   $scope.downloadInfluxDBSketch = function(){
     if(!$scope.settings.influxdb.url) return;
 
-    let kettles = "";
+    let actions = '';
     let connection_string = `${$scope.settings.influxdb.url}`;
     if( !!$scope.settings.influxdb.port )
       connection_string += `:${$scope.settings.influxdb.port}`;
@@ -1015,56 +1038,40 @@ $scope.updateABV();
       connection_string += `u=${$scope.settings.influxdb.user}&p=${$scope.settings.influxdb.pass}&`
     // add db
     connection_string += 'db='+($scope.settings.influxdb.db || 'session-'+moment().format('YYYY-MM-DD'));
+    let tplink_connection_string = BrewService.tplink().connection();
 
     _.each($scope.kettles, (kettle, i) => {
       if( kettle.temp.type == 'Thermistor' )
-        kettles += 'thermistorInfluxDBCommand("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.temp.pin+'");\n';
+        actions += 'temp = thermistorInfluxDBCommand("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.temp.pin+'");\n';
       else if( kettle.temp.type == 'DS18B20' )
-        kettles += 'ds18B20InfluxDBCommand("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.temp.pin+'");\n';
+        actions += 'temp = ds18B20InfluxDBCommand("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.temp.pin+'");\n';
       else if( kettle.temp.type == 'PT100' )
-        kettles += 'pt100InfluxDBCommand("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.temp.pin+'");\n';
+        actions += 'temp = pt100InfluxDBCommand("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.temp.pin+'");\n';
       else if( kettle.temp.type == 'DHT11' )
-        kettles += 'dht11InfluxDBCommand("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.temp.pin+'");\n';
+        actions += 'temp = dht11InfluxDBCommand("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.temp.pin+'");\n';
       else if( kettle.temp.type == 'DHT21' )
-        kettles += 'dht21InfluxDBCommand("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.temp.pin+'");\n';
+        actions += 'temp = dht21InfluxDBCommand("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.temp.pin+'");\n';
       else if( kettle.temp.type == 'DHT22' )
-        kettles += 'dht22InfluxDBCommand("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.temp.pin+'");\n';
+        actions += 'temp = dht22InfluxDBCommand("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.temp.pin+'");\n';
+      //look for triggers
+      if(kettle.sketch){
+        let target = ($scope.settings.unit=='F') ? $filter('toCelsius')(kettle.temp.target) : kettle.temp.target;
+        if(kettle.heater && kettle.heater.sketch)
+          actions += 'trigger("heat","'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.heater.pin+'",temp,'+target+','+kettle.temp.diff+');\n';
+        if(kettle.cooler && kettle.cooler.sketch)
+          actions += 'trigger("cool","'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.cooler.pin+'",temp,'+target+','+kettle.temp.diff+');\n';
+      }
     });
-    return $http.get('assets/BrewBenchInfluxDBYun/BrewBenchInfluxDBYun.ino')
+    return $http.get('assets/arduino/BrewBenchInfluxDBYun/BrewBenchInfluxDBYun.ino')
       .then(response => {
         // replace variables
         response.data = response.data
-          .replace('// [kettles]', kettles)
+          .replace('// [actions]', actions)
           .replace('[INFLUXDB_CONNECTION]', connection_string)
+          .replace('[TPLINK_CONNECTION]', tplink_connection_string)
           .replace('[FREQUENCY_SECONDS]', $scope.settings.sketches.frequency ? parseInt($scope.settings.sketches.frequency,10) : 60);
         let streamSketch = document.createElement('a');
         streamSketch.setAttribute('download', 'BrewBenchInfluxDBYun.ino');
-        streamSketch.setAttribute('href', "data:text/ino;charset=utf-8," + encodeURIComponent(response.data));
-        streamSketch.click();
-      })
-      .catch(err => {
-        $scope.setErrorMessage(`Failed to download sketch ${err.message}`);
-      });
-  };
-
-  $scope.downloadStreamsSketch = function(sessionId){
-    let kettles = "";
-    _.each($scope.kettles, (kettle, i) => {
-      if( kettle.temp.type == 'Thermistor' )
-        kettles += 'thermistorAPICommand("'+kettle.key+'","'+kettle.temp.pin+'");\n  ';
-      else if( kettle.temp.type == 'DS18B20' )
-        kettles += 'ds18B20APICommand("'+kettle.key+'","'+kettle.temp.pin+'");\n  ';
-      else if( kettle.temp.type == 'PT100' )
-        kettles += 'pt100APICommand("'+kettle.key+'","'+kettle.temp.pin+'");\n  ';
-    });
-    return $http.get('assets/BrewBenchStreamsYun/BrewBenchStreamsYun.ino')
-      .then(response => {
-        response.data = response.data
-          .replace('// [kettles]', kettles)
-          .replace('[API_KEY]', $scope.settings.account.apiKey)
-          .replace('[SESSION_ID]', sessionId);
-        let streamSketch = document.createElement('a');
-        streamSketch.setAttribute('download', 'BrewBenchStreamsYun.ino');
         streamSketch.setAttribute('href', "data:text/ino;charset=utf-8," + encodeURIComponent(response.data));
         streamSketch.click();
       })
@@ -1205,7 +1212,7 @@ $scope.updateABV();
       kettle.knob.subText.color = 'gray';
       kettle.knob.readOnly = true;
       return;
-    } else if(kettle.error){
+    } else if(kettle.error.message){
         kettle.knob.trackColor = '#ddd';
         kettle.knob.barColor = '#777';
         kettle.knob.subText.text = 'error';
@@ -1274,10 +1281,13 @@ $scope.updateABV();
     kettle.temp.target = kettleType.target;
     kettle.temp.diff = kettleType.diff;
     kettle.knob = angular.copy(BrewService.defaultKnobOptions(),{value:kettle.temp.current,min:0,max:kettleType.target+kettleType.diff});
-    if(kettleType.type == 'fermenter' || kettleType.type == 'air')
-      kettle.cooler = {pin:'D2',running:false,auto:false,pwm:false,dutyCycle:100};
-    else
+    if(kettleType.type == 'fermenter' || kettleType.type == 'air'){
+      kettle.cooler = {pin:'D2',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false};
+      delete kettle.pump;
+    } else {
+      kettle.pump = {pin:'D2',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false};
       delete kettle.cooler;
+    }
   };
 
   $scope.changeUnits = function(unit){
