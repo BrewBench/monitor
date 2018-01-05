@@ -136,7 +136,7 @@
             <div class="col-12">
               <label class="adjust">Database</label>
               <div class="input-group">
-                <div class="input-group-btn" ng-if="settings.influxdb.dbs">
+                <div class="input-group-btn" ng-if="settings.influxdb.dbs && settings.influxdb.dbs.length">
                   <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">DBs</button>
                   <div class="dropdown-menu">
                     <a class="dropdown-item" href="" ng-click="settings.influxdb.db=''">Create a new database</a>

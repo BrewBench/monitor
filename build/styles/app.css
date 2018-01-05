@@ -1005,7 +1005,7 @@ button {
   margin-bottom: 20px;
 }
 .card-deck {
-  padding-bottom: 80px;
+  padding: 0px 0px 80px 10px;
 }
 @media (min-width: 576px) {
   .modal-dialog {
