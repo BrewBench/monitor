@@ -1437,7 +1437,7 @@ $scope.updateABV();
     BrewService.settings('share',newValue);
   },true);
 
-  $(function () {
-    $('[data-toggle="tooltip"]').tooltip()
+  $( document ).ready(function() {
+    $('[data-toggle="tooltip"]').tooltip();
   });
 });
