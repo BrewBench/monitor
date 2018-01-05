@@ -319,49 +319,49 @@
               <label class="adjust">Timers</label>
               <!--  grain timers -->
               <div class="btn-group" role="group" ng-if="kettle.type=='grain'">
-                  <div class="btn-group" role="group">
-                    <button type="button" class="btn btn-light dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></button>
-                    <div class="dropdown-menu scrollable-menu dropdown-menu-right">
-                      <button ng-repeat="grain in grains"
+                  <button type="button" class="btn btn-light add-timer" ng-click="addTimer(kettle)"><img src="/assets/img/grain.svg" width="32"></button>
+                    <div class="btn-group" role="group">
+                      <button type="button" class="btn btn-light dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></button>
+                      <div class="dropdown-menu scrollable-menu dropdown-menu-right">
+                        <button ng-repeat="grain in grains"
                         ng-click="addTimer(kettle,{label:grain.name,min:60})"
                         class="dropdown-item" type="button">
                         {{grain.name}}
                       </button>
                     </div>
                   </div>
-                  <button type="button" class="btn btn-light add-timer" ng-click="addTimer(kettle)"><img src="/assets/img/grain.svg" width="32"></button>
               </div>
               <!--  hot timers -->
               <div class="btn-group" role="group" ng-if="kettle.type=='hop'">
-                <div class="btn-group" role="group">
-                  <button type="button" class="btn btn-light dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></button>
-                    <div class="dropdown-menu scrollable-menu dropdown-menu-right">
-                      <button ng-click="addTimer(kettle,{label:'Whirlfloc',min:10})"
+                  <button type="button" class="btn btn-light add-timer" ng-click="addTimer(kettle)"><img src="/assets/img/hop.svg" width="32"></button>
+                  <div class="btn-group" role="group">
+                      <button type="button" class="btn btn-light dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></button>
+                      <div class="dropdown-menu scrollable-menu dropdown-menu-right">
+                        <button ng-click="addTimer(kettle,{label:'Whirlfloc',min:10})"
                         class="dropdown-item" type="button">
                         Whirlfloc
                       </button>
                       <button ng-repeat="hop in hops"
-                        ng-click="addTimer(kettle,{label:hop.name,min:30})"
-                        class="dropdown-item" type="button">
-                        {{hop.name}}
-                      </button>
-                    </div>
+                      ng-click="addTimer(kettle,{label:hop.name,min:30})"
+                      class="dropdown-item" type="button">
+                      {{hop.name}}
+                    </button>
                   </div>
-                  <button type="button" class="btn btn-light add-timer" ng-click="addTimer(kettle)"><img src="/assets/img/hop.svg" width="32"></button>
+                </div>
               </div>
               <!--  water timers -->
               <div class="btn-group" role="group" ng-if="kettle.type=='water'">
-                <div class="btn-group" role="group">
-                  <button type="button" class="btn btn-light dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></button>
-                    <div class="dropdown-menu scrollable-menu dropdown-menu-right">
-                        <button ng-repeat="w in water"
-                        ng-click="addTimer(kettle,{label:w.name||w.salt,min:60})"
-                        class="dropdown-item" type="button">
-                        {{w.name||w.salt}}
-                      </button>
-                    </div>
-                  </div>
                   <button type="button" class="btn btn-light add-timer" ng-click="addTimer(kettle)"><img src="/assets/img/water.svg" width="32"></button>
+                  <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-light dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></button>
+                    <div class="dropdown-menu scrollable-menu dropdown-menu-right">
+                      <button ng-repeat="w in water"
+                      ng-click="addTimer(kettle,{label:w.name||w.salt,min:60})"
+                      class="dropdown-item" type="button">
+                      {{w.name||w.salt}}
+                    </button>
+                  </div>
+                </div>
               </div>
 
               <button type="button" class="btn btn-light" ng-click="removeTimers($event,kettle)" ng-if="kettle.timers.length"><i class="fa fa-trash fa-lg"></i></button>
