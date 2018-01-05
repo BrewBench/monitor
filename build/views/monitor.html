@@ -27,10 +27,12 @@
         <button type="button" class="close" data-dismiss="alert" aria-label="Close" ng-click="resetError()"><span aria-hidden="true">&times;</span></button>
         <strong>{{error.type}}</strong> <span ng-bind-html="error.message">{{error.message}}</span>
       </div>
-      <div class="pb-4">
-        <i class="chart-toggle fa fa-area-chart fa-lg float-right"
+      <div class="pb-5">
+        <a href="" class="chart-toggle float-right" ng-click="settings.chart=!settings.chart" ng-class="{'on':settings.chart,'off':!settings.chart}">
+        <i class="fa fa-area-chart"
           ng-class="{'on':settings.chart,'off':!settings.chart}"
-          ng-click="settings.chart=!settings.chart" aria-hidden="true"></i>
+          aria-hidden="true"></i>
+        </a>
       </div>
       <nvd3 options="chartOptions" data="kettles" ng-show="settings.chart"></nvd3>
     </div>

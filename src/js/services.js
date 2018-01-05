@@ -23,7 +23,7 @@ angular.module('brewbench-monitor')
         ,notifications: {on:true,timers:true,high:true,low:true,target:true,slack:'',last:''}
         ,sounds: {on:true,alert:'/assets/audio/bike.mp3',timer:'/assets/audio/school.mp3'}
         ,account: {apiKey: '', sessions: []}
-        ,influxdb: {url: '', port: 8086, user: '', pass: '', db: '', connected: false}
+        ,influxdb: {url: '', port: 8086, user: '', pass: '', db: '', dbs:[], connected: false}
         ,arduinos: [{
           id: btoa('brewbench'),
           url: 'arduino.local',
@@ -470,7 +470,6 @@ angular.module('brewbench-monitor')
           // set the token
           if(!token)
             return q.reject('Invalid token');
-          console.log(JSON.stringify(payload))
           params.token = token;
           $http({url: device.appServerUrl,
               method: 'POST',
@@ -513,6 +512,25 @@ angular.module('brewbench-monitor')
           $http({url: `${influxConnection}/ping`, method: 'GET'})
             .then(response => {
               q.resolve(response);
+            })
+            .catch(err => {
+              q.reject(err);
+            });
+            return q.promise;
+        },
+        dbs: () => {
+          $http({url: `${influxConnection}/query?u=${settings.influxdb.user}&p=${settings.influxdb.pass}&q=${encodeURIComponent('show databases')}`, method: 'GET'})
+            .then(response => {
+              if(response.data &&
+                response.data.results &&
+                response.data.results.length &&
+                response.data.results[0].series &&
+                response.data.results[0].series.length &&
+                response.data.results[0].series[0].values ){
+                q.resolve(response.data.results[0].series[0].values);
+              } else {
+                q.resolve([]);
+              }
             })
             .catch(err => {
               q.reject(err);

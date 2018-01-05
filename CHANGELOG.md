@@ -1,5 +1,16 @@
 # Change Log
 
+## 3.1.1 - 2018-01-05
+
+### Added
+- InfluxDB database list
+- Kettle adjustment % to Auto and InfluxDB sketches
+- Button styles
+
+### Updated
+- CSS styles
+- Sketches
+
 ## 3.1.0 - 2018-01-03
 
 ### Added

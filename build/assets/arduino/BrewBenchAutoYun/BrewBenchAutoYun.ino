@@ -7,7 +7,7 @@
 // https://www.brewbench.co/libs/cactus_io_DS18B20.zip
 #include "cactus_io_DS18B20.h"
 
-const String VERSION = "3.1.0";
+const String VERSION = "3.1.1";
 const String TPLINK_CONNECTION = "[TPLINK_CONNECTION]";
 const int FREQUENCY_SECONDS = [FREQUENCY_SECONDS];
 int secondCounter = 0;
@@ -191,11 +191,11 @@ void ds18B20Command(BridgeClient client) {
   client.print("{\"pin\":\""+String(spin)+String(pin)+"\",\"temp\":\""+String(temp)+"\"}");
 }
 
-float ds18B20AutoCommand(String source, String pin) {
+float ds18B20AutoCommand(String source, String pin, int adjust) {
   DS18B20 ds(pin.substring(1).toInt());
   ds.readSensor();
   float temp = ds.getTemperature_C();
-
+  temp = temp+adjust;
   return temp;
 }
 
@@ -208,9 +208,9 @@ void thermistorCommand(BridgeClient client) {
   client.print("{\"pin\":\""+String(spin)+String(pin)+"\",\"temp\":\""+String(temp)+"\"}");
 }
 
-float thermistorAutoCommand(String source, String pin) {
+float thermistorAutoCommand(String source, String pin, int adjust) {
   float temp = Thermistor(pin.substring(1).toInt());
-
+  temp = temp+adjust;
   return temp;
 }
 
@@ -234,7 +234,7 @@ void pt100Command(BridgeClient client) {
   client.print("{\"pin\":\""+String(spin)+String(pin)+"\",\"temp\":\""+String(temp)+"\"}");
 }
 
-float pt100AutoCommand(String source, String pin) {
+float pt100AutoCommand(String source, String pin, int adjust) {
   float tvoltage;
   float temp;
 
@@ -246,6 +246,7 @@ float pt100AutoCommand(String source, String pin) {
   if (tvoltage>409){
     tvoltage = map(tvoltage,410,1023,0,614);
     temp = (150*tvoltage)/614;
+    temp = temp+adjust;
   }
 
   return temp;
@@ -265,10 +266,10 @@ void dht11Command(BridgeClient client) {
   }
 }
 
-float dht11AutoCommand(String source, String pin) {
+float dht11AutoCommand(String source, String pin, int adjust) {
   int chk = DHT.read11(pin.substring(1).toInt());
   if( chk == DHTLIB_OK ){
-    float temp = DHT.temperature;
+    float temp = DHT.temperature+adjust;
     float humidity = DHT.humidity;
 
     return temp;
@@ -289,10 +290,10 @@ void dht21Command(BridgeClient client) {
   }
 }
 
-float dht21AutoCommand(String source, String pin) {
+float dht21AutoCommand(String source, String pin, int adjust) {
   int chk = DHT.read21(pin.substring(1).toInt());
   if( chk == DHTLIB_OK ){
-    float temp = DHT.temperature;
+    float temp = DHT.temperature+adjust;
     float humidity = DHT.humidity;
 
     return temp;
@@ -313,10 +314,10 @@ void dht22Command(BridgeClient client) {
   }
 }
 
-float dht22AutoCommand(String source, String pin) {
+float dht22AutoCommand(String source, String pin, int adjust) {
   int chk = DHT.read22(pin.substring(1).toInt());
   if( chk == DHTLIB_OK ){
-    float temp = DHT.temperature;
+    float temp = DHT.temperature+adjust;
     float humidity = DHT.humidity;
 
     return temp;

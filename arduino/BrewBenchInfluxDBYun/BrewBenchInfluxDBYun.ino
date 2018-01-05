@@ -7,7 +7,7 @@
 // https://www.brewbench.co/libs/cactus_io_DS18B20.zip
 #include "cactus_io_DS18B20.h"
 
-const String VERSION = "3.1.0";
+const String VERSION = "3.1.1";
 const String INFLUXDB_CONNECTION = "[INFLUXDB_CONNECTION]";
 const String TPLINK_CONNECTION = "[TPLINK_CONNECTION]";
 const int FREQUENCY_SECONDS = [FREQUENCY_SECONDS];
@@ -193,11 +193,11 @@ void ds18B20Command(BridgeClient client) {
   client.print("{\"pin\":\""+String(spin)+String(pin)+"\",\"temp\":\""+String(temp)+"\"}");
 }
 
-float ds18B20InfluxDBCommand(String source, String pin) {
+float ds18B20InfluxDBCommand(String source, String pin, int adjust) {
   DS18B20 ds(pin.substring(1).toInt());
   ds.readSensor();
   float temp = ds.getTemperature_C();
-
+  temp = temp+adjust;
   String data = "temperature,sensor=DS18B20,pin="+pin+",source="+source+" temp="+String(temp);
   Process p;
   p.begin("curl");
@@ -219,9 +219,9 @@ void thermistorCommand(BridgeClient client) {
   client.print("{\"pin\":\""+String(spin)+String(pin)+"\",\"temp\":\""+String(temp)+"\"}");
 }
 
-float thermistorInfluxDBCommand(String source, String pin) {
+float thermistorInfluxDBCommand(String source, String pin, int adjust) {
   float temp = Thermistor(pin.substring(1).toInt());
-
+  temp = temp+adjust;
   String data = "temperature,sensor=Thermistor,pin="+pin+",source="+source+" temp="+String(temp);
   Process p;
   p.begin("curl");
@@ -254,7 +254,7 @@ void pt100Command(BridgeClient client) {
   client.print("{\"pin\":\""+String(spin)+String(pin)+"\",\"temp\":\""+String(temp)+"\"}");
 }
 
-float pt100InfluxDBCommand(String source, String pin) {
+float pt100InfluxDBCommand(String source, String pin, int adjust) {
   float tvoltage;
   float temp;
 
@@ -266,6 +266,7 @@ float pt100InfluxDBCommand(String source, String pin) {
   if (tvoltage>409){
     tvoltage = map(tvoltage,410,1023,0,614);
     temp = (150*tvoltage)/614;
+    temp = temp+adjust;
   }
 
   String data = "temperature,sensor=PT100,pin="+pin+",source="+source+" temp="+String(temp);
@@ -294,10 +295,10 @@ void dht11Command(BridgeClient client) {
   }
 }
 
-float dht11InfluxDBCommand(String source, String pin) {
+float dht11InfluxDBCommand(String source, String pin, int adjust) {
   int chk = DHT.read11(pin.substring(1).toInt());
   if( chk == DHTLIB_OK ){
-    float temp = DHT.temperature;
+    float temp = DHT.temperature+adjust;
     float humidity = DHT.humidity;
     // Send JSON response to client
     String data = "temperature,sensor=DHT11,pin="+pin+",source="+source+" temp="+String(temp)+" humidity="+String(humidity);
@@ -327,10 +328,10 @@ void dht21Command(BridgeClient client) {
   }
 }
 
-float dht21InfluxDBCommand(String source, String pin) {
+float dht21InfluxDBCommand(String source, String pin, int adjust) {
   int chk = DHT.read21(pin.substring(1).toInt());
   if( chk == DHTLIB_OK ){
-    float temp = DHT.temperature;
+    float temp = DHT.temperature+adjust;
     float humidity = DHT.humidity;
     // Send JSON response to client
     String data = "temperature,sensor=DHT11,pin="+pin+",source="+source+" temp="+String(temp)+" humidity="+String(humidity);
@@ -360,10 +361,10 @@ void dht22Command(BridgeClient client) {
   }
 }
 
-float dht22InfluxDBCommand(String source, String pin) {
+float dht22InfluxDBCommand(String source, String pin, int adjust) {
   int chk = DHT.read22(pin.substring(1).toInt());
   if( chk == DHTLIB_OK ){
-    float temp = DHT.temperature;
+    float temp = DHT.temperature+adjust;
     float humidity = DHT.humidity;
     // Send JSON response to client
     String data = "temperature,sensor=DHT22,pin="+pin+",source="+source+" temp="+String(temp)+" humidity="+String(humidity);

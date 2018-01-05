@@ -65,14 +65,26 @@
                   <th>Cool</th>
                   <th>Temp</th>
                   <th>Diff</th>
+                  <th>Adjust</th>
                   <th>Include</th>
                 </tr>
               </thead>
               <tbody>
                 <tr ng-repeat="kettle in kettles track by $index">
-                  <td>{{kettle.key}}</td>
                   <td>
-                    <span ng-if="kettle.heater && kettle.heater.pin.indexOf('TP-')===0">Not Supported</span>
+                    <img ng-if="kettle.type != 'air'" class="type" ng-src="/assets/img/{{kettle.type}}.svg" width="30" height="30"/>
+                    <i ng-if="kettle.type == 'air'" class="fa fa-thermometer-quarter fa-2x type" height="30"></i>
+                    &nbsp;
+                    {{kettle.key}}
+                  </td>
+                  <td>
+                    <span ng-if="kettle.heater && kettle.heater.pin.indexOf('TP-')===0">
+                      <i>Not Supported</i> <br/>
+                      {{pinDisplay(kettle.heater.pin)}}
+                    </span>
+                    <span ng-if="!kettle.heater">
+                      <i>Not Available</i> <br/>
+                    </span>
                     <ul class="tg-list" ng-if="kettle.heater && kettle.heater.pin.indexOf('TP-')===-1">
                       <li class="tg-list-item">
                         <span>{{pinDisplay(kettle.heater.pin)}}</span>
@@ -82,7 +94,13 @@
                     </ul>
                   </td>
                   <td>
-                    <span ng-if="kettle.cooler && kettle.cooler.pin.indexOf('TP-')===0">Not Supported</span>
+                    <span ng-if="kettle.cooler && kettle.cooler.pin.indexOf('TP-')===0">
+                      <i>Not Supported</i> <br/>
+                      {{pinDisplay(kettle.cooler.pin)}}
+                    </span>
+                    <span ng-if="!kettle.cooler">
+                      <i>Not Available</i> <br/>
+                    </span>
                     <ul class="tg-list" ng-if="kettle.cooler && kettle.cooler.pin.indexOf('TP-')===-1">
                       <li class="tg-list-item">
                         <span>{{pinDisplay(kettle.cooler.pin)}}</span>
@@ -93,6 +111,7 @@
                   </td>
                   <td>{{kettle.temp.target}}&deg;{{settings.unit}}</td>
                   <td>{{kettle.temp.diff}}&deg;{{settings.unit}}</td>
+                  <td>{{kettle.temp.adjust}}&deg;{{settings.unit}}</td>
                   <td>
                     <ul class="tg-list">
                       <li class="tg-list-item">

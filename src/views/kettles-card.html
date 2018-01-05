@@ -38,8 +38,10 @@
 
       <div class="row">
         <div class="col">
-          <img ng-if="kettle.type != 'air'" class="type" ng-src="/assets/img/{{kettle.type}}.svg" height="30" ng-click="changeKettleType(kettle)"/>
-          <i ng-if="kettle.type == 'air'" class="fa fa-thermometer-quarter fa-2x type" height="30" ng-click="changeKettleType(kettle)"></i>
+          <a href="" ng-click="changeKettleType(kettle)" class="kettle-type" ng-class="{'svg': kettle.type != 'air'}">
+            <img ng-if="kettle.type != 'air'" class="type" ng-src="/assets/img/{{kettle.type}}.svg" width="30" height="30"/>
+            <i ng-if="kettle.type == 'air'" class="fa fa-thermometer-quarter fa-2x type" height="30"></i>
+          </a>&nbsp;
           <h3><editable type="text" model="kettle.key"></editable></h3>
         </div>
       </div>
@@ -139,8 +141,10 @@
               </div>
             </div>
             <div class="btn-group relay">
-              <button type="button" class="btn" ng-class="{'btn-light':!kettle.heater.running && !kettle.heater.auto,'btn-success':kettle.heater.running,'btn-warning':!kettle.heater.running && kettle.heater.auto}" ng-click="toggleKettle('heat',kettle)">{{kettle.heater.running ? 'On' : (kettle.heater.auto ? 'Wait' :'Off')}}</button>
               <button type="button" class="btn" ng-class="{'btn-light':!kettle.heater.auto,'btn-success':kettle.heater.auto}" ng-click="kettle.heater.auto=!kettle.heater.auto">Auto</button>
+              <button type="button" class="btn" ng-class="{'btn-light':!kettle.heater.running && !kettle.heater.auto,'btn-success':kettle.heater.running,'btn-warning':!kettle.heater.running && kettle.heater.auto}" ng-click="toggleKettle('heat',kettle)">
+                <i class="fa fa-power-off fa-lg"></i>
+              </button>
             </div>
             </div>
             <rzslider
@@ -196,8 +200,10 @@
               </div>
             </div>
             <div class="btn-group relay">
-              <button type="button" class="btn" ng-class="{'btn-light':!kettle.pump.running && !kettle.pump.auto,'btn-success':kettle.pump.running,'btn-warning':!kettle.pump.running && kettle.pump.auto}" ng-click="toggleKettle('pump',kettle)">{{kettle.pump.running ? 'On' : (kettle.pump.auto ? 'Wait' :'Off')}}</button>
               <button type="button" class="btn" ng-class="{'btn-light':!kettle.pump.auto,'btn-success':kettle.pump.auto}" ng-click="kettle.pump.auto=!kettle.pump.auto">Auto</button>
+              <button type="button" class="btn" ng-class="{'btn-light':!kettle.pump.running && !kettle.pump.auto,'btn-success':kettle.pump.running,'btn-warning':!kettle.pump.running && kettle.pump.auto}" ng-click="toggleKettle('pump',kettle)">
+                <i class="fa fa-power-off fa-lg"></i>
+              </button>
             </div>
           </div>
           <rzslider
@@ -253,8 +259,10 @@
               </div>
             </div>
             <div class="btn-group relay">
-              <button type="button" class="btn" ng-class="{'btn-light':!kettle.cooler.running&&!kettle.cooler.auto,'btn-success':kettle.cooler.running,'btn-warning':!kettle.cooler.running&&kettle.cooler.auto}" ng-click="toggleKettle('cool',kettle)">{{kettle.cooler.running ? 'On' : (kettle.cooler.auto ? 'Wait' :'Off')}}</button>
               <button type="button" class="btn" ng-class="{'btn-light':!kettle.cooler.auto,'btn-success':kettle.cooler.auto}" ng-click="kettle.cooler.auto=!kettle.cooler.auto">Auto</button>
+              <button type="button" class="btn" ng-class="{'btn-light':!kettle.cooler.running && !kettle.cooler.auto,'btn-success':kettle.cooler.running,'btn-warning':!kettle.cooler.running&&kettle.cooler.auto}" ng-click="toggleKettle('cool',kettle)">
+                <i class="fa fa-power-off fa-lg"></i>
+              </button>
             </div>
           </div>
           <rzslider
@@ -276,7 +284,14 @@
             value="kettle.temp.current"
             options="kettle.knob">
           </ui-knob>
-          <div class="adjusted" ng-if="kettle.temp.adjust != 0" ng-click="kettle.temp.adjust=0;kettle.temp.current=kettle.temp.previous;">adjusted {{kettle.temp.adjust}}&deg;</div>
+          <br/>
+          <span class="adjusted"
+            ng-click="kettle.temp.adjust=0;kettle.temp.current=kettle.temp.previous;"
+            data-toggle="tooltip" data-placement="right"
+            title="{{kettle.temp.adjust==0 ? 'Slide wheel to adjust' : 'Click to clear adjustment'}}"
+            data-original-title="{{kettle.temp.adjust==0 ? 'Slide wheel to adjust' : 'Click to clear adjustment'}}">
+            adjusted {{kettle.temp.adjust}}&deg;&nbsp;
+          </span>
         </div>
         <div class="col-auto" ng-if="shareAccess('fullAccess')">
           <div class="row">

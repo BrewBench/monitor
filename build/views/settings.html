@@ -120,7 +120,9 @@
               <div class="input-group">
                 <input id="influxdbUrl" class="form-control" type="text" ng-model="settings.influxdb.url" placeholder="http://InfluxDBUrl">
                 <span class="input-group-btn">
-                  <button class="btn btn-light" ng-click="testInfluxDB()" ng-disabled="!settings.influxdb.url">Test</button>
+                  <button class="btn btn-light" ng-click="testInfluxDB()" ng-disabled="!settings.influxdb.url">
+                    {{settings.influxdb.connected ? 'Refresh' : 'Connect'}}
+                  </button>
                 </span>
               </div>
               <small ng-if="settings.influxdb.connected" class="form-text text-success">Connected</small>
@@ -134,6 +136,14 @@
             <div class="col-12">
               <label class="adjust">Database</label>
               <div class="input-group">
+                <div class="input-group-btn" ng-if="settings.influxdb.dbs">
+                  <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">DBs</button>
+                  <div class="dropdown-menu">
+                    <a class="dropdown-item" href="" ng-click="settings.influxdb.db=''">Create a new database</a>
+                    <div role="separator" class="dropdown-divider"></div>
+                    <a ng-repeat="db in settings.influxdb.dbs" class="dropdown-item" href="" ng-click="settings.influxdb.db=db">{{db}}</a>
+                  </div>
+                </div>
                 <input class="form-control" type="text" ng-model="settings.influxdb.db" placeholder="Database Name">
                 <span class="input-group-btn">
                   <button class="btn btn-light" ng-click="createInfluxDB()" ng-disabled="!settings.influxdb.connected">Create</button>

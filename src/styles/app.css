@@ -136,9 +136,6 @@ sup.ref {
 .recipe ul {
   list-style: none;
 }
-.kettles .fa-thumb-tack {
-  padding-left: 10px;
-}
 .kettles ul {
   padding: 10px;
 }
@@ -172,9 +169,6 @@ sup.ref {
 }
 .kettles .kettle-row .kettle-head {
   flex: auto;
-}
-.kettles .type {
-  cursor: pointer;
 }
 .kettles .kettle-col {
   display: flex;
@@ -271,10 +265,13 @@ sup.ref {
 }
 .kettles .editable {
   height: 34px;
-  max-width: 50px;
+  max-width: 200px;
+  padding: 11px;
 }
-.layout-card .fa-thumb-tack {
-  margin-left: -48px;
+.kettles .editable:hover {
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 10px;
 }
 .layout-list {
   padding-bottom: 45px;
@@ -389,6 +386,10 @@ sup.ref {
   transition: color 0.1s ease;
   border-top: none;
 }
+.layout-list .kettles a.sticky {
+    margin-left: 12px;
+}
+
 .sticky-layout .card {
   min-width: 100px;
   max-width: 110px;
@@ -592,11 +593,11 @@ label.notes {
   letter-spacing: 0.2em;
   font-size: 13px;
 }
-.fa-stop-circle, .fa-times-circle, .chart-toggle.on {
+.fa-stop-circle, .fa-times-circle {
   color: rgba(200, 47, 47, 1);
   cursor: pointer;
 }
-.fa-play-circle, .chart-toggle.off {
+.fa-play-circle {
   color: rgba(73, 163, 127, 1);
   cursor: pointer;
 }
@@ -682,6 +683,16 @@ li.ssr {
   padding-left: 5px;
   color: rgba(119, 119, 119, .4);
 }
+
+.card-footer {
+  height: 56px;
+}
+
+.fa-chevron-right, .fa-chevron-left{
+  margin-top: 7px;
+  padding-left: 15px;
+}
+
 .btn-file {
   position: relative;
   overflow: hidden;
@@ -906,11 +917,11 @@ a.ui.label {
 button {
   cursor: pointer;
 }
-.btn-light {
+.btn-light, .btn-outline-secondary {
   border: 1px solid #ccc;
 }
 
-.tplinks .fa-power-off.on {
+.tplinks .fa-power-off.on, .chart-toggle .fa-area-chart.on {
   color: #FFF;
   background: #1FA66C;
   padding: 8px;
@@ -922,17 +933,62 @@ button {
   padding: 10px 2px 10px 2px;
 }
 
-.tplinks .fa-power-off.off {
+.chart-toggle.on {
+  border: 1px solid #1FA66C;
+  border-radius: 20px;
+  padding: 2px;
+}
+
+.tplinks .fa-power-off.off, .chart-toggle .fa-area-chart.off {
   color: #777;
   background: #ccc;
   padding: 8px;
   border-radius: 20px;
 }
 
-.tplinks .off {
+.tplinks a.off {
   border: 1px solid #ccc;
   border-radius: 20px;
   padding: 10px 2px 10px 2px;
+}
+
+.chart-toggle.off {
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  padding: 2px;
+}
+
+.kettles a.kettle-type:hover, .kettles a.sticky:hover, .chart-toggle.off:hover, .settings .tplinks .off:hover {
+    text-decoration: none;
+    background-color: #e5e5e5;
+}
+
+.kettles a.kettle-type {
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  padding: 15px 5px 3px 11px;
+}
+
+.fa-thermometer-quarter, .fa-power-off {
+  color: #777;
+}
+
+.kettles .btn-warning .fa-power-off, .kettles .btn-success .fa-power-off {
+  color: #fff;
+}
+
+.kettles a.kettle-type.svg {
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  padding: 10px 0px 10px 5px;
+}
+
+.kettles a.sticky {
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  padding: 12px 12px 8px 12px;
+  margin-left: -30px;
+  display: inline-flex;
 }
 
 .card {
