@@ -909,12 +909,32 @@ button {
 .btn-light {
   border: 1px solid #ccc;
 }
-.btn-light.on {
-  border: 1px solid rgba(73, 163, 127, 1);
+
+.tplinks .fa-power-off.on {
+  color: #FFF;
+  background: #1FA66C;
+  padding: 8px;
+  border-radius: 20px;
 }
-.btn-light.off {
-  border: 1px solid rgba(200, 47, 47, 1);
+.tplinks a.on {
+  border: 1px solid #1FA66C;
+  border-radius: 20px;
+  padding: 10px 2px 10px 2px;
 }
+
+.tplinks .fa-power-off.off {
+  color: #777;
+  background: #ccc;
+  padding: 8px;
+  border-radius: 20px;
+}
+
+.tplinks .off {
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  padding: 10px 2px 10px 2px;
+}
+
 .card {
   min-width: 350px;
   margin-bottom: 20px;
