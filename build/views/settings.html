@@ -188,16 +188,21 @@
               <tr>
                 <th>Name</th>
                 <th>Type</th>
-                <th>Test Status</th>
+                <th>Online</th>
+                <th>Power On/Off</th>
               </tr>
             </thead>
             <tbody>
               <tr ng-repeat="tp in settings.tplink.plugs">
                 <td>{{ tp.alias }}</td>
                 <td>{{ tp.deviceModel }}</td>
+                <td><i class="fa fa-circle fa-lg" ng-class="{'on':!!tp.status, 'off':!tp.status}" aria-hidden="true"></i></td>
                 <td>
-                  <a href="" ng-click="tplink.toggle(tp)" ng-class="{'on':!!tp.info.relay_state,'off':!tp.info.relay_state}">
-                    <i class="fa fa-power-off fa-lg" ng-class="{'on':!!tp.info.relay_state,'off':!tp.info.relay_state}"></i>
+                  <a href=""
+                    ng-if="!!tp.status"
+                    ng-click="tplink.toggle(tp)"
+                    ng-class="{'on':!!tp.info.relay_state,'off':!tp.info.relay_state}">
+                  <i class="fa fa-power-off fa-lg" ng-class="{'on':!!tp.info.relay_state,'off':!tp.info.relay_state}"></i>
                   </a>
                 </td>
               </tr>

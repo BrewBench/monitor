@@ -1,5 +1,10 @@
 # Change Log
 
+## 3.1.2 - 2018-01-06
+
+### Fixed
+- TP Links fixes
+
 ## 3.1.1 - 2018-01-05
 
 ### Added

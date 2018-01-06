@@ -396,7 +396,7 @@ angular.module('brewbench-monitor')
           let settings = this.settings('settings');
           if(settings.tplink.token){
             params.token = settings.tplink.token;
-            return url+'?'+jQuery.param(params);
+            return url+'/?'+jQuery.param(params);
           }
           return '';
         },

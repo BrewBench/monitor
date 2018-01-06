@@ -587,7 +587,7 @@ label.adjust, a.adjust {
   padding-bottom: 0;
   font-size: 13px;
 }
-a.heat, label.heating, .high {
+a.heat, label.heating, .high, .fa-circle.off {
   color: rgba(200, 47, 47, 1);
 }
 a.cool, label.cooling, .low {
@@ -613,7 +613,7 @@ label.notes {
 .label-success {
   background-color: rgba(73, 163, 127, 1);
 }
-.fa-check-circle {
+.fa-check-circle, .fa-circle.on {
   color: rgba(73, 163, 127, 1);
 }
 .fa-fire.on {

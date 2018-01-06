@@ -194,12 +194,16 @@ $scope.updateABV();
       BrewService.tplink().scan(token).then(response => {
         if(response.deviceList){
           $scope.settings.tplink.plugs = response.deviceList;
-          // get device info
+          // get device info if online (ie. status==1)
           _.each($scope.settings.tplink.plugs, plug => {
-            BrewService.tplink().info(plug).then(info => {
-              let sysinfo = JSON.parse(info.responseData).system.get_sysinfo;
-              plug.info = sysinfo;
-            });
+            if(!!plug.status){
+              BrewService.tplink().info(plug).then(info => {
+                if(info && info.responseData){
+                  let sysinfo = JSON.parse(info.responseData).system.get_sysinfo;
+                  plug.info = sysinfo;
+                }
+              });
+            }
           });
         }
       });
@@ -985,26 +989,27 @@ $scope.updateABV();
   $scope.downloadAutoSketch = function(){
     let actions = '';
     let tplink_connection_string = BrewService.tplink().connection();
-    let kettles = _.filter($scope.kettles,{sketch:true});
-    _.each(kettles, (kettle, i) => {
-      if( kettle.temp.type == 'Thermistor' )
+    _.each($scope.kettles, (kettle, i) => {
+      if((kettle.heater && kettle.heater.sketch) || (kettle.cooler && kettle.cooler.sketch)){
+        if( kettle.temp.type == 'Thermistor' )
         actions += 'temp = thermistorAutoCommand("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.temp.pin+'",'+kettle.temp.adjust+');\n';
-      else if( kettle.temp.type == 'DS18B20' )
+        else if( kettle.temp.type == 'DS18B20' )
         actions += 'temp = ds18B20AutoCommand("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.temp.pin+'",'+kettle.temp.adjust+');\n';
-      else if( kettle.temp.type == 'PT100' )
+        else if( kettle.temp.type == 'PT100' )
         actions += 'temp = pt100AutoCommand("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.temp.pin+'",'+kettle.temp.adjust+');\n';
-      else if( kettle.temp.type == 'DHT11' )
+        else if( kettle.temp.type == 'DHT11' )
         actions += 'temp = dht11AutoCommand("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.temp.pin+'",'+kettle.temp.adjust+');\n';
-      else if( kettle.temp.type == 'DHT21' )
+        else if( kettle.temp.type == 'DHT21' )
         actions += 'temp = dht21AutoCommand("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.temp.pin+'",'+kettle.temp.adjust+');\n';
-      else if( kettle.temp.type == 'DHT22' )
+        else if( kettle.temp.type == 'DHT22' )
         actions += 'temp = dht22AutoCommand("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.temp.pin+'",'+kettle.temp.adjust+');\n';
-      //look for triggers
-      let target = ($scope.settings.unit=='F') ? $filter('toCelsius')(kettle.temp.target) : kettle.temp.target;
-      if(kettle.heater && kettle.heater.sketch)
-        actions += 'trigger("heat","'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.heater.pin+'",temp,'+target+','+kettle.temp.diff+');\n';
-      if(kettle.cooler && kettle.cooler.sketch)
-        actions += 'trigger("cool","'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.cooler.pin+'",temp,'+target+','+kettle.temp.diff+');\n';
+        //look for triggers
+        let target = ($scope.settings.unit=='F') ? $filter('toCelsius')(kettle.temp.target) : kettle.temp.target;
+        if(kettle.heater && kettle.heater.sketch)
+          actions += 'trigger("heat","'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.heater.pin+'",temp,'+target+','+kettle.temp.diff+');\n';
+        if(kettle.cooler && kettle.cooler.sketch)
+          actions += 'trigger("cool","'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.cooler.pin+'",temp,'+target+','+kettle.temp.diff+');\n';
+      }
     });
     return $http.get('assets/arduino/BrewBenchAutoYun/BrewBenchAutoYun.ino')
       .then(response => {

@@ -7,7 +7,7 @@
 // https://www.brewbench.co/libs/cactus_io_DS18B20.zip
 #include "cactus_io_DS18B20.h"
 
-const String VERSION = "3.1.1";
+const String VERSION = "3.1.2";
 const String TPLINK_CONNECTION = "[TPLINK_CONNECTION]";
 const int FREQUENCY_SECONDS = [FREQUENCY_SECONDS];
 int secondCounter = 0;
@@ -143,21 +143,25 @@ void analogAutoCommand(int pin, int value) {
   pinMode(pin, OUTPUT);
   analogWrite(pin, value);
 }
-// TODO figure out why this doesn't work
-void tplinkAutoCommand(String deviceId, int value){
+
+String tplinkAutoCommand(String deviceId, int value){
+  String response = "";
   String data = "{\"method\":\"passthrough\",\"params\":{\"deviceId\":\""+String(deviceId)+"\",\"requestData\":\"{\\\"system\\\":{\\\"set_relay_state\\\":{\\\"state\\\":"+String(value)+"}}}\"}}";
   Process p;
-  // p.runShellCommand("curl -H 'Content-Type: application/json' -XPOST -d '"+data+"' --insecure '"+TPLINK_CONNECTION+"'");
   p.begin("curl");
+  p.addParameter("-k");
+  p.addParameter("-XPOST");
   p.addParameter("-H");
   p.addParameter("Content-Type: application/json");
-  p.addParameter("-XPOST");
   p.addParameter("-d");
   p.addParameter(data);
-  p.addParameter("--insecure");
   p.addParameter(TPLINK_CONNECTION);
   p.run();
-  while (p.running());
+  while(p.running());
+  while(p.available() > 0){
+    response = p.readString();
+  }
+  return response;
 }
 
 // https://www.arduino.cc/en/Reference/AnalogWrite
