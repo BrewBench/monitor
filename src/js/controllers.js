@@ -231,7 +231,6 @@ $scope.updateABV();
         ,type: type || $scope.kettleTypes[0].type
         ,active: false
         ,sticky: false
-        ,sketch:false
         ,heater: {pin:'D6',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
         ,pump: {pin:'D7',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
         ,temp: {pin:'A0',type:'Thermistor',hit:false,current:0,previous:0,adjust:0,target:$scope.kettleTypes[0].target,diff:$scope.kettleTypes[0].diff}
@@ -711,7 +710,7 @@ $scope.updateABV();
     $scope.updateKnobCopy(kettle);
 
     //is temp too high?
-    if(kettle.temp.current >= kettle.temp.target+kettle.temp.diff){
+    if(kettle.temp.current > kettle.temp.target+kettle.temp.diff){
       //stop the heating element
       if(kettle.heater.auto && kettle.heater.running){
         temps.push($scope.toggleRelay(kettle, kettle.heater, false));
@@ -728,7 +727,7 @@ $scope.updateABV();
         }));
       }
     } //is temp too low?
-    else if(kettle.temp.current <= kettle.temp.target-kettle.temp.diff){
+    else if(kettle.temp.current < kettle.temp.target-kettle.temp.diff){
       $scope.alert(kettle);
       //start the heating element
       if(kettle.heater.auto && !kettle.heater.running){
@@ -837,22 +836,12 @@ $scope.updateABV();
   $scope.hasSketches = function(kettle){
     let hasASketch = false;
     _.each($scope.kettles, kettle => {
-      if(kettle.sketch && kettle.heater && kettle.heater.sketch)
+      if(kettle.heater && kettle.heater.sketch)
         hasASketch = true;
-      else if(kettle.sketch && kettle.cooler && kettle.cooler.sketch)
+      else if(kettle.cooler && kettle.cooler.sketch)
         hasASketch = true;
     });
     return hasASketch;
-  };
-
-  $scope.updateKettleSketches = function(kettle){
-    kettle.sketch = !kettle.sketch;
-    if(!kettle.sketch){
-      if(kettle.heater)
-        kettle.heater.sketch = kettle.sketch;
-      if(kettle.cooler)
-        kettle.cooler.sketch = kettle.sketch;
-    }
   };
 
   $scope.knobClick = function(kettle){
@@ -1011,13 +1000,11 @@ $scope.updateABV();
       else if( kettle.temp.type == 'DHT22' )
         actions += 'temp = dht22AutoCommand("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.temp.pin+'",'+kettle.temp.adjust+');\n';
       //look for triggers
-      if(kettle.sketch){
-        let target = ($scope.settings.unit=='F') ? $filter('toCelsius')(kettle.temp.target) : kettle.temp.target;
-        if(kettle.heater && kettle.heater.sketch)
-          actions += 'trigger("heat","'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.heater.pin+'",temp,'+target+','+kettle.temp.diff+');\n';
-        if(kettle.cooler && kettle.cooler.sketch)
-          actions += 'trigger("cool","'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.cooler.pin+'",temp,'+target+','+kettle.temp.diff+');\n';
-      }
+      let target = ($scope.settings.unit=='F') ? $filter('toCelsius')(kettle.temp.target) : kettle.temp.target;
+      if(kettle.heater && kettle.heater.sketch)
+        actions += 'trigger("heat","'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.heater.pin+'",temp,'+target+','+kettle.temp.diff+');\n';
+      if(kettle.cooler && kettle.cooler.sketch)
+        actions += 'trigger("cool","'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.cooler.pin+'",temp,'+target+','+kettle.temp.diff+');\n';
     });
     return $http.get('assets/arduino/BrewBenchAutoYun/BrewBenchAutoYun.ino')
       .then(response => {
@@ -1065,13 +1052,11 @@ $scope.updateABV();
       else if( kettle.temp.type == 'DHT22' )
         actions += 'temp = dht22InfluxDBCommand("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.temp.pin+'",'+kettle.temp.adjust+');\n';
       //look for triggers
-      if(kettle.sketch){
-        let target = ($scope.settings.unit=='F') ? $filter('toCelsius')(kettle.temp.target) : kettle.temp.target;
-        if(kettle.heater && kettle.heater.sketch)
-          actions += 'trigger("heat","'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.heater.pin+'",temp,'+target+','+kettle.temp.diff+');\n';
-        if(kettle.cooler && kettle.cooler.sketch)
-          actions += 'trigger("cool","'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.cooler.pin+'",temp,'+target+','+kettle.temp.diff+');\n';
-      }
+      let target = ($scope.settings.unit=='F') ? $filter('toCelsius')(kettle.temp.target) : kettle.temp.target;
+      if(kettle.heater && kettle.heater.sketch)
+        actions += 'trigger("heat","'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.heater.pin+'",temp,'+target+','+kettle.temp.diff+');\n';
+      if(kettle.cooler && kettle.cooler.sketch)
+        actions += 'trigger("cool","'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.cooler.pin+'",temp,'+target+','+kettle.temp.diff+');\n';
     });
     return $http.get('assets/arduino/BrewBenchInfluxDBYun/BrewBenchInfluxDBYun.ino')
       .then(response => {

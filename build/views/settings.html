@@ -249,7 +249,7 @@
                     <button class="btn btn-light" ng-show="!arduino.secure" ng-click="arduino.secure=true; arduinos.update(arduino)">http</button>
                     <button class="btn btn-success" ng-show="arduino.secure" ng-click="arduino.secure=false; arduinos.update(arduino)">https</button>
                   </span>
-                  <input class="form-control" type="text" ng-model="arduino.url" ng-change="arduinos.update(arduino)" placeholder="URL">
+                  <input class="form-control" type="text" ng-model="arduino.url" ng-change="arduinos.update(arduino)" placeholder="URL" style="min-width: 200px;">
                 </div>
               </td>
               <!-- <td class="text-left">

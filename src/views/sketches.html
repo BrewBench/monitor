@@ -6,8 +6,7 @@
         <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
       </div>
       <div class="modal-body settings">
-      <div id="settings">
-      <a href="" data-dismiss="modal" data-toggle="modal" data-target="#settingsModal">&larr; Settings</a>
+      <div id="sketches">
       <div class="card-body">
         <div class="pb-3">
           <h4>Arduino
@@ -17,17 +16,6 @@
           <div class="row new">
 
             <div class="col-4">
-              <span class="badge badge-pill badge-info">Auto</span>
-              <label class="adjust">Fermenter <sup>*</sup><br>Heat/Cool</label>
-              <ul class="tg-list">
-                <li class="tg-list-item">
-                  <input class="tgl tgl-ios" id="triggers" type="checkbox" ng-checked="settings.sketches.include_triggers" ng-click="settings.sketches.include_triggers = !settings.sketches.include_triggers"/>
-                  <label class="tgl-btn" for="triggers"></label>
-                </li>
-              </ul>
-            </div>
-            <div class="col-4">
-              <span class="badge badge-pill badge-info">Auto</span>
               <label class="adjust">Poll Frequency</label>
               <div class="input-group">
                 <input class="form-control" type="number" ng-model="settings.sketches.frequency" step="1" min="5">
@@ -38,6 +26,7 @@
               </div>
               <small class="form-text text-muted">Every {{settings.sketches.frequency}} seconds</small>
             </div>
+            <div class="col-4"></div>
             <div class="col-4">
               <div class="btn-group float-right">
                 <button type="button" class="btn btn-light dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -56,17 +45,16 @@
 
           </div>
 
-          <div class="row new" ng-if="settings.sketches.include_triggers">
+          <div class="row new">
             <table class="table table-striped table-responsive">
               <thead class="thead-inverse">
                 <tr>
                   <th>Name</th>
-                  <th>Heat</th>
-                  <th>Cool</th>
+                  <th>Heat <span class="badge badge-pill badge-info">Auto</span></th>
+                  <th>Cool <span class="badge badge-pill badge-info">Auto</span></th>
                   <th>Temp</th>
                   <th>Diff</th>
                   <th>Adjust</th>
-                  <th>Include</th>
                 </tr>
               </thead>
               <tbody>
@@ -78,33 +66,29 @@
                     {{kettle.key}}
                   </td>
                   <td>
-                    <span ng-if="kettle.heater && kettle.heater.pin.indexOf('TP-')===0">
-                      <i>Not Supported</i> <br/>
-                      {{pinDisplay(kettle.heater.pin)}}
-                    </span>
                     <span ng-if="!kettle.heater">
                       <i>Not Available</i> <br/>
                     </span>
-                    <ul class="tg-list" ng-if="kettle.heater && kettle.heater.pin.indexOf('TP-')===-1">
+                    <ul class="tg-list" ng-if="kettle.heater">
                       <li class="tg-list-item">
                         <span>{{pinDisplay(kettle.heater.pin)}}</span>
-                        <input class="tgl tgl-ios" id="triggerHeater{{$index}}" type="checkbox" ng-checked="kettle.heater.sketch" ng-disabled="!kettle.sketch" ng-click="kettle.heater.sketch = !kettle.heater.sketch;"/>
+                        <input class="tgl tgl-ios" id="triggerHeater{{$index}}" type="checkbox"
+                          ng-checked="kettle.heater.sketch"
+                          ng-click="kettle.heater.sketch = !kettle.heater.sketch;"/>
                         <label class="tgl-btn" for="triggerHeater{{$index}}"></label>
                       </li>
                     </ul>
                   </td>
                   <td>
-                    <span ng-if="kettle.cooler && kettle.cooler.pin.indexOf('TP-')===0">
-                      <i>Not Supported</i> <br/>
-                      {{pinDisplay(kettle.cooler.pin)}}
-                    </span>
                     <span ng-if="!kettle.cooler">
                       <i>Not Available</i> <br/>
                     </span>
-                    <ul class="tg-list" ng-if="kettle.cooler && kettle.cooler.pin.indexOf('TP-')===-1">
+                    <ul class="tg-list" ng-if="kettle.cooler">
                       <li class="tg-list-item">
                         <span>{{pinDisplay(kettle.cooler.pin)}}</span>
-                        <input class="tgl tgl-ios" id="triggerCooler{{$index}}" type="checkbox" ng-checked="kettle.cooler.sketch" ng-disabled="!kettle.sketch" ng-click="kettle.cooler.sketch = !kettle.cooler.sketch;"/>
+                        <input class="tgl tgl-ios" id="triggerCooler{{$index}}" type="checkbox"
+                          ng-checked="kettle.cooler.sketch"
+                          ng-click="kettle.cooler.sketch = !kettle.cooler.sketch;"/>
                         <label class="tgl-btn" for="triggerCooler{{$index}}"></label>
                       </li>
                     </ul>
@@ -112,19 +96,11 @@
                   <td>{{kettle.temp.target}}&deg;{{settings.unit}}</td>
                   <td>{{kettle.temp.diff}}&deg;{{settings.unit}}</td>
                   <td>{{kettle.temp.adjust}}&deg;{{settings.unit}}</td>
-                  <td>
-                    <ul class="tg-list">
-                      <li class="tg-list-item">
-                        <input class="tgl tgl-ios" id="trigger{{$index}}" type="checkbox" ng-checked="kettle.sketch" ng-click="updateKettleSketches(kettle)"/>
-                        <label class="tgl-btn" for="trigger{{$index}}"></label>
-                      </li>
-                    </ul>
-                  </td>
                 </tr>
               </tbody>
             </table>
             <p>
-              * Please test your heat and cool pins before installing the sketch.  Relay's will automatically be triggered if the temperature raises or falls.
+              <span class="badge badge-pill badge-info">Auto</span> Please test your heat and cool pins before installing the sketch.  Relay's will automatically be triggered if the temperature raises or falls.
             </p>
           </div>
         </div>

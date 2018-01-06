@@ -1005,11 +1005,17 @@ button {
   margin-bottom: 20px;
 }
 .card-deck {
-  padding: 0px 0px 80px 10px;
+  padding: 0px 10px 80px 10px;
 }
 @media (min-width: 576px) {
   .modal-dialog {
-    max-width: 800px;
+    max-width: 90%;
     margin: 30px auto;
   }
+}
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
