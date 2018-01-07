@@ -7,9 +7,11 @@
 // https://www.brewbench.co/libs/cactus_io_DS18B20.zip
 #include "cactus_io_DS18B20.h"
 
-const String VERSION = "3.1.2";
+const String VERSION = "3.1.3";
 const String INFLUXDB_CONNECTION = "[INFLUXDB_CONNECTION]";
 const String TPLINK_CONNECTION = "[TPLINK_CONNECTION]";
+const String SLACK_CONNECTION = "[SLACK_CONNECTION]";
+const String DWEET_CONNECTION = "https://dweet.io/dweet/for/brewbench";
 const int FREQUENCY_SECONDS = [FREQUENCY_SECONDS];
 int secondCounter = 0;
 
@@ -61,7 +63,7 @@ float Thermistor(int pin) {
    return steinhart;
 }
 
-void process(BridgeClient client) {
+void processRest(BridgeClient client) {
   String command = client.readStringUntil('/');
   command.trim();
 
@@ -73,29 +75,13 @@ void process(BridgeClient client) {
     responseOkHeader(client);
     analogCommand(client);
   }
-  if (command == "DS18B20") {
+  if (command == "test") {
     responseOkHeader(client);
-    ds18B20Command(client);
+    testCommand(client);
   }
-  if (command == "Thermistor") {
+  if (command == "Thermistor" || command == "DS18B20" || command == "PT100" || command == "DHT11" || command == "DHT21" || command == "DHT22") {
     responseOkHeader(client);
-    thermistorCommand(client);
-  }
-  if (command == "PT100") {
-    responseOkHeader(client);
-    pt100Command(client);
-  }
-  if (command == "DHT11") {
-    responseOkHeader(client);
-    dht11Command(client);
-  }
-  if (command == "DHT21") {
-    responseOkHeader(client);
-    dht21Command(client);
-  }
-  if (command == "DHT22") {
-    responseOkHeader(client);
-    dht22Command(client);
+    tempCommand(client, command);
   }
 }
 
@@ -151,6 +137,67 @@ void analogCommand(BridgeClient client) {
   client.print("{\"pin\":\""+String(spin)+String(pin)+"\",\"value\":\""+String(value)+"\"}");
 }
 
+void testCommand(BridgeClient client) {
+  // Dweet Test
+  client.println("Testing Dweet");
+  String response = dweetAutoCommand("Test", "BrewBench", "Big IPA", 20);
+  client.println(response);
+  // Slack Test
+  if(SLACK_CONNECTION != ""){
+    client.println("Testing Slack");
+    response = slackAutoCommand("cool", "Test", "A0", 20, 22, 1);
+    client.println(response);
+  }
+  client.print("");
+}
+
+void tempCommand(BridgeClient client, String type) {
+  char spin = client.read();
+  int pin = client.parseInt();
+  float tvoltage;
+  int chk;
+  float temp;
+  float humidity;
+
+  if(type == "Thermistor")
+    temp = Thermistor(pin);
+  else if(type == "PT100"){
+    if( spin == "A" )
+      tvoltage = analogRead(pin);
+    else
+      tvoltage = digitalRead(pin);
+
+    if (tvoltage>409){
+      tvoltage = map(tvoltage,410,1023,0,614);
+      temp = (150*tvoltage)/614;
+    }
+  }
+  else if(type == "DS18B20"){
+    DS18B20 ds(pin);
+    ds.readSensor();
+    temp = ds.getTemperature_C();
+  }
+  else if(type == "DHT11")
+    chk = DHT.read11(pin);
+  else if(type == "DHT21")
+    chk = DHT.read21(pin);
+  else if(type == "DHT22")
+    chk = DHT.read22(pin);
+  if(type == "DHT11" || type == "DHT21" || type == "DHT22"){
+    if( chk == DHTLIB_OK ){
+      temp = DHT.temperature;
+      humidity = DHT.humidity;
+    }
+  }
+  String data = "{\"pin\":\""+String(spin)+String(pin)+"\",\"temp\":\""+String(temp)+"\"";
+  if(humidity)
+    data += ",\"humidity\":\""+String(humidity)+"\"}";
+  else
+    data += "}";
+  // Send JSON response to client
+  client.print(data);
+}
+
 void digitalAutoCommand(int pin, int value) {
   pinMode(pin, OUTPUT);
   if(value == 1)
@@ -164,226 +211,104 @@ void analogAutoCommand(int pin, int value) {
   analogWrite(pin, value);
 }
 
-String tplinkAutoCommand(String deviceId, int value){
+String postData(String connection, String data, String dataType, String contentType){
   String response = "";
-  String data = "{\"method\":\"passthrough\",\"params\":{\"deviceId\":\""+String(deviceId)+"\",\"requestData\":\"{\\\"system\\\":{\\\"set_relay_state\\\":{\\\"state\\\":"+String(value)+"}}}\"}}";
   Process p;
   p.begin("curl");
   p.addParameter("-k");
   p.addParameter("-XPOST");
   p.addParameter("-H");
-  p.addParameter("Content-Type: application/json");
-  p.addParameter("-d");
+  if(contentType != "")
+    p.addParameter("Content-Type: "+contentType);
+  if(dataType == "")
+    p.addParameter("-d");
+  else
+    p.addParameter(dataType);
   p.addParameter(data);
-  p.addParameter(TPLINK_CONNECTION);
+  p.addParameter(connection);
+  /* p.runAsynchronously(); */
   p.run();
   while(p.running());
-  while(p.available() > 0){
+  while(p.available() > 0)
     response = p.readString();
-  }
   return response;
 }
 
-void ds18B20Command(BridgeClient client) {
-  char spin = client.read();
-  int pin = client.parseInt();
-
-  DS18B20 ds(pin);
-  ds.readSensor();
-  float temp = ds.getTemperature_C();
-
-  // Send JSON response to client
-  client.print("{\"pin\":\""+String(spin)+String(pin)+"\",\"temp\":\""+String(temp)+"\"}");
+String dweetAutoCommand(String source, String brewer, String beer, float temp){
+  String data = "{\"brewer\":\""+brewer+"\",\"beer\":\""+beer+"\",\"source\":\""+source+"\",\"temp\":"+String(temp)+"}";
+  String response = postData(DWEET_CONNECTION, data, "", "application/json");
+  return response;
 }
 
-float ds18B20InfluxDBCommand(String source, String pin, int adjust) {
-  DS18B20 ds(pin.substring(1).toInt());
-  ds.readSensor();
-  float temp = ds.getTemperature_C();
-  temp = temp+adjust;
-  String data = "temperature,sensor=DS18B20,pin="+pin+",source="+source+" temp="+String(temp);
-  Process p;
-  p.begin("curl");
-  p.addParameter("-k");
-  p.addParameter("-XPOST");
-  p.addParameter("--data-binary");
-  p.addParameter(data);
-  p.addParameter(INFLUXDB_CONNECTION);
-  p.run();
-  return temp;
+String slackAutoCommand(String type, String source, String pin, float temp, int target, int diff) {
+  String msg = "";
+  String color = "";
+  if(type=="heat"){
+    msg = source+" temp is "+String(temp)+"\u00B0 and is heating";
+    color = "danger";
+  } else if(type=="cool"){
+    msg = source+" temp is "+String(temp)+"\u00B0 and is cooling";
+    color = "#3498DB";
+  }
+  String data = "{\"attachments\": [{\"fallback\": "+msg+",\"title\": \""+source+"\",\"fields\": [{\"value\": "+msg+"}],\"color\": \""+color+"\",\"mrkdwn_in\": [\"text\", \"fallback\", \"fields\"],\"thumb_url\": \"https://monitor.brewbench.co/assets/img/fermenter.png\"}]}";
+  String response = postData(SLACK_CONNECTION, "payload="+data, "", "application/x-www-form-urlencoded");
+  return response;
 }
 
-void thermistorCommand(BridgeClient client) {
-  char spin = client.read();
-  int pin = client.parseInt();
-  float temp = Thermistor(pin);
-
-  // Send JSON response to client
-  client.print("{\"pin\":\""+String(spin)+String(pin)+"\",\"temp\":\""+String(temp)+"\"}");
+void tplinkAutoCommand(String deviceId, int value){
+  String data = "{\"method\":\"passthrough\",\"params\":{\"deviceId\":\""+String(deviceId)+"\",\"requestData\":\"{\\\"system\\\":{\\\"set_relay_state\\\":{\\\"state\\\":"+String(value)+"}}}\"}}";
+  postData(TPLINK_CONNECTION, data, "", "application/json");
 }
 
-float thermistorInfluxDBCommand(String source, String pin, int adjust) {
-  float temp = Thermistor(pin.substring(1).toInt());
-  temp = temp+adjust;
-  String data = "temperature,sensor=Thermistor,pin="+pin+",source="+source+" temp="+String(temp);
-  Process p;
-  p.begin("curl");
-  p.addParameter("-k");
-  p.addParameter("-XPOST");
-  p.addParameter("--data-binary");
-  p.addParameter(data);
-  p.addParameter(INFLUXDB_CONNECTION);
-  p.run();
-  return temp;
-}
-
-// http://www.instructables.com/id/Temperature-Measurement-Tutorial-Part1/
-void pt100Command(BridgeClient client) {
-  char spin = client.read();
-  int pin = client.parseInt();
+float influxDBCommand(String source, String spin, String type, int adjust) {
   float tvoltage;
+  int chk;
   float temp;
+  float humidity;
+  int pin = spin.substring(1).toInt();
+  if(type == "Thermistor")
+    temp = Thermistor(pin);
+  else if(type == "PT100"){
+    if( spin.substring(0,1) == "A" )
+      tvoltage = analogRead(pin);
+    else
+      tvoltage = digitalRead(pin);
 
-  if( spin == "A" )
-    tvoltage = analogRead(pin);
-  else
-    tvoltage = digitalRead(pin);
-
-  if (tvoltage>409){
-    tvoltage = map(tvoltage,410,1023,0,614);
-    temp = (150*tvoltage)/614;
+    if (tvoltage>409){
+      tvoltage = map(tvoltage,410,1023,0,614);
+      temp = (150*tvoltage)/614;
+    }
   }
+  else if(type == "DS18B20"){
+    DS18B20 ds(pin);
+    ds.readSensor();
+    temp = ds.getTemperature_C();
+  }
+  else if(type == "DHT11")
+    chk = DHT.read11(pin);
+  else if(type == "DHT21")
+    chk = DHT.read21(pin);
+  else if(type == "DHT22")
+    chk = DHT.read22(pin);
+  if(type == "DHT11" || type == "DHT21" || type == "DHT22"){
+    if( chk == DHTLIB_OK ){
+      temp = DHT.temperature;
+      humidity = DHT.humidity;
+    }
+  }
+  // adjust temp if we have it
+  if(temp) temp = temp+adjust;
   // Send JSON response to client
-  client.print("{\"pin\":\""+String(spin)+String(pin)+"\",\"temp\":\""+String(temp)+"\"}");
-}
+  String data = "temperature,sensor="+type+",pin="+pin+",source="+source+" temp="+String(temp);
+  // Add humidity if we have it
+  if(humidity) data = data+" humidity="+String(humidity);
 
-float pt100InfluxDBCommand(String source, String pin, int adjust) {
-  float tvoltage;
-  float temp;
+  postData(INFLUXDB_CONNECTION, data, "--data-binary", "");
 
-  if( pin.substring(0,1) == "A" )
-    tvoltage = analogRead(pin.substring(1).toInt());
-  else
-    tvoltage = digitalRead(pin.substring(1).toInt());
-
-  if (tvoltage>409){
-    tvoltage = map(tvoltage,410,1023,0,614);
-    temp = (150*tvoltage)/614;
-    temp = temp+adjust;
-  }
-
-  String data = "temperature,sensor=PT100,pin="+pin+",source="+source+" temp="+String(temp);
-  Process p;
-  p.begin("curl");
-  p.addParameter("-k");
-  p.addParameter("-XPOST");
-  p.addParameter("--data-binary");
-  p.addParameter(data);
-  p.addParameter(INFLUXDB_CONNECTION);
-  p.run();
   return temp;
 }
 
-void dht11Command(BridgeClient client) {
-  char spin = client.read();
-  int pin = client.parseInt();
-  int chk = DHT.read11(pin);
-  if( chk == DHTLIB_OK ){
-    float temp = DHT.temperature;
-    float humidity = DHT.humidity;
-    // Send JSON response to client
-    client.print("{\"pin\":\""+String(spin)+String(pin)+"\",\"temp\":\""+String(temp)+"\",\"humidity\":\""+String(humidity)+"\"}");
-  } else {
-    client.print("{\"error\":\""+String(chk)+"\"}");
-  }
-}
-
-float dht11InfluxDBCommand(String source, String pin, int adjust) {
-  int chk = DHT.read11(pin.substring(1).toInt());
-  if( chk == DHTLIB_OK ){
-    float temp = DHT.temperature+adjust;
-    float humidity = DHT.humidity;
-    // Send JSON response to client
-    String data = "temperature,sensor=DHT11,pin="+pin+",source="+source+" temp="+String(temp)+" humidity="+String(humidity);
-    Process p;
-    p.begin("curl");
-    p.addParameter("-k");
-    p.addParameter("-XPOST");
-    p.addParameter("--data-binary");
-    p.addParameter(data);
-    p.addParameter(INFLUXDB_CONNECTION);
-    p.run();
-    return temp;
-  }
-}
-
-void dht21Command(BridgeClient client) {
-  char spin = client.read();
-  int pin = client.parseInt();
-  int chk = DHT.read21(pin);
-  if( chk == DHTLIB_OK ){
-    float temp = DHT.temperature;
-    float humidity = DHT.humidity;
-    // Send JSON response to client
-    client.print("{\"pin\":\""+String(spin)+String(pin)+"\",\"temp\":\""+String(temp)+"\",\"humidity\":\""+String(humidity)+"\"}");
-  } else {
-    client.print("{\"error\":\""+String(chk)+"\"}");
-  }
-}
-
-float dht21InfluxDBCommand(String source, String pin, int adjust) {
-  int chk = DHT.read21(pin.substring(1).toInt());
-  if( chk == DHTLIB_OK ){
-    float temp = DHT.temperature+adjust;
-    float humidity = DHT.humidity;
-    // Send JSON response to client
-    String data = "temperature,sensor=DHT11,pin="+pin+",source="+source+" temp="+String(temp)+" humidity="+String(humidity);
-    Process p;
-    p.begin("curl");
-    p.addParameter("-k");
-    p.addParameter("-XPOST");
-    p.addParameter("--data-binary");
-    p.addParameter(data);
-    p.addParameter(INFLUXDB_CONNECTION);
-    p.run();
-    return temp;
-  }
-}
-
-void dht22Command(BridgeClient client) {
-  char spin = client.read();
-  int pin = client.parseInt();
-  int chk = DHT.read22(pin);
-  if( chk == DHTLIB_OK ){
-    float temp = DHT.temperature;
-    float humidity = DHT.humidity;
-    // Send JSON response to client
-    client.print("{\"pin\":\""+String(spin)+String(pin)+"\",\"temp\":\""+String(temp)+"\",\"humidity\":\""+String(humidity)+"\"}");
-  } else {
-    client.print("{\"error\":\""+String(chk)+"\"}");
-  }
-}
-
-float dht22InfluxDBCommand(String source, String pin, int adjust) {
-  int chk = DHT.read22(pin.substring(1).toInt());
-  if( chk == DHTLIB_OK ){
-    float temp = DHT.temperature+adjust;
-    float humidity = DHT.humidity;
-    // Send JSON response to client
-    String data = "temperature,sensor=DHT22,pin="+pin+",source="+source+" temp="+String(temp)+" humidity="+String(humidity);
-    Process p;
-    p.begin("curl");
-    p.addParameter("-k");
-    p.addParameter("-XPOST");
-    p.addParameter("--data-binary");
-    p.addParameter(data);
-    p.addParameter(INFLUXDB_CONNECTION);
-    p.run();
-    return temp;
-  }
-}
-
-void trigger(String type, String source, String pin, float temp, int target, int diff) {
+void trigger(String type, String source, String pin, float temp, int target, int diff, bool slack) {
   String pinType = pin.substring(0,1);
   String deviceId;
   int pinNumber;
@@ -411,6 +336,9 @@ void trigger(String type, String source, String pin, float temp, int target, int
     digitalAutoCommand(pinNumber, changeTo);
   else if(pinType == "T" && deviceId)
     tplinkAutoCommand(deviceId, changeTo);
+
+  if(slack && changeTo == 1 && SLACK_CONNECTION != "")
+    slackAutoCommand(type, source, pin, temp, target, diff);
 }
 
 void InfluxDB(){
@@ -433,7 +361,7 @@ void loop() {
   BridgeClient client = server.accept();
 
   if (client) {
-    process(client);
+    processRest(client);
     client.stop();
   }
   secondCounter+=1;

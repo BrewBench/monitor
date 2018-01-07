@@ -19,7 +19,7 @@ angular.module('brewbench-monitor')
         ,layout: 'card'
         ,chart: true
         ,shared: false
-        ,recipe: {'name':'','brewer':{name:'','email':''},'yeast':[],'hops':[],'malt':[],scale:'gravity',method:'papazian','og':1.050,'fg':1.010,'abv':0,'abw':0,'calories':0,'attenuation':0}
+        ,recipe: {'name':'','brewer':{name:'','email':''},'yeast':[],'hops':[],'grains':[],scale:'gravity',method:'papazian','og':1.050,'fg':1.010,'abv':0,'abw':0,'calories':0,'attenuation':0}
         ,notifications: {on:true,timers:true,high:true,low:true,target:true,slack:'',last:''}
         ,sounds: {on:true,alert:'/assets/audio/bike.mp3',timer:'/assets/audio/school.mp3'}
         ,account: {apiKey: '', sessions: []}
@@ -71,6 +71,7 @@ angular.module('brewbench-monitor')
           ,knob: angular.copy(this.defaultKnobOptions(),{value:0,min:0,max:220})
           ,arduino: {id: btoa('brewbench'), url: 'arduino.local',analog: 5,digital: 13}
           ,error: {message:'',version:''}
+          ,notify: {slack: false, dweet: true}
         },{
           key: 'Mash'
           ,type: 'grain'
@@ -84,6 +85,7 @@ angular.module('brewbench-monitor')
           ,knob: angular.copy(this.defaultKnobOptions(),{value:0,min:0,max:220})
           ,arduino: {id: btoa('brewbench'), url: 'arduino.local',analog: 5,digital: 13}
           ,error: {message:'',version:''}
+          ,notify: {slack: false, dweet: true}
         },{
           key: 'Boil'
           ,type: 'hop'
@@ -97,6 +99,7 @@ angular.module('brewbench-monitor')
           ,knob: angular.copy(this.defaultKnobOptions(),{value:0,min:0,max:220})
           ,arduino: {id: btoa('brewbench'), url: 'arduino.local',analog: 5,digital: 13}
           ,error: {message:'',version:''}
+          ,notify: {slack: false, dweet: true}
         }];
     },
 
@@ -379,6 +382,33 @@ angular.module('brewbench-monitor')
           q.reject(err);
         });
       return q.promise;
+    },
+
+    dweet: function(){
+        return {
+          latest: () => {
+            let q = $q.defer();
+            $http({url: 'https://dweet.io/get/latest/dweet/for/brewbench', method: 'GET'})
+              .then(response => {
+                q.resolve(response.data);
+              })
+              .catch(err => {
+                q.reject(err);
+              });
+            return q.promise;
+          },
+          all: () => {
+            let q = $q.defer();
+            $http({url: 'https://dweet.io/get/dweets/for/brewbench', method: 'GET'})
+              .then(response => {
+                q.resolve(response.data);
+              })
+              .catch(err => {
+                q.reject(err);
+              });
+            return q.promise;
+          }
+        };
     },
 
     tplink: function(){

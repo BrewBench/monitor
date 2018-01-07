@@ -7,7 +7,7 @@
 // https://www.brewbench.co/libs/cactus_io_DS18B20.zip
 #include "cactus_io_DS18B20.h"
 
-const String VERSION = "3.1.2";
+const String VERSION = "3.1.3";
 
 BridgeServer server;
 dht DHT;
@@ -57,7 +57,7 @@ float Thermistor(int pin) {
    return steinhart;
 }
 
-void process(BridgeClient client) {
+void processRest(BridgeClient client) {
   String command = client.readStringUntil('/');
   command.trim();
 
@@ -69,30 +69,10 @@ void process(BridgeClient client) {
     responseOkHeader(client);
     analogCommand(client);
   }
-  if (command == "DS18B20") {
+  if (command == "Thermistor" || command == "DS18B20" || command == "PT100" || command == "DHT11" || command == "DHT21" || command == "DHT22") {
     responseOkHeader(client);
-    ds18B20Command(client);
-  }
-  if (command == "Thermistor") {
-    responseOkHeader(client);
-    thermistorCommand(client);
-  }
-  if (command == "PT100") {
-    responseOkHeader(client);
-    pt100Command(client);
-  }
-  if (command == "DHT11") {
-    responseOkHeader(client);
-    dht11Command(client);
-  }
-  if (command == "DHT21") {
-    responseOkHeader(client);
-    dht21Command(client);
-  }
-  if (command == "DHT22") {
-    responseOkHeader(client);
-    dht22Command(client);
-  }
+    tempCommand(client, command);
+  }  
 }
 
 void responseOkHeader(BridgeClient client){
@@ -111,7 +91,7 @@ void digitalCommand(BridgeClient client) {
   int pin = client.parseInt();
   int value;
 
-  if (client.read() == '/') {
+  if (client.read() == "/") {
     //set pin as output
     pinMode(pin, OUTPUT);
     value = client.parseInt();
@@ -134,7 +114,7 @@ void analogCommand(BridgeClient client) {
   int pin = client.parseInt();
   int value;
 
-  if (client.read() == '/') {
+  if (client.read() == "/") {
     pinMode(pin, OUTPUT);
     value = client.parseInt();
     analogWrite(pin, value);//0 - 255
@@ -147,88 +127,51 @@ void analogCommand(BridgeClient client) {
   client.print("{\"pin\":\""+String(spin)+String(pin)+"\",\"value\":\""+String(value)+"\"}");
 }
 
-void ds18B20Command(BridgeClient client) {
-  char spin = client.read();
-  int pin = client.parseInt();
-  float temp;
-
-  DS18B20 ds(pin);
-  ds.readSensor();
-  temp = ds.getTemperature_C();
-
-  // Send JSON response to client
-  client.print("{\"pin\":\""+String(spin)+String(pin)+"\",\"temp\":\""+String(temp)+"\"}");
-}
-
-void thermistorCommand(BridgeClient client) {
-  char spin = client.read();
-  int pin = client.parseInt();
-  float temp = Thermistor(pin);
-
-  // Send JSON response to client
-  client.print("{\"pin\":\""+String(spin)+String(pin)+"\",\"temp\":\""+String(temp)+"\"}");
-}
-
-// http://www.instructables.com/id/Temperature-Measurement-Tutorial-Part1/
-void pt100Command(BridgeClient client) {
+void tempCommand(BridgeClient client, String type) {
   char spin = client.read();
   int pin = client.parseInt();
   float tvoltage;
+  int chk;
   float temp;
+  float humidity;
 
-  if( spin == 'A' )
-    tvoltage = analogRead(pin);
+  if(type == "Thermistor")
+    temp = Thermistor(pin);
+  else if(type == "PT100"){
+    if( spin == "A" )
+      tvoltage = analogRead(pin);
+    else
+      tvoltage = digitalRead(pin);
+
+    if (tvoltage>409){
+      tvoltage = map(tvoltage,410,1023,0,614);
+      temp = (150*tvoltage)/614;
+    }
+  }
+  else if(type == "DS18B20"){
+    DS18B20 ds(pin);
+    ds.readSensor();
+    temp = ds.getTemperature_C();
+  }
+  else if(type == "DHT11")
+    chk = DHT.read11(pin);
+  else if(type == "DHT21")
+    chk = DHT.read21(pin);
+  else if(type == "DHT22")
+    chk = DHT.read22(pin);
+  if(type == "DHT11" || type == "DHT21" || type == "DHT22"){
+    if( chk == DHTLIB_OK ){
+      temp = DHT.temperature;
+      humidity = DHT.humidity;
+    }
+  }
+  String data = "{\"pin\":\""+String(spin)+String(pin)+"\",\"temp\":\""+String(temp)+"\"";
+  if(humidity)
+    data += ",\"humidity\":\""+String(humidity)+"\"}";
   else
-    tvoltage = digitalRead(pin);
-
-  if (tvoltage>409){
-    tvoltage = map(tvoltage,410,1023,0,614);
-    temp = (150*tvoltage)/614;
-  }
+    data += "}";
   // Send JSON response to client
-  client.print("{\"pin\":\""+String(spin)+String(pin)+"\",\"temp\":\""+String(temp)+"\"}");
-}
-
-void dht11Command(BridgeClient client) {
-  char spin = client.read();
-  int pin = client.parseInt();
-  int chk = DHT.read11(pin);
-  if( chk == DHTLIB_OK ){
-    float temp = DHT.temperature;
-    float humidity = DHT.humidity;
-    // Send JSON response to client
-    client.print("{\"pin\":\""+String(spin)+String(pin)+"\",\"temp\":\""+String(temp)+"\",\"humidity\":\""+String(humidity)+"\"}");
-  } else {
-    client.print("{\"error\":\""+String(chk)+"\"}");
-  }
-}
-
-void dht21Command(BridgeClient client) {
-  char spin = client.read();
-  int pin = client.parseInt();
-  int chk = DHT.read21(pin);
-  if( chk == DHTLIB_OK ){
-    float temp = DHT.temperature;
-    float humidity = DHT.humidity;
-    // Send JSON response to client
-    client.print("{\"pin\":\""+String(spin)+String(pin)+"\",\"temp\":\""+String(temp)+"\",\"humidity\":\""+String(humidity)+"\"}");
-  } else {
-    client.print("{\"error\":\""+String(chk)+"\"}");
-  }
-}
-
-void dht22Command(BridgeClient client) {
-  char spin = client.read();
-  int pin = client.parseInt();
-  int chk = DHT.read22(pin);
-  if( chk == DHTLIB_OK ){
-    float temp = DHT.temperature;
-    float humidity = DHT.humidity;
-    // Send JSON response to client
-    client.print("{\"pin\":\""+String(spin)+String(pin)+"\",\"temp\":\""+String(temp)+"\",\"humidity\":\""+String(humidity)+"\"}");
-  } else {
-    client.print("{\"error\":\""+String(chk)+"\"}");
-  }
+  client.print(data);
 }
 
 void setup() {
@@ -246,7 +189,7 @@ void loop() {
   BridgeClient client = server.accept();
 
   if (client) {
-    process(client);
+    processRest(client);
     client.stop();
   }
 

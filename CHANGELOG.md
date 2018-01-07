@@ -1,5 +1,14 @@
 # Change Log
 
+## 3.1.3 - 2018-01-07
+
+### Added
+- [slack](https://slack.com) sketch notify feature
+- [dweet.io](https://dweet.io) sketch notify feature
+
+### Fixed
+- adjustment from F to C in auto sketches
+
 ## 3.1.2 - 2018-01-06
 
 ### Fixed
