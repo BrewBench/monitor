@@ -1010,7 +1010,7 @@ $scope.updateABV();
           actions += 'dweetAutoCommand("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+$scope.settings.recipe.brewer.name+'","'+$scope.settings.recipe.name+'",temp);\n';
       }
     });
-    return $http.get('assets/arduino/BrewBenchAutoYun/BrewBenchAutoYun.ino')
+    $http.get('assets/arduino/BrewBenchAutoYun/BrewBenchAutoYun.ino')
       .then(response => {
         // replace variables
         response.data = response.data
@@ -1046,16 +1046,16 @@ $scope.updateABV();
     _.each($scope.kettles, (kettle, i) => {
       let target = ($scope.settings.unit=='F') ? $filter('toCelsius')(kettle.temp.target) : kettle.temp.target;
       let adjust = ($scope.settings.unit=='F' && kettle.temp.adjust != 0) ? Math.round(kettle.temp.adjust*0.555) : kettle.temp.adjust;
-      actions += 'temp = influxDBCommand("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.temp.pin+'","'+kettle.temp.type+'",'+adjust+');\n';
+      actions += 'temp = influxDBCommand(F("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'"),F("'+kettle.temp.pin+'"),F("'+kettle.temp.type+'"),'+adjust+');\n';
       //look for triggers
       if(kettle.heater && kettle.heater.sketch)
-        actions += 'trigger("heat","'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.heater.pin+'",temp,'+target+','+kettle.temp.diff+','+!!kettle.notify.slack+');\n';
+        actions += 'trigger(F("heat"),F("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'"),F("'+kettle.heater.pin+'"),temp,'+target+','+kettle.temp.diff+','+!!kettle.notify.slack+');\n';
       if(kettle.cooler && kettle.cooler.sketch)
-        actions += 'trigger("cool","'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.cooler.pin+'",temp,'+target+','+kettle.temp.diff+','+!!kettle.notify.slack+');\n';
+        actions += 'trigger(F("cool"),F("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'"),F("'+kettle.cooler.pin+'"),temp,'+target+','+kettle.temp.diff+','+!!kettle.notify.slack+');\n';
       if(kettle.notify.dweet)
-        actions += 'dweetAutoCommand("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+$scope.settings.recipe.brewer.name+'","'+$scope.settings.recipe.name+'",temp);\n';
+        actions += 'dweetAutoCommand(F("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'"),F("'+$scope.settings.recipe.brewer.name+'"),F("'+$scope.settings.recipe.name+'"),temp);\n';
     });
-    return $http.get('assets/arduino/BrewBenchInfluxDBYun/BrewBenchInfluxDBYun.ino')
+    $http.get('assets/arduino/BrewBenchInfluxDBYun/BrewBenchInfluxDBYun.ino')
       .then(response => {
         // replace variables
         response.data = response.data

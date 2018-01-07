@@ -7,11 +7,11 @@
 // https://www.brewbench.co/libs/cactus_io_DS18B20.zip
 #include "cactus_io_DS18B20.h"
 
-const String VERSION = "3.1.3";
-const String TPLINK_CONNECTION = "[TPLINK_CONNECTION]";
-const String SLACK_CONNECTION = "[SLACK_CONNECTION]";
-const String DWEET_CONNECTION = "https://dweet.io/dweet/for/brewbench";
-const int FREQUENCY_SECONDS = [FREQUENCY_SECONDS];
+const PROGMEM char VERSION[] = "3.1.3";
+const PROGMEM char TPLINK_CONNECTION[] = "[TPLINK_CONNECTION]";
+const PROGMEM char SLACK_CONNECTION[] = "[SLACK_CONNECTION]";
+const PROGMEM char DWEET_CONNECTION[] = "https://dweet.io/dweet/for/brewbench";
+const PROGMEM int FREQUENCY_SECONDS = [FREQUENCY_SECONDS];
 int secondCounter = 0;
 
 BridgeServer server;
@@ -74,10 +74,6 @@ void processRest(BridgeClient client) {
     responseOkHeader(client);
     analogCommand(client);
   }
-  if (command == "test") {
-    responseOkHeader(client);
-    testCommand(client);
-  }
   if (command == "Thermistor" || command == "DS18B20" || command == "PT100" || command == "DHT11" || command == "DHT21" || command == "DHT22") {
     responseOkHeader(client);
     tempCommand(client, command);
@@ -85,14 +81,15 @@ void processRest(BridgeClient client) {
 }
 
 void responseOkHeader(BridgeClient client){
-    client.println("Status: 200");
-    client.println("Access-Control-Allow-Origin: *");
-    client.println("Access-Control-Allow-Methods: GET");
-    client.println("Access-Control-Expose-Headers: X-Sketch-Version");
-    client.println("X-Sketch-Version: "+VERSION);
-    client.println("Content-Type: application/json");
-    client.println("Connection: close");
-    client.println();
+  client.println(F("Status: 200"));
+  client.println(F("Access-Control-Allow-Origin: *"));
+  client.println(F("Access-Control-Allow-Methods: GET"));
+  client.println(F("Access-Control-Expose-Headers: X-Sketch-Version"));
+  client.print(F("X-Sketch-Version: "));
+  client.println(VERSION);
+  client.println(F("Content-Type: application/json"));
+  client.println(F("Connection: close"));
+  client.println();
 }
 
 void digitalCommand(BridgeClient client) {
@@ -134,20 +131,6 @@ void analogCommand(BridgeClient client) {
 
   // Send JSON response to client
   client.print("{\"pin\":\""+String(spin)+String(pin)+"\",\"value\":\""+String(value)+"\"}");
-}
-
-void testCommand(BridgeClient client) {
-  // Dweet Test
-  client.println("Testing Dweet");
-  String response = dweetAutoCommand("Test", "BrewBench", "Big IPA", 20);
-  client.println(response);
-  // Slack Test
-  if(SLACK_CONNECTION != ""){
-    client.println("Testing Slack");
-    response = slackAutoCommand("cool", "Test", "A0", 20, 22, 1);
-    client.println(response);
-  }
-  client.print("");
 }
 
 void tempCommand(BridgeClient client, String type) {
@@ -210,33 +193,25 @@ void analogAutoCommand(int pin, int value) {
   analogWrite(pin, value);
 }
 
-String postData(String connection, String data, String dataType, String contentType){
-  String response = "";
+void postData(String connection, String data, String dataType, String contentType){
   Process p;
-  p.begin("curl");
-  p.addParameter("-k");
-  p.addParameter("-XPOST");
-  p.addParameter("-H");
+  p.begin(F("curl"));
+  p.addParameter(F("-k"));
+  p.addParameter(F("-XPOST"));
+  p.addParameter(F("-H"));
   if(contentType != "")
-    p.addParameter("Content-Type: "+contentType);
+    p.addParameter(contentType);
   if(dataType == "")
-    p.addParameter("-d");
+    p.addParameter(F("-d"));
   else
     p.addParameter(dataType);
   p.addParameter(data);
   p.addParameter(connection);
-  /* p.runAsynchronously(); */
-  p.run();
-  while(p.running());
-  while(p.available() > 0)
-    response = p.readString();
-  return response;
+  p.runAsynchronously();
 }
 
 String dweetAutoCommand(String source, String brewer, String beer, float temp){
-  String data = "{\"brewer\":\""+brewer+"\",\"beer\":\""+beer+"\",\"source\":\""+source+"\",\"temp\":"+String(temp)+"}";
-  String response = postData(DWEET_CONNECTION, data, "", "application/json");
-  return response;
+  postData(DWEET_CONNECTION, "{\"brewer\":\""+brewer+"\",\"beer\":\""+beer+"\",\"source\":\""+source+"\",\"temp\":"+String(temp)+"}", "", F("Content-Type: application/json"));
 }
 
 String slackAutoCommand(String type, String source, String pin, float temp, int target, int diff) {
@@ -244,22 +219,21 @@ String slackAutoCommand(String type, String source, String pin, float temp, int 
   String color = "";
   if(type=="heat"){
     msg = source+" temp is "+String(temp)+"\u00B0 and is heating";
-    color = "danger";
+    color = F("danger");
   } else if(type=="cool"){
     msg = source+" temp is "+String(temp)+"\u00B0 and is cooling";
-    color = "#3498DB";
+    color = F("#3498DB");
   }
   String data = "{\"attachments\": [{\"fallback\": "+msg+",\"title\": \""+source+"\",\"fields\": [{\"value\": "+msg+"}],\"color\": \""+color+"\",\"mrkdwn_in\": [\"text\", \"fallback\", \"fields\"],\"thumb_url\": \"https://monitor.brewbench.co/assets/img/fermenter.png\"}]}";
-  String response = postData(SLACK_CONNECTION, "payload="+data, "", "application/x-www-form-urlencoded");
-  return response;
+  postData(SLACK_CONNECTION, "payload="+data, "", F("Content-Type: application/x-www-form-urlencoded"));
 }
 
 void tplinkAutoCommand(String deviceId, int value){
   String data = "{\"method\":\"passthrough\",\"params\":{\"deviceId\":\""+String(deviceId)+"\",\"requestData\":\"{\\\"system\\\":{\\\"set_relay_state\\\":{\\\"state\\\":"+String(value)+"}}}\"}}";
-  postData(TPLINK_CONNECTION, data, "", "application/json");
+  postData(TPLINK_CONNECTION, data, "", F("Content-Type: application/json"));
 }
 
-float autoCommand(String source, String spin, String type, int adjust) {
+float autoCommand(String source, String spin, String type, int adjustTemp) {
   float tvoltage;
   int chk;
   float temp;
@@ -296,11 +270,11 @@ float autoCommand(String source, String spin, String type, int adjust) {
     }
   }
   // adjust temp if we have it
-  if(temp) temp = temp+adjust;
+  if(temp) temp = temp+adjustTemp;
   return temp;
 }
 
-void trigger(String type, String source, String pin, float temp, int target, int diff, bool slack) {
+void trigger(String type, String source, String pin, float temp, int target, int diff, boolean slack) {
   String pinType = pin.substring(0,1);
   String deviceId;
   int pinNumber;

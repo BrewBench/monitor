@@ -7,7 +7,7 @@
 // https://www.brewbench.co/libs/cactus_io_DS18B20.zip
 #include "cactus_io_DS18B20.h"
 
-const String VERSION = "3.1.3";
+const PROGMEM char VERSION[] = "3.1.3";
 
 BridgeServer server;
 dht DHT;
@@ -72,18 +72,19 @@ void processRest(BridgeClient client) {
   if (command == "Thermistor" || command == "DS18B20" || command == "PT100" || command == "DHT11" || command == "DHT21" || command == "DHT22") {
     responseOkHeader(client);
     tempCommand(client, command);
-  }  
+  }
 }
 
 void responseOkHeader(BridgeClient client){
-    client.println("Status: 200");
-    client.println("Access-Control-Allow-Origin: *");
-    client.println("Access-Control-Allow-Methods: GET");
-    client.println("Access-Control-Expose-Headers: X-Sketch-Version");
-    client.println("X-Sketch-Version: "+VERSION);
-    client.println("Content-Type: application/json");
-    client.println("Connection: close");
-    client.println();
+  client.println(F("Status: 200"));
+  client.println(F("Access-Control-Allow-Origin: *"));
+  client.println(F("Access-Control-Allow-Methods: GET"));
+  client.println(F("Access-Control-Expose-Headers: X-Sketch-Version"));
+  client.print(F("X-Sketch-Version: "));
+  client.println(VERSION);
+  client.println(F("Content-Type: application/json"));
+  client.println(F("Connection: close"));
+  client.println();
 }
 
 void digitalCommand(BridgeClient client) {
@@ -130,14 +131,13 @@ void analogCommand(BridgeClient client) {
 void tempCommand(BridgeClient client, String type) {
   char spin = client.read();
   int pin = client.parseInt();
-  float tvoltage;
-  int chk;
   float temp;
   float humidity;
 
   if(type == "Thermistor")
     temp = Thermistor(pin);
   else if(type == "PT100"){
+    float tvoltage;
     if( spin == "A" )
       tvoltage = analogRead(pin);
     else
@@ -153,13 +153,14 @@ void tempCommand(BridgeClient client, String type) {
     ds.readSensor();
     temp = ds.getTemperature_C();
   }
-  else if(type == "DHT11")
-    chk = DHT.read11(pin);
-  else if(type == "DHT21")
-    chk = DHT.read21(pin);
-  else if(type == "DHT22")
-    chk = DHT.read22(pin);
-  if(type == "DHT11" || type == "DHT21" || type == "DHT22"){
+  else if(type == "DHT11" || type == "DHT21" || type == "DHT22"){
+    int chk;
+    if(type == "DHT11")
+      chk = DHT.read11(pin);
+    else if(type == "DHT21")
+      chk = DHT.read21(pin);
+    else if(type == "DHT22")
+      chk = DHT.read22(pin);
     if( chk == DHTLIB_OK ){
       temp = DHT.temperature;
       humidity = DHT.humidity;
