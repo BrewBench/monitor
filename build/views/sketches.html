@@ -130,11 +130,22 @@
                 </tr>
               </tbody>
             </table>
-            <p>
-              <span class="badge badge-pill badge-info">Auto</span> Please test your heat and cool pins before installing the sketch.
-              Relay's will automatically be triggered if the temperature raises or falls.
-            </p>
           </div>
+
+          <div class="row new">
+            <div class="col-lg-1"></div>
+            <div class="col-lg-10">
+              <p>
+                <span class="badge badge-pill badge-info">Auto</span> <strong>Sketches are still in beta</strong>.  Please test your heat and cool pins before installing the sketch as relay's will automatically be triggered if the temperature raises or falls.
+                <br><br>
+                Arduino Yun has a limited amount of memory and will be unstable if the sketch exceeds 21570 bytes (75%) of program storage space and or Global variables use more than 1229 bytes (48%) of dynamic memory.  There is logic to include only libraries that are needed.
+                <br><br>
+                Slack Webhook URL can be added in settings and <a href="https://dweet.io/get/dweets/for/brewbench" target="_blank">Dweet</a> is interesting...
+              </p>
+            </div>
+            <div class="col-lg-1"></div>
+          </div>
+
         </div>
       </div>
     </div>

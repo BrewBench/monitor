@@ -2,17 +2,14 @@
 #include <Bridge.h>
 #include <BridgeServer.h>
 #include <BridgeClient.h>
-// https://www.brewbench.co/libs/DHTLib.zip
-#include <dht.h>
-// https://www.brewbench.co/libs/cactus_io_DS18B20.zip
-#include "cactus_io_DS18B20.h"
+// headers
 
-const PROGMEM char VERSION[] = "3.1.3";
+const PROGMEM char VERSION[] = "3.2.0";
 const PROGMEM int FREQUENCY_SECONDS = [FREQUENCY_SECONDS];
 int secondCounter = 0;
 
 BridgeServer server;
-dht DHT;
+// DHT dht DHT;
 
 // https://learn.adafruit.com/thermistor/using-a-thermistor
 // resistance at 25 degrees C
@@ -150,24 +147,24 @@ void tempCommand(BridgeClient client, String type) {
       temp = (150*tvoltage)/614;
     }
   }
-  else if(type == "DS18B20"){
-    DS18B20 ds(pin);
-    ds.readSensor();
-    temp = ds.getTemperature_C();
-  }
-  else if(type == "DHT11" || type == "DHT21" || type == "DHT22"){
-    int chk;
-    if(type == "DHT11")
-      chk = DHT.read11(pin);
-    else if(type == "DHT21")
-      chk = DHT.read21(pin);
-    else if(type == "DHT22")
-      chk = DHT.read22(pin);
-    if( chk == DHTLIB_OK ){
-      temp = DHT.temperature;
-      humidity = DHT.humidity;
-    }
-  }
+  // DS18B20 else if(type == "DS18B20"){
+  // DS18B20 DS18B20 ds(pin);
+  // DS18B20 ds.readSensor();
+  // DS18B20 temp = ds.getTemperature_C();
+  // DS18B20 }
+  // DHT else if(type == "DHT11" || type == "DHT21" || type == "DHT22"){
+  // DHT   int chk;
+  // DHT if(type == "DHT11")
+  // DHT   chk = DHT.read11(pin);
+  // DHT else if(type == "DHT21")
+  // DHT   chk = DHT.read21(pin);
+  // DHT else if(type == "DHT22")
+  // DHT   chk = DHT.read22(pin);
+  // DHT if( chk == DHTLIB_OK ){
+  // DHT     temp = DHT.temperature;
+  // DHT     humidity = DHT.humidity;
+  // DHT   }
+  // DHT }
   String data = "{\"pin\":\""+String(spin)+String(pin)+"\",\"temp\":\""+String(temp)+"\"";
   if(humidity)
     data += ",\"humidity\":\""+String(humidity)+"\"}";
@@ -177,20 +174,7 @@ void tempCommand(BridgeClient client, String type) {
   client.print(data);
 }
 
-void digitalAutoCommand(int pin, int value) {
-  pinMode(pin, OUTPUT);
-  if(value == 1)
-    digitalWrite(pin, LOW);//turn on relay
-  else if(value == 0)
-    digitalWrite(pin, HIGH);//turn off relay
-}
-
-void analogAutoCommand(int pin, int value) {
-  pinMode(pin, OUTPUT);
-  analogWrite(pin, value);
-}
-
-void postData(String connection, String data, String dataType, String contentType){
+void postData(const String &connection, const String &data, const String &dataType, const String &contentType){
   Process p;
   p.begin(F("curl"));
   p.addParameter(F("-k"));
@@ -205,34 +189,47 @@ void postData(String connection, String data, String dataType, String contentTyp
     p.addParameter(dataType);
   p.addParameter(data);
   p.addParameter(connection);
-  p.run();
+  p.runAsynchronously();
   while(p.running());
 }
 
-String dweetAutoCommand(String source, String brewer, String beer, float temp){
+String dweetAutoCommand(const String &source, const String &brewer, const String &beer, const float &temp){
   postData(F("https://dweet.io/dweet/for/brewbench"), "{\"brewer\":\""+brewer+"\",\"beer\":\""+beer+"\",\"source\":\""+source+"\",\"temp\":"+String(temp)+"}", "", F("Content-Type: application/json"));
 }
 
-String slackAutoCommand(String type, String source, String pin, float temp, int target, int diff) {
-  String msg = "";
-  String color = "";
-  if(type=="heat"){
-    msg = source+" temp is "+String(temp)+"\u00B0 and is heating";
-    color = F("danger");
-  } else if(type=="cool"){
-    msg = source+" temp is "+String(temp)+"\u00B0 and is cooling";
-    color = F("#3498DB");
-  }
-  String data = "{\"attachments\": [{\"fallback\": "+msg+",\"title\": \""+source+"\",\"fields\": [{\"value\": "+msg+"}],\"color\": \""+color+"\",\"mrkdwn_in\": [\"text\", \"fallback\", \"fields\"],\"thumb_url\": \"https://monitor.brewbench.co/assets/img/fermenter.png\"}]}";
-  postData(F("[SLACK_CONNECTION]"), "payload="+data, "", F("Content-Type: application/x-www-form-urlencoded"));
-}
+// triggers void digitalAutoCommand(int pin, int value) {
+// triggers   pinMode(pin, OUTPUT);
+// triggers   if(value == 1)
+// triggers     digitalWrite(pin, LOW);//turn on relay
+// triggers   else if(value == 0)
+// triggers     digitalWrite(pin, HIGH);//turn off relay
+// triggers }
 
-void tplinkAutoCommand(String deviceId, int value){
-  String data = "{\"method\":\"passthrough\",\"params\":{\"deviceId\":\""+String(deviceId)+"\",\"requestData\":\"{\\\"system\\\":{\\\"set_relay_state\\\":{\\\"state\\\":"+String(value)+"}}}\"}}";
-  postData(F("[TPLINK_CONNECTION]"), data, "", F("Content-Type: application/json"));
-}
+// triggers void analogAutoCommand(int pin, int value) {
+// triggers   pinMode(pin, OUTPUT);
+// triggers   analogWrite(pin, value);
+// triggers }
 
-float influxDBCommand(String source, String spin, String type, int adjustTemp) {
+// triggers String slackAutoCommand(const String &type, const String &source, const String &pin, const float &temp, const int &target, const int &diff) {
+// triggers   String msg = "";
+// triggers   String color = "";
+// triggers   if(type=="heat"){
+// triggers     msg = source+" temp is "+String(temp)+"\u00B0 and is heating";
+// triggers     color = F("danger");
+// triggers   } else if(type=="cool"){
+// triggers     msg = source+" temp is "+String(temp)+"\u00B0 and is cooling";
+// triggers     color = F("#3498DB");
+// triggers   }
+// triggers   String data = "{\"attachments\": [{\"fallback\": "+msg+",\"title\": \""+source+"\",\"fields\": [{\"value\": "+msg+"}],\"color\": \""+color+"\",\"mrkdwn_in\": [\"text\", \"fallback\", \"fields\"],\"thumb_url\": \"https://monitor.brewbench.co/assets/img/fermenter.png\"}]}";
+// triggers   postData(F("[SLACK_CONNECTION]"), "payload="+data, "", F("Content-Type: application/x-www-form-urlencoded"));
+// triggers }
+
+// triggers void tplinkAutoCommand(const String &deviceId, const int &value){
+// triggers   String data = "{\"method\":\"passthrough\",\"params\":{\"deviceId\":\""+String(deviceId)+"\",\"requestData\":\"{\\\"system\\\":{\\\"set_relay_state\\\":{\\\"state\\\":"+String(value)+"}}}\"}}";
+// triggers   postData(F("[TPLINK_CONNECTION]"), data, "", F("Content-Type: application/json"));
+// triggers }
+
+float influxDBCommand(const String &source, const String &spin, const String &type, const int &adjustTemp) {
   float temp;
   float humidity;
   int pin = spin.substring(1).toInt();
@@ -250,24 +247,24 @@ float influxDBCommand(String source, String spin, String type, int adjustTemp) {
       temp = (150*tvoltage)/614;
     }
   }
-  else if(type == "DS18B20"){
-    DS18B20 ds(pin);
-    ds.readSensor();
-    temp = ds.getTemperature_C();
-  }
-  else if(type == "DHT11" || type == "DHT21" || type == "DHT22"){
-    int chk;
-    if(type == "DHT11")
-      chk = DHT.read11(pin);
-    else if(type == "DHT21")
-      chk = DHT.read21(pin);
-    else if(type == "DHT22")
-      chk = DHT.read22(pin);
-    if( chk == DHTLIB_OK ){
-      temp = DHT.temperature;
-      humidity = DHT.humidity;
-    }
-  }
+  // DS18B20 else if(type == "DS18B20"){
+  // DS18B20 DS18B20 ds(pin);
+  // DS18B20 ds.readSensor();
+  // DS18B20 temp = ds.getTemperature_C();
+  // DS18B20 }
+  // DHT else if(type == "DHT11" || type == "DHT21" || type == "DHT22"){
+  // DHT   int chk;
+  // DHT if(type == "DHT11")
+  // DHT   chk = DHT.read11(pin);
+  // DHT else if(type == "DHT21")
+  // DHT   chk = DHT.read21(pin);
+  // DHT else if(type == "DHT22")
+  // DHT   chk = DHT.read22(pin);
+  // DHT if( chk == DHTLIB_OK ){
+  // DHT     temp = DHT.temperature;
+  // DHT     humidity = DHT.humidity;
+  // DHT   }
+  // DHT }
   // adjust temp if we have it
   if(temp) temp = temp+adjustTemp;
   // Send JSON response to client
@@ -280,40 +277,40 @@ float influxDBCommand(String source, String spin, String type, int adjustTemp) {
   return temp;
 }
 
-void trigger(String type, String source, String spin, float temp, int target, int diff, boolean slack) {
-  String pinType = spin.substring(0,1);
-  String deviceId;
-  int pinNumber;
-  int changeTo;
-  if(pinType == "T"){ //TP Link
-    deviceId = spin.substring(3);
-  } else {
-    pinNumber = spin.substring(1).toInt();
-  }
+// triggers void trigger(const String &type, const String &source, const String &spin, const float &temp, const int &target, const int &diff, const boolean &slack) {
+// triggers   String pinType = spin.substring(0,1);
+// triggers   String deviceId;
+// triggers   int pinNumber;
+// triggers   int changeTo;
+// triggers   if(pinType == "T"){ //TP Link
+// triggers     deviceId = spin.substring(3);
+// triggers   } else {
+// triggers     pinNumber = spin.substring(1).toInt();
+// triggers   }
 
-  if(type == "heat"){
-    if( temp < (target+diff) )
-      changeTo = 1;
-    else
-      changeTo = 0;
-  } else if(type == "cool"){
-    if( temp > (target+diff) )
-      changeTo = 1;
-    else
-      changeTo = 0;
-  }
-  if(pinType == "A")
-    analogAutoCommand(pinNumber, changeTo);
-  else if(pinType == "D")
-    digitalAutoCommand(pinNumber, changeTo);
-  else if(pinType == "T" && deviceId)
-    tplinkAutoCommand(deviceId, changeTo);
+// triggers   if(type == "heat"){
+// triggers     if( temp < (target+diff) )
+// triggers       changeTo = 1;
+// triggers     else
+// triggers       changeTo = 0;
+// triggers   } else if(type == "cool"){
+// triggers     if( temp > (target+diff) )
+// triggers       changeTo = 1;
+// triggers     else
+// triggers       changeTo = 0;
+// triggers   }
+// triggers   if(pinType == "A")
+// triggers     analogAutoCommand(pinNumber, changeTo);
+// triggers   else if(pinType == "D")
+// triggers     digitalAutoCommand(pinNumber, changeTo);
+// triggers   else if(pinType == "T" && deviceId)
+// triggers     tplinkAutoCommand(deviceId, changeTo);
 
-  if(slack && changeTo == 1)
-    slackAutoCommand(type, source, spin, temp, target, diff);
-}
+// triggers   if(slack && changeTo == 1)
+// triggers     slackAutoCommand(type, source, spin, temp, target, diff);
+// triggers }
 
-void InfluxDB(){
+void runActions(){
   float temp;
   // [actions]
 }
@@ -340,7 +337,7 @@ void loop() {
   if( secondCounter == FREQUENCY_SECONDS ){
     // reset the secondCounter
     secondCounter = 0;
-    InfluxDB();
+    runActions();
   }
 
   delay(1000);

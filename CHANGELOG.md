@@ -1,6 +1,6 @@
 # Change Log
 
-## 3.1.3 - 2018-01-07
+## 3.2.0 - 2018-01-07
 
 ### Added
 - [slack](https://slack.com) sketch notify feature

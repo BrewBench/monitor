@@ -7,7 +7,7 @@
 // https://www.brewbench.co/libs/cactus_io_DS18B20.zip
 #include "cactus_io_DS18B20.h"
 
-const PROGMEM char VERSION[] = "3.1.3";
+const PROGMEM char VERSION[] = "3.2.0";
 
 BridgeServer server;
 dht DHT;
