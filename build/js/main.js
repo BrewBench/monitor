@@ -5,10 +5,10 @@ webpackJsonp([1],{
 
 __webpack_require__(24);
 __webpack_require__(201);
+__webpack_require__(203);
 __webpack_require__(204);
 __webpack_require__(205);
-__webpack_require__(206);
-module.exports = __webpack_require__(207);
+module.exports = __webpack_require__(206);
 
 
 /***/ }),
@@ -19,7 +19,7 @@ module.exports = __webpack_require__(207);
 "use strict";
 
 
-var _angular = __webpack_require__(13);
+var _angular = __webpack_require__(12);
 
 var _angular2 = _interopRequireDefault(_angular);
 
@@ -60,7 +60,7 @@ _angular2.default.module('brewbench-monitor', ['ui.router', 'nvd3', 'ngTouch', '
 
 /***/ }),
 
-/***/ 204:
+/***/ 203:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1403,11 +1403,11 @@ angular.module('brewbench-monitor').controller('mainCtrl', function ($scope, $st
     $('[data-toggle="tooltip"]').tooltip();
   });
 });
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(14)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(13)))
 
 /***/ }),
 
-/***/ 205:
+/***/ 204:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1463,7 +1463,7 @@ angular.module('brewbench-monitor').directive('editable', function () {
 
 /***/ }),
 
-/***/ 206:
+/***/ 205:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1499,7 +1499,7 @@ angular.module('brewbench-monitor').filter('moment', function () {
 
 /***/ }),
 
-/***/ 207:
+/***/ 206:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2302,7 +2302,7 @@ angular.module('brewbench-monitor').factory('BrewService', function ($http, $q, 
     }
   };
 });
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(14)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(13)))
 
 /***/ })
 
