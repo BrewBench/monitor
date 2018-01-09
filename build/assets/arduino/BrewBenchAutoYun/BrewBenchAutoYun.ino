@@ -8,9 +8,6 @@
 #include "cactus_io_DS18B20.h"
 
 const PROGMEM char VERSION[] = "3.1.3";
-const PROGMEM char TPLINK_CONNECTION[] = "[TPLINK_CONNECTION]";
-const PROGMEM char SLACK_CONNECTION[] = "[SLACK_CONNECTION]";
-const PROGMEM char DWEET_CONNECTION[] = "https://dweet.io/dweet/for/brewbench";
 const PROGMEM int FREQUENCY_SECONDS = [FREQUENCY_SECONDS];
 int secondCounter = 0;
 
@@ -81,14 +78,14 @@ void processRest(BridgeClient client) {
 }
 
 void responseOkHeader(BridgeClient client){
-  client.println(F("Status: 200"));
-  client.println(F("Access-Control-Allow-Origin: *"));
-  client.println(F("Access-Control-Allow-Methods: GET"));
-  client.println(F("Access-Control-Expose-Headers: X-Sketch-Version"));
-  client.print(F("X-Sketch-Version: "));
+  client.println("Status: 200");
+  client.println("Access-Control-Allow-Origin: *");
+  client.println("Access-Control-Allow-Methods: GET");
+  client.println("Access-Control-Expose-Headers: X-Sketch-Version");
+  client.print("X-Sketch-Version: ");
   client.println(VERSION);
-  client.println(F("Content-Type: application/json"));
-  client.println(F("Connection: close"));
+  client.println("Content-Type: application/json");
+  client.println("Connection: close");
   client.println();
 }
 
@@ -208,10 +205,30 @@ void postData(String connection, String data, String dataType, String contentTyp
   p.addParameter(data);
   p.addParameter(connection);
   p.runAsynchronously();
+  while(p.running());
 }
 
 String dweetAutoCommand(String source, String brewer, String beer, float temp){
-  postData(DWEET_CONNECTION, "{\"brewer\":\""+brewer+"\",\"beer\":\""+beer+"\",\"source\":\""+source+"\",\"temp\":"+String(temp)+"}", "", F("Content-Type: application/json"));
+  postData(F("[DWEET_CONNECTION]"), "{\"brewer\":\""+brewer+"\",\"beer\":\""+beer+"\",\"source\":\""+source+"\",\"temp\":"+String(temp)+"}", "", F("Content-Type: application/json"));
+}
+
+String slackAutoCommand(String type, String source, String pin, float temp, int target, int diff) {
+  String msg = "";
+  String color = "";
+  if(type=="heat"){
+    msg = source+" temp is "+String(temp)+"\u00B0 and is heating";
+    color = F("danger");
+  } else if(type=="cool"){
+    msg = source+" temp is "+String(temp)+"\u00B0 and is cooling";
+    color = F("#3498DB");
+  }
+  String data = "{\"attachments\": [{\"fallback\": "+msg+",\"title\": \""+source+"\",\"fields\": [{\"value\": "+msg+"}],\"color\": \""+color+"\",\"mrkdwn_in\": [\"text\", \"fallback\", \"fields\"],\"thumb_url\": \"https://monitor.brewbench.co/assets/img/fermenter.png\"}]}";
+  postData(F("[SLACK_CONNECTION]"), "payload="+data, "", F("Content-Type: application/x-www-form-urlencoded"));
+}
+
+void tplinkAutoCommand(String deviceId, int value){
+  String data = "{\"method\":\"passthrough\",\"params\":{\"deviceId\":\""+String(deviceId)+"\",\"requestData\":\"{\\\"system\\\":{\\\"set_relay_state\\\":{\\\"state\\\":"+String(value)+"}}}\"}}";
+  postData(F("[TPLINK_CONNECTION]"), data, "", F("Content-Type: application/json"));
 }
 
 String slackAutoCommand(String type, String source, String pin, float temp, int target, int diff) {
@@ -274,15 +291,15 @@ float autoCommand(String source, String spin, String type, int adjustTemp) {
   return temp;
 }
 
-void trigger(String type, String source, String pin, float temp, int target, int diff, boolean slack) {
-  String pinType = pin.substring(0,1);
+void trigger(String type, String source, String spin, float temp, int target, int diff, boolean slack) {
+  String pinType = spin.substring(0,1);
   String deviceId;
   int pinNumber;
   int changeTo;
   if(pinType == "T"){ //TP Link
-    deviceId = pin.substring(3);
+    deviceId = spin.substring(3);
   } else {
-    pinNumber = pin.substring(1).toInt();
+    pinNumber = spin.substring(1).toInt();
   }
 
   if(type == "heat"){
@@ -304,7 +321,7 @@ void trigger(String type, String source, String pin, float temp, int target, int
     tplinkAutoCommand(deviceId, changeTo);
 
   if(slack && changeTo == 1 && SLACK_CONNECTION != "")
-    slackAutoCommand(type, source, pin, temp, target, diff);
+    slackAutoCommand(type, source, spin, temp, target, diff);
 }
 
 void Auto(){

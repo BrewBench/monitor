@@ -8,10 +8,6 @@
 #include "cactus_io_DS18B20.h"
 
 const PROGMEM char VERSION[] = "3.1.3";
-const PROGMEM char INFLUXDB_CONNECTION[] = "[INFLUXDB_CONNECTION]";
-const PROGMEM char TPLINK_CONNECTION[] = "[TPLINK_CONNECTION]";
-const PROGMEM char SLACK_CONNECTION[] = "[SLACK_CONNECTION]";
-const PROGMEM char DWEET_CONNECTION[] = "https://dweet.io/dweet/for/brewbench";
 const PROGMEM int FREQUENCY_SECONDS = [FREQUENCY_SECONDS];
 int secondCounter = 0;
 
@@ -199,20 +195,22 @@ void postData(String connection, String data, String dataType, String contentTyp
   p.begin(F("curl"));
   p.addParameter(F("-k"));
   p.addParameter(F("-XPOST"));
-  p.addParameter(F("-H"));
-  if(contentType != "")
+  if(contentType != ""){
+    p.addParameter(F("-H"));
     p.addParameter(contentType);
+  }
   if(dataType == "")
     p.addParameter(F("-d"));
   else
     p.addParameter(dataType);
   p.addParameter(data);
   p.addParameter(connection);
-  p.runAsynchronously();
+  p.run();
+  while(p.running());
 }
 
 String dweetAutoCommand(String source, String brewer, String beer, float temp){
-  postData(DWEET_CONNECTION, "{\"brewer\":\""+brewer+"\",\"beer\":\""+beer+"\",\"source\":\""+source+"\",\"temp\":"+String(temp)+"}", "", F("Content-Type: application/json"));
+  postData(F("https://dweet.io/dweet/for/brewbench"), "{\"brewer\":\""+brewer+"\",\"beer\":\""+beer+"\",\"source\":\""+source+"\",\"temp\":"+String(temp)+"}", "", F("Content-Type: application/json"));
 }
 
 String slackAutoCommand(String type, String source, String pin, float temp, int target, int diff) {
@@ -226,12 +224,12 @@ String slackAutoCommand(String type, String source, String pin, float temp, int 
     color = F("#3498DB");
   }
   String data = "{\"attachments\": [{\"fallback\": "+msg+",\"title\": \""+source+"\",\"fields\": [{\"value\": "+msg+"}],\"color\": \""+color+"\",\"mrkdwn_in\": [\"text\", \"fallback\", \"fields\"],\"thumb_url\": \"https://monitor.brewbench.co/assets/img/fermenter.png\"}]}";
-  postData(SLACK_CONNECTION, "payload="+data, "", F("Content-Type: application/x-www-form-urlencoded"));
+  postData(F("[SLACK_CONNECTION]"), "payload="+data, "", F("Content-Type: application/x-www-form-urlencoded"));
 }
 
 void tplinkAutoCommand(String deviceId, int value){
   String data = "{\"method\":\"passthrough\",\"params\":{\"deviceId\":\""+String(deviceId)+"\",\"requestData\":\"{\\\"system\\\":{\\\"set_relay_state\\\":{\\\"state\\\":"+String(value)+"}}}\"}}";
-  postData(TPLINK_CONNECTION, data, "", F("Content-Type: application/json"));
+  postData(F("[TPLINK_CONNECTION]"), data, "", F("Content-Type: application/json"));
 }
 
 float influxDBCommand(String source, String spin, String type, int adjustTemp) {
@@ -273,24 +271,24 @@ float influxDBCommand(String source, String spin, String type, int adjustTemp) {
   // adjust temp if we have it
   if(temp) temp = temp+adjustTemp;
   // Send JSON response to client
-  String data = "temperature,sensor="+type+",pin="+pin+",source="+source+" temp="+String(temp);
+  String data = "temperature,sensor="+type+",pin="+spin+",source="+source+" temp="+String(temp);
   // Add humidity if we have it
   if(humidity) data = data+" humidity="+String(humidity);
 
-  postData(INFLUXDB_CONNECTION, data, F("--data-binary"), "");
+  postData(F("[INFLUXDB_CONNECTION]"), data, F("--data-binary"), "");
 
   return temp;
 }
 
-void trigger(String type, String source, String pin, float temp, int target, int diff, boolean slack) {
-  String pinType = pin.substring(0,1);
+void trigger(String type, String source, String spin, float temp, int target, int diff, boolean slack) {
+  String pinType = spin.substring(0,1);
   String deviceId;
   int pinNumber;
   int changeTo;
   if(pinType == "T"){ //TP Link
-    deviceId = pin.substring(3);
+    deviceId = spin.substring(3);
   } else {
-    pinNumber = pin.substring(1).toInt();
+    pinNumber = spin.substring(1).toInt();
   }
 
   if(type == "heat"){
@@ -311,8 +309,8 @@ void trigger(String type, String source, String pin, float temp, int target, int
   else if(pinType == "T" && deviceId)
     tplinkAutoCommand(deviceId, changeTo);
 
-  if(slack && changeTo == 1 && SLACK_CONNECTION != "")
-    slackAutoCommand(type, source, pin, temp, target, diff);
+  if(slack && changeTo == 1)
+    slackAutoCommand(type, source, spin, temp, target, diff);
 }
 
 void InfluxDB(){

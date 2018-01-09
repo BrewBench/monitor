@@ -5,9 +5,11 @@
 ### Added
 - [slack](https://slack.com) sketch notify feature
 - [dweet.io](https://dweet.io) sketch notify feature
+- multiple sketch download
 
 ### Fixed
 - adjustment from F to C in auto sketches
+- moment include
 
 ## 3.1.2 - 2018-01-06
 
