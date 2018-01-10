@@ -1005,7 +1005,6 @@ $scope.updateABV();
     // add db
     connection_string += 'db='+($scope.settings.influxdb.db || 'session-'+moment().format('YYYY-MM-DD'));
     let autogen = '/* Sketch Auto Generated from http://monitor.brewbench.co on '+moment().format('YYYY-MM-DD HH:MM:SS')+' for '+name+'*/\n';
-    console.log(headers)
     $http.get('assets/arduino/'+sketch+'/'+sketch+'.ino')
       .then(response => {
         // replace variables
