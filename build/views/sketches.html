@@ -2,17 +2,13 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h1 class="modal-title"><i class="fa fa-gear fa-lg" aria-hidden="true"></i> Sketches</h1>
+        <h1 class="modal-title"><img src="assets/img/arduino.svg" width="45"> Sketches</h1>
         <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
       </div>
       <div class="modal-body settings">
       <div id="sketches">
       <div class="card-body">
         <div class="pb-3">
-          <h4>Arduino
-            <i class="fa fa-microchip fa-lg float-right" aria-hidden="true"></i>
-          </h4>
-
           <div class="row new pb-3">
 
             <div class="col-lg-4 col-sm-6">
@@ -34,7 +30,8 @@
                 <input class="form-control" type="text" ng-model="settings.recipe.name" placeholder="Beer Name">
             </div>
             <div class="col-lg-4 col-sm-6">
-              <div class="btn-group float-right">
+              <strong>Sketch Version:</strong> {{pkg.sketch_version}}<br>
+              <div class="btn-group">
                 <button type="button" class="btn btn-light dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   Download <span class="caret"></span>
                 </button>

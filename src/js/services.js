@@ -71,7 +71,7 @@ angular.module('brewbench-monitor')
           ,knob: angular.copy(this.defaultKnobOptions(),{value:0,min:0,max:220})
           ,arduino: {id: btoa('brewbench'), url: 'arduino.local',analog: 5,digital: 13}
           ,error: {message:'',version:''}
-          ,notify: {slack: false, dweet: true}
+          ,notify: {slack: false, dweet: false}
         },{
           key: 'Mash'
           ,type: 'grain'
@@ -85,7 +85,7 @@ angular.module('brewbench-monitor')
           ,knob: angular.copy(this.defaultKnobOptions(),{value:0,min:0,max:220})
           ,arduino: {id: btoa('brewbench'), url: 'arduino.local',analog: 5,digital: 13}
           ,error: {message:'',version:''}
-          ,notify: {slack: false, dweet: true}
+          ,notify: {slack: false, dweet: false}
         },{
           key: 'Boil'
           ,type: 'hop'
@@ -99,7 +99,7 @@ angular.module('brewbench-monitor')
           ,knob: angular.copy(this.defaultKnobOptions(),{value:0,min:0,max:220})
           ,arduino: {id: btoa('brewbench'), url: 'arduino.local',analog: 5,digital: 13}
           ,error: {message:'',version:''}
-          ,notify: {slack: false, dweet: true}
+          ,notify: {slack: false, dweet: false}
         }];
     },
 

@@ -22,6 +22,7 @@ $scope.hops;
 $scope.grains;
 $scope.water;
 $scope.lovibond;
+$scope.pkg;
 $scope.kettleTypes = BrewService.kettleTypes();
 $scope.chartOptions = BrewService.chartOptions();
 $scope.sensorTypes = BrewService.sensorTypes;
@@ -243,7 +244,7 @@ $scope.updateABV();
         ,knob: angular.copy(BrewService.defaultKnobOptions(),{value:0,min:0,max:$scope.kettleTypes[0].target+$scope.kettleTypes[0].diff})
         ,arduino: $scope.settings.arduinos.length ? $scope.settings.arduinos[0] : null
         ,error: {message:'',version:''}
-        ,notify: {slack: false, dweet: true}
+        ,notify: {slack: false, dweet: false}
     });
   };
 
@@ -1004,7 +1005,7 @@ $scope.updateABV();
     // add db
     connection_string += 'db='+($scope.settings.influxdb.db || 'session-'+moment().format('YYYY-MM-DD'));
     let autogen = '/* Sketch Auto Generated from http://monitor.brewbench.co on '+moment().format('YYYY-MM-DD HH:MM:SS')+' for '+name+'*/\n';
-
+    console.log(headers)
     $http.get('assets/arduino/'+sketch+'/'+sketch+'.ino')
       .then(response => {
         // replace variables
@@ -1020,7 +1021,7 @@ $scope.updateABV();
         if(headers.indexOf('#include <dht.h>') !== -1){
           response.data = response.data.replace(/\/\/ DHT /g, '');
         }
-        if(headers.indexOf('#include <cactus_io_DS18B20.h>') !== -1){
+        if(headers.indexOf('#include "cactus_io_DS18B20.h"') !== -1){
           response.data = response.data.replace(/\/\/ DS18B20 /g, '');
         }
         if(actions.length){
@@ -1038,9 +1039,6 @@ $scope.updateABV();
 
   $scope.downloadAutoSketch = function(){
     let sketches = [];
-    let actions = [];
-    let headers = [];
-    let downloads = [];
     let arduinoName = '';
     _.each($scope.kettles, (kettle, i) => {
       // reset the actions
@@ -1066,7 +1064,7 @@ $scope.updateABV();
         }
         else if(kettle.temp.type.indexOf('DS18B20') !== -1){
           currentSketch.headers.push('// https://www.brewbench.co/libs/cactus_io_DS18B20.zip');
-          currentSketch.headers.push('#include <cactus_io_DS18B20.h>');
+          currentSketch.headers.push('#include "cactus_io_DS18B20.h"');
         }
         currentSketch.actions.push('temp = autoCommand("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.temp.pin+'","'+kettle.temp.type+'",'+adjust+');');
         //look for triggers
@@ -1086,11 +1084,7 @@ $scope.updateABV();
   $scope.downloadInfluxDBSketch = function(){
     if(!$scope.settings.influxdb.url) return;
     let sketches = [];
-    let actions = [];
-    let headers = [];
-    let downloads = [];
     let arduinoName = '';
-
     _.each($scope.kettles, (kettle, i) => {
       arduinoName = kettle.arduino.url.replace(/[^a-zA-Z0-9-.]/g, "");
       let currentSketch = _.find(sketches,{name:arduinoName});
@@ -1110,7 +1104,7 @@ $scope.updateABV();
       }
       else if(kettle.temp.type.indexOf('DS18B20') !== -1){
         currentSketch.headers.push('// https://www.brewbench.co/libs/cactus_io_DS18B20.zip');
-        currentSketch.headers.push('#include <cactus_io_DS18B20.h>')
+        currentSketch.headers.push('#include "cactus_io_DS18B20.h"');
       }
       currentSketch.actions.push('temp = influxDBCommand(F("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'"),F("'+kettle.temp.pin+'"),F("'+kettle.temp.type+'"),'+adjust+');');
       //look for triggers
@@ -1477,8 +1471,8 @@ $scope.updateABV();
   $scope.$watch('share',function(newValue,oldValue){
     BrewService.settings('share',newValue);
   },true);
+});
 
-  $( document ).ready(function() {
-    $('[data-toggle="tooltip"]').tooltip();
-  });
+$( document ).ready(function() {
+  $('[data-toggle="tooltip"]').tooltip();
 });

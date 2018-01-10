@@ -2,7 +2,7 @@
 #include <Bridge.h>
 #include <BridgeServer.h>
 #include <BridgeClient.h>
-// headers
+// [headers]
 
 const PROGMEM char VERSION[] = "3.2.0";
 const PROGMEM int FREQUENCY_SECONDS = [FREQUENCY_SECONDS];

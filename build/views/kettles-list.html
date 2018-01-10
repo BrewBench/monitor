@@ -12,7 +12,10 @@
         <a href="" class="text-success sticky" ng-click="kettle.sticky = !!(kettle.sticky) ?  false : true"><i class="fa fa-thumb-tack fa-lg"></i></a>
         <div class="dropdown-menu scrollable-menu">
           <button class="text-center modal-link dropdown-item" type="button" data-toggle="modal" data-target="#settingsModal">
-            Add/Edit Arduinos
+            Add / Edit Arduinos
+          </button>
+          <button class="text-center modal-link dropdown-item" type="button" data-toggle="modal" data-target="#sketchesModal">
+            Arduino Sketches
           </button>
           <button ng-repeat="arduino in settings.arduinos"
             ng-class="{'active': kettle.arduino && kettle.arduino.id == arduino.id}"
