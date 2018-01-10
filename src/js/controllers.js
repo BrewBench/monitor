@@ -391,7 +391,7 @@ $scope.updateABV();
   };
 
   $scope.loadShareFile = function(){
-    BrewService.clear();
+    BrewService.clear(true);
     $scope.settings = BrewService.reset();
     $scope.settings.shared = true;
     return BrewService.loadShareFile($scope.share.file, $scope.share.password || null)
@@ -559,7 +559,7 @@ $scope.updateABV();
             $scope.settings.bb_version = response.version;
           } else if($scope.settings.bb_version != response.version){
             $scope.error.type = 'info';
-            $scope.setErrorMessage('There is a new version available for BrewBench. Please <a href="#/reset">clear</a> your settings.');
+            $scope.setErrorMessage('There is a new version available. Click <a href="#/reset">here</a> to update.');
           }
         })
       );
