@@ -196,6 +196,7 @@ void postData(const String &connection, const String &data, const String &dataTy
   p.addParameter(data);
   p.addParameter(connection);
   p.runAsynchronously();
+  while(p.running());
 }
 
 // triggers void dweetAutoCommand(const String &source, const String &brewer, const String &beer, const float &temp){
