@@ -1,6 +1,12 @@
 # Change Log
 
-## 3.2.0 - 2018-01-07
+## 3.2.1 - 2018-01-10
+
+### Updated
+- sketches to remove compile warnings
+- removed sketch runAsynchronously to run since there seems to be [issues](https://forum.arduino.cc/index.php?topic=286841.0) with Bridge
+
+## 3.2.0 - 2018-01-7
 
 ### Added
 - [slack](https://slack.com) sketch notify feature

@@ -4,7 +4,7 @@
 #include <BridgeClient.h>
 // [headers]
 
-const PROGMEM char VERSION[] = "3.2.0";
+const PROGMEM char VERSION[] = "3.2.1";
 const PROGMEM int FREQUENCY_SECONDS = [FREQUENCY_SECONDS];
 int secondCounter = 0;
 
@@ -68,9 +68,11 @@ void processRest(BridgeClient client) {
     responseOkHeader(client);
     analogCommand(client);
   }
-  if (command == "Thermistor" || command == "DS18B20" || command == "PT100" || command == "DHT11" || command == "DHT21" || command == "DHT22") {
-    responseOkHeader(client);
-    tempCommand(client, command);
+  if (command == "Thermistor" || command == "DS18B20" || command == "PT100" ||
+    command == "DHT11" || command == "DHT12" || command == "DHT21" ||
+    command == "DHT22" || command == "DHT33" || command == "DHT44") {
+      responseOkHeader(client);
+      tempCommand(client, command);
   }
 }
 
@@ -91,7 +93,7 @@ void digitalCommand(BridgeClient client) {
   int pin = client.parseInt();
   int value;
 
-  if (client.read() == "/") {
+  if (client.readString().substring(0,1) == "/") {
     //set pin as output
     pinMode(pin, OUTPUT);
     value = client.parseInt();
@@ -114,7 +116,7 @@ void analogCommand(BridgeClient client) {
   int pin = client.parseInt();
   int value;
 
-  if (client.read() == "/") {
+  if (client.readString().substring(0,1) == "/") {
     pinMode(pin, OUTPUT);
     value = client.parseInt();
     analogWrite(pin, value);//0 - 255
@@ -127,17 +129,16 @@ void analogCommand(BridgeClient client) {
   client.print("{\"pin\":\""+String(spin)+String(pin)+"\",\"value\":\""+String(value)+"\"}");
 }
 
-void tempCommand(BridgeClient client, String type) {
-  char spin = client.read();
+void tempCommand(BridgeClient client, const String type) {
+  const String spin = client.readString().substring(0,1);
   int pin = client.parseInt();
-  float tvoltage;
-  int chk;
-  float temp;
-  float humidity;
+  float temp = 0.00;
+  // DHT float humidity = 0.00;
 
   if(type == "Thermistor")
     temp = Thermistor(pin);
   else if(type == "PT100"){
+    float tvoltage = 0;
     if( spin == "A" )
       tvoltage = analogRead(pin);
     else
@@ -153,24 +154,28 @@ void tempCommand(BridgeClient client, String type) {
   // DS18B20 ds.readSensor();
   // DS18B20 temp = ds.getTemperature_C();
   // DS18B20 }
-  // DHT else if(type == "DHT11" || type == "DHT21" || type == "DHT22"){
-  // DHT   int chk;
+  // DHT else if(type == "DHT11" || type == "DHT12" || type == "DHT21" || type == "DHT22" || type == "DHT33" || type == "DHT44"){
+  // DHT   int chk = -1;
   // DHT if(type == "DHT11")
   // DHT   chk = DHT.read11(pin);
+  // DHT else if(type == "DHT12")
+  // DHT   chk = DHT.read12(pin);
   // DHT else if(type == "DHT21")
   // DHT   chk = DHT.read21(pin);
   // DHT else if(type == "DHT22")
   // DHT   chk = DHT.read22(pin);
+  // DHT else if(type == "DHT33")
+  // DHT   chk = DHT.read33(pin);
+  // DHT else if(type == "DHT44")
+  // DHT   chk = DHT.read44(pin);
   // DHT if( chk == DHTLIB_OK ){
   // DHT     temp = DHT.temperature;
   // DHT     humidity = DHT.humidity;
   // DHT   }
   // DHT }
   String data = "{\"pin\":\""+String(spin)+String(pin)+"\",\"temp\":\""+String(temp)+"\"";
-  if(humidity)
-    data += ",\"humidity\":\""+String(humidity)+"\"}";
-  else
-    data += "}";
+  // DHT if(humidity) data += ",\"humidity\":\""+String(humidity)+"\"";
+  data += "}";
   // Send JSON response to client
   client.print(data);
 }
@@ -190,12 +195,11 @@ void postData(String connection, String data, String dataType, String contentTyp
   p.addParameter(data);
   p.addParameter(connection);
   p.runAsynchronously();
-  while(p.running());
 }
 
-String dweetAutoCommand(String source, String brewer, String beer, float temp){
-  postData(F("[DWEET_CONNECTION]"), "{\"brewer\":\""+brewer+"\",\"beer\":\""+beer+"\",\"source\":\""+source+"\",\"temp\":"+String(temp)+"}", "", F("Content-Type: application/json"));
-}
+// triggers void dweetAutoCommand(const String &source, const String &brewer, const String &beer, const float &temp){
+// triggers   postData(F("https://dweet.io/dweet/for/brewbench"), "{\"brewer\":\""+brewer+"\",\"beer\":\""+beer+"\",\"source\":\""+source+"\",\"temp\":"+String(temp)+"}", "", F("Content-Type: application/json"));
+// triggers }
 
 // triggers void digitalAutoCommand(int pin, int value) {
 // triggers   pinMode(pin, OUTPUT);
@@ -210,7 +214,7 @@ String dweetAutoCommand(String source, String brewer, String beer, float temp){
 // triggers   analogWrite(pin, value);
 // triggers }
 
-// triggers String slackAutoCommand(const String &type, const String &source, const String &pin, const float &temp, const int &target, const int &diff) {
+// triggers void slackAutoCommand(const String &type, const String &source, const float &temp) {
 // triggers   String msg = "";
 // triggers   String color = "";
 // triggers   if(type=="heat"){
@@ -229,15 +233,14 @@ String dweetAutoCommand(String source, String brewer, String beer, float temp){
 // triggers   postData(F("[TPLINK_CONNECTION]"), data, "", F("Content-Type: application/json"));
 // triggers }
 
-float autoCommand(String source, String spin, String type, int adjustTemp) {
-  float tvoltage;
-  int chk;
-  float temp;
-  float humidity;
+float autoCommand(String spin, String type, int adjustTemp) {
+  float temp = 0.00;
+  // DHT float humidity = 0.00;
   int pin = spin.substring(1).toInt();
   if(type == "Thermistor")
     temp = Thermistor(pin);
   else if(type == "PT100"){
+    float tvoltage = 0;
     if( spin.substring(0,1) == "A" )
       tvoltage = analogRead(pin);
     else
@@ -253,14 +256,20 @@ float autoCommand(String source, String spin, String type, int adjustTemp) {
   // DS18B20 ds.readSensor();
   // DS18B20 temp = ds.getTemperature_C();
   // DS18B20 }
-  // DHT else if(type == "DHT11" || type == "DHT21" || type == "DHT22"){
-  // DHT   int chk;
+  // DHT else if(type == "DHT11" || type == "DHT12" || type == "DHT21" || type == "DHT22" || type == "DHT33" || type == "DHT44"){
+  // DHT   int chk = -1;
   // DHT if(type == "DHT11")
   // DHT   chk = DHT.read11(pin);
+  // DHT else if(type == "DHT12")
+  // DHT   chk = DHT.read12(pin);
   // DHT else if(type == "DHT21")
   // DHT   chk = DHT.read21(pin);
   // DHT else if(type == "DHT22")
   // DHT   chk = DHT.read22(pin);
+  // DHT else if(type == "DHT33")
+  // DHT   chk = DHT.read33(pin);
+  // DHT else if(type == "DHT44")
+  // DHT   chk = DHT.read44(pin);
   // DHT if( chk == DHTLIB_OK ){
   // DHT     temp = DHT.temperature;
   // DHT     humidity = DHT.humidity;
@@ -273,9 +282,9 @@ float autoCommand(String source, String spin, String type, int adjustTemp) {
 
 // triggers void trigger(const String &type, const String &source, const String &spin, const float &temp, const int &target, const int &diff, const boolean &slack) {
 // triggers   String pinType = spin.substring(0,1);
-// triggers   String deviceId;
-// triggers   int pinNumber;
-// triggers   int changeTo;
+// triggers   String deviceId = "";
+// triggers   int pinNumber = -1;
+// triggers   int changeTo = 0;
 // triggers   if(pinType == "T"){ //TP Link
 // triggers     deviceId = spin.substring(3);
 // triggers   } else {
@@ -285,13 +294,9 @@ float autoCommand(String source, String spin, String type, int adjustTemp) {
 // triggers   if(type == "heat"){
 // triggers     if( temp < (target+diff) )
 // triggers       changeTo = 1;
-// triggers     else
-// triggers       changeTo = 0;
 // triggers   } else if(type == "cool"){
 // triggers     if( temp > (target+diff) )
 // triggers       changeTo = 1;
-// triggers     else
-// triggers       changeTo = 0;
 // triggers   }
 // triggers   if(pinType == "A")
 // triggers     analogAutoCommand(pinNumber, changeTo);
@@ -301,11 +306,10 @@ float autoCommand(String source, String spin, String type, int adjustTemp) {
 // triggers     tplinkAutoCommand(deviceId, changeTo);
 
 // triggers   if(slack && changeTo == 1)
-// triggers     slackAutoCommand(type, source, spin, temp, target, diff);
+// triggers     slackAutoCommand(type, source, temp);
 // triggers }
 
 void runActions(){
-  float temp;
   // [actions]
 }
 

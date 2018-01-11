@@ -391,7 +391,7 @@ $scope.updateABV();
   };
 
   $scope.loadShareFile = function(){
-    BrewService.clear(true);
+    BrewService.clear();
     $scope.settings = BrewService.reset();
     $scope.settings.shared = true;
     return BrewService.loadShareFile($scope.share.file, $scope.share.password || null)
@@ -557,9 +557,6 @@ $scope.updateABV();
           $scope.settings.sketch_version = response.sketch_version;
           if(!$scope.settings.bb_version){
             $scope.settings.bb_version = response.version;
-          } else if($scope.settings.bb_version != response.version){
-            $scope.error.type = 'info';
-            $scope.setErrorMessage('There is a new version available. Click <a href="#/reset">here</a> to update.');
           }
         })
       );
@@ -991,7 +988,7 @@ $scope.updateABV();
     $scope.resetError(kettle);
   };
 
-  function downloadSketch(name, actions, headers, sketch){
+  function downloadSketch(name, actions, hasTriggers, headers, sketch){
     // tp link connection
     let tplink_connection_string = BrewService.tplink().connection();
     // influx db connection
@@ -1023,7 +1020,7 @@ $scope.updateABV();
         if(headers.indexOf('#include "cactus_io_DS18B20.h"') !== -1){
           response.data = response.data.replace(/\/\/ DS18B20 /g, '');
         }
-        if(actions.length){
+        if(hasTriggers){
           response.data = response.data.replace(/\/\/ triggers /g, '');
         }
         let streamSketch = document.createElement('a');
@@ -1051,7 +1048,8 @@ $scope.updateABV();
           sketches.push({
             name: arduinoName,
             actions: [],
-            headers: []
+            headers: [],
+            triggers: false
           });
           currentSketch = _.find(sketches,{name:arduinoName});
         }
@@ -1065,18 +1063,32 @@ $scope.updateABV();
           currentSketch.headers.push('// https://www.brewbench.co/libs/cactus_io_DS18B20.zip');
           currentSketch.headers.push('#include "cactus_io_DS18B20.h"');
         }
-        currentSketch.actions.push('temp = autoCommand("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.temp.pin+'","'+kettle.temp.type+'",'+adjust+');');
+        currentSketch.actions.push('autoCommand("'+kettle.temp.pin+'","'+kettle.temp.type+'",'+adjust+');');
         //look for triggers
-        if(kettle.heater && kettle.heater.sketch)
+        if(kettle.heater && kettle.heater.sketch){
+          currentSketch.triggers = true;
           currentSketch.actions.push('trigger("heat","'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.heater.pin+'",temp,'+target+','+kettle.temp.diff+','+!!kettle.notify.slack+');');
-        if(kettle.cooler && kettle.cooler.sketch)
+        }
+        if(kettle.cooler && kettle.cooler.sketch){
+          currentSketch.triggers = true;
           currentSketch.actions.push('trigger("cool","'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.cooler.pin+'",temp,'+target+','+kettle.temp.diff+','+!!kettle.notify.slack+');');
-        if(kettle.notify.dweet)
+        }
+        if(kettle.notify.dweet){
+          currentSketch.triggers = true;
           currentSketch.actions.push('dweetAutoCommand("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+$scope.settings.recipe.brewer.name+'","'+$scope.settings.recipe.name+'",temp);');
+        }
       }
     });
     _.each(sketches, (sketch, i) => {
-      downloadSketch(sketch.name, sketch.actions, sketch.headers, 'BrewBenchAutoYun');
+      if(sketch.triggers){
+        sketch.actions.unshift('float temp = 0.00;')
+        // update autoCommand
+        for(let a = 0; a < sketch.actions.length; a++){
+          if(sketches[i].actions[a].indexOf('autoCommand(') !== -1)
+            sketches[i].actions[a] = sketches[i].actions[a].replace('autoCommand(','temp = autoCommand(')
+        }
+      }
+      downloadSketch(sketch.name, sketch.actions, sketch.triggers, sketch.headers, 'BrewBenchAutoYun');
     });
   };
 
@@ -1091,7 +1103,8 @@ $scope.updateABV();
         sketches.push({
           name: arduinoName,
           actions: [],
-          headers: []
+          headers: [],
+          triggers: false
         });
         currentSketch = _.find(sketches,{name:arduinoName});
       }
@@ -1105,17 +1118,31 @@ $scope.updateABV();
         currentSketch.headers.push('// https://www.brewbench.co/libs/cactus_io_DS18B20.zip');
         currentSketch.headers.push('#include "cactus_io_DS18B20.h"');
       }
-      currentSketch.actions.push('temp = influxDBCommand(F("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'"),F("'+kettle.temp.pin+'"),F("'+kettle.temp.type+'"),'+adjust+');');
+      currentSketch.actions.push('influxDBCommand(F("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'"),F("'+kettle.temp.pin+'"),F("'+kettle.temp.type+'"),'+adjust+');');
       //look for triggers
-      if(kettle.heater && kettle.heater.sketch)
+      if(kettle.heater && kettle.heater.sketch){
+        currentSketch.triggers = true;
         currentSketch.actions.push('trigger(F("heat"),F("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'"),F("'+kettle.heater.pin+'"),temp,'+target+','+kettle.temp.diff+','+!!kettle.notify.slack+');');
-      if(kettle.cooler && kettle.cooler.sketch)
+      }
+      if(kettle.cooler && kettle.cooler.sketch){
+        currentSketch.triggers = true;
         currentSketch.actions.push('trigger(F("cool"),F("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'"),F("'+kettle.cooler.pin+'"),temp,'+target+','+kettle.temp.diff+','+!!kettle.notify.slack+');');
-      if(kettle.notify.dweet)
+      }
+      if(kettle.notify.dweet){
+        currentSketch.triggers = true;
         currentSketch.actions.push('dweetAutoCommand(F("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'"),F("'+$scope.settings.recipe.brewer.name+'"),F("'+$scope.settings.recipe.name+'"),temp);');
+      }
     });
     _.each(sketches, (sketch, i) => {
-      downloadSketch(sketch.name, sketch.actions, sketch.headers, 'BrewBenchInfluxDBYun');
+      if(sketch.triggers){
+        sketch.actions.unshift('float temp = 0.00;')
+        // update autoCommand
+        for(let a = 0; a < sketch.actions.length; a++){
+          if(sketches[i].actions[a].indexOf('influxDBCommand(') !== -1)
+            sketches[i].actions[a] = sketches[i].actions[a].replace('influxDBCommand(','temp = influxDBCommand(')
+        }
+      }
+      downloadSketch(sketch.name, sketch.actions, sketch.triggers, sketch.headers, 'BrewBenchInfluxDBYun');
     });
   };
 

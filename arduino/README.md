@@ -17,7 +17,7 @@
 
     <img src="../src/assets/img/PT100.png?raw=true" alt="BrewBench PT100" align="center" width="400" />
 
-  * DHT11, DHT21, DHT22 Temperature and Humidity great addition for brew house monitoring.
+  * DHT11, DHT12, DHT21, DHT22, DHT33, DHT44 Temperature and Humidity great addition for brew house monitoring.
 
     <img src="../src/assets/img/DHT11.png?raw=true" alt="BrewBench DHT" align="center" width="400" />
 
@@ -74,7 +74,7 @@ Sensors are:
 * Thermistor
 * DS18B20
 * PT100
-* DHT11
+* DHT11, DHT12, DHT21, DHT22, DHT33, DHT44
 
 Then add this to your `/home/user/.homeassistant/configuration.yaml`
 

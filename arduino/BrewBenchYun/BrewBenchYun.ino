@@ -7,7 +7,7 @@
 // https://www.brewbench.co/libs/cactus_io_DS18B20.zip
 #include "cactus_io_DS18B20.h"
 
-const PROGMEM char VERSION[] = "3.2.0";
+const PROGMEM char VERSION[] = "3.2.1";
 
 BridgeServer server;
 dht DHT;
@@ -69,7 +69,9 @@ void processRest(BridgeClient client) {
     responseOkHeader(client);
     analogCommand(client);
   }
-  if (command == "Thermistor" || command == "DS18B20" || command == "PT100" || command == "DHT11" || command == "DHT21" || command == "DHT22") {
+  if (command == "Thermistor" || command == "DS18B20" || command == "PT100" ||
+      command == "DHT11" || command == "DHT12" || command == "DHT21" ||
+      command == "DHT22" || command == "DHT33" || command == "DHT44") {
     responseOkHeader(client);
     tempCommand(client, command);
   }
@@ -92,7 +94,7 @@ void digitalCommand(BridgeClient client) {
   int pin = client.parseInt();
   int value;
 
-  if (client.read() == "/") {
+  if (client.readString().substring(0,1) == "/") {
     //set pin as output
     pinMode(pin, OUTPUT);
     value = client.parseInt();
@@ -115,7 +117,7 @@ void analogCommand(BridgeClient client) {
   int pin = client.parseInt();
   int value;
 
-  if (client.read() == "/") {
+  if (client.readString().substring(0,1) == "/") {
     pinMode(pin, OUTPUT);
     value = client.parseInt();
     analogWrite(pin, value);//0 - 255
@@ -129,10 +131,10 @@ void analogCommand(BridgeClient client) {
 }
 
 void tempCommand(BridgeClient client, String type) {
-  char spin = client.read();
+  const String spin = client.readString().substring(0,1);
   int pin = client.parseInt();
-  float temp;
-  float humidity;
+  float temp = 0.00;
+  float humidity = 0.00;
 
   if(type == "Thermistor")
     temp = Thermistor(pin);
@@ -153,14 +155,20 @@ void tempCommand(BridgeClient client, String type) {
     ds.readSensor();
     temp = ds.getTemperature_C();
   }
-  else if(type == "DHT11" || type == "DHT21" || type == "DHT22"){
-    int chk;
+  else if(type == "DHT11" || type == "DHT12" || type == "DHT21" || type == "DHT22" || type == "DHT33" || type == "DHT44"){
+    int chk = -1;
     if(type == "DHT11")
       chk = DHT.read11(pin);
+    else if(type == "DHT12")
+      chk = DHT.read12(pin);
     else if(type == "DHT21")
       chk = DHT.read21(pin);
     else if(type == "DHT22")
       chk = DHT.read22(pin);
+    else if(type == "DHT33")
+      chk = DHT.read33(pin);
+    else if(type == "DHT44")
+      chk = DHT.read44(pin);
     if( chk == DHTLIB_OK ){
       temp = DHT.temperature;
       humidity = DHT.humidity;

@@ -4,10 +4,9 @@ angular.module('brewbench-monitor')
   return {
 
     //cookies size 4096 bytes
-    clear: function(all){
+    clear: function(){
       if(window.localStorage){
-        if(all)
-          window.localStorage.removeItem('settings');
+        window.localStorage.removeItem('settings');
         window.localStorage.removeItem('kettles');
         window.localStorage.removeItem('share');
       }
