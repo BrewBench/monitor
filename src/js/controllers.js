@@ -149,7 +149,7 @@ $scope.updateABV();
 
   $scope.arduinos = {
     add: () => {
-      let now = new Date();
+      var now = new Date();
       if(!$scope.settings.arduinos) $scope.settings.arduinos = [];
       $scope.settings.arduinos.push({
         id: btoa(now+''+$scope.settings.arduinos.length+1),
@@ -200,7 +200,7 @@ $scope.updateABV();
             if(!!plug.status){
               BrewService.tplink().info(plug).then(info => {
                 if(info && info.responseData){
-                  let sysinfo = JSON.parse(info.responseData).system.get_sysinfo;
+                  var sysinfo = JSON.parse(info.responseData).system.get_sysinfo;
                   plug.info = sysinfo;
                 }
               });
@@ -243,7 +243,7 @@ $scope.updateABV();
         ,timers: []
         ,knob: angular.copy(BrewService.defaultKnobOptions(),{value:0,min:0,max:$scope.kettleTypes[0].target+$scope.kettleTypes[0].diff})
         ,arduino: $scope.settings.arduinos.length ? $scope.settings.arduinos[0] : null
-        ,error: {message:'',version:''}
+        ,error: {message:'',version:'',count:0}
         ,notify: {slack: false, dweet: false}
     });
   };
@@ -262,7 +262,7 @@ $scope.updateABV();
 
   $scope.pinDisplay = function(pin){
       if( pin.indexOf('TP-')===0 ){
-        let device = _.filter($scope.settings.tplink.plugs,{deviceId: pin.substr(3)})[0];
+        var device = _.filter($scope.settings.tplink.plugs,{deviceId: pin.substr(3)})[0];
         return device ? device.alias : '';
       } else
         return pin;
@@ -331,7 +331,7 @@ $scope.updateABV();
           BrewService.influxdb().dbs()
             .then(response => {
               if(response.length){
-                let dbs = [].concat.apply([], response);
+                var dbs = [].concat.apply([], response);
                 $scope.settings.influxdb.dbs = _.remove(dbs, (db) => db != "_internal");
               }
             });
@@ -479,7 +479,7 @@ $scope.updateABV();
 
       if(recipe.grains.length){
         $scope.settings.recipe.grains = recipe.grains;
-        let kettle = _.filter($scope.kettles,{type:'grain'})[0];
+        var kettle = _.filter($scope.kettles,{type:'grain'})[0];
         if(kettle) kettle.timers = [];
         $scope.settings.recipe.grains = {};
         _.each(recipe.grains,function(grain){
@@ -499,7 +499,7 @@ $scope.updateABV();
       }
 
       if(recipe.hops.length){
-        let kettle = _.filter($scope.kettles,{type:'hop'})[0];
+        var kettle = _.filter($scope.kettles,{type:'hop'})[0];
         if(kettle) kettle.timers = [];
         $scope.settings.recipe.hops = [];
         _.each(recipe.hops,function(hop){
@@ -518,7 +518,7 @@ $scope.updateABV();
         });
       }
       if(recipe.misc.length){
-        let kettle = _.filter($scope.kettles,{type:'water'})[0];
+        var kettle = _.filter($scope.kettles,{type:'water'})[0];
         if(kettle){
           kettle.timers = [];
           _.each(recipe.misc,function(misc){
@@ -550,7 +550,7 @@ $scope.updateABV();
   };
 
   $scope.loadConfig = function(){
-    let config = [];
+    var config = [];
     if(!$scope.pkg){
       config.push(BrewService.pkg().then(function(response){
           $scope.pkg = response;
@@ -632,7 +632,7 @@ $scope.updateABV();
       $scope.error.type = 'warning';
       $scope.error.message = $sce.trustAsHtml('The monitor seems to be off-line, re-connecting...');
     } else {
-      let message;
+      var message;
 
       if(typeof err == 'string' && err.indexOf('{') !== -1){
         if(!Object.keys(err).length) return;
@@ -658,12 +658,14 @@ $scope.updateABV();
 
       if(!!message){
         if(kettle){
+          kettle.error.count=0;
           kettle.error.message = $sce.trustAsHtml(`Connection error: ${message}`);
           $scope.updateKnobCopy(kettle);
         } else {
           $scope.error.message = $sce.trustAsHtml(`Error: ${message}`);
         }
       } else if(kettle){
+        kettle.error.count=0;
         kettle.error.message = `Error connecting to ${BrewService.domain(kettle.arduino)}`;
       } else {
         $scope.error.message = $sce.trustAsHtml('Connection error:');
@@ -673,6 +675,7 @@ $scope.updateABV();
 
   $scope.resetError = function(kettle){
     if(kettle) {
+      kettle.error.count=0;
       kettle.error.message = $sce.trustAsHtml('');
     } else {
       $scope.error.type = 'danger';
@@ -837,7 +840,7 @@ $scope.updateABV();
   };
 
   $scope.hasSketches = function(kettle){
-    let hasASketch = false;
+    var hasASketch = false;
     _.each($scope.kettles, kettle => {
       if((kettle.heater && kettle.heater.sketch) ||
         (kettle.cooler && kettle.cooler.sketch) ||
@@ -867,7 +870,11 @@ $scope.updateABV();
 
         BrewService.temp(kettle)
           .then(response => $scope.updateTemp(response, kettle))
-          .catch(err => $scope.setErrorMessage(err, kettle));
+          .catch(err => {
+            kettle.error.count++;
+            if(kettle.error.count==2)
+              $scope.setErrorMessage(err, kettle);
+          });
 
         // start the relays
         if(kettle.heater.running){
@@ -905,7 +912,7 @@ $scope.updateABV();
   $scope.toggleRelay = function(kettle, element, on){
     if(on) {
       if(element.pin.indexOf('TP-')===0){
-        let device = _.filter($scope.settings.tplink.plugs,{deviceId: element.pin.substr(3)})[0];
+        var device = _.filter($scope.settings.tplink.plugs,{deviceId: element.pin.substr(3)})[0];
         return BrewService.tplink().on(device)
           .then(() => {
             //started
@@ -937,7 +944,7 @@ $scope.updateABV();
       }
     } else {
       if(element.pin.indexOf('TP-')===0){
-        let device = _.filter($scope.settings.tplink.plugs,{deviceId: element.pin.substr(3)})[0];
+        var device = _.filter($scope.settings.tplink.plugs,{deviceId: element.pin.substr(3)})[0];
         return BrewService.tplink().off(device)
           .then(() => {
             //started
@@ -965,7 +972,7 @@ $scope.updateABV();
 
   $scope.importSettings = function($fileContent,$ext){
     try {
-      let profileContent = JSON.parse($fileContent);
+      var profileContent = JSON.parse($fileContent);
       $scope.settings = profileContent.settings || BrewService.reset();
       $scope.kettles = profileContent.kettles || BrewService.defaultKettles();
     } catch(e){
@@ -975,7 +982,7 @@ $scope.updateABV();
   };
 
   $scope.exportSettings = function(){
-    let kettles = angular.copy($scope.kettles);
+    var kettles = angular.copy($scope.kettles);
     _.each(kettles, (kettle, i) => {
       kettles[i].values = [];
       kettles[i].active = false;
@@ -990,9 +997,9 @@ $scope.updateABV();
 
   function downloadSketch(name, actions, hasTriggers, headers, sketch){
     // tp link connection
-    let tplink_connection_string = BrewService.tplink().connection();
+    var tplink_connection_string = BrewService.tplink().connection();
     // influx db connection
-    let connection_string = `${$scope.settings.influxdb.url}`;
+    var connection_string = `${$scope.settings.influxdb.url}`;
     if( !!$scope.settings.influxdb.port )
       connection_string += `:${$scope.settings.influxdb.port}`;
     connection_string += '/write?';
@@ -1001,7 +1008,7 @@ $scope.updateABV();
       connection_string += `u=${$scope.settings.influxdb.user}&p=${$scope.settings.influxdb.pass}&`
     // add db
     connection_string += 'db='+($scope.settings.influxdb.db || 'session-'+moment().format('YYYY-MM-DD'));
-    let autogen = '/* Sketch Auto Generated from http://monitor.brewbench.co on '+moment().format('YYYY-MM-DD HH:MM:SS')+' for '+name+'*/\n';
+    var autogen = '/* Sketch Auto Generated from http://monitor.brewbench.co on '+moment().format('YYYY-MM-DD HH:MM:SS')+' for '+name+'*/\n';
     $http.get('assets/arduino/'+sketch+'/'+sketch+'.ino')
       .then(response => {
         // replace variables
@@ -1023,7 +1030,7 @@ $scope.updateABV();
         if(hasTriggers){
           response.data = response.data.replace(/\/\/ triggers /g, '');
         }
-        let streamSketch = document.createElement('a');
+        var streamSketch = document.createElement('a');
         streamSketch.setAttribute('download', sketch+'-'+name+'.ino');
         streamSketch.setAttribute('href', "data:text/ino;charset=utf-8," + encodeURIComponent(response.data));
         streamSketch.click();
@@ -1034,8 +1041,8 @@ $scope.updateABV();
   }
 
   $scope.downloadAutoSketch = function(){
-    let sketches = [];
-    let arduinoName = '';
+    var sketches = [];
+    var arduinoName = '';
     _.each($scope.kettles, (kettle, i) => {
       // reset the actions
       if((kettle.heater && kettle.heater.sketch) ||
@@ -1043,7 +1050,7 @@ $scope.updateABV();
         kettle.notify.dweet
       ){
         arduinoName = kettle.arduino.url.replace(/[^a-zA-Z0-9-.]/g, "");
-        let currentSketch = _.find(sketches,{name:arduinoName});
+        var currentSketch = _.find(sketches,{name:arduinoName});
         if(!currentSketch){
           sketches.push({
             name: arduinoName,
@@ -1053,8 +1060,8 @@ $scope.updateABV();
           });
           currentSketch = _.find(sketches,{name:arduinoName});
         }
-        let target = ($scope.settings.unit=='F') ? $filter('toCelsius')(kettle.temp.target) : kettle.temp.target;
-        let adjust = ($scope.settings.unit=='F' && kettle.temp.adjust != 0) ? Math.round(kettle.temp.adjust*0.555) : kettle.temp.adjust;
+        var target = ($scope.settings.unit=='F') ? $filter('toCelsius')(kettle.temp.target) : kettle.temp.target;
+        var adjust = ($scope.settings.unit=='F' && kettle.temp.adjust != 0) ? Math.round(kettle.temp.adjust*0.555) : kettle.temp.adjust;
         if(kettle.temp.type.indexOf('DHT') !== -1){
           currentSketch.headers.push('// https://www.brewbench.co/libs/DHTLib.zip');
           currentSketch.headers.push('#include <dht.h>');
@@ -1083,7 +1090,7 @@ $scope.updateABV();
       if(sketch.triggers){
         sketch.actions.unshift('float temp = 0.00;')
         // update autoCommand
-        for(let a = 0; a < sketch.actions.length; a++){
+        for(var a = 0; a < sketch.actions.length; a++){
           if(sketches[i].actions[a].indexOf('autoCommand(') !== -1)
             sketches[i].actions[a] = sketches[i].actions[a].replace('autoCommand(','temp = autoCommand(')
         }
@@ -1094,11 +1101,11 @@ $scope.updateABV();
 
   $scope.downloadInfluxDBSketch = function(){
     if(!$scope.settings.influxdb.url) return;
-    let sketches = [];
-    let arduinoName = '';
+    var sketches = [];
+    var arduinoName = '';
     _.each($scope.kettles, (kettle, i) => {
       arduinoName = kettle.arduino.url.replace(/[^a-zA-Z0-9-.]/g, "");
-      let currentSketch = _.find(sketches,{name:arduinoName});
+      var currentSketch = _.find(sketches,{name:arduinoName});
       if(!currentSketch){
         sketches.push({
           name: arduinoName,
@@ -1108,8 +1115,8 @@ $scope.updateABV();
         });
         currentSketch = _.find(sketches,{name:arduinoName});
       }
-      let target = ($scope.settings.unit=='F') ? $filter('toCelsius')(kettle.temp.target) : kettle.temp.target;
-      let adjust = ($scope.settings.unit=='F' && kettle.temp.adjust != 0) ? Math.round(kettle.temp.adjust*0.555) : kettle.temp.adjust;
+      var target = ($scope.settings.unit=='F') ? $filter('toCelsius')(kettle.temp.target) : kettle.temp.target;
+      var adjust = ($scope.settings.unit=='F' && kettle.temp.adjust != 0) ? Math.round(kettle.temp.adjust*0.555) : kettle.temp.adjust;
       if(kettle.temp.type.indexOf('DHT') !== -1){
         currentSketch.headers.push('// https://www.brewbench.co/libs/DHTLib.zip');
         currentSketch.headers.push('#include <dht.h>')
@@ -1137,7 +1144,7 @@ $scope.updateABV();
       if(sketch.triggers){
         sketch.actions.unshift('float temp = 0.00;')
         // update autoCommand
-        for(let a = 0; a < sketch.actions.length; a++){
+        for(var a = 0; a < sketch.actions.length; a++){
           if(sketches[i].actions[a].indexOf('influxDBCommand(') !== -1)
             sketches[i].actions[a] = sketches[i].actions[a].replace('influxDBCommand(','temp = influxDBCommand(')
         }
@@ -1166,7 +1173,7 @@ $scope.updateABV();
     }
 
     // Desktop / Slack Notification
-    let message,
+    var message,
       icon = '/assets/img/brewbench-logo.png',
       color = 'good';
 

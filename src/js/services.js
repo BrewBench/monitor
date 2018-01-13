@@ -70,7 +70,7 @@ angular.module('brewbench-monitor')
           ,timers: []
           ,knob: angular.copy(this.defaultKnobOptions(),{value:0,min:0,max:220})
           ,arduino: {id: btoa('brewbench'), url: 'arduino.local',analog: 5,digital: 13}
-          ,error: {message:'',version:''}
+          ,error: {message:'',version:'',count:0}
           ,notify: {slack: false, dweet: false}
         },{
           key: 'Mash'
@@ -84,7 +84,7 @@ angular.module('brewbench-monitor')
           ,timers: []
           ,knob: angular.copy(this.defaultKnobOptions(),{value:0,min:0,max:220})
           ,arduino: {id: btoa('brewbench'), url: 'arduino.local',analog: 5,digital: 13}
-          ,error: {message:'',version:''}
+          ,error: {message:'',version:'',count:0}
           ,notify: {slack: false, dweet: false}
         },{
           key: 'Boil'
@@ -98,7 +98,7 @@ angular.module('brewbench-monitor')
           ,timers: []
           ,knob: angular.copy(this.defaultKnobOptions(),{value:0,min:0,max:220})
           ,arduino: {id: btoa('brewbench'), url: 'arduino.local',analog: 5,digital: 13}
-          ,error: {message:'',version:''}
+          ,error: {message:'',version:'',count:0}
           ,notify: {slack: false, dweet: false}
         }];
     },
@@ -120,7 +120,7 @@ angular.module('brewbench-monitor')
     },
 
     sensorTypes: function(name){
-      let sensors = [
+      var sensors = [
         {name: 'Thermistor', analog: true, digital: false}
         ,{name: 'DS18B20', analog: false, digital: true}
         ,{name: 'PT100', analog: true, digital: true}
@@ -134,7 +134,7 @@ angular.module('brewbench-monitor')
     },
 
     kettleTypes: function(type){
-      let kettles = [
+      var kettles = [
         {'name':'Boil','type':'hop','target':200,'diff':2}
         ,{'name':'Mash','type':'grain','target':152,'diff':2}
         ,{'name':'Hot Liquor','type':'water','target':170,'diff':2}
@@ -147,8 +147,8 @@ angular.module('brewbench-monitor')
     },
 
     domain: function(arduino){
-      let settings = this.settings('settings');
-      let domain = 'http://arduino.local';
+      var settings = this.settings('settings');
+      var domain = 'http://arduino.local';
 
       if(arduino && arduino.url){
         domain = (arduino.url.indexOf('//') !== -1) ?
@@ -165,9 +165,9 @@ angular.module('brewbench-monitor')
     },
 
     slack: function(webhook_url, msg, color, icon, kettle){
-      let q = $q.defer();
+      var q = $q.defer();
 
-      let postObj = {'attachments': [{'fallback': msg,
+      var postObj = {'attachments': [{'fallback': msg,
             'title': kettle.key,
             'title_link': 'http://'+document.location.host,
             'fields': [{'value': msg}],
@@ -193,10 +193,10 @@ angular.module('brewbench-monitor')
     // https://www.adafruit.com/product/3290 and https://www.adafruit.com/product/3328
     temp: function(kettle){
       if(!kettle.arduino) return $q.reject('Select an arduino to use.');
-      let q = $q.defer();
-      let url = this.domain(kettle.arduino)+'/arduino/'+kettle.temp.type+'/'+kettle.temp.pin;
-      let settings = this.settings('settings');
-      let headers = {};
+      var q = $q.defer();
+      var url = this.domain(kettle.arduino)+'/arduino/'+kettle.temp.type+'/'+kettle.temp.pin;
+      var settings = this.settings('settings');
+      var headers = {};
 
       if(kettle.arduino.password)
         headers.Authorization = 'Basic '+btoa('root:'+kettle.arduino.password);
@@ -221,10 +221,10 @@ angular.module('brewbench-monitor')
     // http://myhowtosandprojects.blogspot.com/2014/02/sainsmart-2-channel-5v-relay-arduino.html
     digital: function(kettle,sensor,value){
       if(!kettle.arduino) return $q.reject('Select an arduino to use.');
-      let q = $q.defer();
-      let url = this.domain(kettle.arduino)+'/arduino/digital/'+sensor+'/'+value;
-      let settings = this.settings('settings');
-      let headers = {};
+      var q = $q.defer();
+      var url = this.domain(kettle.arduino)+'/arduino/digital/'+sensor+'/'+value;
+      var settings = this.settings('settings');
+      var headers = {};
 
       if(kettle.arduino.password)
         headers.Authorization = 'Basic '+btoa('root:'+kettle.arduino.password);
@@ -247,10 +247,10 @@ angular.module('brewbench-monitor')
 
     analog: function(kettle,sensor,value){
       if(!kettle.arduino) return $q.reject('Select an arduino to use.');
-      let q = $q.defer();
-      let url = this.domain(kettle.arduino)+'/arduino/analog/'+sensor+'/'+value;
-      let settings = this.settings('settings');
-      let headers = {};
+      var q = $q.defer();
+      var url = this.domain(kettle.arduino)+'/arduino/analog/'+sensor+'/'+value;
+      var settings = this.settings('settings');
+      var headers = {};
 
       if(kettle.arduino.password)
         headers.Authorization = 'Basic '+btoa('root:'+kettle.arduino.password);
@@ -273,10 +273,10 @@ angular.module('brewbench-monitor')
 
     digitalRead: function(kettle,sensor,timeout){
       if(!kettle.arduino) return $q.reject('Select an arduino to use.');
-      let q = $q.defer();
-      let url = this.domain(kettle.arduino)+'/arduino/digital/'+sensor;
-      let settings = this.settings('settings');
-      let headers = {};
+      var q = $q.defer();
+      var url = this.domain(kettle.arduino)+'/arduino/digital/'+sensor;
+      var settings = this.settings('settings');
+      var headers = {};
 
       if(kettle.arduino.password)
         headers.Authorization = 'Basic '+btoa('root:'+kettle.arduino.password);
@@ -298,8 +298,8 @@ angular.module('brewbench-monitor')
     },
 
     loadShareFile: function(file, password){
-      let q = $q.defer();
-      let query = '';
+      var q = $q.defer();
+      var query = '';
       if(password)
         query = '?password='+md5(password);
       $http({url: 'https://monitor.brewbench.co/share/get/'+file+query, method: 'GET'})
@@ -314,7 +314,7 @@ angular.module('brewbench-monitor')
 
     // TODO finish this
     // deleteShareFile: function(file, password){
-    //   let q = $q.defer();
+    //   var q = $q.defer();
     //   $http({url: 'https://monitor.brewbench.co/share/delete/'+file, method: 'GET'})
     //     .then(response => {
     //       q.resolve(response.data);
@@ -326,10 +326,10 @@ angular.module('brewbench-monitor')
     // },
 
     createShare: function(share){
-      let q = $q.defer();
-      let settings = this.settings('settings');
-      let kettles = this.settings('kettles');
-      let sh = Object.assign({}, {password: share.password, access: share.access});
+      var q = $q.defer();
+      var settings = this.settings('settings');
+      var kettles = this.settings('kettles');
+      var sh = Object.assign({}, {password: share.password, access: share.access});
       //remove some things we don't need to share
       _.each(kettles, (kettle, i) => {
         delete kettles[i].knob;
@@ -355,8 +355,8 @@ angular.module('brewbench-monitor')
     },
 
     shareTest: function(arduino){
-      let q = $q.defer();
-      let query = `url=${arduino.url}`
+      var q = $q.defer();
+      var query = `url=${arduino.url}`
 
       if(arduino.password)
         query += '&auth='+btoa('root:'+arduino.password);
@@ -372,7 +372,7 @@ angular.module('brewbench-monitor')
     },
 
     ip: function(arduino){
-      let q = $q.defer();
+      var q = $q.defer();
 
       $http({url: 'https://monitor.brewbench.co/share/ip', method: 'GET'})
         .then(response => {
@@ -387,7 +387,7 @@ angular.module('brewbench-monitor')
     dweet: function(){
         return {
           latest: () => {
-            let q = $q.defer();
+            var q = $q.defer();
             $http({url: 'https://dweet.io/get/latest/dweet/for/brewbench', method: 'GET'})
               .then(response => {
                 q.resolve(response.data);
@@ -398,7 +398,7 @@ angular.module('brewbench-monitor')
             return q.promise;
           },
           all: () => {
-            let q = $q.defer();
+            var q = $q.defer();
             $http({url: 'https://dweet.io/get/dweets/for/brewbench', method: 'GET'})
               .then(response => {
                 q.resolve(response.data);
@@ -413,7 +413,7 @@ angular.module('brewbench-monitor')
 
     tplink: function(){
       const url = "https://wap.tplinkcloud.com";
-      let params = {
+      var params = {
         appName: 'Kasa_Android',
         termID: 'BrewBench',
         appVer: '1.4.4.607',
@@ -423,7 +423,7 @@ angular.module('brewbench-monitor')
       };
       return {
         connection: () => {
-          let settings = this.settings('settings');
+          var settings = this.settings('settings');
           if(settings.tplink.token){
             params.token = settings.tplink.token;
             return url+'/?'+jQuery.param(params);
@@ -431,7 +431,7 @@ angular.module('brewbench-monitor')
           return '';
         },
         login: (user,pass) => {
-          let q = $q.defer();
+          var q = $q.defer();
           if(!user || !pass)
             return q.reject('Invalid Login');
           const login_payload = {
@@ -464,8 +464,8 @@ angular.module('brewbench-monitor')
           return q.promise;
         },
         scan: (token) => {
-          let q = $q.defer();
-          let settings = this.settings('settings');
+          var q = $q.defer();
+          var settings = this.settings('settings');
           token = token || settings.tplink.token;
           if(!token)
             return q.reject('Invalid token');
@@ -484,10 +484,10 @@ angular.module('brewbench-monitor')
           return q.promise;
         },
         command: (device, command) => {
-          let q = $q.defer();
-          let settings = this.settings('settings');
-          let token = settings.tplink.token;
-          let payload = {
+          var q = $q.defer();
+          var settings = this.settings('settings');
+          var token = settings.tplink.token;
+          var payload = {
             "method":"passthrough",
             "params": {
               "deviceId": device.deviceId,
@@ -513,24 +513,24 @@ angular.module('brewbench-monitor')
           return q.promise;
         },
         on: (device) => {
-          let command = {"system":{"set_relay_state":{"state": 1 }}};
+          var command = {"system":{"set_relay_state":{"state": 1 }}};
           return this.tplink().command(device, command);
         },
         off: (device) => {
-          let command = {"system":{"set_relay_state":{"state": 0 }}};
+          var command = {"system":{"set_relay_state":{"state": 0 }}};
           return this.tplink().command(device, command);
         },
         info: (device) => {
-          let command = {"system":{"get_sysinfo":null},"emeter":{"get_realtime":null}};
+          var command = {"system":{"get_sysinfo":null},"emeter":{"get_realtime":null}};
           return this.tplink().command(device, command);
         }
       };
     },
 
     influxdb: function(){
-      let q = $q.defer();
-      let settings = this.settings('settings');
-      let influxConnection = `${settings.influxdb.url}`;
+      var q = $q.defer();
+      var settings = this.settings('settings');
+      var influxConnection = `${settings.influxdb.url}`;
       if( !!settings.influxdb.port )
         influxConnection += `:${settings.influxdb.port}`
 
@@ -578,7 +578,7 @@ angular.module('brewbench-monitor')
     },
 
     pkg: function(){
-        let q = $q.defer();
+        var q = $q.defer();
         $http.get('/package.json')
           .then(response => {
             q.resolve(response.data);
@@ -590,7 +590,7 @@ angular.module('brewbench-monitor')
     },
 
     grains: function(){
-        let q = $q.defer();
+        var q = $q.defer();
         $http.get('/assets/data/grains.json')
           .then(response => {
             q.resolve(response.data);
@@ -602,7 +602,7 @@ angular.module('brewbench-monitor')
     },
 
     hops: function(){
-        let q = $q.defer();
+        var q = $q.defer();
         $http.get('/assets/data/hops.json')
           .then(response => {
             q.resolve(response.data);
@@ -614,7 +614,7 @@ angular.module('brewbench-monitor')
     },
 
     water: function(){
-        let q = $q.defer();
+        var q = $q.defer();
         $http.get('/assets/data/water.json')
           .then(response => {
             q.resolve(response.data);
@@ -626,7 +626,7 @@ angular.module('brewbench-monitor')
     },
 
     styles: function(){
-      let q = $q.defer();
+      var q = $q.defer();
       $http.get('/assets/data/styleguide.json')
         .then(response => {
           q.resolve(response.data);
@@ -638,7 +638,7 @@ angular.module('brewbench-monitor')
     },
 
     lovibond: function(){
-        let q = $q.defer();
+        var q = $q.defer();
         $http.get('/assets/data/lovibond.json')
           .then(response => {
             q.resolve(response.data);
@@ -717,11 +717,11 @@ angular.module('brewbench-monitor')
     },
     // http://www.brewersfriend.com/plato-to-sg-conversion-chart/
     sg: function(plato){
-      let sg = ( 1 + (plato / (258.6 - ( (plato/258.2) * 227.1) ) ) ).toFixed(3);
+      var sg = ( 1 + (plato / (258.6 - ( (plato/258.2) * 227.1) ) ) ).toFixed(3);
       return parseFloat(sg);
     },
     plato: function(sg){
-      let plato = ((-1 * 616.868) + (1111.14 * sg) - (630.272 * Math.pow(sg,2)) + (135.997 * Math.pow(sg,3))).toString();
+      var plato = ((-1 * 616.868) + (1111.14 * sg) - (630.272 * Math.pow(sg,2)) + (135.997 * Math.pow(sg,3))).toString();
       if(plato.substring(plato.indexOf('.')+1,plato.indexOf('.')+2) == 5)
         plato = plato.substring(0,plato.indexOf('.')+2);
       else if(plato.substring(plato.indexOf('.')+1,plato.indexOf('.')+2) < 5)
@@ -733,7 +733,7 @@ angular.module('brewbench-monitor')
       return parseFloat(plato);
     },
     recipeBeerSmith: function(recipe){
-      let response = {name:'', date:'', brewer: {name:''}, category:'', abv:'', og:0.000, fg:0.000, ibu:0, hops:[], grains:[], yeast:[], misc:[]};
+      var response = {name:'', date:'', brewer: {name:''}, category:'', abv:'', og:0.000, fg:0.000, ibu:0, hops:[], grains:[], yeast:[], misc:[]};
       if(!!recipe.F_R_NAME)
         response.name = recipe.F_R_NAME;
       if(!!recipe.F_R_STYLE.F_S_CATEGORY)
@@ -830,8 +830,8 @@ angular.module('brewbench-monitor')
       return response;
     },
     recipeBeerXML: function(recipe){
-      let response = {name:'', date:'', brewer: {name:''}, category:'', abv:'', og:0.000, fg:0.000, ibu:0, hops:[], grains:[], yeast:[], misc:[]};
-      let mash_time = 60;
+      var response = {name:'', date:'', brewer: {name:''}, category:'', abv:'', og:0.000, fg:0.000, ibu:0, hops:[], grains:[], yeast:[], misc:[]};
+      var mash_time = 60;
 
       if(!!recipe.NAME)
         response.name = recipe.NAME;
@@ -861,7 +861,7 @@ angular.module('brewbench-monitor')
       }
 
       if(!!recipe.FERMENTABLES){
-        let grains = (recipe.FERMENTABLES.FERMENTABLE && recipe.FERMENTABLES.FERMENTABLE.length) ? recipe.FERMENTABLES.FERMENTABLE : recipe.FERMENTABLES;
+        var grains = (recipe.FERMENTABLES.FERMENTABLE && recipe.FERMENTABLES.FERMENTABLE.length) ? recipe.FERMENTABLES.FERMENTABLE : recipe.FERMENTABLES;
         _.each(grains,function(grain){
           response.grains.push({
             label: grain.NAME,
@@ -873,7 +873,7 @@ angular.module('brewbench-monitor')
       }
 
       if(!!recipe.HOPS){
-        let hops = (recipe.HOPS.HOP && recipe.HOPS.HOP.length) ? recipe.HOPS.HOP : recipe.HOPS;
+        var hops = (recipe.HOPS.HOP && recipe.HOPS.HOP.length) ? recipe.HOPS.HOP : recipe.HOPS;
         _.each(hops,function(hop){
           response.hops.push({
             label: hop.NAME+' ('+hop.FORM+')',
@@ -887,7 +887,7 @@ angular.module('brewbench-monitor')
       }
 
       if(!!recipe.MISCS){
-        let misc = (recipe.MISCS.MISC && recipe.MISCS.MISC.length) ? recipe.MISCS.MISC : recipe.MISCS;
+        var misc = (recipe.MISCS.MISC && recipe.MISCS.MISC.length) ? recipe.MISCS.MISC : recipe.MISCS;
         _.each(misc,function(misc){
           response.misc.push({
             label: misc.NAME,
@@ -899,7 +899,7 @@ angular.module('brewbench-monitor')
       }
 
       if(!!recipe.YEASTS){
-        let yeast = (recipe.YEASTS.YEAST && recipe.YEASTS.YEAST.length) ? recipe.YEASTS.YEAST : recipe.YEASTS;
+        var yeast = (recipe.YEASTS.YEAST && recipe.YEASTS.YEAST.length) ? recipe.YEASTS.YEAST : recipe.YEASTS;
           _.each(yeast,function(yeast){
             response.yeast.push({
               name: yeast.NAME
@@ -909,7 +909,7 @@ angular.module('brewbench-monitor')
       return response;
     },
     formatXML: function(content){
-      let htmlchars = [
+      var htmlchars = [
         {f: '&Ccedil;', r: 'Ç'},
         {f: '&ccedil;', r: 'ç'},
         {f: '&Euml;', r: 'Ë'},
