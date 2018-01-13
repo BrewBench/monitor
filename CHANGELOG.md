@@ -1,5 +1,10 @@
 # Change Log
 
+## 3.2.2 - 2018-01-13
+
+### Updated
+- js to use var instead of let due to iOS issues
+
 ## 3.2.1 - 2018-01-10
 
 ### Updated
