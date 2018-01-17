@@ -1,5 +1,13 @@
 # Change Log
 
+## 3.2.3 - 2018-01-16
+
+### Fixed
+- Duplicate sketch headers for DHT and DS18B20
+- In Use pin for multiple Arduinos
+- Sketch version char bug
+- 500 connection error when running InfluxDB or Auto sketches in the background
+
 ## 3.2.2 - 2018-01-13
 
 ### Updated

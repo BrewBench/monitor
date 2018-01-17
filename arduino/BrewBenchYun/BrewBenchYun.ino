@@ -7,7 +7,7 @@
 // https://www.brewbench.co/libs/cactus_io_DS18B20.zip
 #include "cactus_io_DS18B20.h"
 
-const PROGMEM char VERSION[] = "3.2.1";
+const String VERSION = "3.2.2";
 
 BridgeServer server;
 dht DHT;
@@ -82,8 +82,7 @@ void responseOkHeader(BridgeClient client){
   client.println(F("Access-Control-Allow-Origin: *"));
   client.println(F("Access-Control-Allow-Methods: GET"));
   client.println(F("Access-Control-Expose-Headers: X-Sketch-Version"));
-  client.print(F("X-Sketch-Version: "));
-  client.println(VERSION);
+  client.println("X-Sketch-Version: "+VERSION);
   client.println(F("Content-Type: application/json"));
   client.println(F("Connection: close"));
   client.println();

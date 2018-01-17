@@ -66,7 +66,7 @@
                       ng-class="{'active': kettle.temp.pin=='A'+p}"
                       ng-click="kettle.temp.pin='A'+p;"
                       class="dropdown-item" type="button">
-                    A{{p}} <span class="pininuse" ng-show="pinInUse('A'+p,true)">(In Use)</span>
+                    A{{p}} <span class="pininuse" ng-show="pinInUse('A'+p,kettle.arduino.id,true)">(In Use)</span>
                   </button>
                   <div ng-if="sensorTypes(kettle.temp.type).digital" class="dropdown-divider"></div>
                   <h6 ng-if="sensorTypes(kettle.temp.type).digital" class="dropdown-header">Digital</h6>
@@ -76,7 +76,7 @@
                       ng-class="{'active': kettle.temp.pin=='D'+p}"
                       ng-click="kettle.temp.pin='D'+p;"
                       class="dropdown-item" type="button">
-                    D{{p}} <span class="pininuse" ng-show="pinInUse('D'+p,false)">(In Use)</span>
+                    D{{p}} <span class="pininuse" ng-show="pinInUse('D'+p,kettle.arduino.id,false)">(In Use)</span>
                   </button>
                 </div>
               </div>
@@ -121,7 +121,7 @@
                      ng-class="{'active': kettle.heater.pin=='TP-'+tp.deviceId}"
                      ng-click="kettle.heater.pin='TP-'+tp.deviceId; kettle.heater.pwm=false;"
                      class="dropdown-item" type="button">
-                   {{ tp.alias }} <i class="fa fa-circle" ng-class="{'on':!!tp.status, 'off':!tp.status}" aria-hidden="true"></i> <span class="pininuse" ng-show="pinInUse('TP-'+tp.deviceId,false)">(In Use)</span>
+                   {{ tp.alias }} <i class="fa fa-circle" ng-class="{'on':!!tp.status, 'off':!tp.status}" aria-hidden="true"></i> <span class="pininuse" ng-show="pinInUse('TP-'+tp.deviceId,kettle.arduino.id,false)">(In Use)</span>
                 </button>
                 <div class="dropdown-divider" ng-if="settings.tplink.token"></div>
                 <h6 class="dropdown-header">Analog</h6>
@@ -130,7 +130,7 @@
                     ng-class="{'active': kettle.heater.pin=='A'+p}"
                     ng-click="kettle.heater.pin='A'+p; kettle.heater.pwm=false;"
                     class="dropdown-item" type="button">
-                  A{{p}} <span class="pininuse" ng-show="pinInUse('A'+p,true)">(In Use)</span>
+                  A{{p}} <span class="pininuse" ng-show="pinInUse('A'+p,kettle.arduino.id,true)">(In Use)</span>
                 </button>
                 <div class="dropdown-divider"></div>
                 <h6 class="dropdown-header">Digital</h6>
@@ -139,7 +139,7 @@
                     ng-class="{'active': kettle.heater.pin=='D'+p}"
                     ng-click="kettle.heater.pin='D'+p;"
                     class="dropdown-item" type="button">
-                  D{{p}} <span class="pininuse" ng-show="pinInUse('D'+p,false)">(In Use)</span>
+                  D{{p}} <span class="pininuse" ng-show="pinInUse('D'+p,kettle.arduino.id,false)">(In Use)</span>
                 </button>
               </div>
             </div>
@@ -180,7 +180,7 @@
                      ng-class="{'active': kettle.pump.pin=='TP-'+tp.deviceId}"
                      ng-click="kettle.pump.pin='TP-'+tp.deviceId; kettle.pump.pwm=false;"
                      class="dropdown-item" type="button">
-                   {{ tp.alias }} <i class="fa fa-circle" ng-class="{'on':!!tp.status, 'off':!tp.status}" aria-hidden="true"></i> <span class="pininuse" ng-show="pinInUse('TP-'+tp.deviceId,false)">(In Use)</span>
+                   {{ tp.alias }} <i class="fa fa-circle" ng-class="{'on':!!tp.status, 'off':!tp.status}" aria-hidden="true"></i> <span class="pininuse" ng-show="pinInUse('TP-'+tp.deviceId,kettle.arduino.id,false)">(In Use)</span>
                 </button>
                 <div class="dropdown-divider" ng-if="settings.tplink.token"></div>
                 <h6 class="dropdown-header">Analog</h6>
@@ -189,7 +189,7 @@
                     ng-class="{'active': kettle.pump.pin=='A'+p}"
                     ng-click="kettle.pump.pin='A'+p; kettle.pump.pwm=false;"
                     class="dropdown-item" type="button">
-                  A{{p}} <span class="pininuse" ng-show="pinInUse('A'+p,true)">(In Use)</span>
+                  A{{p}} <span class="pininuse" ng-show="pinInUse('A'+p,kettle.arduino.id,true)">(In Use)</span>
                 </button>
                 <div class="dropdown-divider"></div>
                 <h6 class="dropdown-header">Digital</h6>
@@ -198,7 +198,7 @@
                     ng-class="{'active': kettle.pump.pin=='D'+p}"
                     ng-click="kettle.pump.pin='D'+p;"
                     class="dropdown-item" type="button">
-                  D{{p}} <span class="pininuse" ng-show="pinInUse('D'+p,false)">(In Use)</span>
+                  D{{p}} <span class="pininuse" ng-show="pinInUse('D'+p,kettle.arduino.id,false)">(In Use)</span>
                 </button>
               </div>
             </div>
@@ -239,7 +239,7 @@
                      ng-class="{'active': kettle.cooler.pin=='TP-'+tp.deviceId}"
                      ng-click="kettle.cooler.pin='TP-'+tp.deviceId; kettle.cooler.pwm=false;"
                      class="dropdown-item" type="button">
-                   {{ tp.alias }} <i class="fa fa-circle" ng-class="{'on':!!tp.status, 'off':!tp.status}" aria-hidden="true"></i> <span class="pininuse" ng-show="pinInUse('TP-'+tp.deviceId,false)">(In Use)</span>
+                   {{ tp.alias }} <i class="fa fa-circle" ng-class="{'on':!!tp.status, 'off':!tp.status}" aria-hidden="true"></i> <span class="pininuse" ng-show="pinInUse('TP-'+tp.deviceId,kettle.arduino.id,false)">(In Use)</span>
                 </button>
                 <div class="dropdown-divider" ng-if="settings.tplink.token"></div>
                 <h6 class="dropdown-header">Analog</h6>
@@ -248,7 +248,7 @@
                     ng-class="{'active': kettle.cooler.pin=='A'+p}"
                     ng-click="kettle.cooler.pin='A'+p; kettle.cooler.pwm=false;"
                     class="dropdown-item" type="button">
-                  A{{p}} <span class="pininuse" ng-show="pinInUse('A'+p,true)">(In Use)</span>
+                  A{{p}} <span class="pininuse" ng-show="pinInUse('A'+p,kettle.arduino.id,true)">(In Use)</span>
                 </button>
                 <div class="dropdown-divider"></div>
                 <h6 class="dropdown-header">Digital</h6>
@@ -257,7 +257,7 @@
                     ng-class="{'active': kettle.cooler.pin=='D'+p}"
                     ng-click="kettle.cooler.pin='D'+p;"
                     class="dropdown-item" type="button">
-                  D{{p}} <span class="pininuse" ng-show="pinInUse('D'+p,false)">(In Use)</span>
+                  D{{p}} <span class="pininuse" ng-show="pinInUse('D'+p,kettle.arduino.id,false)">(In Use)</span>
                 </button>
               </div>
             </div>

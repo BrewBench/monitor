@@ -268,16 +268,17 @@ $scope.updateABV();
         return pin;
   };
 
-  $scope.pinInUse = function(pin,analog){
+  $scope.pinInUse = function(pin,arduinoId,analog){
     var kettle = _.find($scope.kettles, function(kettle){
       return (
-        (analog && kettle.temp.type=='Thermistor' && kettle.temp.pin==pin) ||
+        (kettle.arduino.id==arduinoId) &&
+        ((analog && kettle.temp.type=='Thermistor' && kettle.temp.pin==pin) ||
         (!analog && kettle.temp.type=='DS18B20' && kettle.temp.pin==pin) ||
         (kettle.temp.type=='PT100' && kettle.temp.pin==pin) ||
         (!analog && kettle.heater.pin==pin) ||
         (!analog && kettle.cooler && kettle.cooler.pin==pin) ||
         (!analog && !kettle.cooler && kettle.pump.pin==pin)
-      );
+      ));
     });
     return kettle || false;
   };
@@ -1062,11 +1063,11 @@ $scope.updateABV();
         }
         var target = ($scope.settings.unit=='F') ? $filter('toCelsius')(kettle.temp.target) : kettle.temp.target;
         var adjust = ($scope.settings.unit=='F' && kettle.temp.adjust != 0) ? Math.round(kettle.temp.adjust*0.555) : kettle.temp.adjust;
-        if(kettle.temp.type.indexOf('DHT') !== -1){
+        if(kettle.temp.type.indexOf('DHT') !== -1 && currentSketch.headers.indexOf('#include <dht.h>') === -1){
           currentSketch.headers.push('// https://www.brewbench.co/libs/DHTLib.zip');
           currentSketch.headers.push('#include <dht.h>');
         }
-        else if(kettle.temp.type.indexOf('DS18B20') !== -1){
+        else if(kettle.temp.type.indexOf('DS18B20') !== -1 && currentSketch.headers.indexOf('#include "cactus_io_DS18B20.h"') === -1){
           currentSketch.headers.push('// https://www.brewbench.co/libs/cactus_io_DS18B20.zip');
           currentSketch.headers.push('#include "cactus_io_DS18B20.h"');
         }
@@ -1117,11 +1118,11 @@ $scope.updateABV();
       }
       var target = ($scope.settings.unit=='F') ? $filter('toCelsius')(kettle.temp.target) : kettle.temp.target;
       var adjust = ($scope.settings.unit=='F' && kettle.temp.adjust != 0) ? Math.round(kettle.temp.adjust*0.555) : kettle.temp.adjust;
-      if(kettle.temp.type.indexOf('DHT') !== -1){
+      if(kettle.temp.type.indexOf('DHT') !== -1 && currentSketch.headers.indexOf('#include <dht.h>') === -1){
         currentSketch.headers.push('// https://www.brewbench.co/libs/DHTLib.zip');
-        currentSketch.headers.push('#include <dht.h>')
+        currentSketch.headers.push('#include <dht.h>');
       }
-      else if(kettle.temp.type.indexOf('DS18B20') !== -1){
+      else if(kettle.temp.type.indexOf('DS18B20') !== -1 && currentSketch.headers.indexOf('#include "cactus_io_DS18B20.h"') === -1){
         currentSketch.headers.push('// https://www.brewbench.co/libs/cactus_io_DS18B20.zip');
         currentSketch.headers.push('#include "cactus_io_DS18B20.h"');
       }
@@ -1448,7 +1449,14 @@ $scope.updateABV();
         allSensors.push(BrewService.temp($scope.kettles[i])
           .then(response => $scope.updateTemp(response, $scope.kettles[i]))
           .catch(err => {
-            $scope.setErrorMessage(err, $scope.kettles[i]);
+            if($scope.kettles[i].error.count)
+              $scope.kettles[i].error.count++;
+            else
+              $scope.kettles[i].error.count=1;              
+            if($scope.kettles[i].error.count == 5){
+              $scope.kettles[i].error.count=0;
+              $scope.setErrorMessage(err, $scope.kettles[i]);
+            }
             return err;
           }));
       }

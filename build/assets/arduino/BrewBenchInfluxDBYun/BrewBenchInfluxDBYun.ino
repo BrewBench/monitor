@@ -4,7 +4,7 @@
 #include <BridgeClient.h>
 // [headers]
 
-const PROGMEM char VERSION[] = "3.2.1";
+const String VERSION = "3.2.2";
 const PROGMEM int FREQUENCY_SECONDS = [FREQUENCY_SECONDS];
 int secondCounter = 0;
 
@@ -81,8 +81,7 @@ void responseOkHeader(BridgeClient client){
   client.println(F("Access-Control-Allow-Origin: *"));
   client.println(F("Access-Control-Allow-Methods: GET"));
   client.println(F("Access-Control-Expose-Headers: X-Sketch-Version"));
-  client.print(F("X-Sketch-Version: "));
-  client.println(VERSION);
+  client.println("X-Sketch-Version: "+VERSION);
   client.println(F("Content-Type: application/json"));
   client.println(F("Connection: close"));
   client.println();
