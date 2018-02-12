@@ -125,8 +125,11 @@ angular.module('brewbench-monitor')
         ,{name: 'DS18B20', analog: false, digital: true}
         ,{name: 'PT100', analog: true, digital: true}
         ,{name: 'DHT11', analog: false, digital: true}
+        ,{name: 'DHT12', analog: false, digital: true}
         ,{name: 'DHT21', analog: false, digital: true}
         ,{name: 'DHT22', analog: false, digital: true}
+        ,{name: 'DHT33', analog: false, digital: true}
+        ,{name: 'DHT44', analog: false, digital: true}
       ];
       if(name)
         return _.filter(sensors, {'name': name})[0];

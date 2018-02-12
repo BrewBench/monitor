@@ -873,7 +873,7 @@ $scope.updateABV();
           .then(response => $scope.updateTemp(response, kettle))
           .catch(err => {
             kettle.error.count++;
-            if(kettle.error.count==2)
+            if(kettle.error.count==7)
               $scope.setErrorMessage(err, kettle);
           });
 
@@ -1452,8 +1452,8 @@ $scope.updateABV();
             if($scope.kettles[i].error.count)
               $scope.kettles[i].error.count++;
             else
-              $scope.kettles[i].error.count=1;              
-            if($scope.kettles[i].error.count == 5){
+              $scope.kettles[i].error.count=1;
+            if($scope.kettles[i].error.count == 7){
               $scope.kettles[i].error.count=0;
               $scope.setErrorMessage(err, $scope.kettles[i]);
             }

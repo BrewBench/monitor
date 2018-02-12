@@ -1,12 +1,16 @@
 # Change Log
 
-## 3.2.3 - 2018-01-16
+## 3.2.3 - 2018-02-12
+
+### Added
+- DHT12, DHT33, DHT44
 
 ### Fixed
 - Duplicate sketch headers for DHT and DS18B20
 - In Use pin for multiple Arduinos
 - Sketch version char bug
 - 500 connection error when running InfluxDB or Auto sketches in the background
+- tempCommand in sketches
 
 ## 3.2.2 - 2018-01-13
 

@@ -4,7 +4,7 @@
 #include <BridgeClient.h>
 // [headers]
 
-const String VERSION = "3.2.2";
+const String VERSION = "3.2.3";
 const PROGMEM int FREQUENCY_SECONDS = [FREQUENCY_SECONDS];
 int secondCounter = 0;
 
@@ -129,8 +129,9 @@ void analogCommand(BridgeClient client) {
 }
 
 void tempCommand(BridgeClient client, const String type) {
-  const String spin = client.readString().substring(0,1);
-  int pin = client.parseInt();
+  String spin = client.readString();
+  spin.trim();
+  int pin = spin.substring(1).toInt();
   float temp = 0.00;
 // DHT  float humidity = 0.00;
 
@@ -172,7 +173,7 @@ void tempCommand(BridgeClient client, const String type) {
   // DHT     humidity = DHT.humidity;
   // DHT   }
   // DHT }
-  String data = "{\"pin\":\""+String(spin)+String(pin)+"\",\"temp\":\""+String(temp)+"\"";
+  String data = "{\"pin\":\""+String(spin)+"\",\"temp\":\""+String(temp)+"\"";
 // DHT  if(humidity) data += ",\"humidity\":\""+String(humidity)+"\"";
   data += "}";
   // Send JSON response to client
