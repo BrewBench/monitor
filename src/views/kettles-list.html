@@ -252,7 +252,7 @@
           <label class="adjust" ng-class="{'cooling':kettle.cooler.running}">Cool
             <sup><a ng-if="kettle.cooler.pin.indexOf('D') === 0" href="" ng-click="togglePWM(kettle.cooler)">PWM ~</a></sup>
           </label>
-          <div class="btn-group">
+          <div class="btn-group pb-3">
             <div class="btn-group">
               <button type="button" class="btn btn-light dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" ng-disabled="kettle.cooler.running">
                 {{ pinDisplay(kettle.cooler.pin) }} <span class="caret"></span>

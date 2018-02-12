@@ -44,6 +44,8 @@ module.exports = {
         minChunks: ({ resource }) => /node_modules/.test(resource)
       }),
 
+      new ExtractTextPlugin('[name].[chunkhash].css'),
+
       // Generate a 'manifest' chunk to be inlined in the HTML template
       new webpack.optimize.CommonsChunkPlugin('manifest'),
 
@@ -64,6 +66,7 @@ module.exports = {
             {from:'src/favicon.ico',to:'favicon.ico'},
             {from:'package.json',to:'package.json'},
             {from:'src/styles/app.css',to:'styles/app.css'},
+            {from: './node_modules/angularjs-slider/dist/rzslider.min.css', to: 'styles/vendor.css'}
         ]),
 
       new webpack.ProvidePlugin({
@@ -118,6 +121,10 @@ module.exports = {
           test: /\.scss$/,
           include: path.resolve('./src/styles'),
           loader: ExtractTextPlugin.extract("style-loader", "css-loader!sass-loader")
+        },
+        {
+          test: /\.css$/,
+          loader: ExtractTextPlugin.extract("style-loader", "css-loader")
         }
       ]
     },

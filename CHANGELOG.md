@@ -11,6 +11,7 @@
 - Sketch version char bug
 - 500 connection error when running InfluxDB or Auto sketches in the background
 - tempCommand in sketches
+- PWM style
 
 ## 3.2.2 - 2018-01-13
 
