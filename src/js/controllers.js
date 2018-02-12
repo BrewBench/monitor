@@ -555,10 +555,7 @@ $scope.updateABV();
     if(!$scope.pkg){
       config.push(BrewService.pkg().then(function(response){
           $scope.pkg = response;
-          $scope.settings.sketch_version = response.sketch_version;
-          if(!$scope.settings.bb_version){
-            $scope.settings.bb_version = response.version;
-          }
+          $scope.settings.sketch_version = response.sketch_version;                 
         })
       );
     }

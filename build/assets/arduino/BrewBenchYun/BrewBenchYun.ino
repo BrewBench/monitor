@@ -7,7 +7,7 @@
 // https://www.brewbench.co/libs/cactus_io_DS18B20.zip
 #include "cactus_io_DS18B20.h"
 
-const String VERSION = "3.2.2";
+const String VERSION = "3.2.3";
 
 BridgeServer server;
 dht DHT;
@@ -130,8 +130,9 @@ void analogCommand(BridgeClient client) {
 }
 
 void tempCommand(BridgeClient client, String type) {
-  const String spin = client.readString().substring(0,1);
-  int pin = client.parseInt();
+  String spin = client.readString();
+  spin.trim();
+  int pin = spin.substring(1).toInt();
   float temp = 0.00;
   float humidity = 0.00;
 
@@ -173,7 +174,7 @@ void tempCommand(BridgeClient client, String type) {
       humidity = DHT.humidity;
     }
   }
-  String data = "{\"pin\":\""+String(spin)+String(pin)+"\",\"temp\":\""+String(temp)+"\"";
+  String data = "{\"pin\":\""+String(spin)+"\",\"temp\":\""+String(temp)+"\"";
   if(humidity)
     data += ",\"humidity\":\""+String(humidity)+"\"}";
   else

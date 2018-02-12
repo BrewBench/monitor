@@ -32,7 +32,7 @@ angular.module('brewbench-monitor')
           secure: false
         }]
         ,tplink: {user: '', pass: '', token:'', plugs: []}
-        ,sketches: {frequency: 60, ignore_version_error: false}
+        ,sketches: {frequency: 60, version: 0, ignore_version_error: false}
       };
     },
 
@@ -211,6 +211,10 @@ angular.module('brewbench-monitor')
             (response.headers('X-Sketch-Version') == null || response.headers('X-Sketch-Version') < settings.sketch_version)){
             q.reject({version: response.headers('X-Sketch-Version')});
           } else {
+            if(settings.sketches.version != response.headers('X-Sketch-Version')){
+              settings.sketches.version = response.headers('X-Sketch-Version');
+              this.settings('settings',settings);
+            }
             q.resolve(response.data);
           }
         })
@@ -239,6 +243,10 @@ angular.module('brewbench-monitor')
             (response.headers('X-Sketch-Version') == null || response.headers('X-Sketch-Version') < settings.sketch_version)){
             q.reject({version: response.headers('X-Sketch-Version')});
           } else {
+            if(settings.sketches.version != response.headers('X-Sketch-Version')){
+              settings.sketches.version = response.headers('X-Sketch-Version');
+              this.settings('settings',settings);
+            }
             q.resolve(response.data);
           }
         })
@@ -265,6 +273,10 @@ angular.module('brewbench-monitor')
             (response.headers('X-Sketch-Version') == null || response.headers('X-Sketch-Version') < settings.sketch_version)){
             q.reject({version: response.headers('X-Sketch-Version')});
           } else {
+            if(settings.sketches.version != response.headers('X-Sketch-Version')){
+              settings.sketches.version = response.headers('X-Sketch-Version');
+              this.settings('settings',settings);
+            }
             q.resolve(response.data);
           }
         })
@@ -291,6 +303,10 @@ angular.module('brewbench-monitor')
             (response.headers('X-Sketch-Version') == null || response.headers('X-Sketch-Version') < settings.sketch_version)){
             q.reject({version: response.headers('X-Sketch-Version')});
           } else {
+            if(settings.sketches.version != response.headers('X-Sketch-Version')){
+              settings.sketches.version = response.headers('X-Sketch-Version');
+              this.settings('settings',settings);
+            }
             q.resolve(response.data);
           }
         })
