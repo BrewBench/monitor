@@ -22,7 +22,7 @@
     <div class="col-auto sticky-layout" ng-if="hasStickyKettles()">
       <ng-include src="'views/kettles-sticky.html'"></ng-include>
     </div>
-    <div class="col">
+    <div class="col pb-3">
       <div class="alert alert-{{error.type}} alert-dismissible" role="alert" ng-if="error.message">
         <button type="button" class="close" data-dismiss="alert" aria-label="Close" ng-click="resetError()"><span aria-hidden="true">&times;</span></button>
         <strong>{{error.type}}</strong> <span ng-bind-html="error.message">{{error.message}}</span>
@@ -35,6 +35,7 @@
         </a>
       </div>
       <nvd3 options="chartOptions" data="kettles" ng-show="settings.chart"></nvd3>
+      <button class="btn btn-light" ng-click="addKettle()">Add Kettle</button>
     </div>
   </div>
   <div class="flex-row" ng-disabled="share.needPassword" ng-class="{'disabled':share.needPassword}">

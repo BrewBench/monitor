@@ -30,11 +30,17 @@
                 <input class="form-control" type="text" ng-model="settings.recipe.name" placeholder="Beer Name">
             </div>
             <div class="col-lg-4 col-sm-6">
+              <label class="adjust">Sketches</label>
               <strong>Current Sketch Version:</strong> {{pkg.sketch_version}}<br>
-              <strong>Your Sketch Version:</strong> {{settings.sketches.version}}<br>
+              <strong>Your Sketch Version:</strong> {{settings.sketches.version}}<br><br>
+              Include these libraries<br>
+              <p>
+                <a href="https://www.brewbench.co/libs/DHTLib.zip">DHT Library</a> <br>
+                <a href="https://www.brewbench.co/libs/cactus_io_DS18B20.zip">DS18B20 Library</a>
+              </p>
               <div class="btn-group">
                 <button type="button" class="btn btn-light dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  Download <span class="caret"></span>
+                  Download Sketch <span class="caret"></span>
                 </button>
                 <div class="dropdown-menu scrollable-menu">
                   <a href="/assets/arduino/BrewBenchYun/BrewBenchYun.ino" class="dropdown-item">Arduino Yun Sketch</a>

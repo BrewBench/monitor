@@ -1,5 +1,10 @@
 # Change Log
 
+## 3.2.4 - 2018-02-17
+
+### Added
+- Library links in the sketch modal
+
 ## 3.2.3 - 2018-02-12
 
 ### Added
