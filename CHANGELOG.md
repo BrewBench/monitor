@@ -1,5 +1,10 @@
 # Change Log
 
+## 3.2.5 - 2018-02-25
+
+### Fixed
+- Sketch digital / analog URL parsing for value
+
 ## 3.2.4 - 2018-02-17
 
 ### Added
