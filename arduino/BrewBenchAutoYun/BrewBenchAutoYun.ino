@@ -4,7 +4,7 @@
 #include <BridgeClient.h>
 // [headers]
 
-const String VERSION = "3.2.3";
+const String VERSION = "3.2.4";
 const PROGMEM int FREQUENCY_SECONDS = [FREQUENCY_SECONDS];
 int secondCounter = 0;
 
@@ -88,36 +88,36 @@ void responseOkHeader(BridgeClient client){
 }
 
 void digitalCommand(BridgeClient client) {
-  char spin = client.read();
-  int pin = client.parseInt();
-  int value;
+  String spin = client.readString();
+  spin.trim();
+  int pin = spin.substring(1,spin.indexOf("/")).toInt();
+  int value = spin.substring(spin.indexOf("/")+1).toInt();
 
-  if (client.readString().substring(0,1) == "/") {
-    //set pin as output
+  if (spin.indexOf("/") != -1) {
     pinMode(pin, OUTPUT);
-    value = client.parseInt();
     if(value == 1)
       digitalWrite(pin, LOW);//turn on relay
     else
       digitalWrite(pin, HIGH);//turn off relay
   }
   else {
+    pinMode(pin, INPUT);
     value = digitalRead(pin);
   }
 
   // Send JSON response to client
-  client.print("{\"pin\":\""+String(spin)+String(pin)+"\",\"value\":\""+String(value)+"\"}");
+  client.print("{\"pin\":\""+spin.substring(0,spin.indexOf("/"))+"\",\"value\":\""+String(value)+"\"}");
 }
 
 // https://www.arduino.cc/en/Reference/AnalogWrite
 void analogCommand(BridgeClient client) {
-  char spin = client.read();
-  int pin = client.parseInt();
-  int value;
+  String spin = client.readString();
+  spin.trim();
+  int pin = spin.substring(1,spin.indexOf("/")).toInt();
+  int value = spin.substring(spin.indexOf("/")+1).toInt();
 
-  if (client.readString().substring(0,1) == "/") {
+  if (spin.indexOf("/") != -1) {
     pinMode(pin, OUTPUT);
-    value = client.parseInt();
     analogWrite(pin, value);//0 - 255
   }
   else {
