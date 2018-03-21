@@ -44,8 +44,9 @@
                 </button>
                 <div class="dropdown-menu scrollable-menu">
                   <a href="/assets/arduino/BrewBenchYun/BrewBenchYun.ino" class="dropdown-item">Arduino Yun Sketch</a>
-                  <a href="" ng-click="downloadAutoSketch()" class="dropdown-item" ng-class="{'disabled': !hasSketches()}">Arduino Yun Auto Sketch <span class="badge badge-pill badge-info">Auto</span></a>
-                  <a href="" ng-click="downloadInfluxDBSketch()" class="dropdown-item" ng-class="{'disabled':!settings.influxdb.connected}">Arduino Yun InfluxDB Sketch <span class="badge badge-pill badge-info">Auto</span></a>
+                  <a href="" ng-click="compileSketch('StreamsYun')" class="dropdown-item" ng-class="{'disabled':settings.streams.status=='Connected'}">Arduino Yun Streams Sketch</a>
+                  <a href="" ng-click="compileSketch('AutoYun')" class="dropdown-item" ng-class="{'disabled': !hasSketches()}">Arduino Yun Auto Sketch <span class="badge badge-pill badge-info">Auto</span></a>
+                  <a href="" ng-click="compileSketch('InfluxDBYun')" class="dropdown-item" ng-class="{'disabled':!settings.influxdb.connected}">Arduino Yun InfluxDB Sketch <span class="badge badge-pill badge-info">Auto</span></a>
                   <hr>
                   <a href="https://grafana.com/dashboards/3960" class="dropdown-item" target="_blank">Grafana Session Dashboard</a>
                   <a href="https://grafana.com/dashboards/3957" class="dropdown-item" target="_blank">Grafana Fermentation Dashboard</a>
@@ -53,6 +54,87 @@
               </div>
             </div>
           </div>
+          <div class="pb-3">
+            <h4>BrewBench Streams
+              <sup class="badge badge-{{ getStatusClass(settings.streams.status) }} badge-pill">
+                {{ settings.streams.status || 'Not Connected'}}
+              </sup>
+              <a href="https://app.brewbench.co" target="_blank">Signup</a>
+              <img src="/assets/img/brewbench-colors.png" class="float-right" width="50" style="margin-top: -20px;">
+            </h4>
+            <div class="row pb-2">
+              <div class="col-6">
+                <label class="adjust">Username</label>
+                <input class="form-control" type="text" ng-model="settings.streams.user" placeholder="Username">
+              </div>
+              <div class="col-6">
+                <label class="adjust">API Key</label>
+                <input class="form-control" type="text" ng-model="settings.streams.api_key" placeholder="API Key">
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-12">
+                <button class="btn btn-primary float-right" ng-click="streamsConnect()" ng-disabled="!settings.streams.user && !settings.streams.api_key">Connect</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="pb-3">
+            <h4>InfluxDB
+              <sup class="badge badge-{{ getStatusClass(settings.influxdb.status) }} badge-pill">
+                {{ settings.influxdb.status || 'Not Connected'}}
+              </sup>
+              <a href="#" ng-click="showInflux=!showInflux;">{{!showInflux ? 'show': 'hide'}}</a>
+              <i class="fa fa-area-chart fa-lg float-right" aria-hidden="true"></i>
+            </h4>
+            <div ng-show="showInflux">
+            <div class="row">
+              <div class="col-9">
+                <label class="adjust">Url</label>
+                <div class="input-group">
+                  <input id="influxdbUrl" class="form-control" type="text" ng-model="settings.influxdb.url" placeholder="http://InfluxDBUrl">
+                  <span class="input-group-btn">
+                    <button class="btn btn-primary" ng-click="testInfluxDB()" ng-disabled="!settings.influxdb.url">Connect</button>
+                  </span>
+                </div>
+              </div>
+              <div class="col-3">
+                <label class="adjust">Port</label>
+                <input class="form-control" style="width: 100%;" type="number" ng-model="settings.influxdb.port">
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-12">
+                <label class="adjust">Database</label>
+                <div class="input-group">
+                  <div class="input-group-btn" ng-if="settings.influxdb.dbs && settings.influxdb.dbs.length">
+                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">DBs</button>
+                    <div class="dropdown-menu">
+                      <a class="dropdown-item" href="" ng-click="settings.influxdb.db=''">Create a new database</a>
+                      <div role="separator" class="dropdown-divider"></div>
+                      <a ng-repeat="db in settings.influxdb.dbs" class="dropdown-item" href="" ng-click="settings.influxdb.db=db">{{db}}</a>
+                    </div>
+                  </div>
+                  <input class="form-control" type="text" ng-model="settings.influxdb.db" placeholder="Database Name">
+                  <span class="input-group-btn">
+                    <button class="btn btn-primary" ng-click="createInfluxDB()" ng-disabled="!settings.influxdb.connected">Create</button>
+                  </span>
+                </div>
+                <small ng-if="settings.influxdb.created" class="badge badge-success">Created</small>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-6">
+                <label class="adjust">Username</label>
+                <input id="influxdbUser" class="form-control" type="text" ng-model="settings.influxdb.user" placeholder="Username">
+              </div>
+              <div class="col-6">
+                <label class="adjust">Password</label>
+                <input id="influxdbPass" class="form-control" type="password" ng-model="settings.influxdb.pass" placeholder="Password">
+              </div>
+            </div>
+          </div>
+        </div>
 
           <div class="row new">
             <table class="table table-striped table-responsive">

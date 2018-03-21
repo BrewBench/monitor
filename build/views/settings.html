@@ -115,7 +115,7 @@
             <img src="/assets/img/arduino.svg" width="32" class="float-right">
           </h4>
 
-          <a href="" class="btn btn-light pull-right" data-dismiss="modal" data-toggle="modal" data-target="#sketchesModal">Sketches</a>
+          <a href="" class="btn btn-light float-right" data-dismiss="modal" data-toggle="modal" data-target="#sketchesModal">Sketches</a>
 
           <div class="row new">
 
@@ -133,12 +133,12 @@
 
         </div>
 
-          <button class="btn btn-primary" ng-click="arduinos.add()">Add Arduino</button>
+          <button class="btn btn-primary float-right" ng-click="arduinos.add()">Add Arduino</button>
           <table class="table table-striped table-responsive">
           <thead class="thead-inverse">
             <tr>
               <th>URL</th>
-              <!-- <th>Password</th> -->
+              <th>Password</th>
               <th>Analog Ports</th>
               <th>Digital Ports</th>
               <th></th>
@@ -155,10 +155,9 @@
                   <input class="form-control" type="text" ng-model="arduino.url" ng-change="arduinos.update(arduino)" placeholder="URL" style="min-width: 200px;">
                 </div>
               </td>
-              <!-- <td class="text-left">
-                <input ng-show="!!arduino.showpass" type="password" ng-model="arduino.password" ng-change="arduino.showpass=false; arduinos.update(arduino)"></input>
-                <a href="" ng-show="!arduino.showpass" ng-click="arduino.showpass=true">*******</a>
-              </td> -->
+              <td class="text-left">
+                <input class="form-control" type="password" ng-model="arduino.password" ng-change="arduinos.update(arduino)"></input>
+              </td>
               <td class="text-left"><input class="form-control" type="number" ng-model="arduino.analog" ng-change="arduinos.update(arduino)"></td>
               <td class="text-left"><input class="form-control" type="number" ng-model="arduino.digital" ng-change="arduinos.update(arduino)"></td>
               <td><a href="" ng-click="arduinos.delete($index, arduino)"><i class="fa fa-trash fa-2x text-danger"></i></a></td>
@@ -168,62 +167,10 @@
         </div>
 
         <div class="pb-3">
-          <h4>InfluxDB
-            <i class="fa fa-area-chart fa-lg float-right" aria-hidden="true"></i>
-          </h4>
-
-          <div class="row">
-            <div class="col-9">
-              <label class="adjust">Url</label>
-              <div class="input-group">
-                <input id="influxdbUrl" class="form-control" type="text" ng-model="settings.influxdb.url" placeholder="http://InfluxDBUrl">
-                <span class="input-group-btn">
-                  <button class="btn btn-light" ng-click="testInfluxDB()" ng-disabled="!settings.influxdb.url">
-                    {{settings.influxdb.connected ? 'Refresh' : 'Connect'}}
-                  </button>
-                </span>
-              </div>
-              <small ng-if="settings.influxdb.connected" class="form-text text-success">Connected</small>
-            </div>
-            <div class="col-3">
-              <label class="adjust">Port</label>
-              <input class="form-control" style="width: 100%;" type="number" ng-model="settings.influxdb.port">
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-12">
-              <label class="adjust">Database</label>
-              <div class="input-group">
-                <div class="input-group-btn" ng-if="settings.influxdb.dbs && settings.influxdb.dbs.length">
-                  <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">DBs</button>
-                  <div class="dropdown-menu">
-                    <a class="dropdown-item" href="" ng-click="settings.influxdb.db=''">Create a new database</a>
-                    <div role="separator" class="dropdown-divider"></div>
-                    <a ng-repeat="db in settings.influxdb.dbs" class="dropdown-item" href="" ng-click="settings.influxdb.db=db">{{db}}</a>
-                  </div>
-                </div>
-                <input class="form-control" type="text" ng-model="settings.influxdb.db" placeholder="Database Name">
-                <span class="input-group-btn">
-                  <button class="btn btn-light" ng-click="createInfluxDB()" ng-disabled="!settings.influxdb.connected">Create</button>
-                </span>
-              </div>
-              <small ng-if="settings.influxdb.created" class="form-text text-success">Created</small>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-6">
-              <label class="adjust">Username</label>
-              <input id="influxdbUser" class="form-control" type="text" ng-model="settings.influxdb.user" placeholder="Username">
-            </div>
-            <div class="col-6">
-              <label class="adjust">Password</label>
-              <input id="influxdbPass" class="form-control" type="password" ng-model="settings.influxdb.pass" placeholder="Password">
-            </div>
-          </div>
-        </div>
-
-        <div class="pb-3">
           <h4>TP-Link
+            <sup class="badge badge-{{ getStatusClass(settings.tplink.status) }} badge-pill">
+              {{ settings.tplink.status || 'Not Connected'}}
+            </sup>
             <i class="fa fa-plug fa-lg float-right" aria-hidden="true"></i>
           </h4>
           <div class="row">
@@ -236,10 +183,9 @@
               <input class="form-control" type="password" ng-model="settings.tplink.pass" placeholder="Password">
             </div>
           </div>
-          <small ng-if="settings.tplink.token" class="form-text text-success float-left">Connected</small>
-          <div class="btn-group">
+          <div class="btn-group float-right">
             <button ng-if="settings.tplink.token" class="btn btn-light" style="margin-top: 5px;" ng-click="tplink.scan()">Scan</button>
-            <button class="btn btn-primary" style="margin-top: 5px;" ng-click="tplink.login()">Login</button>
+            <button class="btn btn-primary" style="margin-top: 5px;" ng-click="tplink.login()">Connect</button>
           </div>
           <table class="table table-striped table-responsive tplinks">
             <thead class="thead-inverse">

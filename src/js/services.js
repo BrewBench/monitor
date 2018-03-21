@@ -23,7 +23,7 @@ angular.module('brewbench-monitor')
         ,notifications: {on:true,timers:true,high:true,low:true,target:true,slack:'',last:''}
         ,sounds: {on:true,alert:'/assets/audio/bike.mp3',timer:'/assets/audio/school.mp3'}
         ,account: {apiKey: '', sessions: []}
-        ,influxdb: {url: '', port: 8086, user: '', pass: '', db: '', dbs:[], connected: false}
+        ,influxdb: {url: '', port: 8086, user: '', pass: '', db: '', dbs:[], status: ''}
         ,arduinos: [{
           id: btoa('brewbench'),
           url: 'arduino.local',
@@ -31,8 +31,9 @@ angular.module('brewbench-monitor')
           digital: 13,
           secure: false
         }]
-        ,tplink: {user: '', pass: '', token:'', plugs: []}
+        ,tplink: {user: '', pass: '', token:'', status: '', plugs: []}
         ,sketches: {frequency: 60, version: 0, ignore_version_error: false}
+        ,streams: {username: '', api_key: '', status: ''}
       };
     },
 
@@ -199,12 +200,14 @@ angular.module('brewbench-monitor')
       var q = $q.defer();
       var url = this.domain(kettle.arduino)+'/arduino/'+kettle.temp.type+'/'+kettle.temp.pin;
       var settings = this.settings('settings');
-      var headers = {};
+      var request = {url: url, method: 'GET', timeout: settings.pollSeconds*10000};
 
-      if(kettle.arduino.password)
-        headers.Authorization = 'Basic '+btoa('root:'+kettle.arduino.password);
+      if(kettle.arduino.password){
+        request.withCredentials = true;
+        request.headers = {'Authorization': 'Basic '+btoa('root:'+kettle.arduino.password)};
+      }
 
-      $http({url: url, method: 'GET', headers: headers, timeout: settings.pollSeconds*10000})
+      $http(request)
         .then(response => {
           if(!settings.shared &&
             !settings.sketches.ignore_version_error &&
@@ -231,12 +234,14 @@ angular.module('brewbench-monitor')
       var q = $q.defer();
       var url = this.domain(kettle.arduino)+'/arduino/digital/'+sensor+'/'+value;
       var settings = this.settings('settings');
-      var headers = {};
+      var request = {url: url, method: 'GET', timeout: settings.pollSeconds*10000};
 
-      if(kettle.arduino.password)
-        headers.Authorization = 'Basic '+btoa('root:'+kettle.arduino.password);
+      if(kettle.arduino.password){
+        request.withCredentials = true;
+        request.headers = {'Authorization': 'Basic '+btoa('root:'+kettle.arduino.password)};
+      }
 
-      $http({url: url, method: 'GET', headers: headers, timeout: settings.pollSeconds*1000})
+      $http(request)
         .then(response => {
           if(!settings.shared &&
             !settings.sketches.ignore_version_error &&
@@ -261,12 +266,14 @@ angular.module('brewbench-monitor')
       var q = $q.defer();
       var url = this.domain(kettle.arduino)+'/arduino/analog/'+sensor+'/'+value;
       var settings = this.settings('settings');
-      var headers = {};
+      var request = {url: url, method: 'GET', timeout: settings.pollSeconds*10000};
 
-      if(kettle.arduino.password)
-        headers.Authorization = 'Basic '+btoa('root:'+kettle.arduino.password);
+      if(kettle.arduino.password){
+        request.withCredentials = true;
+        request.headers = {'Authorization': 'Basic '+btoa('root:'+kettle.arduino.password)};
+      }
 
-      $http({url: url, method: 'GET', headers: headers, timeout: settings.pollSeconds*1000})
+      $http(request)
         .then(response => {
           if(!settings.shared &&
             !settings.sketches.ignore_version_error &&
@@ -291,12 +298,14 @@ angular.module('brewbench-monitor')
       var q = $q.defer();
       var url = this.domain(kettle.arduino)+'/arduino/digital/'+sensor;
       var settings = this.settings('settings');
-      var headers = {};
+      var request = {url: url, method: 'GET', timeout: settings.pollSeconds*10000};
 
-      if(kettle.arduino.password)
-        headers.Authorization = 'Basic '+btoa('root:'+kettle.arduino.password);
+      if(kettle.arduino.password){
+        request.withCredentials = true;
+        request.headers = {'Authorization': 'Basic '+btoa('root:'+kettle.arduino.password)};
+      }
 
-      $http({url: url, method: 'GET', headers: headers, timeout: (timeout || settings.pollSeconds*1000)})
+      $http(request)
         .then(response => {
           if(!settings.shared &&
             !settings.sketches.ignore_version_error &&
@@ -542,6 +551,33 @@ angular.module('brewbench-monitor')
         info: (device) => {
           var command = {"system":{"get_sysinfo":null},"emeter":{"get_realtime":null}};
           return this.tplink().command(device, command);
+        }
+      };
+    },
+
+    streams: function(){
+      var q = $q.defer();
+      var settings = this.settings('settings');
+      var url = `https://${settings.streams.user}.streams.brewbench.co/ping`;
+      var request = {url: url, method: 'GET', timeout: settings.pollSeconds*10000};
+
+      if(settings.streams.api_key){
+        request.withCredentials = true;
+        request.headers = {'Authorization': 'Basic '+btoa(settings.streams.user+':'+settings.streams.api_key)};
+      }
+
+      return {
+        ping: () => {
+          $http(request)
+            .then(response => {
+              console.log('response',response)
+              q.resolve(response);
+            })
+            .catch(err => {
+              console.log('err',err)
+              q.reject(err);
+            });
+            return q.promise;
         }
       };
     },

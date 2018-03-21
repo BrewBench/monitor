@@ -140,6 +140,15 @@ $scope.changeScale = function(scale){
   }
 };
 
+$scope.getStatusClass = function(status){
+  if(status == 'Connected')
+    return 'success';
+  else if(_.endsWith(status,'ing'))
+    return 'secondary';
+  else
+    return 'danger';
+}
+
 $scope.updateABV();
 
   $scope.getPortRange = function(number){
@@ -179,21 +188,26 @@ $scope.updateABV();
 
   $scope.tplink = {
     login: () => {
+      $scope.settings.tplink.status = 'Connecting';
       BrewService.tplink().login($scope.settings.tplink.user,$scope.settings.tplink.pass)
         .then(response => {
           if(response.token){
+            $scope.settings.tplink.status = 'Connected';
             $scope.settings.tplink.token = response.token;
             $scope.tplink.scan(response.token);
           }
         })
         .catch(err => {
+          $scope.settings.tplink.status = 'Failed to Connect';
           $scope.setErrorMessage(err.msg || err);
         });
     },
     scan: (token) => {
       $scope.settings.tplink.plugs = [];
+      $scope.settings.tplink.status = 'Scanning';
       BrewService.tplink().scan(token).then(response => {
         if(response.deviceList){
+          $scope.settings.tplink.status = 'Connected';
           $scope.settings.tplink.plugs = response.deviceList;
           // get device info if online (ie. status==1)
           _.each($scope.settings.tplink.plugs, plug => {
@@ -320,14 +334,12 @@ $scope.updateABV();
   };
 
   $scope.testInfluxDB = function(){
-    $scope.settings.influxdb.testing = true;
-    $scope.settings.influxdb.connected = false;
+    $scope.settings.influxdb.status = 'Connecting';
     BrewService.influxdb().ping()
       .then(response => {
-        $scope.settings.influxdb.testing = false;
         if(response.status == 204){
           $('#influxdbUrl').removeClass('is-invalid');
-          $scope.settings.influxdb.connected = true;
+          $scope.settings.influxdb.status = 'Connected';
           //get list of databases
           BrewService.influxdb().dbs()
             .then(response => {
@@ -338,13 +350,25 @@ $scope.updateABV();
             });
         } else {
           $('#influxdbUrl').addClass('is-invalid');
-          $scope.settings.influxdb.connected = false;
+          $scope.settings.influxdb.status = 'Failed to Connect';
         }
       })
       .catch(err => {
         $('#influxdbUrl').addClass('is-invalid');
-        $scope.settings.influxdb.testing = false;
-        $scope.settings.influxdb.connected = false;
+        $scope.settings.influxdb.status = 'Failed to Connect';
+      });
+  };
+
+  $scope.streamsConnect = function(){
+    if(!$scope.settings.streams.user || !$scope.settings.streams.api_key)
+      return;
+    $scope.settings.streams.status = 'Connecting';
+    BrewService.streams().ping()
+      .then(response => {
+        $scope.settings.streams.status = 'Connected';
+      })
+      .catch(err => {
+        $scope.settings.streams.status = 'Failed to Connect';
       });
   };
 
@@ -555,7 +579,7 @@ $scope.updateABV();
     if(!$scope.pkg){
       config.push(BrewService.pkg().then(function(response){
           $scope.pkg = response;
-          $scope.settings.sketch_version = response.sketch_version;                 
+          $scope.settings.sketch_version = response.sketch_version;
         })
       );
     }
@@ -993,111 +1017,7 @@ $scope.updateABV();
     $scope.resetError(kettle);
   };
 
-  function downloadSketch(name, actions, hasTriggers, headers, sketch){
-    // tp link connection
-    var tplink_connection_string = BrewService.tplink().connection();
-    // influx db connection
-    var connection_string = `${$scope.settings.influxdb.url}`;
-    if( !!$scope.settings.influxdb.port )
-      connection_string += `:${$scope.settings.influxdb.port}`;
-    connection_string += '/write?';
-    // add user/pass
-    if(!!$scope.settings.influxdb.user && !!$scope.settings.influxdb.pass)
-      connection_string += `u=${$scope.settings.influxdb.user}&p=${$scope.settings.influxdb.pass}&`
-    // add db
-    connection_string += 'db='+($scope.settings.influxdb.db || 'session-'+moment().format('YYYY-MM-DD'));
-    var autogen = '/* Sketch Auto Generated from http://monitor.brewbench.co on '+moment().format('YYYY-MM-DD HH:MM:SS')+' for '+name+'*/\n';
-    $http.get('assets/arduino/'+sketch+'/'+sketch+'.ino')
-      .then(response => {
-        // replace variables
-        response.data = autogen+response.data
-          .replace('// [actions]', actions.length ? actions.join('\n') : '')
-          .replace('// [headers]', headers.length ? headers.join('\n') : '')
-          .replace('[TPLINK_CONNECTION]', tplink_connection_string)
-          .replace('[SLACK_CONNECTION]', $scope.settings.notifications.slack)
-          .replace('[FREQUENCY_SECONDS]', $scope.settings.sketches.frequency ? parseInt($scope.settings.sketches.frequency,10) : 60);
-        if( sketch.indexOf('InfluxDB') !== -1){
-          response.data = response.data.replace('[INFLUXDB_CONNECTION]', connection_string);
-        }
-        if(headers.indexOf('#include <dht.h>') !== -1){
-          response.data = response.data.replace(/\/\/ DHT /g, '');
-        }
-        if(headers.indexOf('#include "cactus_io_DS18B20.h"') !== -1){
-          response.data = response.data.replace(/\/\/ DS18B20 /g, '');
-        }
-        if(hasTriggers){
-          response.data = response.data.replace(/\/\/ triggers /g, '');
-        }
-        var streamSketch = document.createElement('a');
-        streamSketch.setAttribute('download', sketch+'-'+name+'.ino');
-        streamSketch.setAttribute('href', "data:text/ino;charset=utf-8," + encodeURIComponent(response.data));
-        streamSketch.click();
-      })
-      .catch(err => {
-        $scope.setErrorMessage(`Failed to download sketch ${err.message}`);
-      });
-  }
-
-  $scope.downloadAutoSketch = function(){
-    var sketches = [];
-    var arduinoName = '';
-    _.each($scope.kettles, (kettle, i) => {
-      // reset the actions
-      if((kettle.heater && kettle.heater.sketch) ||
-        (kettle.cooler && kettle.cooler.sketch) ||
-        kettle.notify.dweet
-      ){
-        arduinoName = kettle.arduino.url.replace(/[^a-zA-Z0-9-.]/g, "");
-        var currentSketch = _.find(sketches,{name:arduinoName});
-        if(!currentSketch){
-          sketches.push({
-            name: arduinoName,
-            actions: [],
-            headers: [],
-            triggers: false
-          });
-          currentSketch = _.find(sketches,{name:arduinoName});
-        }
-        var target = ($scope.settings.unit=='F') ? $filter('toCelsius')(kettle.temp.target) : kettle.temp.target;
-        var adjust = ($scope.settings.unit=='F' && kettle.temp.adjust != 0) ? Math.round(kettle.temp.adjust*0.555) : kettle.temp.adjust;
-        if(kettle.temp.type.indexOf('DHT') !== -1 && currentSketch.headers.indexOf('#include <dht.h>') === -1){
-          currentSketch.headers.push('// https://www.brewbench.co/libs/DHTLib.zip');
-          currentSketch.headers.push('#include <dht.h>');
-        }
-        else if(kettle.temp.type.indexOf('DS18B20') !== -1 && currentSketch.headers.indexOf('#include "cactus_io_DS18B20.h"') === -1){
-          currentSketch.headers.push('// https://www.brewbench.co/libs/cactus_io_DS18B20.zip');
-          currentSketch.headers.push('#include "cactus_io_DS18B20.h"');
-        }
-        currentSketch.actions.push('autoCommand("'+kettle.temp.pin+'","'+kettle.temp.type+'",'+adjust+');');
-        //look for triggers
-        if(kettle.heater && kettle.heater.sketch){
-          currentSketch.triggers = true;
-          currentSketch.actions.push('trigger("heat","'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.heater.pin+'",temp,'+target+','+kettle.temp.diff+','+!!kettle.notify.slack+');');
-        }
-        if(kettle.cooler && kettle.cooler.sketch){
-          currentSketch.triggers = true;
-          currentSketch.actions.push('trigger("cool","'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+kettle.cooler.pin+'",temp,'+target+','+kettle.temp.diff+','+!!kettle.notify.slack+');');
-        }
-        if(kettle.notify.dweet){
-          currentSketch.triggers = true;
-          currentSketch.actions.push('dweetAutoCommand("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'","'+$scope.settings.recipe.brewer.name+'","'+$scope.settings.recipe.name+'",temp);');
-        }
-      }
-    });
-    _.each(sketches, (sketch, i) => {
-      if(sketch.triggers){
-        sketch.actions.unshift('float temp = 0.00;')
-        // update autoCommand
-        for(var a = 0; a < sketch.actions.length; a++){
-          if(sketches[i].actions[a].indexOf('autoCommand(') !== -1)
-            sketches[i].actions[a] = sketches[i].actions[a].replace('autoCommand(','temp = autoCommand(')
-        }
-      }
-      downloadSketch(sketch.name, sketch.actions, sketch.triggers, sketch.headers, 'BrewBenchAutoYun');
-    });
-  };
-
-  $scope.downloadInfluxDBSketch = function(){
+  $scope.compileSketch = function(sketchName){
     if(!$scope.settings.influxdb.url) return;
     var sketches = [];
     var arduinoName = '';
@@ -1123,7 +1043,7 @@ $scope.updateABV();
         currentSketch.headers.push('// https://www.brewbench.co/libs/cactus_io_DS18B20.zip');
         currentSketch.headers.push('#include "cactus_io_DS18B20.h"');
       }
-      currentSketch.actions.push('influxDBCommand(F("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'"),F("'+kettle.temp.pin+'"),F("'+kettle.temp.type+'"),'+adjust+');');
+      currentSketch.actions.push('actionsCommand(F("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'"),F("'+kettle.temp.pin+'"),F("'+kettle.temp.type+'"),'+adjust+');');
       //look for triggers
       if(kettle.heater && kettle.heater.sketch){
         currentSketch.triggers = true;
@@ -1143,13 +1063,63 @@ $scope.updateABV();
         sketch.actions.unshift('float temp = 0.00;')
         // update autoCommand
         for(var a = 0; a < sketch.actions.length; a++){
-          if(sketches[i].actions[a].indexOf('influxDBCommand(') !== -1)
-            sketches[i].actions[a] = sketches[i].actions[a].replace('influxDBCommand(','temp = influxDBCommand(')
+          if(sketches[i].actions[a].indexOf('actionsCommand(') !== -1)
+            sketches[i].actions[a] = sketches[i].actions[a].replace('actionsCommand(','temp = actionsCommand(')
         }
       }
-      downloadSketch(sketch.name, sketch.actions, sketch.triggers, sketch.headers, 'BrewBenchInfluxDBYun');
+      downloadSketch(sketch.name, sketch.actions, sketch.triggers, sketch.headers, 'BrewBench'+sketchName);
     });
   };
+
+  function downloadSketch(name, actions, hasTriggers, headers, sketch){
+    // tp link connection
+    var tplink_connection_string = BrewService.tplink().connection();
+    var autogen = '/* Sketch Auto Generated from http://monitor.brewbench.co on '+moment().format('YYYY-MM-DD HH:MM:SS')+' for '+name+'*/\n';
+    $http.get('assets/arduino/'+sketch+'/'+sketch+'.ino')
+      .then(response => {
+        // replace variables
+        response.data = autogen+response.data
+          .replace('// [actions]', actions.length ? actions.join('\n') : '')
+          .replace('// [headers]', headers.length ? headers.join('\n') : '')
+          .replace('[TPLINK_CONNECTION]', tplink_connection_string)
+          .replace('[SLACK_CONNECTION]', $scope.settings.notifications.slack)
+          .replace('[FREQUENCY_SECONDS]', $scope.settings.sketches.frequency ? parseInt($scope.settings.sketches.frequency,10) : 60);
+        if( sketch.indexOf('Streams') !== -1){
+          // influx db connection
+          var connection_string = `https://${$scope.settings.streams.user}.streams.brewbench.co/api`;
+          response.data = response.data.replace('[PROXY_CONNECTION]', connection_string);
+          response.data = response.data.replace('[PROXY_AUTH]', 'Authorization: Basic '+btoa($scope.settings.streams.user+':'+$scope.settings.streams.api_key));
+        } if( sketch.indexOf('InfluxDB') !== -1){
+          // influx db connection
+          var connection_string = `${$scope.settings.influxdb.url}`;
+          if( !!$scope.settings.influxdb.port )
+            connection_string += `:${$scope.settings.influxdb.port}`;
+          connection_string += '/write?';
+          // add user/pass
+          if(!!$scope.settings.influxdb.user && !!$scope.settings.influxdb.pass)
+            connection_string += `u=${$scope.settings.influxdb.user}&p=${$scope.settings.influxdb.pass}&`
+          // add db
+          connection_string += 'db='+($scope.settings.influxdb.db || 'session-'+moment().format('YYYY-MM-DD'));
+          response.data = response.data.replace('[PROXY_CONNECTION]', connection_string);
+        }
+        if(headers.indexOf('#include <dht.h>') !== -1){
+          response.data = response.data.replace(/\/\/ DHT /g, '');
+        }
+        if(headers.indexOf('#include "cactus_io_DS18B20.h"') !== -1){
+          response.data = response.data.replace(/\/\/ DS18B20 /g, '');
+        }
+        if(hasTriggers){
+          response.data = response.data.replace(/\/\/ triggers /g, '');
+        }
+        var streamSketch = document.createElement('a');
+        streamSketch.setAttribute('download', sketch+'-'+name+'.ino');
+        streamSketch.setAttribute('href', "data:text/ino;charset=utf-8," + encodeURIComponent(response.data));
+        streamSketch.click();
+      })
+      .catch(err => {
+        $scope.setErrorMessage(`Failed to download sketch ${err.message}`);
+      });
+  }
 
   $scope.getIPAddress = function(){
     $scope.settings.ipAddress = "";

@@ -4,7 +4,7 @@
 #include <BridgeClient.h>
 // [headers]
 
-const String VERSION = "3.2.4";
+const String VERSION = "3.3.0";
 const PROGMEM int FREQUENCY_SECONDS = [FREQUENCY_SECONDS];
 int secondCounter = 0;
 
@@ -234,7 +234,7 @@ void postData(String connection, String data, String dataType, String contentTyp
 // triggers   postData(F("[TPLINK_CONNECTION]"), data, "", F("Content-Type: application/json"));
 // triggers }
 
-float autoCommand(String spin, String type, int adjustTemp) {
+float actionsCommand(String spin, String type, int adjustTemp) {
   float temp = 0.00;
   // DHT float humidity = 0.00;
   int pin = spin.substring(1).toInt();

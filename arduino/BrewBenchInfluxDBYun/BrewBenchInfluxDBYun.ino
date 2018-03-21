@@ -4,7 +4,7 @@
 #include <BridgeClient.h>
 // [headers]
 
-const String VERSION = "3.2.4";
+const String VERSION = "3.3.0";
 const PROGMEM int FREQUENCY_SECONDS = [FREQUENCY_SECONDS];
 int secondCounter = 0;
 
@@ -235,7 +235,7 @@ void postData(const String &connection, const String &data, const String &dataTy
 // triggers   postData(F("[TPLINK_CONNECTION]"), data, "", F("Content-Type: application/json"));
 // triggers }
 
-float influxDBCommand(const String &source, const String &spin, const String &type, const int &adjustTemp) {
+float actionsCommand(const String &source, const String &spin, const String &type, const int &adjustTemp) {
   float temp = 0.00;
 // DHT  float humidity = 0.00;
   int pin = spin.substring(1).toInt();

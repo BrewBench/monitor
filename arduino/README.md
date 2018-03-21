@@ -1,5 +1,7 @@
 # BrewBench Monitor Arduino Sketches
 
+You can download sketches from the [monitor](http://monitor.brewbench.co)
+
 ## Setup the Arduino
 
 ### Choose a Temperature Sensor
@@ -46,16 +48,27 @@
 
 ## Arduino Boards
 
-1. Power up and connect to the default IP http://192.168.240.1
-1. Set the digital pin or analog pin depending on which temp sensor you're using.
-1. Press play, you can adjust the temp by sliding the temp knob.
-1. Download the [Arduino IDE](https://www.arduino.cc/en/Main/Software) >= 1.8.5
+Download the [Arduino IDE](https://www.arduino.cc/en/Main/Software) >= 1.8.5
 
 ### Arduino Yun
-  * If the WiFi network starts with Arduino use password: arduino
+  * Connect to the WiFi network starts with `Arduino Yun-`
+  * Open http://192.168.240.1 in your browser
+  * Default Password: `arduino`
   * Set REST API access to open
     * you can password protect the REST API but will need to update the [sketch](BrewBenchYun/BrewBenchYun.ino)
   * Change or remember the host name or IP address (you will need this later)
+  * Connect to your WiFi
+  * Save to reboot
+  * Using the [Arduino IDE](https://www.arduino.cc/en/Main/Software) upload the [BrewBenchYun sketch](BrewBenchYun/BrewBenchYun.ino)
+
+### Seeeduino
+  * Connect to the WiFi network starts with `SeeeduinoCloud-`
+  * Open http://192.168.240.1 in your browser
+  * Default Password: `seeeduino`
+  * Set REST API access to open
+    * you can password protect the REST API but will need to update the [sketch](BrewBenchYun/BrewBenchYun.ino)
+  * Change or remember the host name or IP address (you will need this later)
+  * Connect to your WiFi
   * Save to reboot
   * Using the [Arduino IDE](https://www.arduino.cc/en/Main/Software) upload the [BrewBenchYun sketch](BrewBenchYun/BrewBenchYun.ino)
 
@@ -64,8 +77,7 @@
 
     * http://wiki.dragino.com/index.php?title=Getting_Start_with_Arduino_Yun#Automatically_Add_Board_Profile_in_Arduino_IDE
 
-
-### Setup with Home Assistant
+## Home Assistant
 This is a cool option for monitoring, check out https://home-assistant.io
 
 Depending on which sensor and pin you are using you would setup the resource in the format, `http://<arduino Domain or IP>/arduino/<sensor>/<pin>`
@@ -89,7 +101,7 @@ Then add this to your `/home/user/.homeassistant/configuration.yaml`
       value_template: "{{ ((float(value_json.temp) * 9 / 5 )  +  32) | round(1) }}"
 ```
 
-### Setup with InfluxDB
+### Setup with InfluxDB & Grafana
 
 Use the [InfluxDB]() sketch, download from the app and it will create the kettles you have connected.  Then use docker and  [Grafana](https://grafana.com/grafana/download?platform=docker) for graphs.
 
