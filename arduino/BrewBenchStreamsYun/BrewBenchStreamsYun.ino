@@ -180,7 +180,7 @@ void tempCommand(BridgeClient client, const String type) {
   client.print(data);
 }
 
-void postData(const String &connection, const String &data, const String &dataType, const String &contentType, const string &additionalHeader){
+void postData(const String &connection, const String &data, const String &dataType, const String &contentType, const String &additionalHeader){
   Process p;
   p.begin(F("curl"));
   p.addParameter(F("-k"));

@@ -44,7 +44,7 @@
                 </button>
                 <div class="dropdown-menu scrollable-menu">
                   <a href="/assets/arduino/BrewBenchYun/BrewBenchYun.ino" class="dropdown-item">Arduino Yun Sketch</a>
-                  <a href="" ng-click="compileSketch('StreamsYun')" class="dropdown-item" ng-class="{'disabled':settings.streams.status=='Connected'}">Arduino Yun Streams Sketch</a>
+                  <a href="" ng-click="compileSketch('StreamsYun')" class="dropdown-item" ng-class="{'disabled':settings.streams.status!='Connected'}">Arduino Yun Streams Sketch</a>
                   <a href="" ng-click="compileSketch('AutoYun')" class="dropdown-item" ng-class="{'disabled': !hasSketches()}">Arduino Yun Auto Sketch <span class="badge badge-pill badge-info">Auto</span></a>
                   <a href="" ng-click="compileSketch('InfluxDBYun')" class="dropdown-item" ng-class="{'disabled':!settings.influxdb.connected}">Arduino Yun InfluxDB Sketch <span class="badge badge-pill badge-info">Auto</span></a>
                   <hr>
@@ -59,7 +59,8 @@
               <sup class="badge badge-{{ getStatusClass(settings.streams.status) }} badge-pill">
                 {{ settings.streams.status || 'Not Connected'}}
               </sup>
-              <a href="https://app.brewbench.co" target="_blank">Signup</a>
+              <a href="https://app.brewbench.co" target="_blank" ng-if="settings.streams.status != 'Connected'">signup</a>
+              <a href="https://app.brewbench.co/dashboard/{{ settings.streams.api_key }}" target="_blank" ng-if="settings.streams.status == 'Connected'">dashboard</a>
               <img src="/assets/img/brewbench-colors.png" class="float-right" width="50" style="margin-top: -20px;">
             </h4>
             <div class="row pb-2">
