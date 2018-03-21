@@ -1017,6 +1017,14 @@ $scope.updateABV();
     $scope.resetError(kettle);
   };
 
+  $scope.arduinoList = function(){
+    var list = [];
+    _.each($scope.kettles, (kettle, i) => {
+      list.push(kettle.arduino.url.replace(/[^a-zA-Z0-9-.]/g, ""));
+    });
+    return list;
+  };
+
   $scope.compileSketch = function(sketchName){
     if(!$scope.settings.influxdb.url) return;
     var sketches = [];
@@ -1085,8 +1093,8 @@ $scope.updateABV();
           .replace('[SLACK_CONNECTION]', $scope.settings.notifications.slack)
           .replace('[FREQUENCY_SECONDS]', $scope.settings.sketches.frequency ? parseInt($scope.settings.sketches.frequency,10) : 60);
         if( sketch.indexOf('Streams') !== -1){
-          // influx db connection
-          var connection_string = `https://${$scope.settings.streams.user}.streams.brewbench.co/api`;
+          // streams connection
+          var connection_string = `https://${$scope.settings.streams.user}.streams.brewbench.co/bbp`;
           response.data = response.data.replace('[PROXY_CONNECTION]', connection_string);
           response.data = response.data.replace('[PROXY_AUTH]', 'Authorization: Basic '+btoa($scope.settings.streams.user+':'+$scope.settings.streams.api_key));
         } if( sketch.indexOf('InfluxDB') !== -1){

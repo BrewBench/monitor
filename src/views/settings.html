@@ -25,20 +25,21 @@
 
         <div class="pb-3">
           <h4>General</h4>
-
-          <div class="row">
-            <div class="col-6">
-              <label class="adjust">Temperature</label>
-              <div class="input-group" role="group">
-                <input id="celsius" class="degree" type="radio" ng-checked="settings.unit=='C'" value="C" ng-click="changeUnits('C')"> <label for="celsius">&deg;C</label>&nbsp;&nbsp;
-                <input id="fahrenheit" class="degree" type="radio" ng-checked="settings.unit=='F'" value="F" ng-click="changeUnits('F')"> <label for="fahrenheit">&deg;F</label>
+          <div class="block-border">
+            <div class="row">
+              <div class="col-6">
+                <label class="adjust">Temperature</label>
+                <div class="input-group" role="group">
+                  <input id="celsius" class="degree" type="radio" ng-checked="settings.unit=='C'" value="C" ng-click="changeUnits('C')"> <label for="celsius">&deg;C</label>&nbsp;&nbsp;
+                  <input id="fahrenheit" class="degree" type="radio" ng-checked="settings.unit=='F'" value="F" ng-click="changeUnits('F')"> <label for="fahrenheit">&deg;F</label>
+                </div>
               </div>
-            </div>
-            <div class="col-6">
-              <label class="adjust">Layout</label>
-              <div class="input-group" role="group">
-                <input id="list" class="degree" type="radio" ng-checked="settings.layout=='list'" value="list" ng-click="settings.layout='list'"> <label for="list">List</label>&nbsp;&nbsp;
-                <input id="card" class="degree" type="radio" ng-checked="settings.layout=='card'" value="card" ng-click="settings.layout='card'"> <label for="card">Card</label>
+              <div class="col-6">
+                <label class="adjust">Layout</label>
+                <div class="input-group" role="group">
+                  <input id="list" class="degree" type="radio" ng-checked="settings.layout=='list'" value="list" ng-click="settings.layout='list'"> <label for="list">List</label>&nbsp;&nbsp;
+                  <input id="card" class="degree" type="radio" ng-checked="settings.layout=='card'" value="card" ng-click="settings.layout='card'"> <label for="card">Card</label>
+                </div>
               </div>
             </div>
           </div>
@@ -48,50 +49,51 @@
           <h4>Notifications
             <i class="fa fa-bell fa-lg float-right" aria-hidden="true"></i>
           </h4>
+          <div class="block-border">
+            <button class="btn btn-primary float-right" ng-click="alert()" ng-disabled="!settings.notifications.on">Test</button>
 
-          <button class="btn btn-primary float-right" ng-click="alert()" ng-disabled="!settings.notifications.on">Test</button>
+            <ul class="tg-list">
+              <li class="tg-list-item">
+                <span>{{settings.notifications.on?'On':'Off'}}</span>
+                <input class="tgl tgl-ios" id="notifications" type="checkbox" ng-checked="settings.notifications.on" ng-click="settings.notifications.on = !settings.notifications.on"/>
+                <label class="tgl-btn" for="notifications"></label>
+              </li>
+            </ul>
+            <ul class="tg-list">
+              <li class="tg-list-item">
+                <span>Sounds</span>
+                <input class="tgl tgl-ios" id="sounds" type="checkbox" ng-checked="settings.notifications.on && settings.sounds.on" ng-disabled="!settings.notifications.on" ng-click="settings.sounds.on = !settings.sounds.on"/>
+                <label class="tgl-btn" for="sounds"></label>
+              </li>
+              <li class="tg-list-item">
+                <span>Timers</span>
+                <input class="tgl tgl-ios" id="timers" type="checkbox" ng-checked="settings.notifications.on && settings.notifications.timers" ng-disabled="!settings.notifications.on" ng-click="settings.notifications.timers = !settings.notifications.timers"/>
+                <label class="tgl-btn" for="timers"></label>
+              </li>
+              <li class="tg-list-item">
+                <span>High</span>
+                <input class="tgl tgl-ios" id="high" type="checkbox" ng-checked="settings.notifications.on && settings.notifications.high" ng-disabled="!settings.notifications.on" ng-click="settings.notifications.high = !settings.notifications.high"/>
+                <label class="tgl-btn" for="high"></label>
+              </li>
+              <li class="tg-list-item">
+                <span>Low</span>
+                <input class="tgl tgl-ios" id="low" type="checkbox" ng-checked="settings.notifications.on && settings.notifications.low" ng-disabled="!settings.notifications.on" ng-click="settings.notifications.low = !settings.notifications.low"/>
+                <label class="tgl-btn" for="low"></label>
+              </li>
+              <li class="tg-list-item">
+                <span>Target</span>
+                <input class="tgl tgl-ios" id="target" type="checkbox" ng-checked="settings.notifications.on && settings.notifications.target" ng-disabled="!settings.notifications.on" ng-click="settings.notifications.target = !settings.notifications.target"/>
+                <label class="tgl-btn" for="target"></label>
+              </li>
+            </ul>
 
-          <ul class="tg-list">
-            <li class="tg-list-item">
-              <span>{{settings.notifications.on?'On':'Off'}}</span>
-              <input class="tgl tgl-ios" id="notifications" type="checkbox" ng-checked="settings.notifications.on" ng-click="settings.notifications.on = !settings.notifications.on"/>
-              <label class="tgl-btn" for="notifications"></label>
-            </li>
-          </ul>
-          <ul class="tg-list">
-            <li class="tg-list-item">
-              <span>Sounds</span>
-              <input class="tgl tgl-ios" id="sounds" type="checkbox" ng-checked="settings.notifications.on && settings.sounds.on" ng-disabled="!settings.notifications.on" ng-click="settings.sounds.on = !settings.sounds.on"/>
-              <label class="tgl-btn" for="sounds"></label>
-            </li>
-            <li class="tg-list-item">
-              <span>Timers</span>
-              <input class="tgl tgl-ios" id="timers" type="checkbox" ng-checked="settings.notifications.on && settings.notifications.timers" ng-disabled="!settings.notifications.on" ng-click="settings.notifications.timers = !settings.notifications.timers"/>
-              <label class="tgl-btn" for="timers"></label>
-            </li>
-            <li class="tg-list-item">
-              <span>High</span>
-              <input class="tgl tgl-ios" id="high" type="checkbox" ng-checked="settings.notifications.on && settings.notifications.high" ng-disabled="!settings.notifications.on" ng-click="settings.notifications.high = !settings.notifications.high"/>
-              <label class="tgl-btn" for="high"></label>
-            </li>
-            <li class="tg-list-item">
-              <span>Low</span>
-              <input class="tgl tgl-ios" id="low" type="checkbox" ng-checked="settings.notifications.on && settings.notifications.low" ng-disabled="!settings.notifications.on" ng-click="settings.notifications.low = !settings.notifications.low"/>
-              <label class="tgl-btn" for="low"></label>
-            </li>
-            <li class="tg-list-item">
-              <span>Target</span>
-              <input class="tgl tgl-ios" id="target" type="checkbox" ng-checked="settings.notifications.on && settings.notifications.target" ng-disabled="!settings.notifications.on" ng-click="settings.notifications.target = !settings.notifications.target"/>
-              <label class="tgl-btn" for="target"></label>
-            </li>
-          </ul>
-
-          <label class="adjust">Slack</label>
-          <div class="input-group">
-            <span class="input-group-addon" style="padding: 0;">
-              <a href="https://api.slack.com/incoming-webhooks" title="https://api.slack.com/incoming-webhooks" target="_blank"><img src="/assets/img/Slack_Mark_Web.png" width="45"></a>
-            </span>
-            <input class="form-control" trim="30" ng-model="settings.notifications.slack" placeholder="Webhook URL">
+            <label class="adjust">Slack</label>
+            <div class="input-group">
+              <span class="input-group-addon" style="padding: 0;">
+                <a href="https://api.slack.com/incoming-webhooks" title="https://api.slack.com/incoming-webhooks" target="_blank"><img src="/assets/img/Slack_Mark_Web.png" width="45"></a>
+              </span>
+              <input class="form-control" trim="30" ng-model="settings.notifications.slack" placeholder="Webhook URL">
+            </div>
           </div>
         </div>
 
@@ -99,13 +101,15 @@
           <h4>Kettles
             <i class="fa fa-cubes fa-lg float-right" aria-hidden="true"></i>
           </h4>
-          <label class="adjust">Add a kettle</label>
-          <div class="btn-group item" ng-repeat="kettle in kettleTypes">
-            <button class="btn btn-light {{kettle.type}}" ng-click="addKettle(kettle.type)">
-              <img ng-if="kettle.type != 'air'" class="type" ng-src="/assets/img/{{kettle.type}}.svg" height="30"/>
-              <i ng-if="kettle.type == 'air'" class="fa fa-thermometer-quarter fa-2x type"></i>
-            </button>
-            <div class="floating ui blue circular label">{{kettleCount(kettle.type)}}</div>
+          <div class="block-border">
+            <label class="adjust">Add a kettle</label>
+            <div class="btn-group item" ng-repeat="kettle in kettleTypes">
+              <button class="btn btn-light {{kettle.type}}" ng-click="addKettle(kettle.type)">
+                <img ng-if="kettle.type != 'air'" class="type" ng-src="/assets/img/{{kettle.type}}.svg" height="30"/>
+                <i ng-if="kettle.type == 'air'" class="fa fa-thermometer-quarter fa-2x type"></i>
+              </button>
+              <div class="floating ui blue circular label">{{kettleCount(kettle.type)}}</div>
+            </div>
           </div>
         </div>
 
@@ -114,105 +118,105 @@
           <h4>Arduinos
             <img src="/assets/img/arduino.svg" width="32" class="float-right">
           </h4>
+          <div class="block-border">
+            <a href="" class="btn btn-light float-right" data-dismiss="modal" data-toggle="modal" data-target="#sketchesModal">Sketches</a>
 
-          <a href="" class="btn btn-light float-right" data-dismiss="modal" data-toggle="modal" data-target="#sketchesModal">Sketches</a>
-
-          <div class="row new">
-
-            <div class="col-4">
-              <label class="adjust">Poll Frequency</label>
-              <div class="input-group">
-                <input class="form-control" type="number" ng-model="settings.pollSeconds" step="1" min="5">
-                <span class="input-group-btn">
-                  <button type="button" class="btn btn-light"><i class="fa fa-minus fa-lg" ng-click="(settings.pollSeconds > 5) ? settings.pollSeconds=settings.pollSeconds-1 : 5"></i></button>
-                  <button type="button" class="btn btn-light"><i class="fa fa-plus fa-lg" ng-click="settings.pollSeconds=settings.pollSeconds+1"></i></button>
-                </span>
+            <div class="row new">
+              <div class="col-4">
+                <label class="adjust">Poll Frequency</label>
+                <div class="input-group">
+                  <input class="form-control" type="number" ng-model="settings.pollSeconds" step="1" min="5">
+                  <span class="input-group-btn">
+                    <button type="button" class="btn btn-light"><i class="fa fa-minus fa-lg" ng-click="(settings.pollSeconds > 5) ? settings.pollSeconds=settings.pollSeconds-1 : 5"></i></button>
+                    <button type="button" class="btn btn-light"><i class="fa fa-plus fa-lg" ng-click="settings.pollSeconds=settings.pollSeconds+1"></i></button>
+                  </span>
+                </div>
+                <small class="form-text text-muted">Every {{settings.pollSeconds}} seconds</small>
               </div>
-              <small class="form-text text-muted">Every {{settings.pollSeconds}} seconds</small>
             </div>
 
-        </div>
-
-          <button class="btn btn-primary float-right" ng-click="arduinos.add()">Add Arduino</button>
-          <table class="table table-striped table-responsive">
-          <thead class="thead-inverse">
-            <tr>
-              <th>URL</th>
-              <th>Password</th>
-              <th>Analog Ports</th>
-              <th>Digital Ports</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr ng-repeat="arduino in settings.arduinos">
-              <td class="text-left">
-                <div class="input-group">
-                  <span class="input-group-btn">
-                    <button class="btn btn-light" ng-show="!arduino.secure" ng-click="arduino.secure=true; arduinos.update(arduino)">http</button>
-                    <button class="btn btn-success" ng-show="arduino.secure" ng-click="arduino.secure=false; arduinos.update(arduino)">https</button>
-                  </span>
-                  <input class="form-control" type="text" ng-model="arduino.url" ng-change="arduinos.update(arduino)" placeholder="URL" style="min-width: 200px;">
-                </div>
-              </td>
-              <td class="text-left">
-                <input class="form-control" type="password" ng-model="arduino.password" ng-change="arduinos.update(arduino)"></input>
-              </td>
-              <td class="text-left"><input class="form-control" type="number" ng-model="arduino.analog" ng-change="arduinos.update(arduino)"></td>
-              <td class="text-left"><input class="form-control" type="number" ng-model="arduino.digital" ng-change="arduinos.update(arduino)"></td>
-              <td><a href="" ng-click="arduinos.delete($index, arduino)"><i class="fa fa-trash fa-2x text-danger"></i></a></td>
-            </tr>
-          </tbody>
-        </table>
+            <button class="btn btn-primary float-right" ng-click="arduinos.add()">Add Arduino</button>
+            <table class="table table-striped table-responsive">
+            <thead class="thead-inverse">
+              <tr>
+                <th>URL</th>
+                <!-- <th>Password</th> -->
+                <th>Analog Ports</th>
+                <th>Digital Ports</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr ng-repeat="arduino in settings.arduinos">
+                <td class="text-left">
+                  <div class="input-group">
+                    <span class="input-group-btn">
+                      <button class="btn btn-light" ng-show="!arduino.secure" ng-click="arduino.secure=true; arduinos.update(arduino)">http</button>
+                      <button class="btn btn-success" ng-show="arduino.secure" ng-click="arduino.secure=false; arduinos.update(arduino)">https</button>
+                    </span>
+                    <input class="form-control" type="text" ng-model="arduino.url" ng-change="arduinos.update(arduino)" placeholder="URL" style="min-width: 200px;">
+                  </div>
+                </td>
+                <!-- <td class="text-left">
+                  <input class="form-control" type="password" ng-model="arduino.password" ng-change="arduinos.update(arduino)"></input>
+                </td> -->
+                <td class="text-left"><input class="form-control" type="number" ng-model="arduino.analog" ng-change="arduinos.update(arduino)"></td>
+                <td class="text-left"><input class="form-control" type="number" ng-model="arduino.digital" ng-change="arduinos.update(arduino)"></td>
+                <td><a href="" ng-click="arduinos.delete($index, arduino)"><i class="fa fa-trash fa-2x text-danger"></i></a></td>
+              </tr>
+            </tbody>
+          </table>
+          </div>
         </div>
 
         <div class="pb-3">
-          <h4>TP-Link
+          <h4>TP-Links
             <sup class="badge badge-{{ getStatusClass(settings.tplink.status) }} badge-pill">
               {{ settings.tplink.status || 'Not Connected'}}
             </sup>
             <i class="fa fa-plug fa-lg float-right" aria-hidden="true"></i>
           </h4>
-          <div class="row">
-            <div class="col-6">
-              <label class="adjust">Email</label>
-              <input class="form-control" type="text" ng-model="settings.tplink.user" placeholder="Email">
+          <div class="block-border">
+            <div class="row">
+              <div class="col-6">
+                <label class="adjust">Email</label>
+                <input class="form-control" type="text" ng-model="settings.tplink.user" placeholder="Email">
+              </div>
+              <div class="col-6">
+                <label class="adjust">Password</label>
+                <input class="form-control" type="password" ng-model="settings.tplink.pass" placeholder="Password">
+              </div>
             </div>
-            <div class="col-6">
-              <label class="adjust">Password</label>
-              <input class="form-control" type="password" ng-model="settings.tplink.pass" placeholder="Password">
+            <div class="btn-group float-right">
+              <button ng-if="settings.tplink.token" class="btn btn-light" style="margin-top: 5px;" ng-click="tplink.scan()">Scan</button>
+              <button class="btn btn-primary" style="margin-top: 5px;" ng-click="tplink.login()">Connect</button>
             </div>
+            <table class="table table-striped table-responsive tplinks">
+              <thead class="thead-inverse">
+                <tr>
+                  <th>Name</th>
+                  <th>Type</th>
+                  <th>Online</th>
+                  <th>Power On/Off</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr ng-repeat="tp in settings.tplink.plugs">
+                  <td>{{ tp.alias }}</td>
+                  <td>{{ tp.deviceModel }}</td>
+                  <td><i class="fa fa-circle fa-lg" ng-class="{'on':!!tp.status, 'off':!tp.status}" aria-hidden="true"></i></td>
+                  <td>
+                    <a href=""
+                      ng-if="!!tp.status"
+                      ng-click="tplink.toggle(tp)"
+                      ng-class="{'on':!!tp.info.relay_state,'off':!tp.info.relay_state}">
+                    <i class="fa fa-power-off fa-lg" ng-class="{'on':!!tp.info.relay_state,'off':!tp.info.relay_state}"></i>
+                    </a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-          <div class="btn-group float-right">
-            <button ng-if="settings.tplink.token" class="btn btn-light" style="margin-top: 5px;" ng-click="tplink.scan()">Scan</button>
-            <button class="btn btn-primary" style="margin-top: 5px;" ng-click="tplink.login()">Connect</button>
-          </div>
-          <table class="table table-striped table-responsive tplinks">
-            <thead class="thead-inverse">
-              <tr>
-                <th>Name</th>
-                <th>Type</th>
-                <th>Online</th>
-                <th>Power On/Off</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr ng-repeat="tp in settings.tplink.plugs">
-                <td>{{ tp.alias }}</td>
-                <td>{{ tp.deviceModel }}</td>
-                <td><i class="fa fa-circle fa-lg" ng-class="{'on':!!tp.status, 'off':!tp.status}" aria-hidden="true"></i></td>
-                <td>
-                  <a href=""
-                    ng-if="!!tp.status"
-                    ng-click="tplink.toggle(tp)"
-                    ng-class="{'on':!!tp.info.relay_state,'off':!tp.info.relay_state}">
-                  <i class="fa fa-power-off fa-lg" ng-class="{'on':!!tp.info.relay_state,'off':!tp.info.relay_state}"></i>
-                  </a>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-
         </div>
       </div>
     </div>

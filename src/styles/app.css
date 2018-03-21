@@ -519,6 +519,13 @@ sup.ref {
   border-bottom: 1px solid #ccc;
   padding: 12px 0 12px 0;
 }
+.settings h4 .badge {
+  font-size: 50%;
+}
+.settings .block-border {
+  border-left: 4px solid #2e6da4;
+  padding-left: 15px;
+}
 .settings ul > li {
   list-style-type: none;
   margin: 4px;

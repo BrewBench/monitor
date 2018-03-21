@@ -1,5 +1,13 @@
 # Change Log
 
+## 3.3.0 - 2018-03-21
+
+### Added
+- [BrewBench Streams](https://app.brewbench.co)
+
+### Updated
+- Cleaned up Arduino and Settings styles
+
 ## 3.2.5 - 2018-02-25
 
 ### Fixed

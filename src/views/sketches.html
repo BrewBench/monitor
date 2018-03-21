@@ -9,51 +9,56 @@
       <div id="sketches">
       <div class="card-body">
         <div class="pb-3">
-          <div class="row new pb-3">
-
-            <div class="col-lg-4 col-sm-6">
-              <label class="adjust">Poll Frequency</label>
-              <div class="input-group">
-                <input class="form-control" type="number" ng-model="settings.sketches.frequency" step="1" min="5">
-                <span class="input-group-btn">
-                  <button type="button" class="btn btn-light"><i class="fa fa-minus fa-lg" ng-click="(settings.sketches.frequency > 5) ? settings.sketches.frequency=settings.sketches.frequency-1 : 5"></i></button>
-                  <button type="button" class="btn btn-light"><i class="fa fa-plus fa-lg" ng-click="settings.sketches.frequency=settings.sketches.frequency+1"></i></button>
-                </span>
+          <h4>
+            Sketch Settings
+          </h4>
+          <div class="block-border">
+            <div class="row new pb-3">
+              <div class="col-lg-4 col-sm-6">
+                <label class="adjust">Poll Frequency</label>
+                <div class="input-group">
+                  <input class="form-control" type="number" ng-model="settings.sketches.frequency" step="1" min="5">
+                  <span class="input-group-btn">
+                    <button type="button" class="btn btn-light"><i class="fa fa-minus fa-lg" ng-click="(settings.sketches.frequency > 5) ? settings.sketches.frequency=settings.sketches.frequency-1 : 5"></i></button>
+                    <button type="button" class="btn btn-light"><i class="fa fa-plus fa-lg" ng-click="settings.sketches.frequency=settings.sketches.frequency+1"></i></button>
+                  </span>
+                </div>
+                <small class="form-text text-muted">Every {{settings.sketches.frequency}} seconds</small>
               </div>
-              <small class="form-text text-muted">Every {{settings.sketches.frequency}} seconds</small>
-            </div>
-            <div class="col-lg-4 col-sm-6 pb-3">
-                <label class="adjust">Brewer</label>
-                <input class="form-control" type="text" ng-model="settings.recipe.brewer.name" placeholder="Brewer">
-                <br/>
-                <label class="adjust">Beer</label>
-                <input class="form-control" type="text" ng-model="settings.recipe.name" placeholder="Beer Name">
-            </div>
-            <div class="col-lg-4 col-sm-6">
-              <label class="adjust">Sketches</label>
-              <strong>Current Sketch Version:</strong> {{pkg.sketch_version}}<br>
-              <strong>Your Sketch Version:</strong> {{settings.sketches.version}}<br><br>
-              Include these libraries<br>
-              <p>
-                <a href="https://www.brewbench.co/libs/DHTLib.zip">DHT Library</a> <br>
-                <a href="https://www.brewbench.co/libs/cactus_io_DS18B20.zip">DS18B20 Library</a>
-              </p>
-              <div class="btn-group">
-                <button type="button" class="btn btn-light dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  Download Sketch <span class="caret"></span>
-                </button>
-                <div class="dropdown-menu scrollable-menu">
-                  <a href="/assets/arduino/BrewBenchYun/BrewBenchYun.ino" class="dropdown-item">Arduino Yun Sketch</a>
-                  <a href="" ng-click="compileSketch('StreamsYun')" class="dropdown-item" ng-class="{'disabled':settings.streams.status!='Connected'}">Arduino Yun Streams Sketch</a>
-                  <a href="" ng-click="compileSketch('AutoYun')" class="dropdown-item" ng-class="{'disabled': !hasSketches()}">Arduino Yun Auto Sketch <span class="badge badge-pill badge-info">Auto</span></a>
-                  <a href="" ng-click="compileSketch('InfluxDBYun')" class="dropdown-item" ng-class="{'disabled':!settings.influxdb.connected}">Arduino Yun InfluxDB Sketch <span class="badge badge-pill badge-info">Auto</span></a>
-                  <hr>
-                  <a href="https://grafana.com/dashboards/3960" class="dropdown-item" target="_blank">Grafana Session Dashboard</a>
-                  <a href="https://grafana.com/dashboards/3957" class="dropdown-item" target="_blank">Grafana Fermentation Dashboard</a>
+              <div class="col-lg-4 col-sm-6 pb-3">
+                  <label class="adjust">Brewer</label>
+                  <input class="form-control" type="text" ng-model="settings.recipe.brewer.name" placeholder="Brewer">
+                  <br/>
+                  <label class="adjust">Beer</label>
+                  <input class="form-control" type="text" ng-model="settings.recipe.name" placeholder="Beer Name">
+              </div>
+              <div class="col-lg-4 col-sm-6">
+                <label class="adjust">Sketches</label>
+                <strong>Current Sketch Version:</strong> {{pkg.sketch_version}}<br>
+                <strong>Your Sketch Version:</strong> {{settings.sketches.version}}<br><br>
+                Include these libraries<br>
+                <p>
+                  <a href="https://www.brewbench.co/libs/DHTLib.zip">DHT Library</a> <br>
+                  <a href="https://www.brewbench.co/libs/cactus_io_DS18B20.zip">DS18B20 Library</a>
+                </p>
+                <div class="btn-group">
+                  <button type="button" class="btn btn-light dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Download Sketch <span class="caret"></span>
+                  </button>
+                  <div class="dropdown-menu scrollable-menu">
+                    <a href="/assets/arduino/BrewBenchYun/BrewBenchYun.ino" class="dropdown-item">Arduino Yun Sketch</a>
+                    <a href="" ng-click="compileSketch('StreamsYun')" class="dropdown-item" ng-class="{'disabled':settings.streams.status!='Connected'}">Arduino Yun Streams Sketch</a>
+                    <a href="" ng-click="compileSketch('AutoYun')" class="dropdown-item" ng-class="{'disabled': !hasSketches()}">Arduino Yun Auto Sketch <span class="badge badge-pill badge-info">Auto</span></a>
+                    <a href="" ng-click="compileSketch('InfluxDBYun')" class="dropdown-item" ng-class="{'disabled':!settings.influxdb.connected}">Arduino Yun InfluxDB Sketch <span class="badge badge-pill badge-info">Auto</span></a>
+                    <hr>
+                    <a href="https://grafana.com/dashboards/3960" class="dropdown-item" target="_blank">Grafana Session Dashboard</a>
+                    <a href="https://grafana.com/dashboards/3957" class="dropdown-item" target="_blank">Grafana Fermentation Dashboard</a>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
+
           <div class="pb-3">
             <h4>BrewBench Streams
               <sup class="badge badge-{{ getStatusClass(settings.streams.status) }} badge-pill">
@@ -61,21 +66,23 @@
               </sup>
               <a href="https://app.brewbench.co" target="_blank" ng-if="settings.streams.status != 'Connected'">signup</a>
               <a href="https://app.brewbench.co/dashboard/{{ settings.streams.api_key }}" target="_blank" ng-if="settings.streams.status == 'Connected'">dashboard</a>
-              <img src="/assets/img/brewbench-colors.png" class="float-right" width="50" style="margin-top: -20px;">
+              <img src="/assets/img/brewbench-colors.png" class="float-right" width="35" style="margin-top: -5px;border-radius: 10px;">
             </h4>
-            <div class="row pb-2">
-              <div class="col-6">
-                <label class="adjust">Username</label>
-                <input class="form-control" type="text" ng-model="settings.streams.user" placeholder="Username">
+            <div class="block-border">
+              <div class="row pb-2">
+                <div class="col-6">
+                  <label class="adjust">Username</label>
+                  <input class="form-control" type="text" ng-model="settings.streams.user" placeholder="Username">
+                </div>
+                <div class="col-6">
+                  <label class="adjust">API Key</label>
+                  <input class="form-control" type="text" ng-model="settings.streams.api_key" placeholder="API Key">
+                </div>
               </div>
-              <div class="col-6">
-                <label class="adjust">API Key</label>
-                <input class="form-control" type="text" ng-model="settings.streams.api_key" placeholder="API Key">
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-12">
-                <button class="btn btn-primary float-right" ng-click="streamsConnect()" ng-disabled="!settings.streams.user && !settings.streams.api_key">Connect</button>
+              <div class="row">
+                <div class="col-12">
+                  <button class="btn btn-primary float-right" ng-click="streamsConnect()" ng-disabled="!settings.streams.user && !settings.streams.api_key">Connect</button>
+                </div>
               </div>
             </div>
           </div>
@@ -86,18 +93,13 @@
                 {{ settings.influxdb.status || 'Not Connected'}}
               </sup>
               <a href="#" ng-click="showInflux=!showInflux;">{{!showInflux ? 'show': 'hide'}}</a>
-              <i class="fa fa-area-chart fa-lg float-right" aria-hidden="true"></i>
+              <img src="/assets/img/influxdb.png" class="float-right" width="35" style="margin-top: -5px;">
             </h4>
-            <div ng-show="showInflux">
+            <div class="block-border" ng-show="showInflux">
             <div class="row">
               <div class="col-9">
                 <label class="adjust">Url</label>
-                <div class="input-group">
-                  <input id="influxdbUrl" class="form-control" type="text" ng-model="settings.influxdb.url" placeholder="http://InfluxDBUrl">
-                  <span class="input-group-btn">
-                    <button class="btn btn-primary" ng-click="testInfluxDB()" ng-disabled="!settings.influxdb.url">Connect</button>
-                  </span>
-                </div>
+                <input id="influxdbUrl" class="form-control" type="text" ng-model="settings.influxdb.url" placeholder="http://InfluxDBUrl">
               </div>
               <div class="col-3">
                 <label class="adjust">Port</label>
@@ -124,7 +126,7 @@
                 <small ng-if="settings.influxdb.created" class="badge badge-success">Created</small>
               </div>
             </div>
-            <div class="row">
+            <div class="row pb-2">
               <div class="col-6">
                 <label class="adjust">Username</label>
                 <input id="influxdbUser" class="form-control" type="text" ng-model="settings.influxdb.user" placeholder="Username">
@@ -134,89 +136,99 @@
                 <input id="influxdbPass" class="form-control" type="password" ng-model="settings.influxdb.pass" placeholder="Password">
               </div>
             </div>
+            <div class="row">
+              <div class="col-12">
+                <button class="btn btn-primary float-right" ng-click="testInfluxDB()" ng-disabled="!settings.influxdb.url">Connect</button>
+              </div>
+            </div>
           </div>
         </div>
-
-          <div class="row new">
-            <table class="table table-striped table-responsive">
-              <thead class="thead-inverse">
-                <tr>
-                  <th>Name</th>
-                  <th>Heat <span class="badge badge-pill badge-info">Auto</span></th>
-                  <th>Cool <span class="badge badge-pill badge-info">Auto</span></th>
-                  <th>Notify</th>
-                  <th>Current</th>
-                  <th>Target</th>
-                  <th>Diff</th>
-                  <th>Adjustment</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr ng-repeat="kettle in kettles track by $index">
-                  <td>
-                    <img ng-if="kettle.type != 'air'" class="type" ng-src="/assets/img/{{kettle.type}}.svg" width="30" height="30"/>
-                    <i ng-if="kettle.type == 'air'" class="fa fa-thermometer-quarter fa-2x type" height="30"></i>
-                    &nbsp;
-                    {{kettle.key}}<br/>
-                    {{kettle.temp.pin}} {{kettle.temp.type}}
-                  </td>
-                  <td>
-                    <span ng-if="kettle.heater && kettle.heater.pin.indexOf('TP-')===0">
-                      <i>Not Supported</i> <br/>
-                      {{pinDisplay(kettle.heater.pin)}}
-                    </span>
-                    <span ng-if="!kettle.heater">
-                      <i>Not Available</i> <br/>
-                    </span>
-                    <ul class="tg-list" ng-if="kettle.heater && kettle.heater.pin.indexOf('TP-')===-1">
-                      <li class="tg-list-item">
-                        <span>{{pinDisplay(kettle.heater.pin)}}</span>
-                        <input class="tgl tgl-ios" id="triggerHeater{{$index}}" type="checkbox"
-                          ng-checked="kettle.heater.sketch"
-                          ng-click="kettle.heater.sketch = !kettle.heater.sketch;"/>
-                        <label class="tgl-btn" for="triggerHeater{{$index}}"></label>
-                      </li>
-                    </ul>
-                  </td>
-                  <td>
-                    <span ng-if="kettle.cooler && kettle.cooler.pin.indexOf('TP-')===0">
-                      <i>Not Supported</i> <br/>
-                      {{pinDisplay(kettle.cooler.pin)}}
-                    </span>
-                    <span ng-if="!kettle.cooler">
-                      <i>Not Available</i> <br/>
-                    </span>
-                    <ul class="tg-list" ng-if="kettle.cooler && kettle.cooler.pin.indexOf('TP-')===-1">
-                      <li class="tg-list-item">
-                        <span>{{pinDisplay(kettle.cooler.pin)}}</span>
-                        <input class="tgl tgl-ios" id="triggerCooler{{$index}}" type="checkbox"
-                          ng-checked="kettle.cooler.sketch"
-                          ng-click="kettle.cooler.sketch = !kettle.cooler.sketch;"/>
-                        <label class="tgl-btn" for="triggerCooler{{$index}}"></label>
-                      </li>
-                    </ul>
-                  </td>
-                  <td>
-                    <ul class="tg-list">
-                      <li class="tg-list-item">
-                        <span>Slack</span>
-                        <input class="tgl tgl-ios" id="slack{{$index}}" type="checkbox" ng-disabled="!settings.notifications.slack" ng-checked="kettle.notify.slack" ng-click="kettle.notify.slack = !kettle.notify.slack"/>
-                        <label class="tgl-btn" for="slack{{$index}}"></label>
-                      </li>
-                      <li class="tg-list-item">
-                        <span>Dweet</span>
-                        <input class="tgl tgl-ios" id="dweet{{$index}}" type="checkbox" ng-checked="kettle.notify.dweet" ng-click="kettle.notify.dweet = !kettle.notify.dweet"/>
-                        <label class="tgl-btn" for="dweet{{$index}}"></label>
-                      </li>
-                    </ul>
-                  </td>
-                  <td>{{kettle.temp.current}}&deg;{{settings.unit}}</td>
-                  <td>{{kettle.temp.target}}&deg;{{settings.unit}}</td>
-                  <td>{{kettle.temp.diff}}&deg;{{settings.unit}}</td>
-                  <td>{{kettle.temp.adjust}}&deg;{{settings.unit}}</td>
-                </tr>
-              </tbody>
-            </table>
+        <div class="pb-3">
+          <h4>
+            Kettles
+          </h4>
+          <div class="block-border">
+              <table class="table table-striped table-responsive">
+                <thead class="thead-inverse">
+                  <tr>
+                    <th>Name</th>
+                    <th>Heat <span class="badge badge-pill badge-info">Auto</span></th>
+                    <th>Cool <span class="badge badge-pill badge-info">Auto</span></th>
+                    <th>Notify</th>
+                    <th>Current</th>
+                    <th>Target</th>
+                    <th>Diff</th>
+                    <th>Adjustment</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr ng-repeat="kettle in kettles track by $index">
+                    <td>
+                      <img ng-if="kettle.type != 'air'" class="type" ng-src="/assets/img/{{kettle.type}}.svg" width="30" height="30"/>
+                      <i ng-if="kettle.type == 'air'" class="fa fa-thermometer-quarter fa-2x type" height="30"></i>
+                      &nbsp;
+                      <strong>{{kettle.key}}</strong><br/>
+                      {{kettle.temp.pin}} {{kettle.temp.type}}<br/>
+                      <img src="assets/img/arduino.svg" width="15">&nbsp;{{ kettle.arduino.url }}
+                    </td>
+                    <td>
+                      <span ng-if="kettle.heater && kettle.heater.pin.indexOf('TP-')===0">
+                        <i>Not Supported</i> <br/>
+                        {{pinDisplay(kettle.heater.pin)}}
+                      </span>
+                      <span ng-if="!kettle.heater">
+                        <i>Not Available</i> <br/>
+                      </span>
+                      <ul class="tg-list" ng-if="kettle.heater && kettle.heater.pin.indexOf('TP-')===-1">
+                        <li class="tg-list-item">
+                          <span>{{pinDisplay(kettle.heater.pin)}}</span>
+                          <input class="tgl tgl-ios" id="triggerHeater{{$index}}" type="checkbox"
+                            ng-checked="kettle.heater.sketch"
+                            ng-click="kettle.heater.sketch = !kettle.heater.sketch;"/>
+                          <label class="tgl-btn" for="triggerHeater{{$index}}"></label>
+                        </li>
+                      </ul>
+                    </td>
+                    <td>
+                      <span ng-if="kettle.cooler && kettle.cooler.pin.indexOf('TP-')===0">
+                        <i>Not Supported</i> <br/>
+                        {{pinDisplay(kettle.cooler.pin)}}
+                      </span>
+                      <span ng-if="!kettle.cooler">
+                        <i>Not Available</i> <br/>
+                      </span>
+                      <ul class="tg-list" ng-if="kettle.cooler && kettle.cooler.pin.indexOf('TP-')===-1">
+                        <li class="tg-list-item">
+                          <span>{{pinDisplay(kettle.cooler.pin)}}</span>
+                          <input class="tgl tgl-ios" id="triggerCooler{{$index}}" type="checkbox"
+                            ng-checked="kettle.cooler.sketch"
+                            ng-click="kettle.cooler.sketch = !kettle.cooler.sketch;"/>
+                          <label class="tgl-btn" for="triggerCooler{{$index}}"></label>
+                        </li>
+                      </ul>
+                    </td>
+                    <td>
+                      <ul class="tg-list">
+                        <li class="tg-list-item">
+                          <span>Slack</span>
+                          <input class="tgl tgl-ios" id="slack{{$index}}" type="checkbox" ng-disabled="!settings.notifications.slack" ng-checked="kettle.notify.slack" ng-click="kettle.notify.slack = !kettle.notify.slack"/>
+                          <label class="tgl-btn" for="slack{{$index}}"></label>
+                        </li>
+                        <li class="tg-list-item">
+                          <span>Dweet</span>
+                          <input class="tgl tgl-ios" id="dweet{{$index}}" type="checkbox" ng-checked="kettle.notify.dweet" ng-click="kettle.notify.dweet = !kettle.notify.dweet"/>
+                          <label class="tgl-btn" for="dweet{{$index}}"></label>
+                        </li>
+                      </ul>
+                    </td>
+                    <td>{{kettle.temp.current}}&deg;{{settings.unit}}</td>
+                    <td>{{kettle.temp.target}}&deg;{{settings.unit}}</td>
+                    <td>{{kettle.temp.diff}}&deg;{{settings.unit}}</td>
+                    <td>{{kettle.temp.adjust}}&deg;{{settings.unit}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
 
           <div class="row new">
