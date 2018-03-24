@@ -129,8 +129,9 @@ void tempCommand(BridgeClient client, const String type) {
     raw = digitalRead(pin);
 
   if(type == "Thermistor"){
+    samples[0] = raw;
     // take N samples in a row, with a slight delay
-    for (i=0; i< NUMSAMPLES; i++) {
+    for (i=1; i< NUMSAMPLES; i++) {
       samples[i] = analogRead(pin);
       delay(10);
     }
@@ -140,8 +141,8 @@ void tempCommand(BridgeClient client, const String type) {
        average += samples[i];
     }
     average /= NUMSAMPLES;
-    temp = Thermistor(pin, average);
     raw = average;
+    temp = Thermistor(pin, average);
   } else if(type == "PT100"){
     if (raw>409){
       temp = (150*map(raw,410,1023,0,614))/614;
