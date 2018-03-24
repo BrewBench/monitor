@@ -26,27 +26,14 @@ BridgeServer server;
 
 int samples[NUMSAMPLES];
 
-float Thermistor(int pin) {
+float Thermistor(int pin, float average) {
    uint8_t i;
-   float average;
 
-   // take N samples in a row, with a slight delay
-   for (i=0; i< NUMSAMPLES; i++) {
-     samples[i] = analogRead(pin);
-     delay(10);
-   }
-   // average all the samples out
-   average = 0;
-   for (i=0; i< NUMSAMPLES; i++) {
-      average += samples[i];
-   }
-   average /= NUMSAMPLES;
    // convert the value to resistance
    average = 1023 / average - 1;
    average = SERIESRESISTOR / average;
 
-   float steinhart;
-   steinhart = average / THERMISTORNOMINAL;     // (R/Ro)
+   float steinhart = average / THERMISTORNOMINAL;     // (R/Ro)
    steinhart = log(steinhart);                  // ln(R/Ro)
    steinhart /= BCOEFFICIENT;                   // 1/B * ln(R/Ro)
    steinhart += 1.0 / (TEMPERATURENOMINAL + 273.15); // + (1/To)
@@ -133,20 +120,31 @@ void tempCommand(BridgeClient client, const String type) {
   spin.trim();
   int pin = spin.substring(1).toInt();
   float temp = 0.00;
-// DHT  float humidity = 0.00;
+  float raw = 0.00;
+  // DHT float humidity = 0.00;
 
-  if(type == "Thermistor")
-    temp = Thermistor(pin);
-  else if(type == "PT100"){
-    float tvoltage = 0;
-    if( spin == "A" )
-      tvoltage = analogRead(pin);
-    else
-      tvoltage = digitalRead(pin);
+  if( spin == "A")
+    raw = analogRead(pin);
+  else
+    raw = digitalRead(pin);
 
-    if (tvoltage>409){
-      tvoltage = map(tvoltage,410,1023,0,614);
-      temp = (150*tvoltage)/614;
+  if(type == "Thermistor"){
+    // take N samples in a row, with a slight delay
+    for (i=0; i< NUMSAMPLES; i++) {
+      samples[i] = analogRead(pin);
+      delay(10);
+    }
+    // average all the samples out
+    float average = 0;
+    for (i=0; i< NUMSAMPLES; i++) {
+       average += samples[i];
+    }
+    average /= NUMSAMPLES;
+    temp = Thermistor(pin, average);
+    raw = average;
+  } else if(type == "PT100"){
+    if (raw>409){
+      temp = (150*map(raw,410,1023,0,614))/614;
     }
   }
   // DS18B20 else if(type == "DS18B20"){
@@ -173,7 +171,7 @@ void tempCommand(BridgeClient client, const String type) {
   // DHT     humidity = DHT.humidity;
   // DHT   }
   // DHT }
-  String data = "{\"pin\":\""+String(spin)+"\",\"temp\":\""+String(temp)+"\"";
+  String data = "{\"pin\":\""+String(spin)+"\",\"temp\":\""+String(temp)+"\",\"raw\":\""+String(raw)+"\"";
 // DHT  if(humidity) data += ",\"humidity\":\""+String(humidity)+"\"";
   data += "}";
   // Send JSON response to client

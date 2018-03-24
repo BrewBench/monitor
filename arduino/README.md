@@ -1,6 +1,6 @@
 # BrewBench Monitor Arduino Sketches
 
-You can download sketches from the [monitor](http://monitor.brewbench.co)
+You can download sketches from [BrewBench Monitor](http://monitor.brewbench.co)
 
 ## Setup the Arduino
 
@@ -77,6 +77,18 @@ Download the [Arduino IDE](https://www.arduino.cc/en/Main/Software) >= 1.8.5
 
     * http://wiki.dragino.com/index.php?title=Getting_Start_with_Arduino_Yun#Automatically_Add_Board_Profile_in_Arduino_IDE
 
+## Monitoring
+
+### BrewBench Streams
+
+Monitor and control your temps remotely with history of all your fermentation sessions.
+
+Sign up at https://app.brewbench.co for an API Key
+
+Then enter your username and API key in the settings and download and install the Streams sketch.
+
+<img src="../src/assets/img/screenshot-streams.png?raw=true" alt="BrewBench Streams" align="center" width="100%" />
+
 ## Home Assistant
 This is a cool option for monitoring, check out https://home-assistant.io
 
@@ -101,11 +113,11 @@ Then add this to your `/home/user/.homeassistant/configuration.yaml`
       value_template: "{{ ((float(value_json.temp) * 9 / 5 )  +  32) | round(1) }}"
 ```
 
-### Setup with InfluxDB & Grafana
+### InfluxDB & Grafana
 
 Use the [InfluxDB]() sketch, download from the app and it will create the kettles you have connected.  Then use docker and  [Grafana](https://grafana.com/grafana/download?platform=docker) for graphs.
 
-Download the fermentation dashboard https://grafana.com/dashboards/3957
+Download the [fermentation](https://grafana.com/dashboards/3957) or [session](https://grafana.com/dashboards/3960) dashboard from [Grafana](https://grafana.com/dashboards?search=BrewBench)
 
 ```sh
 brew update
