@@ -14,7 +14,8 @@ angular.module('brewbench-monitor')
 
     reset: function(){
       return {
-        pollSeconds: 10
+        debug: false
+        ,pollSeconds: 10
         ,unit: 'F'
         ,layout: 'card'
         ,chart: true
@@ -66,7 +67,7 @@ angular.module('brewbench-monitor')
           ,sticky: false
           ,heater: {pin:'D2',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
           ,pump: {pin:'D3',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
-          ,temp: {pin:'A0',type:'Thermistor',hit:false,current:0,previous:0,adjust:0,target:170,diff:2}
+          ,temp: {pin:'A0',type:'Thermistor',hit:false,current:0,previous:0,adjust:0,target:170,diff:2,raw:0}
           ,values: []
           ,timers: []
           ,knob: angular.copy(this.defaultKnobOptions(),{value:0,min:0,max:220})
@@ -80,7 +81,7 @@ angular.module('brewbench-monitor')
           ,sticky: false
           ,heater: {pin:'D4',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
           ,pump: {pin:'D5',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
-          ,temp: {pin:'A1',type:'Thermistor',hit:false,current:0,previous:0,adjust:0,target:152,diff:2}
+          ,temp: {pin:'A1',type:'Thermistor',hit:false,current:0,previous:0,adjust:0,target:152,diff:2,raw:0}
           ,values: []
           ,timers: []
           ,knob: angular.copy(this.defaultKnobOptions(),{value:0,min:0,max:220})
@@ -94,7 +95,7 @@ angular.module('brewbench-monitor')
           ,sticky: false
           ,heater: {pin:'D6',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
           ,pump: {pin:'D7',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
-          ,temp: {pin:'A2',type:'Thermistor',hit:false,current:0,previous:0,adjust:0,target:200,diff:2}
+          ,temp: {pin:'A2',type:'Thermistor',hit:false,current:0,previous:0,adjust:0,target:200,diff:2,raw:0}
           ,values: []
           ,timers: []
           ,knob: angular.copy(this.defaultKnobOptions(),{value:0,min:0,max:220})
@@ -739,7 +740,7 @@ angular.module('brewbench-monitor')
               yAxis: {
                   axisLabel: 'Temperature',
                   tickFormat: function(d){
-                      return d+'\u00B0';
+                      return $filter('number')(d,0)+'\u00B0';
                   },
                   orient: 'left',
                   showMaxMin: true,

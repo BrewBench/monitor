@@ -387,6 +387,22 @@
         </div>
       </div>
     </div>
+    <div ng-if="settings.debug">
+      <label class="adjust">Debug</label>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item">
+          raw bits: {{ kettle.temp.raw }}<br/>
+          current: {{ kettle.temp.current }} &deg;{{ settings.unit }}<br/>
+          previous: {{ kettle.temp.previous }} &deg;{{ settings.unit }}<br/>
+          <span ng-if="settings.unit=='F'">
+            celsius: {{ kettle.temp.current | toCelsius}} &deg;C<br/>
+          </span>
+          <span ng-if="settings.unit=='C'">
+            fahrenheit: {{ kettle.temp.current | toFahrenheit }} &deg;F
+          </span>
+        </li>
+      </ul>
+    </div>
     <div class="extra" ng-if="shareAccess('fullAccess')">
         <i class="fa fa-1x float-right" ng-class="{'fa-chevron-left':!showRemoveKettle,'fa-chevron-right':showRemoveKettle}" aria-hidden="true" ng-click="showRemoveKettle=!showRemoveKettle"></i>
         <button ng-show="showRemoveKettle" class="btn btn-danger btn-sm float-right" ng-click="showRemoveKettle=false;kettles.splice($index,1)">Remove Kettle</button>

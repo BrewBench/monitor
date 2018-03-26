@@ -252,7 +252,7 @@ $scope.updateABV();
         ,sticky: false
         ,heater: {pin:'D6',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
         ,pump: {pin:'D7',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
-        ,temp: {pin:'A0',type:'Thermistor',hit:false,current:0,previous:0,adjust:0,target:$scope.kettleTypes[0].target,diff:$scope.kettleTypes[0].diff}
+        ,temp: {pin:'A0',type:'Thermistor',hit:false,current:0,previous:0,adjust:0,target:$scope.kettleTypes[0].target,diff:$scope.kettleTypes[0].diff,raw:0}
         ,values: []
         ,timers: []
         ,knob: angular.copy(BrewService.defaultKnobOptions(),{value:0,min:0,max:$scope.kettleTypes[0].target+$scope.kettleTypes[0].diff})
@@ -715,12 +715,15 @@ $scope.updateABV();
     var temps = [];
     //chart date
     var date = new Date();
+    //update datatype
+    response.temp = parseFloat(response.temp);
+    response.raw = parseFloat(response.raw);
     // temp response is in C
     kettle.temp.previous = ($scope.settings.unit == 'F') ?
       $filter('toFahrenheit')(response.temp) :
-      Math.round(response.temp);
+      $filter('number')(response.temp,2);
     kettle.temp.current = kettle.temp.previous+kettle.temp.adjust;
-
+    kettle.temp.raw = response.raw;
     //reset all kettles every resetChart
     if(kettle.values.length > resetChart){
       $scope.kettles.map((k) => {
@@ -1283,7 +1286,7 @@ $scope.updateABV();
         kettle.knob.subText.color = 'rgba(52,152,219,1)';
       } else {
         //update knob text
-        kettle.knob.subText.text = (kettle.high-kettle.temp.diff)+'\u00B0 high';
+        kettle.knob.subText.text = $filter('number')(kettle.high-kettle.temp.diff,0)+'\u00B0 high';
         kettle.knob.subText.color = 'rgba(255,0,0,.6)';
       }
     } else if(kettle.temp.current < kettle.temp.target-kettle.temp.diff){
@@ -1296,7 +1299,7 @@ $scope.updateABV();
         kettle.knob.subText.color = 'rgba(255,0,0,.6)';
       } else {
         //update knob text
-        kettle.knob.subText.text = (kettle.low-kettle.temp.diff)+'\u00B0 low';
+        kettle.knob.subText.text = $filter('number')(kettle.low-kettle.temp.diff,0)+'\u00B0 low';
         kettle.knob.subText.color = 'rgba(52,152,219,1)';
       }
     } else {
@@ -1344,7 +1347,9 @@ $scope.updateABV();
       $scope.settings.unit = unit;
       _.each($scope.kettles,function(kettle){
         kettle.temp.current = $filter('formatDegrees')(kettle.temp.current,unit);
+        kettle.temp.previous = $filter('formatDegrees')(kettle.temp.previous,unit);
         kettle.temp.target = $filter('formatDegrees')(kettle.temp.target,unit);
+        kettle.temp.target = $filter('number')(kettle.temp.target,0);
         if(!!kettle.temp.adjust){
           if(unit === 'C')
             kettle.temp.adjust = Math.round(kettle.temp.adjust*0.555);

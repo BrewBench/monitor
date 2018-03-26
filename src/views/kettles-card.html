@@ -14,11 +14,9 @@
             <a href="" class="text-success sticky" ng-click="kettle.sticky = !!(kettle.sticky) ?  false : true"><i class="fa fa-thumb-tack fa-lg"></i></a>
             <div class="dropdown-menu scrollable-menu">
               <button class="text-center modal-link dropdown-item" type="button" data-toggle="modal" data-target="#settingsModal">
-                Add / Edit Arduinos
+                <strong>Add / Edit Arduinos</strong>
               </button>
-              <button class="text-center modal-link dropdown-item" type="button" data-toggle="modal" data-target="#sketchesModal">
-                Arduino Sketches
-              </button>
+              <div class="dropdown-divider"></div>
               <button ng-repeat="arduino in settings.arduinos"
                 ng-class="{'active': kettle.arduino && kettle.arduino.id == arduino.id}"
                 ng-click="kettle.arduino=arduino"
@@ -284,7 +282,7 @@
       <div class="row">
         <div class="col-auto mr-auto">
           <ui-knob ng-click="knobClick(kettle)"
-            value="kettle.temp.current"
+            value="kettle.temp.current | number:0"
             options="kettle.knob">
           </ui-knob>
           <br/>
@@ -394,6 +392,22 @@
           </div>
         </div>
       </div>
+    </div>
+    <div ng-if="settings.debug">
+      <label class="adjust" style="margin-left: 14px;">Debug</label>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item">
+          raw bits: {{ kettle.temp.raw }}<br/>
+          current: {{ kettle.temp.current }} &deg;{{ settings.unit }}<br/>
+          previous: {{ kettle.temp.previous }} &deg;{{ settings.unit }}<br/>
+          <span ng-if="settings.unit=='F'">
+            celsius: {{ kettle.temp.current | toCelsius}} &deg;C<br/>
+          </span>
+          <span ng-if="settings.unit=='C'">
+            fahrenheit: {{ kettle.temp.current | toFahrenheit }} &deg;F
+          </span>
+        </li>
+      </ul>
     </div>
     <div class="card-footer" ng-if="shareAccess('fullAccess')">
         <i class="fa fa-1x float-right" ng-class="{'fa-chevron-left':!showRemoveKettle,'fa-chevron-right':showRemoveKettle}" aria-hidden="true" ng-click="showRemoveKettle=!showRemoveKettle"></i>

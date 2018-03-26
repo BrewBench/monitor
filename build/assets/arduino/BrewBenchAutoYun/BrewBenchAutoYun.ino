@@ -26,9 +26,7 @@ BridgeServer server;
 
 int samples[NUMSAMPLES];
 
-float Thermistor(int pin, float average) {
-   uint8_t i;
-
+float Thermistor(float average) {
    // convert the value to resistance
    average = 1023 / average - 1;
    average = SERIESRESISTOR / average;
@@ -123,14 +121,16 @@ void tempCommand(BridgeClient client, const String type) {
   float raw = 0.00;
   // DHT float humidity = 0.00;
 
-  if( spin == "A")
+  if( spin.substring(0,1) == "A" )
     raw = analogRead(pin);
   else
     raw = digitalRead(pin);
 
   if(type == "Thermistor"){
+    samples[0] = raw;
+    uint8_t i;
     // take N samples in a row, with a slight delay
-    for (i=0; i< NUMSAMPLES; i++) {
+    for (i=1; i< NUMSAMPLES; i++) {
       samples[i] = analogRead(pin);
       delay(10);
     }
@@ -140,8 +140,8 @@ void tempCommand(BridgeClient client, const String type) {
        average += samples[i];
     }
     average /= NUMSAMPLES;
-    temp = Thermistor(pin, average);
     raw = average;
+    temp = Thermistor(average);
   } else if(type == "PT100"){
     if (raw>409){
       temp = (150*map(raw,410,1023,0,614))/614;
@@ -234,20 +234,32 @@ void postData(String connection, String data, String dataType, String contentTyp
 
 float actionsCommand(String spin, String type, int adjustTemp) {
   float temp = 0.00;
-  // DHT float humidity = 0.00;
+  float raw = 0.00;
+  if( spin.substring(0,1) == "A" )
+    raw = analogRead(pin);
+  else
+    raw = digitalRead(pin);
+// DHT  float humidity = 0.00;
   int pin = spin.substring(1).toInt();
-  if(type == "Thermistor")
-    temp = Thermistor(pin);
-  else if(type == "PT100"){
-    float tvoltage = 0;
-    if( spin.substring(0,1) == "A" )
-      tvoltage = analogRead(pin);
-    else
-      tvoltage = digitalRead(pin);
-
-    if (tvoltage>409){
-      tvoltage = map(tvoltage,410,1023,0,614);
-      temp = (150*tvoltage)/614;
+  if(type == "Thermistor"){
+    samples[0] = raw;
+    uint8_t i;
+    // take N samples in a row, with a slight delay
+    for (i=1; i< NUMSAMPLES; i++) {
+      samples[i] = analogRead(pin);
+      delay(10);
+    }
+    // average all the samples out
+    float average = 0;
+    for (i=0; i< NUMSAMPLES; i++) {
+       average += samples[i];
+    }
+    average /= NUMSAMPLES;
+    raw = average;
+    temp = Thermistor(average);
+  } else if(type == "PT100"){
+    if (raw>409){
+      temp = (150*map(raw,410,1023,0,614))/614;
     }
   }
   // DS18B20 else if(type == "DS18B20"){

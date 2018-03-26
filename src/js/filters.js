@@ -17,14 +17,14 @@ angular.module('brewbench-monitor')
       return $filter('toCelsius')(temp);
   };
 })
-.filter('toFahrenheit', function() {
+.filter('toFahrenheit', function($filter) {
   return function(celsius) {
-    return Math.round(celsius*9/5+32);
+    return $filter('number')(celsius*9/5+32,2);
   };
 })
-.filter('toCelsius', function() {
+.filter('toCelsius', function($filter) {
   return function(fahrenheit) {
-    return Math.round((fahrenheit-32)*5/9);
+    return $filter('number')((fahrenheit-32)*5/9,2);
   };
 })
 .filter('highlight', function($sce) {

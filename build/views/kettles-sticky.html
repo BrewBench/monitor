@@ -4,12 +4,12 @@
       <div class="header">{{kettle.key}}</div>
       <a href="" class="sticky text-danger" ng-click="kettle.sticky = !!(kettle.sticky) ?  false : true"><i class="fa fa-thumb-tack"></i></a>
       <div class="description temp" ng-class="{'high':kettle.high, 'low':kettle.low}">
-        {{kettle.temp.current}}&deg;
+        {{kettle.temp.current|number:0}}&deg;
       </div>
     </div>
     <div class="extra content">
-      <span class="low" ng-if="kettle.low">{{kettle.low}}&deg; low</span>
-      <span class="high" ng-if="kettle.high">{{kettle.high}}&deg; high</span>
+      <span class="low" ng-if="kettle.low">{{kettle.low|number:0}}&deg; low</span>
+      <span class="high" ng-if="kettle.high">{{kettle.high|number:0}}&deg; high</span>
     </div>
   </div>
 </div>

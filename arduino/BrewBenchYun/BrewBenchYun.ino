@@ -27,9 +27,7 @@ dht DHT;
 
 int samples[NUMSAMPLES];
 
-float Thermistor(int pin, float average) {
-   uint8_t i;
-
+float Thermistor(float average) {
    // convert the value to resistance
    average = 1023 / average - 1;
    average = SERIESRESISTOR / average;
@@ -124,13 +122,14 @@ void tempCommand(BridgeClient client, String type) {
   float raw = 0.00;
   float humidity = 0.00;
 
-  if( spin == "A")
+  if( spin.substring(0,1) == "A" )
     raw = analogRead(pin);
   else
     raw = digitalRead(pin);
 
   if(type == "Thermistor"){
     samples[0] = raw;
+    uint8_t i;
     // take N samples in a row, with a slight delay
     for (i=1; i< NUMSAMPLES; i++) {
       samples[i] = analogRead(pin);
@@ -143,7 +142,7 @@ void tempCommand(BridgeClient client, String type) {
     }
     average /= NUMSAMPLES;
     raw = average;
-    temp = Thermistor(pin, average);
+    temp = Thermistor(average);
   } else if(type == "PT100"){
     if (raw>409){
       temp = (150*map(raw,410,1023,0,614))/614;

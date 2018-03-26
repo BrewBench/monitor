@@ -27,19 +27,28 @@
           <h4>General</h4>
           <div class="block-border">
             <div class="row">
-              <div class="col-6">
+              <div class="col-4">
                 <label class="adjust">Temperature</label>
                 <div class="input-group" role="group">
                   <input id="celsius" class="degree" type="radio" ng-checked="settings.unit=='C'" value="C" ng-click="changeUnits('C')"> <label for="celsius">&deg;C</label>&nbsp;&nbsp;
                   <input id="fahrenheit" class="degree" type="radio" ng-checked="settings.unit=='F'" value="F" ng-click="changeUnits('F')"> <label for="fahrenheit">&deg;F</label>
                 </div>
               </div>
-              <div class="col-6">
+              <div class="col-4">
                 <label class="adjust">Layout</label>
                 <div class="input-group" role="group">
                   <input id="list" class="degree" type="radio" ng-checked="settings.layout=='list'" value="list" ng-click="settings.layout='list'"> <label for="list">List</label>&nbsp;&nbsp;
                   <input id="card" class="degree" type="radio" ng-checked="settings.layout=='card'" value="card" ng-click="settings.layout='card'"> <label for="card">Card</label>
                 </div>
+              </div>
+              <div class="col-4">
+                <ul class="tg-list">
+                  <li class="tg-list-item">
+                    <label class="adjust">Debug</label>
+                    <input class="tgl tgl-ios" id="debug" type="checkbox" ng-checked="settings.debug" ng-click="settings.debug = !settings.debug"/>
+                    <label class="tgl-btn" for="debug"></label>
+                  </li>
+                </ul>
               </div>
             </div>
           </div>
