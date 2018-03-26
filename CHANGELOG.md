@@ -3,12 +3,15 @@
 ## 3.3.0 - 2018-03-21
 
 ### Added
-- [BrewBench Streams](https://app.brewbench.co)
+- [BrewBench Streams](https://app.brewbench.co) Sketch
 - raw analogRead/digitalRead value in response
 - Debug settings option to view raw and unformatted temps
 
 ### Updated
 - Cleaned up Arduino and Settings styles
+- JSON response from sketches to return not string "temp" is now just temp
+  (This was an issue with angular number format)
+- Sketches modal with more info
 
 ## 3.2.5 - 2018-02-25
 

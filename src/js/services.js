@@ -571,11 +571,9 @@ angular.module('brewbench-monitor')
         ping: () => {
           $http(request)
             .then(response => {
-              console.log('response',response)
               q.resolve(response);
             })
             .catch(err => {
-              console.log('err',err)
               q.reject(err);
             });
             return q.promise;

@@ -9,66 +9,64 @@
       <div id="sketches">
       <div class="card-body">
         <div class="pb-3">
+          <div class="row new pb-3">
+            <div class="col-lg-4 col-sm-6 pb-3">
+              <label class="adjust">Sketch Info</label>
+              <strong>Current Sketch Version:</strong> {{pkg.sketch_version}} <br/>
+              <strong>Your Sketch Version:</strong> {{settings.sketches.version}}
+            </div>
+            <div class="col-lg-4 col-sm-6 pb-3">
+              <label class="adjust">Required libraries</label>
+              <p>
+                <a href="https://www.brewbench.co/libs/DHTLib.zip">DHT Library</a> <br/>
+                <a href="https://www.brewbench.co/libs/cactus_io_DS18B20.zip">DS18B20 Library</a>
+              </p>
+            </div>
+            <div class="col-lg-4 col-sm-6 pb-3">
+              <label class="adjust">Other Links</label>
+              <a href="https://www.arduino.cc/en/Main/Software target="_blank"">Arduino IDE</a> <br/>
+              <a href="https://grafana.com/dashboards?search=BrewBench" target="_blank">Grafana Dashboards</a>
+            </div>
+          </div>
+        </div>
+        <div class="pb-3">
           <h4>
-            Sketch Settings
+            BrewBench Basic
           </h4>
           <div class="block-border">
             <div class="row new pb-3">
-              <div class="col-lg-4 col-sm-6">
-                <label class="adjust">Poll Frequency</label>
-                <div class="input-group">
-                  <input class="form-control" type="number" ng-model="settings.sketches.frequency" step="1" min="5">
-                  <span class="input-group-btn">
-                    <button type="button" class="btn btn-light"><i class="fa fa-minus fa-lg" ng-click="(settings.sketches.frequency > 5) ? settings.sketches.frequency=settings.sketches.frequency-1 : 5"></i></button>
-                    <button type="button" class="btn btn-light"><i class="fa fa-plus fa-lg" ng-click="settings.sketches.frequency=settings.sketches.frequency+1"></i></button>
-                  </span>
-                </div>
-                <small class="form-text text-muted">Every {{settings.sketches.frequency}} seconds</small>
+              <div class="col-10 pb-3">
+                <p>This is a basic sketch that lets you connect to all of the supported sensors.  Use this to configure and test all kettles before uploading any the other sketches.</p>
               </div>
-              <div class="col-lg-4 col-sm-6 pb-3">
-                  <label class="adjust">Brewer</label>
-                  <input class="form-control" type="text" ng-model="settings.recipe.brewer.name" placeholder="Brewer">
-                  <br/>
-                  <label class="adjust">Beer</label>
-                  <input class="form-control" type="text" ng-model="settings.recipe.name" placeholder="Beer Name">
-              </div>
-              <div class="col-lg-4 col-sm-6">
-                <label class="adjust">Sketches</label>
-                <strong>Current Sketch Version:</strong> {{pkg.sketch_version}}<br>
-                <strong>Your Sketch Version:</strong> {{settings.sketches.version}}<br><br>
-                Include these libraries<br>
-                <p>
-                  <a href="https://www.brewbench.co/libs/DHTLib.zip">DHT Library</a> <br>
-                  <a href="https://www.brewbench.co/libs/cactus_io_DS18B20.zip">DS18B20 Library</a>
-                </p>
-                <div class="btn-group">
-                  <button type="button" class="btn btn-light dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Download Sketch <span class="caret"></span>
-                  </button>
-                  <div class="dropdown-menu scrollable-menu">
-                    <a href="/assets/arduino/BrewBenchYun/BrewBenchYun.ino" class="dropdown-item">Arduino Yun Sketch</a>
-                    <a href="" ng-click="compileSketch('StreamsYun')" class="dropdown-item" ng-class="{'disabled':settings.streams.status!='Connected'}">Arduino Yun Streams Sketch</a>
-                    <a href="" ng-click="compileSketch('AutoYun')" class="dropdown-item" ng-class="{'disabled': !hasSketches()}">Arduino Yun Auto Sketch <span class="badge badge-pill badge-info">Auto</span></a>
-                    <a href="" ng-click="compileSketch('InfluxDBYun')" class="dropdown-item" ng-class="{'disabled':!settings.influxdb.connected}">Arduino Yun InfluxDB Sketch <span class="badge badge-pill badge-info">Auto</span></a>
-                    <hr>
-                    <a href="https://grafana.com/dashboards/3960" class="dropdown-item" target="_blank">Grafana Session Dashboard</a>
-                    <a href="https://grafana.com/dashboards/3957" class="dropdown-item" target="_blank">Grafana Fermentation Dashboard</a>
-                  </div>
-                </div>
+              <div class="col-2">
+                <a class="btn btn-light float-right" href="/assets/arduino/BrewBenchYun/BrewBenchYun.ino" class="dropdown-item">Download Sketch</a>
               </div>
             </div>
           </div>
+        </div>
 
           <div class="pb-3">
-            <h4>BrewBench Streams
+            <h4>
+              <img src="/assets/img/brewbench-colors.png" width="35" style="margin-top: -5px;border-radius: 10px;">
+              BrewBench Streams
               <sup class="badge badge-{{ getStatusClass(settings.streams.status) }} badge-pill">
                 {{ settings.streams.status || 'Not Connected'}}
               </sup>
               <a href="https://app.brewbench.co" target="_blank" ng-if="settings.streams.status != 'Connected'">signup</a>
               <a href="https://app.brewbench.co/dashboard/{{ settings.streams.api_key }}" target="_blank" ng-if="settings.streams.status == 'Connected'">dashboard</a>
-              <img src="/assets/img/brewbench-colors.png" class="float-right" width="35" style="margin-top: -5px;border-radius: 10px;">
             </h4>
             <div class="block-border">
+              <div class="row">
+                <div class="col-10">
+                  <p>
+                    The Streams sketch will be dynamically created depending on what sensors are in use with your current configuration.  It will run in the background sending temperature data to your BrewBench Streams account for secure remote monitoring.
+                    <br/>Working with BrewBench <span class="badge badge-pill badge-info">Auto</span> it will also trigger the heat / cool relays and notifications you have turned on.
+                  </p>
+                </div>
+                <div class="col-2">
+                  <a href="" class="btn btn-light float-right" ng-click="compileSketch('StreamsYun')" ng-disabled="settings.streams.status!='Connected'">Download Sketch</a>
+                </div>
+              </div>
               <div class="row pb-2">
                 <div class="col-6">
                   <label class="adjust">Username</label>
@@ -81,73 +79,94 @@
               </div>
               <div class="row">
                 <div class="col-12">
-                  <button class="btn btn-primary float-right" ng-click="streamsConnect()" ng-disabled="!settings.streams.user && !settings.streams.api_key">Connect</button>
-                </div>
+                    <button class="btn btn-primary float-right" ng-click="streamsConnect()" ng-disabled="!settings.streams.user && !settings.streams.api_key">Connect</button>
               </div>
             </div>
           </div>
 
           <div class="pb-3">
-            <h4>InfluxDB
+            <h4>
+              <img src="/assets/img/influxdb.png" width="35" style="margin-top: -5px;">
+              BrewBench InfluxDB
               <sup class="badge badge-{{ getStatusClass(settings.influxdb.status) }} badge-pill">
                 {{ settings.influxdb.status || 'Not Connected'}}
               </sup>
               <a href="#" ng-click="showInflux=!showInflux;">{{!showInflux ? 'show': 'hide'}}</a>
-              <img src="/assets/img/influxdb.png" class="float-right" width="35" style="margin-top: -5px;">
             </h4>
             <div class="block-border" ng-show="showInflux">
-            <div class="row">
-              <div class="col-9">
-                <label class="adjust">Url</label>
-                <input id="influxdbUrl" class="form-control" type="text" ng-model="settings.influxdb.url" placeholder="http://InfluxDBUrl">
-              </div>
-              <div class="col-3">
-                <label class="adjust">Port</label>
-                <input class="form-control" style="width: 100%;" type="number" ng-model="settings.influxdb.port">
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-12">
-                <label class="adjust">Database</label>
-                <div class="input-group">
-                  <div class="input-group-btn" ng-if="settings.influxdb.dbs && settings.influxdb.dbs.length">
-                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">DBs</button>
-                    <div class="dropdown-menu">
-                      <a class="dropdown-item" href="" ng-click="settings.influxdb.db=''">Create a new database</a>
-                      <div role="separator" class="dropdown-divider"></div>
-                      <a ng-repeat="db in settings.influxdb.dbs" class="dropdown-item" href="" ng-click="settings.influxdb.db=db">{{db}}</a>
-                    </div>
-                  </div>
-                  <input class="form-control" type="text" ng-model="settings.influxdb.db" placeholder="Database Name">
-                  <span class="input-group-btn">
-                    <button class="btn btn-primary" ng-click="createInfluxDB()" ng-disabled="!settings.influxdb.connected">Create</button>
-                  </span>
+              <div class="row">
+                <div class="col-10">
+                  <p>
+                    The InfluxDB sketch will be dynamically created depending on what sensors are in use with your current configuration.  It will run in the background sending temperature data to your InfluxDB time-series database.
+                    <br/>Working with BrewBench <span class="badge badge-pill badge-info">Auto</span> it will also trigger the heat / cool relays and notifications you have turned on.
+                  </p>
                 </div>
-                <small ng-if="settings.influxdb.created" class="badge badge-success">Created</small>
+                <div class="col-2">
+                  <a href="" ng-click="compileSketch('InfluxDBYun')" class="btn btn-light float-right" ng-class="{'disabled':!settings.influxdb.connected}">Download Sketch</a>
+                </div>
               </div>
-            </div>
-            <div class="row pb-2">
-              <div class="col-6">
-                <label class="adjust">Username</label>
-                <input id="influxdbUser" class="form-control" type="text" ng-model="settings.influxdb.user" placeholder="Username">
+              <div class="row">
+                <div class="col-9">
+                  <label class="adjust">Url</label>
+                  <input id="influxdbUrl" class="form-control" type="text" ng-model="settings.influxdb.url" placeholder="http://InfluxDBUrl">
+                </div>
+                <div class="col-3">
+                  <label class="adjust">Port</label>
+                  <input class="form-control" style="width: 100%;" type="number" ng-model="settings.influxdb.port">
+                </div>
               </div>
-              <div class="col-6">
-                <label class="adjust">Password</label>
-                <input id="influxdbPass" class="form-control" type="password" ng-model="settings.influxdb.pass" placeholder="Password">
+              <div class="row">
+                <div class="col-12">
+                  <label class="adjust">Database</label>
+                  <div class="input-group">
+                    <div class="input-group-btn" ng-if="settings.influxdb.dbs && settings.influxdb.dbs.length">
+                      <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">DBs</button>
+                      <div class="dropdown-menu">
+                        <a class="dropdown-item" href="" ng-click="settings.influxdb.db=''">Create a new database</a>
+                        <div role="separator" class="dropdown-divider"></div>
+                        <a ng-repeat="db in settings.influxdb.dbs" class="dropdown-item" href="" ng-click="settings.influxdb.db=db">{{db}}</a>
+                      </div>
+                    </div>
+                    <input class="form-control" type="text" ng-model="settings.influxdb.db" placeholder="Database Name">
+                    <span class="input-group-btn">
+                      <button class="btn btn-primary" ng-click="createInfluxDB()" ng-disabled="!settings.influxdb.connected">Create</button>
+                    </span>
+                  </div>
+                  <small ng-if="settings.influxdb.created" class="badge badge-success">Created</small>
+                </div>
               </div>
-            </div>
-            <div class="row">
-              <div class="col-12">
-                <button class="btn btn-primary float-right" ng-click="testInfluxDB()" ng-disabled="!settings.influxdb.url">Connect</button>
+              <div class="row pb-2">
+                <div class="col-6">
+                  <label class="adjust">Username</label>
+                  <input id="influxdbUser" class="form-control" type="text" ng-model="settings.influxdb.user" placeholder="Username">
+                </div>
+                <div class="col-6">
+                  <label class="adjust">Password</label>
+                  <input id="influxdbPass" class="form-control" type="password" ng-model="settings.influxdb.pass" placeholder="Password">
+                </div>
               </div>
-            </div>
+              <div class="row">
+                <div class="col-12">
+                    <button class="btn btn-primary float-right" ng-click="testInfluxDB()" ng-disabled="!settings.influxdb.url">Connect</button>
+                </div>
+              </div>
           </div>
         </div>
         <div class="pb-3">
           <h4>
-            Kettles
+            BrewBench <span class="badge badge-pill badge-info">Auto</span>
           </h4>
           <div class="block-border">
+            <div class="row">
+              <div class="col-10">
+                <p>
+                  The Auto sketch will be dynamically created depending on what sensors are in use with your current configuration.  It will run in the background and trigger the heat / cool relays and notifications you have turned on below.
+                </p>
+              </div>
+              <div class="col-2">
+                <a href="" ng-click="compileSketch('AutoYun')" class="btn btn-light float-right"  ng-class="{'disabled': !hasSketches()}">Download Sketch</a>
+              </div>
+            </div>
               <table class="table table-striped table-responsive">
                 <thead class="thead-inverse">
                   <tr>

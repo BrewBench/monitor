@@ -1029,7 +1029,6 @@ $scope.updateABV();
   };
 
   $scope.compileSketch = function(sketchName){
-    if(!$scope.settings.influxdb.url) return;
     var sketches = [];
     var arduinoName = '';
     _.each($scope.kettles, (kettle, i) => {
