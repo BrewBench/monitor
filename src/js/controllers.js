@@ -722,7 +722,9 @@ $scope.updateABV();
     kettle.temp.previous = ($scope.settings.unit == 'F') ?
       $filter('toFahrenheit')(response.temp) :
       $filter('number')(response.temp,2);
-    kettle.temp.current = kettle.temp.previous+kettle.temp.adjust;
+    // add adjustment
+    kettle.temp.current = (parseFloat(kettle.temp.previous) + parseFloat(kettle.temp.adjust));
+    // set raw
     kettle.temp.raw = response.raw;
     //reset all kettles every resetChart
     if(kettle.values.length > resetChart){
@@ -731,7 +733,7 @@ $scope.updateABV();
       });
     }
 
-    //DHT11 sensor has humidity
+    //DHT sensors have humidity
     if( response.humidity ){
       kettle.humidity = response.humidity;
     }
@@ -878,20 +880,12 @@ $scope.updateABV();
     return hasASketch;
   };
 
-  $scope.knobClick = function(kettle){
-      //set adjustment amount
-      if(!!kettle.temp.previous){
-        kettle.temp.adjust = kettle.temp.current - kettle.temp.previous;
-      }
-  };
-
   $scope.startStopKettle = function(kettle){
       kettle.active = !kettle.active;
       $scope.resetError(kettle);
 
       if(kettle.active){
         kettle.knob.subText.text = 'starting...';
-        kettle.knob.readOnly = false;
 
         BrewService.temp(kettle)
           .then(response => $scope.updateTemp(response, kettle))
@@ -912,7 +906,7 @@ $scope.updateABV();
           $scope.toggleRelay(kettle, kettle.cooler, true);
         }
       } else {
-        kettle.knob.readOnly = true;
+
         //stop the heater
         if(!kettle.active && kettle.heater.running){
           $scope.toggleRelay(kettle, kettle.heater, false);
@@ -1261,18 +1255,18 @@ $scope.updateABV();
       kettle.knob.barColor = '#777';
       kettle.knob.subText.text = 'not running';
       kettle.knob.subText.color = 'gray';
-      kettle.knob.readOnly = true;
+
       return;
     } else if(kettle.error.message){
         kettle.knob.trackColor = '#ddd';
         kettle.knob.barColor = '#777';
         kettle.knob.subText.text = 'error';
         kettle.knob.subText.color = 'gray';
-        kettle.knob.readOnly = true;
+
         return;
     }
 
-    kettle.knob.readOnly = false;
+
 
     //is temp too high?
     if(kettle.temp.current > kettle.temp.target+kettle.temp.diff){
@@ -1464,6 +1458,10 @@ $scope.updateABV();
       kettle.temp[field]++;
     else
       kettle.temp[field]--;
+
+    if(field == 'adjust'){
+      kettle.temp.current = (parseFloat(kettle.temp.previous) + parseFloat(kettle.temp.adjust));      
+    }
 
     //update knob after 1 seconds, otherwise we get a lot of refresh on the knob when clicking plus or minus
     timeout = $timeout(function(){
