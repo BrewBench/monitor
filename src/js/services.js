@@ -114,6 +114,8 @@ angular.module('brewbench-monitor')
         }
         else if(window.localStorage.getItem(key)){
           return JSON.parse(window.localStorage.getItem(key));
+        } else if(key == 'settings'){
+          return this.reset();
         }
       } catch(e){
         /*JSON parse error*/

@@ -6,9 +6,7 @@ $scope.clearSettings = function(e){
     angular.element(e.target).html('Removing...');
   }
   BrewService.clear();
-  $timeout(function(){
-    window.location.href='/';
-  },1000);
+  window.location.href='/';  
 };
 
 if( $state.current.name == 'reset')
