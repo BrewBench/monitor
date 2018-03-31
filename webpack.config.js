@@ -5,6 +5,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const BrowserSyncPlugin = require('browser-sync-webpack-plugin');
 const WriteFilePlugin = require('write-file-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const ConcatPlugin = require('webpack-concat-plugin');
 
 const path = require('path');
 const pkg = require('./package.json');
@@ -17,12 +18,6 @@ module.exports = {
         './src/js/directives.js',
         './src/js/filters.js',
         './src/js/services.js'
-      ],
-      vendor: [
-        './src/js/vendor/md5.min.js',
-        './src/js/vendor/ng-knob.min.js',
-        './src/js/vendor/xml2json.min.js',
-        './src/js/vendor/yaml.min.js'
       ],
       vendor_node: Object.keys(pkg.dependencies)
     },
@@ -42,6 +37,18 @@ module.exports = {
       new webpack.optimize.CommonsChunkPlugin({
         name: 'vendor_node',
         minChunks: ({ resource }) => /node_modules/.test(resource)
+      }),
+
+      new ConcatPlugin({
+          uglify: false,
+          sourceMap: false,
+          name: 'vendor',
+          outputPath: 'js/',
+          fileName: 'vendor.js',
+          filesToConcat: ['./src/js/vendor/**'],
+          attributes: {
+              async: true
+          }
       }),
 
       new ExtractTextPlugin('[name].[chunkhash].css'),
