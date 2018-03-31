@@ -96,7 +96,7 @@ $scope.share = (!$state.params.file && BrewService.settings('share')) ? BrewServ
   };
 
 $scope.sumValues = function(obj){
-  return _.sum(_.values(obj));
+  return _.sumBy(obj,'amount');
 }
 
 // init calc values
@@ -503,46 +503,64 @@ $scope.updateABV();
       $scope.settings.recipe.brewer = recipe.brewer;
 
       if(recipe.grains.length){
-        $scope.settings.recipe.grains = recipe.grains;
-        var kettle = _.filter($scope.kettles,{type:'grain'})[0];
-        if(kettle) kettle.timers = [];
-        $scope.settings.recipe.grains = {};
+        // recipe display
+        $scope.settings.recipe.grains = [];
         _.each(recipe.grains,function(grain){
-          if(kettle){
-            $scope.addTimer(kettle,{
-              label: grain.label,
-              min: grain.min,
-              notes: grain.notes
+          if($scope.settings.recipe.grains.length &&
+            _.filter($scope.settings.recipe.grains, {name: grain.label}).length){
+            _.filter($scope.settings.recipe.grains, {name: grain.label})[0].amount += parseFloat(grain.amount);
+          } else {
+            $scope.settings.recipe.grains.push({
+              name: grain.label, amount: parseFloat(grain.amount)
             });
           }
-          // sum the amounts for the grains
-          if($scope.settings.recipe.grains[grain.label])
-            $scope.settings.recipe.grains[grain.label] += Number(grain.amount);
-          else
-            $scope.settings.recipe.grains[grain.label] = Number(grain.amount);
         });
+        // timers
+        var kettle = _.filter($scope.kettles,{type:'grain'})[0];
+        if(kettle) {
+          kettle.timers = [];
+          _.each(recipe.grains,function(grain){
+            if(kettle){
+              $scope.addTimer(kettle,{
+                label: grain.label,
+                min: grain.min,
+                notes: grain.notes
+              });
+            }
+          });
+        }
       }
 
       if(recipe.hops.length){
-        var kettle = _.filter($scope.kettles,{type:'hop'})[0];
-        if(kettle) kettle.timers = [];
+        // recipe display
         $scope.settings.recipe.hops = [];
         _.each(recipe.hops,function(hop){
-          if(kettle){
-            $scope.addTimer(kettle,{
-              label: hop.label,
-              min: hop.min,
-              notes: hop.notes
+          if($scope.settings.recipe.hops.length &&
+            _.filter($scope.settings.recipe.hops, {name: hop.label}).length){
+            _.filter($scope.settings.recipe.hops, {name: hop.label})[0].amount += parseFloat(hop.amount);
+          } else {
+            $scope.settings.recipe.hops.push({
+              name: hop.label, amount: parseFloat(hop.amount)
             });
           }
-          // sum the amounts for the hops
-          if($scope.settings.recipe.hops[hop.label])
-            $scope.settings.recipe.hops[hop.label] += Number(hop.amount);
-          else
-            $scope.settings.recipe.hops[hop.label] = Number(hop.amount);
         });
+        // timers
+        var kettle = _.filter($scope.kettles,{type:'hop'})[0];
+        if(kettle) {
+          kettle.timers = [];
+          _.each(recipe.hops,function(hop){
+            if(kettle){
+              $scope.addTimer(kettle,{
+                label: hop.label,
+                min: hop.min,
+                notes: hop.notes
+              });
+            }
+          });
+        }
       }
       if(recipe.misc.length){
+        // timers
         var kettle = _.filter($scope.kettles,{type:'water'})[0];
         if(kettle){
           kettle.timers = [];
@@ -556,6 +574,7 @@ $scope.updateABV();
         }
       }
       if(recipe.yeast.length){
+        // recipe display
         $scope.settings.recipe.yeast = [];
         _.each(recipe.yeast,function(yeast){
           $scope.settings.recipe.yeast.push({
@@ -1460,7 +1479,7 @@ $scope.updateABV();
       kettle.temp[field]--;
 
     if(field == 'adjust'){
-      kettle.temp.current = (parseFloat(kettle.temp.previous) + parseFloat(kettle.temp.adjust));      
+      kettle.temp.current = (parseFloat(kettle.temp.previous) + parseFloat(kettle.temp.adjust));
     }
 
     //update knob after 1 seconds, otherwise we get a lot of refresh on the knob when clicking plus or minus
