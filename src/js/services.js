@@ -905,7 +905,7 @@ angular.module('brewbench-monitor')
         response.fg = parseFloat(recipe.FG).toFixed(3);
 
       if(!!recipe.IBU)
-        response.fg = parseInt(recipe.IBU,10);
+        response.ibu = parseInt(recipe.IBU,10);
 
       if(!!recipe.STYLE.ABV_MAX)
         response.abv = $filter('number')(recipe.STYLE.ABV_MAX,2);
