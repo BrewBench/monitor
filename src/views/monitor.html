@@ -35,7 +35,7 @@
         </a>
       </div>
       <nvd3 options="chartOptions" data="kettles" ng-show="settings.chart"></nvd3>
-      <button class="btn btn-light" ng-click="addKettle()">Add Kettle</button>
+      <button class="btn btn-light" ng-click="addKettle()" ng-if="shareAccess('fullAccess')">Add Kettle</button>
     </div>
   </div>
   <div class="flex-row" ng-disabled="share.needPassword" ng-class="{'disabled':share.needPassword}">
