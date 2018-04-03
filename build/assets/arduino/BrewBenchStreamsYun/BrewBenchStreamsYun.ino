@@ -4,6 +4,7 @@
 #include <BridgeClient.h>
 // [headers]
 
+String HOSTNAME = "";
 const String VERSION = "3.3.0";
 const PROGMEM int FREQUENCY_SECONDS = [FREQUENCY_SECONDS];
 int secondCounter = 0;
@@ -91,7 +92,7 @@ void digitalCommand(BridgeClient client) {
   }
 
   // Send JSON response to client
-  client.print("{\"pin\":\""+spin.substring(0,spin.indexOf("/"))+"\",\"value\":"+String(value)+"}");
+  client.print("{\"hostname\":\""+String(HOSTNAME)+"\",\"pin\":\""+spin.substring(0,spin.indexOf("/"))+"\",\"value\":"+String(value)+"}");
 }
 
 // https://www.arduino.cc/en/Reference/AnalogWrite
@@ -110,7 +111,7 @@ void analogCommand(BridgeClient client) {
   }
 
   // Send JSON response to client
-  client.print("{\"pin\":\""+String(spin)+String(pin)+"\",\"value\":"+String(value)+"}");
+  client.print("{\"hostname\":\""+String(HOSTNAME)+"\",\"pin\":\""+String(spin)+String(pin)+"\",\"value\":"+String(value)+"}");
 }
 
 void tempCommand(BridgeClient client, const String type) {
@@ -171,7 +172,7 @@ void tempCommand(BridgeClient client, const String type) {
   // DHT     humidity = DHT.humidity;
   // DHT   }
   // DHT }
-  String data = "{\"pin\":\""+String(spin)+"\",\"temp\":"+String(temp)+",\"raw\":"+String(raw)+"";
+  String data = "{\"hostname\":\""+String(HOSTNAME)+"\",\"pin\":\""+String(spin)+"\",\"temp\":"+String(temp)+",\"raw\":"+String(raw)+"";
 // DHT  if(humidity) data += ",\"humidity\":"+String(humidity)+"";
   data += "}";
   // Send JSON response to client
@@ -240,12 +241,14 @@ void postData(const String &connection, const String &data, const String &dataTy
 float actionsCommand(const String &source, const String &spin, const String &type, const int &adjustTemp) {
   float temp = 0.00;
   float raw = 0.00;
+// DHT  float humidity = 0.00;
+  int pin = spin.substring(1).toInt();
+
   if( spin.substring(0,1) == "A" )
     raw = analogRead(pin);
   else
     raw = digitalRead(pin);
-// DHT  float humidity = 0.00;
-  int pin = spin.substring(1).toInt();
+
   if(type == "Thermistor"){
     samples[0] = raw;
     uint8_t i;
@@ -294,8 +297,8 @@ float actionsCommand(const String &source, const String &spin, const String &typ
   // adjust temp if we have it
   if(temp) temp = temp+adjustTemp;
   // Send JSON response to client
-  String data = "temperature,sensor="+type+",pin="+spin+",source="+source+" temp="+String(temp);
-  data += " bits,sensor="+type+",pin="+spin+",source="+source+" raw="+String(raw);
+  String data = "temperature,sensor="+type+",pin="+spin+",source="+source+",host="+HOSTNAME+" temp="+String(temp);
+  data += " bits,sensor="+type+",pin="+spin+",source="+source+",host="+HOSTNAME+" raw="+String(raw);
   // Add humidity if we have it
 // DHT  if(humidity) data = data+" humidity="+String(humidity);
 
@@ -337,6 +340,18 @@ void runActions(){
   // [actions]
 }
 
+void getHostname(){
+  Process p;
+  char c;
+  p.runShellCommand("hostname");
+  while(p.available() > 0) {
+   c = p.read();
+   Serial.print(c);
+   HOSTNAME.concat(c);
+  }
+  HOSTNAME.trim();
+}
+
 void setup() {
 
   Bridge.begin();
@@ -345,7 +360,7 @@ void setup() {
   // Uncomment for REST API with password
   // server.noListenOnLocalhost();
   server.begin();
-
+  getHostname();
 }
 
 void loop() {

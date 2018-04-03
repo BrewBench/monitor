@@ -150,6 +150,7 @@
               <tr>
                 <th>URL</th>
                 <!-- <th>Password</th> -->
+                <th>Online</th>
                 <th>Analog Ports</th>
                 <th>Digital Ports</th>
                 <th></th>
@@ -169,6 +170,7 @@
                 <!-- <td class="text-left">
                   <input class="form-control" type="password" ng-model="arduino.password" ng-change="arduinos.update(arduino)"></input>
                 </td> -->
+                <td><i class="fa fa-circle fa-lg" ng-class="{'on':!!arduino.status, 'off':!arduino.status}" aria-hidden="true"></i></td>
                 <td class="text-left"><input class="form-control" type="number" ng-model="arduino.analog" ng-change="arduinos.update(arduino)"></td>
                 <td class="text-left"><input class="form-control" type="number" ng-model="arduino.digital" ng-change="arduinos.update(arduino)"></td>
                 <td><a href="" ng-click="arduinos.delete($index, arduino)"><i class="fa fa-trash fa-2x text-danger"></i></a></td>

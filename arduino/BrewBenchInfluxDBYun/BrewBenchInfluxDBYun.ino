@@ -4,10 +4,10 @@
 #include <BridgeClient.h>
 // [headers]
 
+String HOSTNAME = "";
 const String VERSION = "3.3.0";
 const PROGMEM int FREQUENCY_SECONDS = [FREQUENCY_SECONDS];
 int secondCounter = 0;
-
 BridgeServer server;
 // DHT dht DHT;
 
@@ -236,12 +236,14 @@ void postData(const String &connection, const String &data, const String &dataTy
 float actionsCommand(const String &source, const String &spin, const String &type, const int &adjustTemp) {
   float temp = 0.00;
   float raw = 0.00;
+// DHT  float humidity = 0.00;
+  int pin = spin.substring(1).toInt();
+
   if( spin.substring(0,1) == "A" )
     raw = analogRead(pin);
   else
     raw = digitalRead(pin);
-// DHT  float humidity = 0.00;
-  int pin = spin.substring(1).toInt();
+
   if(type == "Thermistor"){
     samples[0] = raw;
     uint8_t i;
@@ -333,6 +335,18 @@ void runActions(){
   // [actions]
 }
 
+void getHostname(){
+  Process p;
+  char c;
+  p.runShellCommand("hostname");
+  while(p.available() > 0) {
+   c = p.read();
+   Serial.print(c);
+   HOSTNAME.concat(c);
+  }
+  HOSTNAME.trim();
+}
+
 void setup() {
 
   Bridge.begin();
@@ -341,7 +355,7 @@ void setup() {
   // Uncomment for REST API with password
   // server.noListenOnLocalhost();
   server.begin();
-
+  getHostname();
 }
 
 void loop() {

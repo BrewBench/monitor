@@ -7,6 +7,7 @@
 // https://www.brewbench.co/libs/cactus_io_DS18B20.zip
 #include "cactus_io_DS18B20.h"
 
+String HOSTNAME = "";
 const String VERSION = "3.3.0";
 
 BridgeServer server;
@@ -92,7 +93,7 @@ void digitalCommand(BridgeClient client) {
   }
 
   // Send JSON response to client
-  client.print("{\"pin\":\""+spin.substring(0,spin.indexOf("/"))+"\",\"value\":"+String(value)+"}");
+  client.print("{\"hostname\":\""+String(HOSTNAME)+"\",\"pin\":\""+spin.substring(0,spin.indexOf("/"))+"\",\"value\":"+String(value)+"}");
 }
 
 // https://www.arduino.cc/en/Reference/AnalogWrite
@@ -111,7 +112,7 @@ void analogCommand(BridgeClient client) {
   }
 
   // Send JSON response to client
-  client.print("{\"pin\":\""+String(spin)+String(pin)+"\",\"value\":"+String(value)+"}");
+  client.print("{\"hostname\":\""+String(HOSTNAME)+"\",\"pin\":\""+String(spin)+String(pin)+"\",\"value\":"+String(value)+"}");
 }
 
 void tempCommand(BridgeClient client, String type) {
@@ -172,13 +173,25 @@ void tempCommand(BridgeClient client, String type) {
       humidity = DHT.humidity;
     }
   }
-  String data = "{\"pin\":\""+String(spin)+"\",\"temp\":"+String(temp)+",\"raw\":"+String(raw)+"";
+  String data = "{\"hostname\":\""+String(HOSTNAME)+"\",\"pin\":\""+String(spin)+"\",\"temp\":"+String(temp)+",\"raw\":"+String(raw)+"";
   if(humidity)
     data += ",\"humidity\":"+String(humidity)+"}";
   else
     data += "}";
   // Send JSON response to client
   client.print(data);
+}
+
+void getHostname(){
+  Process p;
+  char c;
+  p.runShellCommand("hostname");
+  while(p.available() > 0) {
+   c = p.read();
+   Serial.print(c);
+   HOSTNAME.concat(c);
+  }
+  HOSTNAME.trim();
 }
 
 void setup() {
@@ -189,7 +202,7 @@ void setup() {
   // Uncomment for REST API with password
   // server.noListenOnLocalhost();
   server.begin();
-
+  getHostname();
 }
 
 void loop() {
