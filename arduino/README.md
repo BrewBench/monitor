@@ -77,6 +77,9 @@ Download the [Arduino IDE](https://www.arduino.cc/en/Main/Software) >= 1.8.5
 
     * http://wiki.dragino.com/index.php?title=Getting_Start_with_Arduino_Yun#Automatically_Add_Board_Profile_in_Arduino_IDE
 
+### ESP8266
+
+
 ## Monitoring
 
 ### BrewBench Streams

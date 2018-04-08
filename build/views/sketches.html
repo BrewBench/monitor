@@ -70,7 +70,7 @@
               <div class="row pb-2">
                 <div class="col-6">
                   <label class="adjust">Username</label>
-                  <input class="form-control" type="text" ng-model="settings.streams.user" placeholder="Username">
+                  <input class="form-control" type="text" ng-model="settings.streams.username" placeholder="Username">
                 </div>
                 <div class="col-6">
                   <label class="adjust">API Key</label>
@@ -79,7 +79,10 @@
               </div>
               <div class="row">
                 <div class="col-12">
-                    <button class="btn btn-primary float-right" ng-click="streamsConnect()" ng-disabled="!settings.streams.user && !settings.streams.api_key">Connect</button>
+                  <div class="btn-group float-right">
+                    <button class="btn btn-secondary" ng-click="streams.remove()" ng-disabled="!settings.streams.user && !settings.streams.api_key">Remove</button>
+                    <button class="btn btn-primary" ng-click="streams.connect()" ng-disabled="!settings.streams.user && !settings.streams.api_key">Connect</button>
+                  </div>
               </div>
             </div>
           </div>
@@ -124,12 +127,12 @@
                       <div class="dropdown-menu">
                         <a class="dropdown-item" href="" ng-click="settings.influxdb.db=''">Create a new database</a>
                         <div role="separator" class="dropdown-divider"></div>
-                        <a ng-repeat="db in settings.influxdb.dbs" class="dropdown-item" href="" ng-click="settings.influxdb.db=db">{{db}}</a>
+                        <a ng-repeat="db in settings.influxdb.dbs" class="dropdown-item" href="" ng-click="settings.influxdb.db=db">{{ db }}</a>
                       </div>
                     </div>
                     <input class="form-control" type="text" ng-model="settings.influxdb.db" placeholder="Database Name">
-                    <span class="input-group-btn">
-                      <button class="btn btn-primary" ng-click="createInfluxDB()" ng-disabled="!settings.influxdb.connected">Create</button>
+                    <span class="input-group-append">
+                      <button class="btn btn-primary" ng-click="influxdb.create()" ng-disabled="!settings.influxdb.connected">Create</button>
                     </span>
                   </div>
                   <small ng-if="settings.influxdb.created" class="badge badge-success">Created</small>
@@ -147,7 +150,10 @@
               </div>
               <div class="row">
                 <div class="col-12">
-                    <button class="btn btn-primary float-right" ng-click="testInfluxDB()" ng-disabled="!settings.influxdb.url">Connect</button>
+                  <div class="btn-group float-right">
+                    <button class="btn btn-secondary" ng-click="influxdb.remove()" ng-disabled="!settings.influxdb.url">Remove</button>
+                    <button class="btn btn-primary" ng-click="influxdb.connect()" ng-disabled="!settings.influxdb.url">Connect</button>
+                  </div>
                 </div>
               </div>
           </div>
@@ -186,7 +192,7 @@
                       <img ng-if="kettle.type != 'air'" class="type" ng-src="/assets/img/{{kettle.type}}.svg" width="30" height="30"/>
                       <i ng-if="kettle.type == 'air'" class="fa fa-thermometer-quarter fa-2x type" height="30"></i>
                       &nbsp;
-                      <strong>{{kettle.key}}</strong><br/>
+                      <strong>{{kettle.name}}</strong><br/>
                       {{kettle.temp.pin}} {{kettle.temp.type}}<br/>
                       <img src="assets/img/arduino.svg" width="15">&nbsp;{{ kettle.arduino.url }}
                     </td>
@@ -203,7 +209,7 @@
                           <span>{{pinDisplay(kettle.heater.pin)}}</span>
                           <input class="tgl tgl-ios" id="triggerHeater{{$index}}" type="checkbox"
                             ng-checked="kettle.heater.sketch"
-                            ng-click="kettle.heater.sketch = !kettle.heater.sketch;"/>
+                            ng-click="streams.kettles(kettle,'heater')"/>
                           <label class="tgl-btn" for="triggerHeater{{$index}}"></label>
                         </li>
                       </ul>
@@ -221,7 +227,7 @@
                           <span>{{pinDisplay(kettle.cooler.pin)}}</span>
                           <input class="tgl tgl-ios" id="triggerCooler{{$index}}" type="checkbox"
                             ng-checked="kettle.cooler.sketch"
-                            ng-click="kettle.cooler.sketch = !kettle.cooler.sketch;"/>
+                            ng-click="streams.kettles(kettle,'cooler')"/>
                           <label class="tgl-btn" for="triggerCooler{{$index}}"></label>
                         </li>
                       </ul>
@@ -229,9 +235,14 @@
                     <td>
                       <ul class="tg-list">
                         <li class="tg-list-item">
+                          <span>Streams</span>
+                          <input class="tgl tgl-ios" id="streams{{$index}}" type="checkbox" ng-disabled="!settings.streams.api_key || settings.streams.status != 'Connected'" ng-checked="kettle.notify.streams" ng-click="streams.kettles(kettle)"/>
+                          <label class="tgl-btn" ng-class="{'disabled':!settings.streams.api_key || settings.streams.status != 'Connected'}" for="streams{{$index}}"></label>
+                        </li>
+                        <li class="tg-list-item">
                           <span>Slack</span>
                           <input class="tgl tgl-ios" id="slack{{$index}}" type="checkbox" ng-disabled="!settings.notifications.slack" ng-checked="kettle.notify.slack" ng-click="kettle.notify.slack = !kettle.notify.slack"/>
-                          <label class="tgl-btn" for="slack{{$index}}"></label>
+                          <label class="tgl-btn" ng-class="{'disabled':!settings.notifications.slack}" for="slack{{$index}}"></label>
                         </li>
                         <li class="tg-list-item">
                           <span>Dweet</span>
@@ -239,6 +250,10 @@
                           <label class="tgl-btn" for="dweet{{$index}}"></label>
                         </li>
                       </ul>
+                      <div class="alert alert-{{kettle.message.type}} alert-dismissible" role="alert" ng-if="kettle.message.message && kettle.message.location == 'sketches'">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <strong>{{kettle.message.type}}</strong> <span ng-bind-html="kettle.message.message">{{kettle.message.message}}</span>
+                      </div>
                     </td>
                     <td>{{kettle.temp.current | number:2}}&deg;{{settings.unit}}</td>
                     <td>{{kettle.temp.target}}&deg;{{settings.unit}}</td>

@@ -2,6 +2,7 @@ angular.module('brewbench-monitor')
 .factory('BrewService', function($http, $q, $filter){
 
   return {
+    accessToken: '',
 
     //cookies size 4096 bytes
     clear: function(){
@@ -13,7 +14,7 @@ angular.module('brewbench-monitor')
     },
 
     reset: function(){
-      return {
+      const defaultSettings = {
         debug: false
         ,pollSeconds: 10
         ,unit: 'F'
@@ -23,8 +24,6 @@ angular.module('brewbench-monitor')
         ,recipe: {'name':'','brewer':{name:'','email':''},'yeast':[],'hops':[],'grains':[],scale:'gravity',method:'papazian','og':1.050,'fg':1.010,'abv':0,'abw':0,'calories':0,'attenuation':0}
         ,notifications: {on:true,timers:true,high:true,low:true,target:true,slack:'',last:''}
         ,sounds: {on:true,alert:'/assets/audio/bike.mp3',timer:'/assets/audio/school.mp3'}
-        ,account: {apiKey: '', sessions: []}
-        ,influxdb: {url: '', port: 8086, user: '', pass: '', db: '', dbs:[], status: ''}
         ,arduinos: [{
           id: btoa('brewbench'),
           url: 'arduino.local',
@@ -34,8 +33,10 @@ angular.module('brewbench-monitor')
         }]
         ,tplink: {user: '', pass: '', token:'', status: '', plugs: []}
         ,sketches: {frequency: 60, version: 0, ignore_version_error: false}
-        ,streams: {username: '', api_key: '', status: ''}
+        ,influxdb: {url: '', port: 8086, user: '', pass: '', db: '', dbs:[], status: ''}
+        ,streams: {username: '', api_key: '', status: '', session: {id: '', name: ''}}
       };
+      return defaultSettings;
     },
 
     defaultKnobOptions: function(){
@@ -61,7 +62,7 @@ angular.module('brewbench-monitor')
 
     defaultKettles: function(){
       return [{
-          key: 'Hot Liquor'
+          name: 'Hot Liquor'
           ,type: 'water'
           ,active: false
           ,sticky: false
@@ -71,11 +72,11 @@ angular.module('brewbench-monitor')
           ,values: []
           ,timers: []
           ,knob: angular.copy(this.defaultKnobOptions(),{value:0,min:0,max:220})
-          ,arduino: {id: btoa('brewbench'), url: 'arduino.local',analog: 5,digital: 13}
-          ,error: {message:'',version:'',count:0}
-          ,notify: {slack: false, dweet: false}
+          ,arduino: {id: btoa('brewbench'),url:'arduino.local',analog:5,digital:13}
+          ,message: {type:'error',message:'',version:'',count:0,location:''}
+          ,notify: {slack: false, dweet: false, streams: false}
         },{
-          key: 'Mash'
+          name: 'Mash'
           ,type: 'grain'
           ,active: false
           ,sticky: false
@@ -85,11 +86,11 @@ angular.module('brewbench-monitor')
           ,values: []
           ,timers: []
           ,knob: angular.copy(this.defaultKnobOptions(),{value:0,min:0,max:220})
-          ,arduino: {id: btoa('brewbench'), url: 'arduino.local',analog: 5,digital: 13}
-          ,error: {message:'',version:'',count:0}
-          ,notify: {slack: false, dweet: false}
+          ,arduino: {id: btoa('brewbench'),url:'arduino.local',analog:5,digital:13}
+          ,message: {type:'error',message:'',version:'',count:0,location:''}
+          ,notify: {slack: false, dweet: false, streams: false}
         },{
-          key: 'Boil'
+          name: 'Boil'
           ,type: 'hop'
           ,active: false
           ,sticky: false
@@ -99,9 +100,9 @@ angular.module('brewbench-monitor')
           ,values: []
           ,timers: []
           ,knob: angular.copy(this.defaultKnobOptions(),{value:0,min:0,max:220})
-          ,arduino: {id: btoa('brewbench'), url: 'arduino.local',analog: 5,digital: 13}
-          ,error: {message:'',version:'',count:0}
-          ,notify: {slack: false, dweet: false}
+          ,arduino: {id: btoa('brewbench'),url:'arduino.local',analog:5,digital:13}
+          ,message: {type:'error',message:'',version:'',count:0,location:''}
+          ,notify: {slack: false, dweet: false, streams: false}
         }];
     },
 
@@ -175,7 +176,7 @@ angular.module('brewbench-monitor')
       var q = $q.defer();
 
       var postObj = {'attachments': [{'fallback': msg,
-            'title': kettle.key,
+            'title': kettle.name,
             'title_link': 'http://'+document.location.host,
             'fields': [{'value': msg}],
             'color': color,
@@ -366,7 +367,8 @@ angular.module('brewbench-monitor')
         delete kettles[i].knob;
         delete kettles[i].values;
       });
-      delete settings.account;
+      delete settings.streams;
+      delete settings.influxdb;
       delete settings.notifications;
       settings.shared = true;
       if(sh.password)
@@ -561,16 +563,34 @@ angular.module('brewbench-monitor')
     streams: function(){
       var q = $q.defer();
       var settings = this.settings('settings');
-      var url = `https://${settings.streams.user}.streams.brewbench.co/ping`;
-      var request = {url: url, method: 'GET', timeout: settings.pollSeconds*10000};
-
-      if(settings.streams.api_key){
-        request.withCredentials = true;
-        request.headers = {'Authorization': 'Basic '+btoa(settings.streams.user+':'+settings.streams.api_key)};
-      }
+      var url = `https://${settings.streams.username}.streams.brewbench.co`;
+      var request = {url: url, headers: {}, timeout: settings.pollSeconds*10000};
 
       return {
+        auth: () => {
+          if(settings.streams.api_key){
+            request.url = `http://localhost:3001/api/users/${settings.streams.api_key}/auth?brewery=${settings.streams.username}`;
+            request.method = 'GET';
+            request.headers['Content-Type'] ='application/json';
+            $http(request)
+              .then(response => {
+                q.resolve(response);
+              })
+              .catch(err => {
+                q.reject(err);
+              });
+          } else {
+            q.reject(false);
+          }
+          return q.promise;
+        },
         ping: () => {
+          if(settings.streams.api_key){
+            request.withCredentials = true;
+            request.headers['Authorization'] = 'Basic '+btoa(settings.streams.username+':'+settings.streams.api_key);
+          }
+          request.url += '/ping';
+          request.method = 'GET';
           $http(request)
             .then(response => {
               q.resolve(response);
@@ -579,8 +599,96 @@ angular.module('brewbench-monitor')
               q.reject(err);
             });
             return q.promise;
+        },
+        kettles: {
+          save: async (kettle) => {
+            if(!this.accessToken){
+              var auth = await this.streams().auth();
+              if(auth && auth.accessToken)
+                this.accessToken = auth.accessToken;
+            }
+            request.url = 'http://localhost:3001/api/kettles/arm';
+            request.method = 'POST';
+            request.data = {
+              session: settings.streams.session,
+              kettle: kettle,
+              notifications: settings.notifications              
+            };
+            request.headers['Content-Type'] = 'application/json';
+            request.headers['Authorization'] = this.accessToken;
+            $http(request)
+              .then(response => {
+                q.resolve(response);
+              })
+              .catch(err => {
+                q.reject(err);
+              });
+              return q.promise;
+            }
+        },
+        sessions: {
+          get: async () => {
+            if(!this.accessToken){
+              var auth = await this.streams().auth();
+              if(auth && auth.accessToken)
+                this.accessToken = auth.accessToken;
+            }
+            request.url = 'http://localhost:3001/api/sessions';
+            request.method = 'POST';
+            request.data = {
+              sessionId: sessionId,
+              kettle: kettle
+            };
+            request.headers['Content-Type'] = 'application/json';
+            request.headers['Authorization'] = this.accessToken;
+            $http(request)
+              .then(response => {
+                q.resolve(response);
+              })
+              .catch(err => {
+                q.reject(err);
+              });
+              return q.promise;
+          }
         }
       };
+    },
+
+    // do calcs that exist on the sketch
+    bitcalc: function(kettle){
+      var average = kettle.temp.raw;
+      // https://www.arduino.cc/reference/en/language/functions/math/map/
+      function fmap (x,in_min,in_max,out_min,out_max){
+        return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+      }
+      if(kettle.temp.type == 'Thermistor'){
+        const THERMISTORNOMINAL = 10000;
+        // temp. for nominal resistance (almost always 25 C)
+        const TEMPERATURENOMINAL = 25;
+        // how many samples to take and average, more takes longer
+        // but is more 'smooth'
+        const NUMSAMPLES = 5;
+        // The beta coefficient of the thermistor (usually 3000-4000)
+        const BCOEFFICIENT = 3950;
+        // the value of the 'other' resistor
+        const SERIESRESISTOR = 10000;
+       // convert the value to resistance
+       average = 1023 / average - 1;
+       average = SERIESRESISTOR / average;
+
+       var steinhart = average / THERMISTORNOMINAL;     // (R/Ro)
+       steinhart = Math.log(steinhart);                  // ln(R/Ro)
+       steinhart /= BCOEFFICIENT;                   // 1/B * ln(R/Ro)
+       steinhart += 1.0 / (TEMPERATURENOMINAL + 273.15); // + (1/To)
+       steinhart = 1.0 / steinhart;                 // Invert
+       steinhart -= 273.15;
+       return steinhart;
+     } else if(kettle.temp.type == 'PT100'){
+       if (raw>409){
+        return (150*fmap(raw,410,1023,0,614))/614;
+       }
+     }
+      return 'N/A';
     },
 
     influxdb: function(){

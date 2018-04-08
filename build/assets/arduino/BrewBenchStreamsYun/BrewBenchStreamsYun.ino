@@ -2,9 +2,11 @@
 #include <Bridge.h>
 #include <BridgeServer.h>
 #include <BridgeClient.h>
+#include <ArduinoJson.h>
 // [headers]
 
 String HOSTNAME = "";
+JsonObject& jsonSettings;
 const String VERSION = "3.3.0";
 const PROGMEM int FREQUENCY_SECONDS = [FREQUENCY_SECONDS];
 int secondCounter = 0;
@@ -184,6 +186,7 @@ void postData(const String &connection, const String &data, const String &dataTy
   p.begin(F("curl"));
   p.addParameter(F("-k"));
   p.addParameter(F("-XPOST"));
+  p.addParameter("User-Agent: BrewBench/"+VERSION);
   if(contentType != ""){
     p.addParameter(F("-H"));
     p.addParameter(contentType);
@@ -297,14 +300,35 @@ float actionsCommand(const String &source, const String &spin, const String &typ
   // adjust temp if we have it
   if(temp) temp = temp+adjustTemp;
   // Send JSON response to client
-  String data = "temperature,sensor="+type+",pin="+spin+",source="+source+",host="+HOSTNAME+" temp="+String(temp);
-  data += " bits,sensor="+type+",pin="+spin+",source="+source+",host="+HOSTNAME+" raw="+String(raw);
-  // Add humidity if we have it
-// DHT  if(humidity) data = data+" humidity="+String(humidity);
+  String data = "{\"hostname\":\""+String(HOSTNAME)+"\",\"pin\":\""+String(spin)+"\",\"temp\":"+String(temp)+",\"raw\":"+String(raw)+"";
+  data += ",\"sensor\":\""+String(type)+"\"";
+  data += ",\"source\":\""+String(source)+"\"";
+// DHT  if(humidity) data += ",\"humidity\":"+String(humidity)+"";
+  data += "}";
 
-  postData(F("[PROXY_CONNECTION]"), data, F("--data-binary"), "", F("[PROXY_AUTH]"));
+  postTemp(data);
 
   return temp;
+}
+
+void postTemp(const &data String){
+  Process p;
+  String jsonRaw;
+  p.begin(F("curl"));
+  p.addParameter(F("-k"));
+  p.addParameter(F("-XPOST"));
+  p.addParameter("User-Agent: BrewBench/"+VERSION);
+  p.addParameter(F("-H"));
+  p.addParameter(F("-d"));
+  p.addParameter(data);
+  p.addParameter(F("[PROXY_AUTH]"));
+  p.addParameter(F("[PROXY_CONNECTION]/settings"));
+  p.runAsynchronously();
+  while (p.available()) {
+    jsonRaw = p.readString();
+  }
+  jsonSettings = jsonBuffer.parseObject(jsonRaw);
+  /* if(jsonSettings["sessionId"]) */
 }
 
 // triggers void trigger(const String &type, const String &source, const String &spin, const float &temp, const int &target, const int &diff, const boolean &slack) {

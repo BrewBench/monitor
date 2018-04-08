@@ -10,9 +10,13 @@ const ConcatPlugin = require('webpack-concat-plugin');
 const path = require('path');
 const pkg = require('./package.json');
 
+require("babel-core/register");
+require("babel-polyfill");
+
 module.exports = {
     entry: {
       main: [
+        'babel-polyfill',
         './src/js/app.js',
         './src/js/controllers.js',
         './src/js/directives.js',
@@ -96,7 +100,13 @@ module.exports = {
           // (which should be serving on http://localhost:3100/)
           // through BrowserSync
           // proxy: 'http://localhost:3100/',
-          server: { baseDir: ['build'] }
+          server: { baseDir: ['build'] },
+
+          ui: false
+
+          // ui: {
+          //     port: 8080
+          // }
         },
         // plugin options
         {

@@ -19,12 +19,19 @@ angular.module('brewbench-monitor')
 })
 .filter('toFahrenheit', function($filter) {
   return function(celsius) {
-    return $filter('number')(celsius*9/5+32,2);
+    celsius = parseFloat(celsius);
+    return $filter('round')(celsius*9/5+32,2);
   };
 })
 .filter('toCelsius', function($filter) {
   return function(fahrenheit) {
-    return $filter('number')((fahrenheit-32)*5/9,2);
+    fahrenheit = parseFloat(fahrenheit);
+    return $filter('round')((fahrenheit-32)*5/9,2);
+  };
+})
+.filter('round', function($filter) {
+  return function(val,decimals) {
+    return Number((Math.round(val + "e" + decimals)  + "e-" + decimals));
   };
 })
 .filter('highlight', function($sce) {

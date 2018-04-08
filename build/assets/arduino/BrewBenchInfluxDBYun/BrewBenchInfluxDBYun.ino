@@ -183,6 +183,7 @@ void postData(const String &connection, const String &data, const String &dataTy
   p.begin(F("curl"));
   p.addParameter(F("-k"));
   p.addParameter(F("-XPOST"));
+  p.addParameter("User-Agent: BrewBench/"+VERSION);
   if(contentType != ""){
     p.addParameter(F("-H"));
     p.addParameter(contentType);
@@ -292,10 +293,10 @@ float actionsCommand(const String &source, const String &spin, const String &typ
   // adjust temp if we have it
   if(temp) temp = temp+adjustTemp;
   // Send JSON response to client
-  String data = "temperature,sensor="+type+",pin="+spin+",source="+source+" temp="+String(temp);
-  data += " bits,sensor="+type+",pin="+spin+",source="+source+" raw="+String(raw);
+  String data = "temperature,sensor="+type+",pin="+spin+",source="+source+" value="+String(temp);
+  data += "\nbits,sensor="+type+",pin="+spin+",source="+source+" value="+String(raw);
   // Add humidity if we have it
-// DHT  if(humidity) data = data+" humidity="+String(humidity);
+// DHT  if(humidity) data += "\nhumidity,sensor="+type+",pin="+spin+",source="+source+" value="+String(humidity);
 
   postData(F("[INFLUXDB_CONNECTION]"), data, F("--data-binary"), "");
 

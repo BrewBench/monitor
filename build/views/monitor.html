@@ -35,7 +35,22 @@
         </a>
       </div>
       <nvd3 options="chartOptions" data="kettles" ng-show="settings.chart"></nvd3>
-      <button class="btn btn-light" ng-click="addKettle()" ng-if="shareAccess('fullAccess')">Add Kettle</button>
+      <div class="row">
+        <div class="col-auto">
+          <button class="btn btn-light" ng-click="addKettle()" ng-if="shareAccess('fullAccess')">Add Kettle</button>
+        </div>
+        <div class="col-auto" ng-if="settings.streams.api_key && settings.streams.status=='Connected'">
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text"><img src="/assets/img/brewbench-colors.png" width="18"/></span>
+            </div>
+            <input class="form-control" type="text" ng-model="settings.streams.session.name" placeholder="Session Name"/>
+            <div class="input-group-append">
+              <button class="btn btn-light" type="button">Save</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
   <div class="flex-row" ng-disabled="share.needPassword" ng-class="{'disabled':share.needPassword}">

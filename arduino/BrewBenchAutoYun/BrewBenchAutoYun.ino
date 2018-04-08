@@ -184,6 +184,7 @@ void postData(String connection, String data, String dataType, String contentTyp
   p.begin(F("curl"));
   p.addParameter(F("-k"));
   p.addParameter(F("-XPOST"));
+  p.addParameter("User-Agent: BrewBench/"+VERSION);
   p.addParameter(F("-H"));
   if(contentType != "")
     p.addParameter(contentType);

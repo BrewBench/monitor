@@ -11,7 +11,9 @@
             <a class="ui ribbon label dropdown-toggle" ng-class="{'teal':kettle.arduino, 'orange':!kettle.arduino}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               <span class="dropdown-toggle"><img src="assets/img/arduino.svg" width="15"> {{kettle.arduino ? kettle.arduino.url : 'Select an Arduino'}}</span>
             </a>
-            <a href="" class="text-success sticky" ng-click="kettle.sticky = !!(kettle.sticky) ?  false : true"><i class="fa fa-thumb-tack fa-lg"></i></a>
+            <div class="kettle-options">
+              <a href="" class="text-success sticky" ng-click="kettle.sticky = !!(kettle.sticky) ?  false : true"><i class="fa fa-thumb-tack fa-lg"></i></a>
+            </div>
             <div class="dropdown-menu scrollable-menu">
               <button class="text-center modal-link dropdown-item" type="button" data-toggle="modal" data-target="#settingsModal">
                 <strong>Add / Edit Arduinos</strong>
@@ -31,10 +33,10 @@
         </div>
       </div>
 
-      <div class="alert alert-danger" ng-if="kettle.error.message">
+      <div class="alert alert-{{kettle.message.type}}" ng-if="kettle.message.message">
         <button type="button" class="close" data-dismiss="alert" aria-label="Close" ng-click="resetError(kettle)"><span aria-hidden="true">×</span></button>
-        <span ng-bind-html="kettle.error.message">{{kettle.error.message}}</span>
-        <a ng-show="kettle.error.version" href="" ng-click="ignoreVersionError(kettle)"><br>Ignore Version Updates</a>
+        <span ng-bind-html="kettle.message.message">{{kettle.message.message}}</span>
+        <a ng-show="kettle.message.version" href="" ng-click="ignoreVersionError(kettle)"><br>Ignore Version Updates</a>
       </div>
 
       <div class="row">
@@ -43,7 +45,7 @@
             <img ng-if="kettle.type != 'air'" class="type" ng-src="/assets/img/{{kettle.type}}.svg" width="30" height="30"/>
             <i ng-if="kettle.type == 'air'" class="fa fa-thermometer-quarter fa-2x type" height="30"></i>
           </a>&nbsp;
-          <h3><editable type="text" model="kettle.key"></editable></h3>
+          <h3><editable type="text" model="kettle.name"></editable></h3>
         </div>
       </div>
 
@@ -57,19 +59,19 @@
                   {{ kettle.temp.pin }} <span class="caret"></span>
                 </button>
                 <div class="dropdown-menu scrollable-menu">
-                  <h6 ng-if="sensorTypes(kettle.temp.type).analog" class="dropdown-header">Analog</h6>
-                  <div ng-if="sensorTypes(kettle.temp.type).analog" class="dropdown-divider"></div>
-                  <button ng-if="sensorTypes(kettle.temp.type).analog"
+                  <h6 ng-if="BrewService.sensorTypes(kettle.temp.type).analog" class="dropdown-header">Analog</h6>
+                  <div ng-if="BrewService.sensorTypes(kettle.temp.type).analog" class="dropdown-divider"></div>
+                  <button ng-if="BrewService.sensorTypes(kettle.temp.type).analog"
                       ng-repeat="p in getPortRange(kettle.arduino.analog) track by $index"
                       ng-class="{'active': kettle.temp.pin=='A'+p}"
                       ng-click="kettle.temp.pin='A'+p;"
                       class="dropdown-item" type="button">
                     A{{p}} <span class="pininuse" ng-show="pinInUse('A'+p,kettle.arduino.id,true)">(In Use)</span>
                   </button>
-                  <div ng-if="sensorTypes(kettle.temp.type).digital" class="dropdown-divider"></div>
-                  <h6 ng-if="sensorTypes(kettle.temp.type).digital" class="dropdown-header">Digital</h6>
-                  <div ng-if="sensorTypes(kettle.temp.type).digital" class="dropdown-divider"></div>
-                  <button ng-if="sensorTypes(kettle.temp.type).digital"
+                  <div ng-if="BrewService.sensorTypes(kettle.temp.type).digital" class="dropdown-divider"></div>
+                  <h6 ng-if="BrewService.sensorTypes(kettle.temp.type).digital" class="dropdown-header">Digital</h6>
+                  <div ng-if="BrewService.sensorTypes(kettle.temp.type).digital" class="dropdown-divider"></div>
+                  <button ng-if="BrewService.sensorTypes(kettle.temp.type).digital"
                       ng-repeat="p in getPortRange(kettle.arduino.digital) track by $index"
                       ng-class="{'active': kettle.temp.pin=='D'+p}"
                       ng-click="kettle.temp.pin='D'+p;"
@@ -82,7 +84,7 @@
                 <button type="button" class="btn btn-light dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   {{kettle.temp.type}} <span class="caret"></span>
                 </button>
-                <div class="dropdown-menu scrollable-menu" ng-init="sensors = sensorTypes()">
+                <div class="dropdown-menu scrollable-menu" ng-init="sensors = BrewService.sensorTypes()">
                   <button ng-repeat="s in sensors track by $index"
                       ng-class="{'active': kettle.temp.type==s.name}"
                       ng-click="kettle.temp.type=s.name;"
@@ -280,13 +282,13 @@
 
     <div class="card-body">
       <div class="row">
-        <div class="col-auto mr-auto">
+        <div class="col mr-auto">
           <ui-knob ng-click="knobClick(kettle)"
-            value="kettle.temp.current | number:0"
+            value="kettle.temp.current | round:0"
             options="kettle.knob">
           </ui-knob>
         </div>
-        <div class="col-auto" ng-if="shareAccess('fullAccess')">
+        <div class="col" ng-if="shareAccess('fullAccess')">
           <div class="row">
             <div class="col">
               <label class="adjust">Target</label>
@@ -400,14 +402,15 @@
       <ul class="list-group list-group-flush">
         <li class="list-group-item">
           raw bits: {{ kettle.temp.raw }}<br/>
+          bit calc temp: {{ BrewService.bitcalc(kettle) }} &deg;C<br/>
           current: {{ kettle.temp.current }} &deg;{{ settings.unit }}<br/>
           previous: {{ kettle.temp.previous }} &deg;{{ settings.unit }}<br/>
           adjusted: {{ kettle.temp.adjust }} &deg;{{ settings.unit }}<br/>
           <span ng-if="settings.unit=='F'">
-            celsius: {{ kettle.temp.current | toCelsius}} &deg;C<br/>
+            celsius: {{ kettle.temp.current ? (kettle.temp.current | toCelsius) : 0 }} &deg;C<br/>
           </span>
           <span ng-if="settings.unit=='C'">
-            fahrenheit: {{ kettle.temp.current | toFahrenheit }} &deg;F
+            fahrenheit: {{ kettle.temp.current ? (kettle.temp.current | toFahrenheit) : 0 }} &deg;F
           </span>
         </li>
       </ul>

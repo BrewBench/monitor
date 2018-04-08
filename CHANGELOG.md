@@ -12,6 +12,7 @@
 - JSON response from sketches to return not string "temp" is now just temp
   (This was an issue with angular number format)
 - Sketches modal with more info
+- InfluxDB temps to use default value
 
 ## 3.2.5 - 2018-02-25
 

@@ -16,6 +16,7 @@ var notification = null
   ,resetChart = 100
   ,timeout = null;//reset chart after 100 polls
 
+$scope.BrewService = BrewService;
 $scope.hops;
 $scope.grains;
 $scope.water;
@@ -23,7 +24,6 @@ $scope.lovibond;
 $scope.pkg;
 $scope.kettleTypes = BrewService.kettleTypes();
 $scope.chartOptions = BrewService.chartOptions();
-$scope.sensorTypes = BrewService.sensorTypes;
 $scope.showSettings = true;
 $scope.error = {message: '', type: 'danger'};
 $scope.slider = {
@@ -244,7 +244,7 @@ $scope.updateABV();
   $scope.addKettle = function(type){
     if(!$scope.kettles) $scope.kettles = [];
     $scope.kettles.push({
-        key: type ? _.find($scope.kettleTypes,{type: type}).name : $scope.kettleTypes[0].name
+        name: type ? _.find($scope.kettleTypes,{type: type}).name : $scope.kettleTypes[0].name
         ,type: type || $scope.kettleTypes[0].type
         ,active: false
         ,sticky: false
@@ -255,8 +255,8 @@ $scope.updateABV();
         ,timers: []
         ,knob: angular.copy(BrewService.defaultKnobOptions(),{value:0,min:0,max:$scope.kettleTypes[0].target+$scope.kettleTypes[0].diff})
         ,arduino: $scope.settings.arduinos.length ? $scope.settings.arduinos[0] : null
-        ,error: {message:'',version:'',count:0}
-        ,notify: {slack: false, dweet: false}
+        ,message: {type:'error',message:'',version:'',count:0,location:''}
+        ,notify: {slack: false, dweet: false, streams: false}
     });
   };
 
@@ -331,70 +331,114 @@ $scope.updateABV();
       });
   };
 
-  $scope.testInfluxDB = function(){
-    $scope.settings.influxdb.status = 'Connecting';
-    BrewService.influxdb().ping()
-      .then(response => {
-        if(response.status == 204){
-          $('#influxdbUrl').removeClass('is-invalid');
-          $scope.settings.influxdb.status = 'Connected';
-          //get list of databases
-          BrewService.influxdb().dbs()
-            .then(response => {
-              if(response.length){
-                var dbs = [].concat.apply([], response);
-                $scope.settings.influxdb.dbs = _.remove(dbs, (db) => db != "_internal");
-              }
-            });
-        } else {
+  $scope.influxdb = {
+    remove: () => {
+      var defaultSettings = BrewService.reset();
+      $scope.settings.influxdb = defaultSettings.influxdb;
+    },
+    connect: () => {
+      $scope.settings.influxdb.status = 'Connecting';
+      BrewService.influxdb().ping()
+        .then(response => {
+          if(response.status == 204){
+            $('#influxdbUrl').removeClass('is-invalid');
+            $scope.settings.influxdb.status = 'Connected';
+            //get list of databases
+            BrewService.influxdb().dbs()
+              .then(response => {
+                if(response.length){
+                  var dbs = [].concat.apply([], response);
+                  $scope.settings.influxdb.dbs = _.remove(dbs, (db) => db != "_internal");
+                }
+              });
+          } else {
+            $('#influxdbUrl').addClass('is-invalid');
+            $scope.settings.influxdb.status = 'Failed to Connect';
+          }
+        })
+        .catch(err => {
           $('#influxdbUrl').addClass('is-invalid');
           $scope.settings.influxdb.status = 'Failed to Connect';
-        }
-      })
-      .catch(err => {
-        $('#influxdbUrl').addClass('is-invalid');
-        $scope.settings.influxdb.status = 'Failed to Connect';
-      });
+        });
+    },
+    create: () => {
+      var db = $scope.settings.influxdb.db || 'session-'+moment().format('YYYY-MM-DD');
+      $scope.settings.influxdb.created = false;
+      BrewService.influxdb().createDB(db)
+        .then(response => {
+          // prompt for password
+          if(response.data && response.data.results && response.data.results.length){
+            $scope.settings.influxdb.db = db;
+            $scope.settings.influxdb.created = true;
+            $('#influxdbUser').removeClass('is-invalid');
+            $('#influxdbPass').removeClass('is-invalid');
+            $scope.resetError();
+          } else {
+            $scope.setErrorMessage("Opps, there was a problem creating the database.");
+          }
+        })
+        .catch(err => {
+          if(err.status == 401 || err.status == 403){
+            $('#influxdbUser').addClass('is-invalid');
+            $('#influxdbPass').addClass('is-invalid');
+            $scope.setErrorMessage("Enter your Username and Password for InfluxDB");
+          } else {
+            $scope.setErrorMessage("Opps, there was a problem creating the database.");
+          }
+        });
+    }
   };
 
-  $scope.streamsConnect = function(){
-    if(!$scope.settings.streams.user || !$scope.settings.streams.api_key)
-      return;
-    $scope.settings.streams.status = 'Connecting';
-    BrewService.streams().ping()
-      .then(response => {
-        $scope.settings.streams.status = 'Connected';
-      })
-      .catch(err => {
-        $scope.settings.streams.status = 'Failed to Connect';
-      });
-  };
-
-  $scope.createInfluxDB = function(){
-    var db = $scope.settings.influxdb.db || 'session-'+moment().format('YYYY-MM-DD');
-    $scope.settings.influxdb.created = false;
-    BrewService.influxdb().createDB(db)
-      .then(response => {
-        // prompt for password
-        if(response.data && response.data.results && response.data.results.length){
-          $scope.settings.influxdb.db = db;
-          $scope.settings.influxdb.created = true;
-          $('#influxdbUser').removeClass('is-invalid');
-          $('#influxdbPass').removeClass('is-invalid');
-          $scope.resetError();
+  $scope.streams = {
+    remove: () => {
+      var defaultSettings = BrewService.reset();
+      $scope.settings.streams = defaultSettings.streams;
+    },
+    connect: () => {
+      if(!$scope.settings.streams.username || !$scope.settings.streams.api_key)
+        return;
+      $scope.settings.streams.status = 'Connecting';
+      BrewService.streams().ping()
+        .then(response => {
+          $scope.settings.streams.status = 'Connected';
+        })
+        .catch(err => {
+          $scope.settings.streams.status = 'Failed to Connect';
+        });
+      },
+      kettles: (kettle, relay) => {
+        if(relay){
+          kettle[relay].sketch = !kettle[relay].sketch;
+          if(!kettle.notify.streams)
+            return;
         } else {
-          $scope.setErrorMessage("Opps, there was a problem creating the database.");
+          kettle.notify.streams = !kettle.notify.streams;
         }
-      })
-      .catch(err => {
-        if(err.status == 401 || err.status == 403){
-          $('#influxdbUser').addClass('is-invalid');
-          $('#influxdbPass').addClass('is-invalid');
-          $scope.setErrorMessage("Enter your Username and Password for InfluxDB");
-        } else {
-          $scope.setErrorMessage("Opps, there was a problem creating the database.");
-        }
-      });
+        BrewService.streams().kettles.save(kettle)
+          .then(response => {
+            kettle.message.type = 'success';
+            if(kettle.notify.streams){
+              kettle.message.location = 'sketches';
+              kettle.message.message = $sce.trustAsHtml('Added to Streams');
+            } else {
+              kettle.message.location = 'sketches';
+              kettle.message.message = $sce.trustAsHtml('Removed from Streams');
+            }
+          })
+          .catch(err => {
+            kettle.notify.streams = !kettle.notify.streams;
+            if(err && err.data && err.data.error && err.data.error.message)
+              $scope.setErrorMessage(err.data.error.message, kettle, 'sketches');
+            else
+              $scope.setErrorMessage(err, kettle, 'sketches');
+          });
+      },
+      enabled: (kettle) => {
+        return (!!$scope.settings.streams.api_key &&
+          $scope.settings.streams.status=='Connected' &&
+          !!$scope.settings.streams.session.name &&
+          !!kettle.valus.length);
+      }
   };
 
   $scope.shareAccess = function(access){
@@ -666,7 +710,7 @@ $scope.updateABV();
       return true;
   };
 
-  $scope.setErrorMessage = function(err, kettle){
+  $scope.setErrorMessage = function(err, kettle, location){
     if(!!$scope.settings.shared){
       $scope.error.type = 'warning';
       $scope.error.message = $sce.trustAsHtml('The monitor seems to be off-line, re-connecting...');
@@ -686,7 +730,7 @@ $scope.updateABV();
       else if(err.config && err.config.url)
         message = err.config.url;
       else if(err.version){
-        if(kettle) kettle.error.version = err.version;
+        if(kettle) kettle.message.version = err.version;
         message = 'Sketch Version is out of date.  <a href="" data-toggle="modal" data-target="#settingsModal">Download here</a>.'+
           '<br/>Your Version: '+err.version+
           '<br/>Current Version: '+$scope.settings.sketch_version;
@@ -697,15 +741,17 @@ $scope.updateABV();
 
       if(!!message){
         if(kettle){
-          kettle.error.count=0;
-          kettle.error.message = $sce.trustAsHtml(`Connection error: ${message}`);
+          kettle.message.type = 'danger';
+          kettle.message.count=0;
+          kettle.message.message = $sce.trustAsHtml(`Connection error: ${message}`);
+          kettle.message.location = location;
           $scope.updateKnobCopy(kettle);
         } else {
           $scope.error.message = $sce.trustAsHtml(`Error: ${message}`);
         }
       } else if(kettle){
-        kettle.error.count=0;
-        kettle.error.message = `Error connecting to ${BrewService.domain(kettle.arduino)}`;
+        kettle.message.count=0;
+        kettle.message.message = `Error connecting to ${BrewService.domain(kettle.arduino)}`;
       } else {
         $scope.error.message = $sce.trustAsHtml('Connection error:');
       }
@@ -714,8 +760,8 @@ $scope.updateABV();
 
   $scope.resetError = function(kettle){
     if(kettle) {
-      kettle.error.count=0;
-      kettle.error.message = $sce.trustAsHtml('');
+      kettle.message.count=0;
+      kettle.message.message = $sce.trustAsHtml('');
     } else {
       $scope.error.type = 'danger';
       $scope.error.message = $sce.trustAsHtml('');
@@ -738,7 +784,7 @@ $scope.updateABV();
     // temp response is in C
     kettle.temp.previous = ($scope.settings.unit == 'F') ?
       $filter('toFahrenheit')(response.temp) :
-      $filter('number')(response.temp,2);
+      $filter('round')(response.temp,2);
     // add adjustment
     kettle.temp.current = (parseFloat(kettle.temp.previous) + parseFloat(kettle.temp.adjust));
     // set raw
@@ -888,6 +934,7 @@ $scope.updateABV();
     _.each($scope.kettles, kettle => {
       if((kettle.heater && kettle.heater.sketch) ||
         (kettle.cooler && kettle.cooler.sketch) ||
+        kettle.notify.streams ||
         kettle.notify.slack ||
         kettle.notify.dweet
       ) {
@@ -907,8 +954,8 @@ $scope.updateABV();
         BrewService.temp(kettle)
           .then(response => $scope.updateTemp(response, kettle))
           .catch(err => {
-            kettle.error.count++;
-            if(kettle.error.count==7)
+            kettle.message.count++;
+            if(kettle.message.count==7)
               $scope.setErrorMessage(err, kettle);
           });
 
@@ -1055,7 +1102,8 @@ $scope.updateABV();
         currentSketch = _.find(sketches,{name:arduinoName});
       }
       var target = ($scope.settings.unit=='F') ? $filter('toCelsius')(kettle.temp.target) : kettle.temp.target;
-      var adjust = ($scope.settings.unit=='F' && kettle.temp.adjust != 0) ? Math.round(kettle.temp.adjust*0.555) : kettle.temp.adjust;
+      kettle.temp.adjust = parseFloat(kettle.temp.adjust);
+      var adjust = ($scope.settings.unit=='F' && !!kettle.temp.adjust) ? $filter('round')(kettle.temp.adjust*0.555,3) : kettle.temp.adjust;
       if(kettle.temp.type.indexOf('DHT') !== -1 && currentSketch.headers.indexOf('#include <dht.h>') === -1){
         currentSketch.headers.push('// https://www.brewbench.co/libs/DHTLib.zip');
         currentSketch.headers.push('#include <dht.h>');
@@ -1064,19 +1112,19 @@ $scope.updateABV();
         currentSketch.headers.push('// https://www.brewbench.co/libs/cactus_io_DS18B20.zip');
         currentSketch.headers.push('#include "cactus_io_DS18B20.h"');
       }
-      currentSketch.actions.push('actionsCommand(F("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'"),F("'+kettle.temp.pin+'"),F("'+kettle.temp.type+'"),'+adjust+');');
+      currentSketch.actions.push('actionsCommand(F("'+kettle.name.replace(/[^a-zA-Z0-9-.]/g, "")+'"),F("'+kettle.temp.pin+'"),F("'+kettle.temp.type+'"),'+adjust+');');
       //look for triggers
       if(kettle.heater && kettle.heater.sketch){
         currentSketch.triggers = true;
-        currentSketch.actions.push('trigger(F("heat"),F("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'"),F("'+kettle.heater.pin+'"),temp,'+target+','+kettle.temp.diff+','+!!kettle.notify.slack+');');
+        currentSketch.actions.push('trigger(F("heat"),F("'+kettle.name.replace(/[^a-zA-Z0-9-.]/g, "")+'"),F("'+kettle.heater.pin+'"),temp,'+target+','+kettle.temp.diff+','+!!kettle.notify.slack+');');
       }
       if(kettle.cooler && kettle.cooler.sketch){
         currentSketch.triggers = true;
-        currentSketch.actions.push('trigger(F("cool"),F("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'"),F("'+kettle.cooler.pin+'"),temp,'+target+','+kettle.temp.diff+','+!!kettle.notify.slack+');');
+        currentSketch.actions.push('trigger(F("cool"),F("'+kettle.name.replace(/[^a-zA-Z0-9-.]/g, "")+'"),F("'+kettle.cooler.pin+'"),temp,'+target+','+kettle.temp.diff+','+!!kettle.notify.slack+');');
       }
       if(kettle.notify.dweet){
         currentSketch.triggers = true;
-        currentSketch.actions.push('dweetAutoCommand(F("'+kettle.key.replace(/[^a-zA-Z0-9-.]/g, "")+'"),F("'+$scope.settings.recipe.brewer.name+'"),F("'+$scope.settings.recipe.name+'"),temp);');
+        currentSketch.actions.push('dweetAutoCommand(F("'+kettle.name.replace(/[^a-zA-Z0-9-.]/g, "")+'"),F("'+$scope.settings.recipe.brewer.name+'"),F("'+$scope.settings.recipe.name+'"),temp);');
       }
     });
     _.each(sketches, (sketch, i) => {
@@ -1107,9 +1155,9 @@ $scope.updateABV();
           .replace('[FREQUENCY_SECONDS]', $scope.settings.sketches.frequency ? parseInt($scope.settings.sketches.frequency,10) : 60);
         if( sketch.indexOf('Streams') !== -1){
           // streams connection
-          var connection_string = `https://${$scope.settings.streams.user}.streams.brewbench.co/bbp`;
-          response.data = response.data.replace('[PROXY_CONNECTION]', connection_string);
-          response.data = response.data.replace('[PROXY_AUTH]', 'Authorization: Basic '+btoa($scope.settings.streams.user+':'+$scope.settings.streams.api_key));
+          var connection_string = `https://${$scope.settings.streams.username}.streams.brewbench.co`;
+          response.data = response.data.replace(/\[PROXY_CONNECTION\]/g, connection_string);
+          response.data = response.data.replace(/\[PROXY_AUTH\]/g, 'Authorization: Basic '+btoa($scope.settings.streams.username+':'+$scope.settings.streams.api_key));
         } if( sketch.indexOf('InfluxDB') !== -1){
           // influx db connection
           var connection_string = `${$scope.settings.influxdb.url}`;
@@ -1186,21 +1234,21 @@ $scope.updateABV();
     else if(kettle && kettle.high){
       if(!$scope.settings.notifications.high || $scope.settings.notifications.last=='high')
         return;
-      message = kettle.key+' is '+(kettle.high-kettle.temp.diff)+'\u00B0 high';
+      message = kettle.name+' is '+(kettle.high-kettle.temp.diff)+'\u00B0 high';
       color = 'danger';
       $scope.settings.notifications.last='high';
     }
     else if(kettle && kettle.low){
       if(!$scope.settings.notifications.low || $scope.settings.notifications.last=='low')
         return;
-      message = kettle.key+' is '+(kettle.low-kettle.temp.diff)+'\u00B0 low';
+      message = kettle.name+' is '+(kettle.low-kettle.temp.diff)+'\u00B0 low';
       color = '#3498DB';
       $scope.settings.notifications.last='low';
     }
     else if(kettle){
       if(!$scope.settings.notifications.target || $scope.settings.notifications.last=='target')
         return;
-      message = kettle.key+' is within the target at '+kettle.temp.current+'\u00B0';
+      message = kettle.name+' is within the target at '+kettle.temp.current+'\u00B0';
       color = 'good';
       $scope.settings.notifications.last='target';
     }
@@ -1231,7 +1279,7 @@ $scope.updateABV();
       if(Notification.permission === "granted"){
         if(message){
           if(kettle)
-            notification = new Notification(kettle.key+' kettle',{body:message,icon:icon});
+            notification = new Notification(kettle.name+' kettle',{body:message,icon:icon});
           else
             notification = new Notification('Test kettle',{body:message,icon:icon});
         }
@@ -1240,7 +1288,7 @@ $scope.updateABV();
           // If the user accepts, let's create a notification
           if (permission === "granted") {
             if(message){
-              notification = new Notification(kettle.key+' kettle',{body:message,icon:icon});
+              notification = new Notification(kettle.name+' kettle',{body:message,icon:icon});
             }
           }
         });
@@ -1274,7 +1322,7 @@ $scope.updateABV();
       kettle.knob.subText.color = 'gray';
 
       return;
-    } else if(kettle.error.message){
+    } else if(kettle.message.message && kettle.message.type == 'danger'){
         kettle.knob.trackColor = '#ddd';
         kettle.knob.barColor = '#777';
         kettle.knob.subText.text = 'error';
@@ -1282,9 +1330,6 @@ $scope.updateABV();
 
         return;
     }
-
-
-
     //is temp too high?
     if(kettle.temp.current > kettle.temp.target+kettle.temp.diff){
       kettle.knob.barColor = 'rgba(255,0,0,.6)';
@@ -1296,7 +1341,7 @@ $scope.updateABV();
         kettle.knob.subText.color = 'rgba(52,152,219,1)';
       } else {
         //update knob text
-        kettle.knob.subText.text = $filter('number')(kettle.high-kettle.temp.diff,0)+'\u00B0 high';
+        kettle.knob.subText.text = $filter('round')(kettle.high-kettle.temp.diff,0)+'\u00B0 high';
         kettle.knob.subText.color = 'rgba(255,0,0,.6)';
       }
     } else if(kettle.temp.current < kettle.temp.target-kettle.temp.diff){
@@ -1309,7 +1354,7 @@ $scope.updateABV();
         kettle.knob.subText.color = 'rgba(255,0,0,.6)';
       } else {
         //update knob text
-        kettle.knob.subText.text = $filter('number')(kettle.low-kettle.temp.diff,0)+'\u00B0 low';
+        kettle.knob.subText.text = $filter('round')(kettle.low-kettle.temp.diff,0)+'\u00B0 low';
         kettle.knob.subText.color = 'rgba(52,152,219,1)';
       }
     } else {
@@ -1338,7 +1383,7 @@ $scope.updateABV();
     kettleIndex++;
     var kettleType = ($scope.kettleTypes[kettleIndex]) ? $scope.kettleTypes[kettleIndex] : $scope.kettleTypes[0];
     //update kettle options if changed
-    kettle.key = kettleType.name;
+    kettle.name = kettleType.name;
     kettle.type = kettleType.type;
     kettle.temp.target = kettleType.target;
     kettle.temp.diff = kettleType.diff;
@@ -1356,15 +1401,18 @@ $scope.updateABV();
     if($scope.settings.unit != unit){
       $scope.settings.unit = unit;
       _.each($scope.kettles,function(kettle){
+        kettle.temp.target = parseFloat(kettle.temp.target);
+        kettle.temp.current = parseFloat(kettle.temp.current);
         kettle.temp.current = $filter('formatDegrees')(kettle.temp.current,unit);
         kettle.temp.previous = $filter('formatDegrees')(kettle.temp.previous,unit);
         kettle.temp.target = $filter('formatDegrees')(kettle.temp.target,unit);
-        kettle.temp.target = $filter('number')(kettle.temp.target,0);
+        kettle.temp.target = $filter('round')(kettle.temp.target,0);
         if(!!kettle.temp.adjust){
+          kettle.temp.adjust = parseFloat(kettle.temp.adjust);
           if(unit === 'C')
-            kettle.temp.adjust = Math.round(kettle.temp.adjust*0.555);
+            kettle.temp.adjust = $filter('round')(kettle.temp.adjust*0.555,3);
           else
-            kettle.temp.adjust = Math.round(kettle.temp.adjust*1.8);
+            kettle.temp.adjust = $filter('round')(kettle.temp.adjust*1.8,0);
         }
         // update knob
         kettle.knob.value = kettle.temp.current;

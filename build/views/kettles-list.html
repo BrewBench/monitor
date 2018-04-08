@@ -26,7 +26,7 @@
         </div>
       </div>
       <ui-knob ng-click="knobClick(kettle)"
-        value="kettle.temp.current | number:0"
+        value="kettle.temp.current | round:0"
         options="kettle.knob">
       </ui-knob>
     </div>
@@ -34,14 +34,14 @@
     <div class="content">
 
       <div class="row header">
-        <div class="col-auto mr-auto">
+        <div class="col mr-auto">
           <a href="" ng-click="changeKettleType(kettle)" class="kettle-type" ng-class="{'svg': kettle.type != 'air'}">
             <img ng-if="kettle.type != 'air'" class="type" ng-src="/assets/img/{{kettle.type}}.svg" width="30" height="30"/>
             <i ng-if="kettle.type == 'air'" class="fa fa-thermometer-quarter fa-2x type" height="30"></i>
           </a>&nbsp;
-          <h3><editable type="text" model="kettle.key"></editable></h3>
+          <h3><editable type="text" model="kettle.name"></editable></h3>
         </div>
-        <div ng-if="shareAccess('fullAccess')" class="col-auto">
+        <div class="col" ng-if="shareAccess('fullAccess')">
           <i class="fa fa-4x float-right" ng-click="startStopKettle(kettle)" ng-class="{'fa-stop-circle':kettle.active,'fa-play-circle':!kettle.active}"></i>
         </div>
       </div>
@@ -394,6 +394,7 @@
       <ul class="list-group list-group-flush">
         <li class="list-group-item">
           raw bits: {{ kettle.temp.raw }}<br/>
+          bit calc temp: {{ BrewService.bitcalc(kettle) }} &deg;C<br/>
           current: {{ kettle.temp.current }} &deg;{{ settings.unit }}<br/>
           previous: {{ kettle.temp.previous }} &deg;{{ settings.unit }}<br/>
           adjusted: {{ kettle.temp.adjust }} &deg;{{ settings.unit }}<br/>

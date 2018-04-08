@@ -72,27 +72,27 @@
               <li class="tg-list-item">
                 <span>Sounds</span>
                 <input class="tgl tgl-ios" id="sounds" type="checkbox" ng-checked="settings.notifications.on && settings.sounds.on" ng-disabled="!settings.notifications.on" ng-click="settings.sounds.on = !settings.sounds.on"/>
-                <label class="tgl-btn" for="sounds"></label>
+                <label class="tgl-btn" ng-class="{'disabled':!settings.notifications.on}" for="sounds"></label>
               </li>
               <li class="tg-list-item">
                 <span>Timers</span>
                 <input class="tgl tgl-ios" id="timers" type="checkbox" ng-checked="settings.notifications.on && settings.notifications.timers" ng-disabled="!settings.notifications.on" ng-click="settings.notifications.timers = !settings.notifications.timers"/>
-                <label class="tgl-btn" for="timers"></label>
+                <label class="tgl-btn" ng-class="{'disabled':!settings.notifications.on}" for="timers"></label>
               </li>
               <li class="tg-list-item">
                 <span>High</span>
                 <input class="tgl tgl-ios" id="high" type="checkbox" ng-checked="settings.notifications.on && settings.notifications.high" ng-disabled="!settings.notifications.on" ng-click="settings.notifications.high = !settings.notifications.high"/>
-                <label class="tgl-btn" for="high"></label>
+                <label class="tgl-btn" ng-class="{'disabled':!settings.notifications.on}" for="high"></label>
               </li>
               <li class="tg-list-item">
                 <span>Low</span>
                 <input class="tgl tgl-ios" id="low" type="checkbox" ng-checked="settings.notifications.on && settings.notifications.low" ng-disabled="!settings.notifications.on" ng-click="settings.notifications.low = !settings.notifications.low"/>
-                <label class="tgl-btn" for="low"></label>
+                <label class="tgl-btn" ng-class="{'disabled':!settings.notifications.on}" for="low"></label>
               </li>
               <li class="tg-list-item">
                 <span>Target</span>
                 <input class="tgl tgl-ios" id="target" type="checkbox" ng-checked="settings.notifications.on && settings.notifications.target" ng-disabled="!settings.notifications.on" ng-click="settings.notifications.target = !settings.notifications.target"/>
-                <label class="tgl-btn" for="target"></label>
+                <label class="tgl-btn" ng-class="{'disabled':!settings.notifications.on}" for="target"></label>
               </li>
             </ul>
 
@@ -135,7 +135,7 @@
                 <label class="adjust">Poll Frequency</label>
                 <div class="input-group">
                   <input class="form-control" type="number" ng-model="settings.pollSeconds" step="1" min="5">
-                  <span class="input-group-btn">
+                  <span class="input-group-append">
                     <button type="button" class="btn btn-light"><i class="fa fa-minus fa-lg" ng-click="(settings.pollSeconds > 5) ? settings.pollSeconds=settings.pollSeconds-1 : 5"></i></button>
                     <button type="button" class="btn btn-light"><i class="fa fa-plus fa-lg" ng-click="settings.pollSeconds=settings.pollSeconds+1"></i></button>
                   </span>
@@ -150,7 +150,6 @@
               <tr>
                 <th>URL</th>
                 <!-- <th>Password</th> -->
-                <th>Online</th>
                 <th>Analog Ports</th>
                 <th>Digital Ports</th>
                 <th></th>
@@ -160,7 +159,7 @@
               <tr ng-repeat="arduino in settings.arduinos">
                 <td class="text-left">
                   <div class="input-group">
-                    <span class="input-group-btn">
+                    <span class="input-group-prepend">
                       <button class="btn btn-light" ng-show="!arduino.secure" ng-click="arduino.secure=true; arduinos.update(arduino)">http</button>
                       <button class="btn btn-success" ng-show="arduino.secure" ng-click="arduino.secure=false; arduinos.update(arduino)">https</button>
                     </span>
@@ -170,9 +169,8 @@
                 <!-- <td class="text-left">
                   <input class="form-control" type="password" ng-model="arduino.password" ng-change="arduinos.update(arduino)"></input>
                 </td> -->
-                <td><i class="fa fa-circle fa-lg" ng-class="{'on':!!arduino.status, 'off':!arduino.status}" aria-hidden="true"></i></td>
-                <td class="text-left"><input class="form-control" type="number" ng-model="arduino.analog" ng-change="arduinos.update(arduino)"></td>
-                <td class="text-left"><input class="form-control" type="number" ng-model="arduino.digital" ng-change="arduinos.update(arduino)"></td>
+                <td class="text-left"><input class="form-control" type="number" step="1" min="0" ng-model="arduino.analog" ng-change="arduinos.update(arduino)"></td>
+                <td class="text-left"><input class="form-control" type="number" step="1" min="0" ng-model="arduino.digital" ng-change="arduinos.update(arduino)"></td>
                 <td><a href="" ng-click="arduinos.delete($index, arduino)"><i class="fa fa-trash fa-2x text-danger"></i></a></td>
               </tr>
             </tbody>

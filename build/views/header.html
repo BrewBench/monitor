@@ -25,7 +25,7 @@
         ng-if="kettle.active"
         ng-repeat="kettle in kettles track by $index"
         style="border: none;">
-          {{kettle.key}} {{kettle.temp.current|number:2}}&deg;{{settings.unit}}
+          {{kettle.name}} {{kettle.temp.current|number:2}}&deg;{{settings.unit}}
       </a>
     </div>
   </div>
