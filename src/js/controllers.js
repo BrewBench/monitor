@@ -17,6 +17,9 @@ var notification = null
   ,timeout = null;//reset chart after 100 polls
 
 $scope.BrewService = BrewService;
+$scope.site = {https: !!(document.location.protocol=='https:')
+  , https_url: `https://${document.location.host}`
+};
 $scope.hops;
 $scope.grains;
 $scope.water;
@@ -162,7 +165,9 @@ $scope.updateABV();
         id: btoa(now+''+$scope.settings.arduinos.length+1),
         url: 'arduino.local',
         analog: 5,
-        digital: 13
+        digital: 13,
+        secure: false,
+        status: {error: '',dt: ''}
       });
       _.each($scope.kettles, kettle => {
         if(!kettle.arduino)
@@ -181,7 +186,7 @@ $scope.updateABV();
         if(kettle.arduino && kettle.arduino.id == arduino.id)
           delete kettle.arduino;
       });
-    }
+    }    
   };
 
   $scope.tplink = {
@@ -745,6 +750,7 @@ $scope.updateABV();
           kettle.message.count=0;
           kettle.message.message = $sce.trustAsHtml(`Connection error: ${message}`);
           kettle.message.location = location;
+          $scope.updateArduinoStatus(kettle, message);
           $scope.updateKnobCopy(kettle);
         } else {
           $scope.error.message = $sce.trustAsHtml(`Error: ${message}`);
@@ -752,16 +758,28 @@ $scope.updateABV();
       } else if(kettle){
         kettle.message.count=0;
         kettle.message.message = `Error connecting to ${BrewService.domain(kettle.arduino)}`;
+        $scope.updateArduinoStatus(kettle, kettle.message.message);
       } else {
         $scope.error.message = $sce.trustAsHtml('Connection error:');
       }
     }
+  };
+  $scope.updateArduinoStatus = function(kettle, error){
+    var arduino = _.filter($scope.settings.arduinos, {id: kettle.arduino.id});
+    if(arduino.length){
+      arduino[0].status.dt = new Date();
+      if(error)
+        arduino[0].status.error = error;
+      else
+        arduino[0].status.error = '';
+      }
   };
 
   $scope.resetError = function(kettle){
     if(kettle) {
       kettle.message.count=0;
       kettle.message.message = $sce.trustAsHtml('');
+      $scope.updateArduinoStatus(kettle);
     } else {
       $scope.error.type = 'danger';
       $scope.error.message = $sce.trustAsHtml('');
@@ -804,6 +822,7 @@ $scope.updateABV();
     kettle.values.push([date.getTime(),kettle.temp.current]);
 
     $scope.updateKnobCopy(kettle);
+    $scope.updateArduinoStatus(kettle);
 
     //is temp too high?
     if(kettle.temp.current > kettle.temp.target+kettle.temp.diff){
@@ -1076,14 +1095,6 @@ $scope.updateABV();
   $scope.ignoreVersionError = function(kettle){
     $scope.settings.sketches.ignore_version_error = true;
     $scope.resetError(kettle);
-  };
-
-  $scope.arduinoList = function(){
-    var list = [];
-    _.each($scope.kettles, (kettle, i) => {
-      list.push(kettle.arduino.url.replace(/[^a-zA-Z0-9-.]/g, ""));
-    });
-    return list;
   };
 
   $scope.compileSketch = function(sketchName){

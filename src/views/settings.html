@@ -155,6 +155,7 @@
             <thead class="thead-inverse">
               <tr>
                 <th>URL</th>
+                <th>Online</th>
                 <!-- <th>Password</th> -->
                 <th>Analog Ports</th>
                 <th>Digital Ports</th>
@@ -171,7 +172,11 @@
                     </span>
                     <input class="form-control" type="text" ng-model="arduino.url" ng-change="arduinos.update(arduino)" placeholder="URL" style="min-width: 200px;">
                   </div>
+                  <span class="text-muted" ng-show="(!site.https && arduino.secure)"><br/>&nbsp;You should use https <a ng-href="site.https_url">{{site.https_url}}</a></span>
+                  <span class="text-muted" ng-show="(!arduino.status.error && arduino.status.dt)"><br/>&nbsp;Last Reported {{arduino.status.dt | moment}}</span>
+                  <span class="text-danger" ng-show="(!!arduino.status.error)"><br/>&nbsp;Error Reported {{arduino.status.dt | moment}} {{arduino.status.error}}</span>
                 </td>
+                <td><i class="fa fa-circle fa-lg" ng-class="{'orange':(!site.https && arduino.secure),'on':(!arduino.status.error && arduino.status.dt),'off':!!arduino.status.error}" aria-hidden="true"></i></td>
                 <!-- <td class="text-left">
                   <input class="form-control" type="password" ng-model="arduino.password" ng-change="arduinos.update(arduino)"></input>
                 </td> -->

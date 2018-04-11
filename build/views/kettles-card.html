@@ -19,7 +19,7 @@
                 <strong>Add / Edit Arduinos</strong>
               </button>
               <div class="dropdown-divider"></div>
-              <button ng-repeat="arduino in settings.arduinos"
+              <button ng-repeat="arduino in settings.arduinos | orderBy:'url'"
                 ng-class="{'active': kettle.arduino && kettle.arduino.id == arduino.id}"
                 ng-click="kettle.arduino=arduino"
                 class="dropdown-item" type="button">

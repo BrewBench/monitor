@@ -6,6 +6,7 @@
 - [BrewBench Streams](https://app.brewbench.co) Sketch
 - raw analogRead/digitalRead value in response
 - Debug settings option to view raw and unformatted temps
+- Arduino online status
 
 ### Updated
 - Cleaned up Arduino and Settings styles

@@ -30,7 +30,8 @@ angular.module('brewbench-monitor')
           url: 'arduino.local',
           analog: 5,
           digital: 13,
-          secure: false
+          secure: false,
+          status: {error: '',dt: ''}
         }]
         ,tplink: {user: '', pass: '', token:'', status: '', plugs: []}
         ,sketches: {frequency: 60, version: 0, ignore_version_error: false}
