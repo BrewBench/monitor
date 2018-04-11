@@ -531,7 +531,7 @@ sup.ref {
 }
 .settings ul > li {
   list-style-type: none;
-  margin: 4px;
+  margin-right: 2px;
 }
 .settings .right label {
   cursor: pointer;
@@ -779,6 +779,9 @@ ul.tg-list, li.tg-list-item {
   text-align: left;
   display: flex;
   align-items: center;
+  -moz-column-width: 11.5em; /* Firefox */
+  -webkit-column-width: 11.5em; /* webkit, Safari, Chrome */
+  column-width: 11.5em;
 }
 .tg-list-item {
   margin: 0 2em;

@@ -824,7 +824,7 @@ $scope.updateABV();
       }
     } //is temp too low?
     else if(kettle.temp.current < kettle.temp.target-kettle.temp.diff){
-      $scope.alert(kettle);
+      $scope.notify(kettle);
       //start the heating element
       if(kettle.heater.auto && !kettle.heater.running){
         temps.push($scope.toggleRelay(kettle, kettle.heater, true).then(heating => {
@@ -843,7 +843,7 @@ $scope.updateABV();
     } else {
       // within target!
       kettle.temp.hit=new Date();//set the time the target was hit so we can now start alerts
-      $scope.alert(kettle);
+      $scope.notify(kettle);
       //stop the heater
       if(kettle.heater.auto && kettle.heater.running){
         temps.push($scope.toggleRelay(kettle, kettle.heater, false));
@@ -1201,7 +1201,7 @@ $scope.updateABV();
       });
   };
 
-  $scope.alert = function(kettle,timer){
+  $scope.notify = function(kettle,timer){
 
     //don't start alerts until we have hit the temp.target
     if(!timer && kettle && !kettle.temp.hit
@@ -1234,14 +1234,14 @@ $scope.updateABV();
     else if(kettle && kettle.high){
       if(!$scope.settings.notifications.high || $scope.settings.notifications.last=='high')
         return;
-      message = kettle.name+' is '+(kettle.high-kettle.temp.diff)+'\u00B0 high';
+      message = kettle.name+' is '+$filter('round')(kettle.high-kettle.temp.diff,0)+'\u00B0 high';
       color = 'danger';
       $scope.settings.notifications.last='high';
     }
     else if(kettle && kettle.low){
       if(!$scope.settings.notifications.low || $scope.settings.notifications.last=='low')
         return;
-      message = kettle.name+' is '+(kettle.low-kettle.temp.diff)+'\u00B0 low';
+      message = kettle.name+' is '+$filter('round')(kettle.low-kettle.temp.diff,0)+'\u00B0 low';
       color = '#3498DB';
       $scope.settings.notifications.last='low';
     }
@@ -1433,7 +1433,7 @@ $scope.updateABV();
         timer.up = {min:0,sec:0,running:true};
         //if all timers are done send an alert
         if( !!kettle && _.filter(kettle.timers, {up: {running:true}}).length == kettle.timers.length )
-          $scope.alert(kettle,timer);
+          $scope.notify(kettle,timer);
       } else if(!timer.up && timer.sec > 0){
         //count down seconds
         timer.sec--;
@@ -1444,7 +1444,7 @@ $scope.updateABV();
         //should we start the next timer?
         if(!!kettle){
           _.each(_.filter(kettle.timers, {running:false,min:timer.min,queue:false}),function(nextTimer){
-            $scope.alert(kettle,nextTimer);
+            $scope.notify(kettle,nextTimer);
             nextTimer.queue=true;
             $timeout(function(){
               $scope.timerStart(nextTimer,kettle);

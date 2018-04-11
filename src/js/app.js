@@ -9,7 +9,6 @@ angular.module('brewbench-monitor', [
   ,'duScroll'
   ,'ui.knob'
   ,'rzModule'
-  ,'ngRaven'
 ])
 .config(function($stateProvider, $urlRouterProvider, $httpProvider, $locationProvider, $compileProvider) {
 

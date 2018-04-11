@@ -43,4 +43,9 @@ angular.module('brewbench-monitor')
     }
     return $sce.trustAsHtml(text.toString());
   };
+})
+.filter('titlecase', function($filter){
+  return function(text){
+    return (text.charAt(0).toUpperCase() + text.slice(1));
+  }
 });

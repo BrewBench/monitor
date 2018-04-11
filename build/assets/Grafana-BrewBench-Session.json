@@ -3,7 +3,7 @@
     {
       "name": "DS_BREWBENCH",
       "label": "Brew Session",
-      "description": "BrewBench Brew Session Dashboard, https://www.brewbench.co",
+      "description": "",
       "type": "datasource",
       "pluginId": "influxdb",
       "pluginName": "InfluxDB"
@@ -14,25 +14,25 @@
       "type": "grafana",
       "id": "grafana",
       "name": "Grafana",
-      "version": "5.0.0"
+      "version": "4.6.1"
     },
     {
       "type": "panel",
       "id": "graph",
       "name": "Graph",
-      "version": "5.0.0"
+      "version": ""
     },
     {
       "type": "datasource",
       "id": "influxdb",
       "name": "InfluxDB",
-      "version": "5.0.0"
+      "version": "1.0.0"
     },
     {
       "type": "panel",
       "id": "singlestat",
       "name": "Singlestat",
-      "version": "5.0.0"
+      "version": ""
     }
   ],
   "annotations": {
@@ -58,14 +58,9 @@
     {
       "icon": "external link",
       "tags": [],
-      "title": "Monitor",
-      "type": "link",
-      "url": "http://monitor.brewbench.co"
-    },
-    {
-      "icon": "external link",
-      "tags": [],
-      "title": "BrewBench",
+      "targetBlank": true,
+      "title": "BrewBench Live",
+      "tooltip": "",
       "type": "link",
       "url": "https://www.brewbench.co"
     }
@@ -152,7 +147,7 @@
                 [
                   {
                     "params": [
-                      "value"
+                      "temp"
                     ],
                     "type": "field"
                   },
@@ -272,7 +267,7 @@
                 [
                   {
                     "params": [
-                      "value"
+                      "temp"
                     ],
                     "type": "field"
                   },
@@ -392,7 +387,7 @@
                 [
                   {
                     "params": [
-                      "value"
+                      "temp"
                     ],
                     "type": "field"
                   },
@@ -522,7 +517,7 @@
                 [
                   {
                     "params": [
-                      "value"
+                      "temp"
                     ],
                     "type": "field"
                   },
@@ -572,7 +567,7 @@
                 [
                   {
                     "params": [
-                      "value"
+                      "temp"
                     ],
                     "type": "field"
                   },
@@ -622,7 +617,7 @@
                 [
                   {
                     "params": [
-                      "value"
+                      "temp"
                     ],
                     "type": "field"
                   },

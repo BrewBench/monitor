@@ -244,11 +244,6 @@
                           <input class="tgl tgl-ios" id="slack{{$index}}" type="checkbox" ng-disabled="!settings.notifications.slack" ng-checked="kettle.notify.slack" ng-click="kettle.notify.slack = !kettle.notify.slack"/>
                           <label class="tgl-btn" ng-class="{'disabled':!settings.notifications.slack}" for="slack{{$index}}"></label>
                         </li>
-                        <li class="tg-list-item">
-                          <span>Dweet</span>
-                          <input class="tgl tgl-ios" id="dweet{{$index}}" type="checkbox" ng-checked="kettle.notify.dweet" ng-click="kettle.notify.dweet = !kettle.notify.dweet"/>
-                          <label class="tgl-btn" for="dweet{{$index}}"></label>
-                        </li>
                       </ul>
                       <div class="alert alert-{{kettle.message.type}} alert-dismissible" role="alert" ng-if="kettle.message.message && kettle.message.location == 'sketches'">
                         <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -269,11 +264,7 @@
             <div class="col-lg-1"></div>
             <div class="col-lg-10">
               <p>
-                <span class="badge badge-pill badge-info">Auto</span> <strong>Sketches are still in beta</strong>.  Please test your heat and cool pins before installing the sketch as relay's will automatically be triggered if the temperature raises or falls.
-                <br><br>
-                Arduino Yun has a limited amount of memory and will be unstable if the sketch exceeds 21570 bytes (75%) of program storage space and or Global variables use more than 1229 bytes (48%) of dynamic memory.  There is logic to include only libraries that are needed.
-                <br><br>
-                Slack Webhook URL can be added in settings and <a href="https://dweet.io/get/dweets/for/brewbench" target="_blank">Dweet</a> is interesting...
+                <span class="badge badge-pill badge-info">Auto</span> <strong>Sketches are still in beta</strong>.  Please test your heat and cool triggers before installing the sketch as relay's will automatically be triggered if the temperature raises or falls.                
               </p>
             </div>
             <div class="col-lg-1"></div>

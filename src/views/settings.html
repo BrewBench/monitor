@@ -59,49 +59,55 @@
             <i class="fa fa-bell fa-lg float-right" aria-hidden="true"></i>
           </h4>
           <div class="block-border">
-            <button class="btn btn-primary float-right" ng-click="alert()" ng-disabled="!settings.notifications.on">Test</button>
+            <button class="btn btn-primary float-right" ng-click="notify()" ng-disabled="!settings.notifications.on">Test</button>
 
-            <ul class="tg-list">
-              <li class="tg-list-item">
-                <span>{{settings.notifications.on?'On':'Off'}}</span>
-                <input class="tgl tgl-ios" id="notifications" type="checkbox" ng-checked="settings.notifications.on" ng-click="settings.notifications.on = !settings.notifications.on"/>
-                <label class="tgl-btn" for="notifications"></label>
-              </li>
-            </ul>
-            <ul class="tg-list">
-              <li class="tg-list-item">
-                <span>Sounds</span>
-                <input class="tgl tgl-ios" id="sounds" type="checkbox" ng-checked="settings.notifications.on && settings.sounds.on" ng-disabled="!settings.notifications.on" ng-click="settings.sounds.on = !settings.sounds.on"/>
-                <label class="tgl-btn" ng-class="{'disabled':!settings.notifications.on}" for="sounds"></label>
-              </li>
-              <li class="tg-list-item">
-                <span>Timers</span>
-                <input class="tgl tgl-ios" id="timers" type="checkbox" ng-checked="settings.notifications.on && settings.notifications.timers" ng-disabled="!settings.notifications.on" ng-click="settings.notifications.timers = !settings.notifications.timers"/>
-                <label class="tgl-btn" ng-class="{'disabled':!settings.notifications.on}" for="timers"></label>
-              </li>
-              <li class="tg-list-item">
-                <span>High</span>
-                <input class="tgl tgl-ios" id="high" type="checkbox" ng-checked="settings.notifications.on && settings.notifications.high" ng-disabled="!settings.notifications.on" ng-click="settings.notifications.high = !settings.notifications.high"/>
-                <label class="tgl-btn" ng-class="{'disabled':!settings.notifications.on}" for="high"></label>
-              </li>
-              <li class="tg-list-item">
-                <span>Low</span>
-                <input class="tgl tgl-ios" id="low" type="checkbox" ng-checked="settings.notifications.on && settings.notifications.low" ng-disabled="!settings.notifications.on" ng-click="settings.notifications.low = !settings.notifications.low"/>
-                <label class="tgl-btn" ng-class="{'disabled':!settings.notifications.on}" for="low"></label>
-              </li>
-              <li class="tg-list-item">
-                <span>Target</span>
-                <input class="tgl tgl-ios" id="target" type="checkbox" ng-checked="settings.notifications.on && settings.notifications.target" ng-disabled="!settings.notifications.on" ng-click="settings.notifications.target = !settings.notifications.target"/>
-                <label class="tgl-btn" ng-class="{'disabled':!settings.notifications.on}" for="target"></label>
-              </li>
-            </ul>
-
-            <label class="adjust">Slack</label>
-            <div class="input-group">
-              <span class="input-group-addon" style="padding: 0;">
-                <a href="https://api.slack.com/incoming-webhooks" title="https://api.slack.com/incoming-webhooks" target="_blank"><img src="/assets/img/Slack_Mark_Web.png" width="45"></a>
-              </span>
-              <input class="form-control" trim="30" ng-model="settings.notifications.slack" placeholder="Webhook URL">
+            <div class="row new">
+              <div class="col-lg-6 col-sm-12">
+                <label class="adjust">Browser</label>
+                <ul class="tg-list">
+                  <li class="tg-list-item">
+                    <span>{{settings.notifications.on?'On':'Off'}}</span>
+                    <input class="tgl tgl-ios" id="notifications" type="checkbox" ng-checked="settings.notifications.on" ng-click="settings.notifications.on = !settings.notifications.on"/>
+                    <label class="tgl-btn" for="notifications"></label>
+                  </li>
+                </ul>
+                <ul class="tg-list row">
+                  <li class="tg-list-item col-sm-3">
+                    <span>Sounds</span>
+                    <input class="tgl tgl-ios" id="sounds" type="checkbox" ng-checked="settings.notifications.on && settings.sounds.on" ng-disabled="!settings.notifications.on" ng-click="settings.sounds.on = !settings.sounds.on"/>
+                    <label class="tgl-btn" ng-class="{'disabled':!settings.notifications.on}" for="sounds"></label>
+                  </li>
+                  <li class="tg-list-item col-sm-3">
+                    <span>Timers</span>
+                    <input class="tgl tgl-ios" id="timers" type="checkbox" ng-checked="settings.notifications.on && settings.notifications.timers" ng-disabled="!settings.notifications.on" ng-click="settings.notifications.timers = !settings.notifications.timers"/>
+                    <label class="tgl-btn" ng-class="{'disabled':!settings.notifications.on}" for="timers"></label>
+                  </li>
+                  <li class="tg-list-item col-sm-3">
+                    <span>High</span>
+                    <input class="tgl tgl-ios" id="high" type="checkbox" ng-checked="settings.notifications.on && settings.notifications.high" ng-disabled="!settings.notifications.on" ng-click="settings.notifications.high = !settings.notifications.high"/>
+                    <label class="tgl-btn" ng-class="{'disabled':!settings.notifications.on}" for="high"></label>
+                  </li>
+                  <li class="tg-list-item col-sm-3">
+                    <span>Low</span>
+                    <input class="tgl tgl-ios" id="low" type="checkbox" ng-checked="settings.notifications.on && settings.notifications.low" ng-disabled="!settings.notifications.on" ng-click="settings.notifications.low = !settings.notifications.low"/>
+                    <label class="tgl-btn" ng-class="{'disabled':!settings.notifications.on}" for="low"></label>
+                  </li>
+                  <li class="tg-list-item col-sm-3">
+                    <span>Target</span>
+                    <input class="tgl tgl-ios" id="target" type="checkbox" ng-checked="settings.notifications.on && settings.notifications.target" ng-disabled="!settings.notifications.on" ng-click="settings.notifications.target = !settings.notifications.target"/>
+                    <label class="tgl-btn" ng-class="{'disabled':!settings.notifications.on}" for="target"></label>
+                  </li>
+                </ul>
+              </div>
+              <div class="col-lg-6 col-sm-12">
+                <label class="adjust">Slack</label> <a href="https://my.slack.com/services/new/incoming-webhook" target="_blank">Setup a Webhook Integrartion</a>
+                <div class="input-group">
+                  <span class="input-group-addon" style="padding: 0;">
+                    <a href="https://api.slack.com/incoming-webhooks" title="https://api.slack.com/incoming-webhooks" target="_blank"><img src="/assets/img/Slack_Mark_Web.png" width="45"></a>
+                  </span>
+                  <input class="form-control" trim="30" ng-model="settings.notifications.slack" placeholder="Webhook URL">
+                </div>
+              </div>
             </div>
           </div>
         </div>
