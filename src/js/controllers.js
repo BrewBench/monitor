@@ -264,6 +264,7 @@ $scope.updateABV();
     if(!$scope.kettles) $scope.kettles = [];
     $scope.kettles.push({
         name: type ? _.find($scope.kettleTypes,{type: type}).name : $scope.kettleTypes[0].name
+        ,id: null
         ,type: type || $scope.kettleTypes[0].type
         ,active: false
         ,sticky: false
@@ -409,6 +410,12 @@ $scope.updateABV();
   };
 
   $scope.streams = {
+    connected: () => {
+      return (!!$scope.settings.streams.username &&
+        !!$scope.settings.streams.api_key &&
+        $scope.settings.streams.status == 'Connected'
+      );
+    },
     remove: () => {
       var defaultSettings = BrewService.reset();
       $scope.settings.streams = defaultSettings.streams;
@@ -424,40 +431,34 @@ $scope.updateABV();
         .catch(err => {
           $scope.settings.streams.status = 'Failed to Connect';
         });
-      },
-      kettles: (kettle, relay) => {
-        if(relay){
-          kettle[relay].sketch = !kettle[relay].sketch;
-          if(!kettle.notify.streams)
-            return;
-        } else {
-          kettle.notify.streams = !kettle.notify.streams;
-        }
-        BrewService.streams().kettles.save(kettle)
-          .then(response => {
-            kettle.message.type = 'success';
-            if(kettle.notify.streams){
-              kettle.message.location = 'sketches';
-              kettle.message.message = $sce.trustAsHtml('Added to Streams');
-            } else {
-              kettle.message.location = 'sketches';
-              kettle.message.message = $sce.trustAsHtml('Removed from Streams');
-            }
-          })
-          .catch(err => {
-            kettle.notify.streams = !kettle.notify.streams;
-            if(err && err.data && err.data.error && err.data.error.message)
-              $scope.setErrorMessage(err.data.error.message, kettle, 'sketches');
-            else
-              $scope.setErrorMessage(err, kettle, 'sketches');
-          });
-      },
-      enabled: (kettle) => {
-        return (!!$scope.settings.streams.api_key &&
-          $scope.settings.streams.status=='Connected' &&
-          !!$scope.settings.streams.session.name &&
-          !!kettle.valus.length);
+    },
+    kettles: (kettle, relay) => {
+      if(relay){
+        kettle[relay].sketch = !kettle[relay].sketch;
+        if(!kettle.notify.streams)
+          return;
       }
+      kettle.message.message = $sce.trustAsHtml('Saving Streams');
+      BrewService.streams().kettles.save(kettle)
+        .then(response => {
+          kettle.id = response.data.response.id;
+          kettle.message.type = 'success';
+          if(kettle.notify.streams){
+            kettle.message.location = 'sketches';
+            kettle.message.message = $sce.trustAsHtml('Streams Updated');
+          } else {
+            kettle.message.location = 'sketches';
+            kettle.message.message = $sce.trustAsHtml('Streams Updated');
+          }
+        })
+        .catch(err => {
+          kettle.notify.streams = !kettle.notify.streams;
+          if(err && err.data && err.data.error && err.data.error.message)
+            $scope.setErrorMessage(err.data.error.message, kettle, 'sketches');
+          else
+            $scope.setErrorMessage(err, kettle, 'sketches');
+        });
+    }
   };
 
   $scope.shareAccess = function(access){
@@ -1539,6 +1540,13 @@ $scope.updateABV();
     });
   };
 
+  $scope.removeKettle = function(kettle,$index){
+    if($scope.streams.connected() && kettle.notify.streams){
+      $scope.streams.kettles(kettle);
+    }
+    $scope.kettles.splice($index,1);
+  };
+
   $scope.changeValue = function(kettle,field,up){
 
     if(timeout)
@@ -1558,6 +1566,10 @@ $scope.updateABV();
       //update max
       kettle.knob.max = kettle.temp['target']+kettle.temp['diff']+10;
       $scope.updateKnobCopy(kettle);
+      //update streams
+      if($scope.streams.connected() && kettle.notify.streams){
+        $scope.streams.kettles(kettle);
+      }
     },1000);
   };
 

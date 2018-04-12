@@ -25,14 +25,7 @@ angular.module('brewbench-monitor')
         ,recipe: {'name':'','brewer':{name:'','email':''},'yeast':[],'hops':[],'grains':[],scale:'gravity',method:'papazian','og':1.050,'fg':1.010,'abv':0,'abw':0,'calories':0,'attenuation':0}
         ,notifications: {on:true,timers:true,high:true,low:true,target:true,slack:'',last:''}
         ,sounds: {on:true,alert:'/assets/audio/bike.mp3',timer:'/assets/audio/school.mp3'}
-        ,arduinos: [{
-          id: btoa('brewbench'),
-          url: 'arduino.local',
-          analog: 5,
-          digital: 13,
-          secure: false,
-          status: {error: '',dt: ''}
-        }]
+        ,arduinos: [{id:btoa('brewbench'),url:'arduino.local',analog:5,digital:13,secure:false,status:{error:'',dt:''}}]
         ,tplink: {user: '', pass: '', token:'', status: '', plugs: []}
         ,sketches: {frequency: 60, version: 0, ignore_version_error: false}
         ,influxdb: {url: '', port: 8086, user: '', pass: '', db: '', dbs:[], status: ''}
@@ -65,6 +58,7 @@ angular.module('brewbench-monitor')
     defaultKettles: function(){
       return [{
           name: 'Hot Liquor'
+          ,id: null
           ,type: 'water'
           ,active: false
           ,sticky: false
@@ -74,11 +68,12 @@ angular.module('brewbench-monitor')
           ,values: []
           ,timers: []
           ,knob: angular.copy(this.defaultKnobOptions(),{value:0,min:0,max:220})
-          ,arduino: {id: btoa('brewbench'),url:'arduino.local',analog:5,digital:13}
+          ,arduino: {id: btoa('brewbench'),url:'arduino.local',analog:5,digital:13,secure:false}
           ,message: {type:'error',message:'',version:'',count:0,location:''}
           ,notify: {slack: false, dweet: false, streams: false}
         },{
           name: 'Mash'
+          ,id: null
           ,type: 'grain'
           ,active: false
           ,sticky: false
@@ -88,11 +83,12 @@ angular.module('brewbench-monitor')
           ,values: []
           ,timers: []
           ,knob: angular.copy(this.defaultKnobOptions(),{value:0,min:0,max:220})
-          ,arduino: {id: btoa('brewbench'),url:'arduino.local',analog:5,digital:13}
+          ,arduino: {id: btoa('brewbench'),url:'arduino.local',analog:5,digital:13,secure:false}
           ,message: {type:'error',message:'',version:'',count:0,location:''}
           ,notify: {slack: false, dweet: false, streams: false}
         },{
           name: 'Boil'
+          ,id: null
           ,type: 'hop'
           ,active: false
           ,sticky: false
@@ -102,7 +98,7 @@ angular.module('brewbench-monitor')
           ,values: []
           ,timers: []
           ,knob: angular.copy(this.defaultKnobOptions(),{value:0,min:0,max:220})
-          ,arduino: {id: btoa('brewbench'),url:'arduino.local',analog:5,digital:13}
+          ,arduino: {id: btoa('brewbench'),url:'arduino.local',analog:5,digital:13,secure:false}
           ,message: {type:'error',message:'',version:'',count:0,location:''}
           ,notify: {slack: false, dweet: false, streams: false}
         }];
@@ -371,7 +367,9 @@ angular.module('brewbench-monitor')
       });
       delete settings.streams;
       delete settings.influxdb;
+      delete settings.tplink;
       delete settings.notifications;
+      delete settings.sketches;
       settings.shared = true;
       if(sh.password)
         sh.password = md5(sh.password);
@@ -613,11 +611,15 @@ angular.module('brewbench-monitor')
                 return q.promise;
               }
             }
+            var updatedKettle = angular.copy(kettle);
+            delete updatedKettle.values;
+            delete updatedKettle.knob;
+            delete updatedKettle.timers;
             request.url = 'http://localhost:3001/api/kettles/arm';
             request.method = 'POST';
             request.data = {
               session: settings.streams.session,
-              kettle: kettle,
+              kettle: updatedKettle,
               notifications: settings.notifications
             };
             request.headers['Content-Type'] = 'application/json';

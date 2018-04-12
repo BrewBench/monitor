@@ -1,15 +1,17 @@
 <div class="controller-fluid layout-{{settings.layout}}">
-<div class="ui divided items">
+<div class="ui divided items mb-3">
 
-  <div class="kettles item"
-    ng-repeat="kettle in kettles" id="kettle{{$index}}" ng-if="!kettle.sticky">
+  <div class="kettles item mt-2"
+    ng-repeat="kettle in kettles track by $index" id="kettle{{$index}}" ng-if="!kettle.sticky">
 
     <div class="image">
       <div class="arduinos" ng-if="shareAccess('fullAccess')">
         <a class="ui ribbon label dropdown-toggle" ng-class="{'teal':kettle.arduino, 'orange':!kettle.arduino}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           <span class="dropdown-toggle"><img src="assets/img/arduino.svg" width="15"> {{kettle.arduino ? kettle.arduino.url : 'Select an Arduino'}}</span>
         </a>
-        <a href="" class="text-success sticky" ng-click="kettle.sticky = !!(kettle.sticky) ?  false : true"><i class="fa fa-thumb-tack fa-lg"></i></a>
+        <div class="kettle-options">
+          <a href="" class="text-success sticky" ng-click="kettle.sticky = !!(kettle.sticky) ?  false : true"><i class="fa fa-thumb-tack fa-lg"></i></a>
+        </div>
         <div class="dropdown-menu scrollable-menu">
           <button class="text-center modal-link dropdown-item" type="button" data-toggle="modal" data-target="#settingsModal">
             Add / Edit Arduinos
@@ -408,8 +410,11 @@
       </ul>
     </div>
     <div class="extra" ng-if="shareAccess('fullAccess')">
-        <i class="fa fa-1x float-right" ng-class="{'fa-chevron-left':!showRemoveKettle,'fa-chevron-right':showRemoveKettle}" aria-hidden="true" ng-click="showRemoveKettle=!showRemoveKettle"></i>
-        <button ng-show="showRemoveKettle" class="btn btn-danger btn-sm float-right" ng-click="showRemoveKettle=false;kettles.splice($index,1)">Remove Kettle</button>
+      <span ng-if="kettle.notify.streams" class="badge badge-pill badge-dark badge-streams float-left" ng-class="{'saving':kettle.message.message=='Saving Streams'}">
+        <img src="/assets/img/brewbench-colors.png" width="25" style="border-radius:10px;"/> Streaming
+      </span>
+      <i class="fa fa-1x float-right" ng-class="{'fa-chevron-left':!showRemoveKettle,'fa-chevron-right':showRemoveKettle}" aria-hidden="true" ng-click="showRemoveKettle=!showRemoveKettle"></i>
+      <button type="button" ng-show="showRemoveKettle" class="btn btn-danger btn-sm float-right" ng-click="removeKettle(kettle, $index); showRemoveKettle=!showRemoveKettle">Remove Kettle</button>
     </div>
     </div>
   </div>

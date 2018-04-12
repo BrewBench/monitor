@@ -1,8 +1,8 @@
 <div class="controller-fluid layout-{{settings.layout}}">
-<div class="card-deck">
+<div class="card-deck mb-3">
 
-  <div class="kettles card"
-    ng-repeat="kettle in kettles" id="kettle{{$index}}" ng-if="!kettle.sticky">
+  <div class="kettles card mt-2"
+    ng-repeat="kettle in kettles track by $index" id="kettle{{$index}}" ng-if="!kettle.sticky">
     <div class="card-header container-fluid">
 
       <div class="row">
@@ -416,8 +416,11 @@
       </ul>
     </div>
     <div class="card-footer" ng-if="shareAccess('fullAccess')">
+        <span ng-if="kettle.notify.streams" class="badge badge-pill badge-dark badge-streams float-left" ng-class="{'saving':kettle.message.message=='Saving Streams'}">
+          <img src="/assets/img/brewbench-colors.png" width="25" style="border-radius:10px;"/> Streaming
+        </span>
         <i class="fa fa-1x float-right" ng-class="{'fa-chevron-left':!showRemoveKettle,'fa-chevron-right':showRemoveKettle}" aria-hidden="true" ng-click="showRemoveKettle=!showRemoveKettle"></i>
-        <button ng-show="showRemoveKettle" class="btn btn-danger btn-sm float-right" ng-click="showRemoveKettle=false;kettles.splice($index,1)">Remove Kettle</button>
+        <button type="button" ng-show="showRemoveKettle" class="btn btn-danger btn-sm float-right" ng-click="removeKettle(kettle, $index); showRemoveKettle=!showRemoveKettle">Remove Kettle</button>
     </div>
   </div>
 </div>

@@ -59,7 +59,7 @@
             <i class="fa fa-bell fa-lg float-right" aria-hidden="true"></i>
           </h4>
           <div class="block-border">
-            <button class="btn btn-primary float-right" ng-click="notify()" ng-disabled="!settings.notifications.on">Test</button>
+            <button type="button" class="btn btn-primary float-right" ng-click="notify()" ng-disabled="!settings.notifications.on">Test</button>
 
             <div class="row new">
               <div class="col-lg-6 col-sm-12">
@@ -119,7 +119,7 @@
           <div class="block-border">
             <label class="adjust">Add a kettle</label>
             <div class="btn-group item" ng-repeat="kettle in kettleTypes">
-              <button class="btn btn-light {{kettle.type}}" ng-click="addKettle(kettle.type)">
+              <button type="button" class="btn btn-light {{kettle.type}}" ng-click="addKettle(kettle.type)">
                 <img ng-if="kettle.type != 'air'" class="type" ng-src="/assets/img/{{kettle.type}}.svg" height="30"/>
                 <i ng-if="kettle.type == 'air'" class="fa fa-thermometer-quarter fa-2x type"></i>
               </button>
@@ -150,42 +150,42 @@
               </div>
             </div>
 
-            <button class="btn btn-primary float-right" ng-click="arduinos.add()">Add Arduino</button>
-            <table class="table table-striped table-responsive">
-            <thead class="thead-inverse">
-              <tr>
-                <th>Online</th>
-                <th>URL</th>
-                <!-- <th>Password</th> -->
-                <th>Analog Ports</th>
-                <th>Digital Ports</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr ng-repeat="arduino in settings.arduinos">
-                <td><i class="fa fa-circle fa-lg" ng-class="{'orange':(!site.https && arduino.secure),'on':(!arduino.status.error && arduino.status.dt),'off':!!arduino.status.error}" aria-hidden="true"></i></td>
-                <td class="text-left">
-                  <div class="input-group">
-                    <span class="input-group-prepend">
-                      <button class="btn btn-light" ng-show="!arduino.secure" ng-click="arduino.secure=true; arduinos.update(arduino)">http</button>
-                      <button class="btn btn-success" ng-show="arduino.secure" ng-click="arduino.secure=false; arduinos.update(arduino)">https</button>
-                    </span>
-                    <input class="form-control" type="text" ng-model="arduino.url" ng-change="arduinos.update(arduino)" placeholder="URL" style="min-width: 200px;">
-                  </div>
-                  <span class="text-muted" ng-show="(!site.https && arduino.secure)"><br/>&nbsp;You should use https <a ng-href="site.https_url">{{site.https_url}}</a></span>
-                  <span class="text-muted" ng-show="(!arduino.status.error && arduino.status.dt)"><br/>&nbsp;Last Reported {{arduino.status.dt | moment}}</span>
-                  <span class="text-danger" ng-show="(!!arduino.status.error)"><br/>&nbsp;Error Reported {{arduino.status.dt | moment}} {{arduino.status.error}}</span>
-                </td>
-                <!-- <td class="text-left">
-                  <input class="form-control" type="password" ng-model="arduino.password" ng-change="arduinos.update(arduino)"></input>
-                </td> -->
-                <td class="text-left"><input class="form-control" type="number" step="1" min="0" ng-model="arduino.analog" ng-change="arduinos.update(arduino)"></td>
-                <td class="text-left"><input class="form-control" type="number" step="1" min="0" ng-model="arduino.digital" ng-change="arduinos.update(arduino)"></td>
-                <td><a href="" ng-click="arduinos.delete($index, arduino)"><i class="fa fa-trash fa-2x text-danger"></i></a></td>
-              </tr>
-            </tbody>
-          </table>
+            <button type="button" class="btn btn-primary float-right" ng-click="arduinos.add()">Add Arduino</button>
+              <table class="table table-striped table-responsive">
+              <thead class="thead-inverse">
+                <tr>
+                  <th>Online</th>
+                  <th>URL</th>
+                  <!-- <th>Password</th> -->
+                  <th>Analog Ports</th>
+                  <th>Digital Ports</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr ng-repeat="arduino in settings.arduinos">
+                  <td><i class="fa fa-circle fa-lg" ng-class="{'orange':(!site.https && arduino.secure),'on':(!arduino.status.error && arduino.status.dt),'off':!!arduino.status.error}" aria-hidden="true"></i></td>
+                  <td class="text-left">
+                    <div class="input-group">
+                      <span class="input-group-prepend">
+                        <button type="button" class="btn btn-light" ng-show="!arduino.secure" ng-click="arduino.secure=true; arduinos.update(arduino)">http</button>
+                        <button type="button" class="btn btn-success" ng-show="arduino.secure" ng-click="arduino.secure=false; arduinos.update(arduino)">https</button>
+                      </span>
+                      <input class="form-control" type="text" ng-model="arduino.url" ng-change="arduinos.update(arduino)" placeholder="URL" style="min-width: 200px;">
+                    </div>
+                    <span class="text-muted" ng-show="(!site.https && arduino.secure)"><br/>&nbsp;You should use https <a ng-href="site.https_url">{{site.https_url}}</a></span>
+                    <span class="text-muted" ng-show="(!arduino.status.error && arduino.status.dt)"><br/>&nbsp;Last Reported {{arduino.status.dt | moment}}</span>
+                    <span class="text-danger" ng-show="(!!arduino.status.error)"><br/>&nbsp;Error Reported {{arduino.status.dt | moment}} {{arduino.status.error}}</span>
+                  </td>
+                  <!-- <td class="text-left">
+                    <input class="form-control" type="password" ng-model="arduino.password" ng-change="arduinos.update(arduino)"></input>
+                  </td> -->
+                  <td class="text-left"><input class="form-control" type="number" step="1" min="0" ng-model="arduino.analog" ng-change="arduinos.update(arduino)"></td>
+                  <td class="text-left"><input class="form-control" type="number" step="1" min="0" ng-model="arduino.digital" ng-change="arduinos.update(arduino)"></td>
+                  <td><a href="" ng-click="arduinos.delete($index, arduino)"><i class="fa fa-trash fa-2x text-danger"></i></a></td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
 
@@ -208,8 +208,8 @@
               </div>
             </div>
             <div class="btn-group float-right">
-              <button ng-if="settings.tplink.token" class="btn btn-light" style="margin-top: 5px;" ng-click="tplink.scan()">Scan</button>
-              <button class="btn btn-primary" style="margin-top: 5px;" ng-click="tplink.login()">Connect</button>
+              <button type="button" ng-if="settings.tplink.token" class="btn btn-light" style="margin-top: 5px;" ng-click="tplink.scan()">Scan</button>
+              <button type="button" class="btn btn-primary" style="margin-top: 5px;" ng-click="tplink.login()">Connect</button>
             </div>
             <table class="table table-striped table-responsive tplinks">
               <thead class="thead-inverse">

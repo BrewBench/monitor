@@ -52,8 +52,8 @@
               <sup class="badge badge-{{ getStatusClass(settings.streams.status) }} badge-pill">
                 {{ settings.streams.status || 'Not Connected'}}
               </sup>
-              <a href="https://app.brewbench.co" target="_blank" ng-if="settings.streams.status != 'Connected'">signup</a>
-              <a href="https://app.brewbench.co/dashboard/{{ settings.streams.api_key }}" target="_blank" ng-if="settings.streams.status == 'Connected'">dashboard</a>
+              <a href="https://app.brewbench.co" target="_blank" ng-if="settings.streams.status != 'Connected'">Signup</a>
+              <a href="https://app.brewbench.co/dashboard/{{ settings.streams.api_key }}" target="_blank" ng-if="settings.streams.status == 'Connected'">Dashboard</a>
             </h4>
             <div class="block-border">
               <div class="row">
@@ -64,7 +64,7 @@
                   </p>
                 </div>
                 <div class="col-2">
-                  <a href="" class="btn btn-light float-right" ng-click="compileSketch('StreamsYun')" ng-disabled="settings.streams.status!='Connected'">Download Sketch</a>
+                  <a href="" class="btn btn-light float-right" ng-click="compileSketch('StreamsYun')" ng-disabled="!streams.connected()">Download Sketch</a>
                 </div>
               </div>
               <div class="row pb-2">
@@ -80,8 +80,8 @@
               <div class="row">
                 <div class="col-12">
                   <div class="btn-group float-right">
-                    <button class="btn btn-secondary" ng-click="streams.remove()" ng-disabled="!settings.streams.user && !settings.streams.api_key">Remove</button>
-                    <button class="btn btn-primary" ng-click="streams.connect()" ng-disabled="!settings.streams.user && !settings.streams.api_key">Connect</button>
+                    <button type="button" class="btn btn-secondary" ng-click="streams.remove()" ng-disabled="!streams.connected()">Remove</button>
+                    <button type="button" class="btn btn-primary" ng-click="streams.connect()" ng-disabled="streams.connected()">Connect</button>
                   </div>
               </div>
             </div>
@@ -123,7 +123,7 @@
                   <label class="adjust">Database</label>
                   <div class="input-group">
                     <div class="input-group-btn" ng-if="settings.influxdb.dbs && settings.influxdb.dbs.length">
-                      <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">DBs</button>
+                      <button type="button" class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">DBs</button>
                       <div class="dropdown-menu">
                         <a class="dropdown-item" href="" ng-click="settings.influxdb.db=''">Create a new database</a>
                         <div role="separator" class="dropdown-divider"></div>
@@ -132,7 +132,7 @@
                     </div>
                     <input class="form-control" type="text" ng-model="settings.influxdb.db" placeholder="Database Name">
                     <span class="input-group-append">
-                      <button class="btn btn-primary" ng-click="influxdb.create()" ng-disabled="!settings.influxdb.connected">Create</button>
+                      <button type="button" class="btn btn-primary" ng-click="influxdb.create()" ng-disabled="!settings.influxdb.connected">Create</button>
                     </span>
                   </div>
                   <small ng-if="settings.influxdb.created" class="badge badge-success">Created</small>
@@ -151,8 +151,8 @@
               <div class="row">
                 <div class="col-12">
                   <div class="btn-group float-right">
-                    <button class="btn btn-secondary" ng-click="influxdb.remove()" ng-disabled="!settings.influxdb.url">Remove</button>
-                    <button class="btn btn-primary" ng-click="influxdb.connect()" ng-disabled="!settings.influxdb.url">Connect</button>
+                    <button type="button" class="btn btn-secondary" ng-click="influxdb.remove()" ng-disabled="!settings.influxdb.url">Remove</button>
+                    <button type="button" class="btn btn-primary" ng-click="influxdb.connect()" ng-disabled="!settings.influxdb.url">Connect</button>
                   </div>
                 </div>
               </div>
@@ -187,7 +187,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr ng-repeat="kettle in kettles track by $index">
+                  <tr ng-repeat="kettle in kettles | orderBy:'name' track by $index">
                     <td>
                       <img ng-if="kettle.type != 'air'" class="type" ng-src="/assets/img/{{kettle.type}}.svg" width="30" height="30"/>
                       <i ng-if="kettle.type == 'air'" class="fa fa-thermometer-quarter fa-2x type" height="30"></i>
@@ -236,7 +236,7 @@
                       <ul class="tg-list">
                         <li class="tg-list-item">
                           <span>Streams</span>
-                          <input class="tgl tgl-ios" id="streams{{$index}}" type="checkbox" ng-disabled="!settings.streams.api_key || settings.streams.status != 'Connected'" ng-checked="kettle.notify.streams" ng-click="streams.kettles(kettle)"/>
+                          <input class="tgl tgl-ios" id="streams{{$index}}" type="checkbox" ng-disabled="!settings.streams.api_key || settings.streams.status != 'Connected'" ng-checked="kettle.notify.streams" ng-click="kettle.notify.streams = !kettle.notify.streams; streams.kettles(kettle)"/>
                           <label class="tgl-btn" ng-class="{'disabled':!settings.streams.api_key || settings.streams.status != 'Connected'}" for="streams{{$index}}"></label>
                         </li>
                         <li class="tg-list-item">
@@ -264,7 +264,7 @@
             <div class="col-lg-1"></div>
             <div class="col-lg-10">
               <p>
-                <span class="badge badge-pill badge-info">Auto</span> <strong>Sketches are still in beta</strong>.  Please test your heat and cool triggers before installing the sketch as relay's will automatically be triggered if the temperature raises or falls.                
+                <span class="badge badge-pill badge-info">Auto</span> <strong>Sketches are still in beta</strong>.  Please test your heat and cool triggers before installing the sketch as relay's will automatically be triggered if the temperature raises or falls.
               </p>
             </div>
             <div class="col-lg-1"></div>

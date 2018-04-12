@@ -45,7 +45,7 @@
               <span class="input-group-text"><img src="/assets/img/brewbench-colors.png" width="18"/></span>
             </div>
             <input class="form-control" type="text" ng-model="settings.streams.session.name" placeholder="Session Name"/>
-            <div class="dropdown">
+            <div class="input-group-append">
               <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 {{ settings.streams.session.type ? (settings.streams.session.type | titlecase) : 'Type'}}
               </button>
@@ -53,9 +53,9 @@
                 <a class="dropdown-item" href="#" ng-click="settings.streams.session.type='brewing'">Brewing</a>
                 <a class="dropdown-item" href="#" ng-click="settings.streams.session.type='fermentation'">Fermentation</a>
               </div>
-            </div>
-            <div class="input-group-append">
-              <button class="btn btn-light" type="button">Save</button>
+              </div>
+              <div class="input-group-append">
+                <button class="btn btn-light" type="button">Save</button>
             </div>
           </div>
         </div>
