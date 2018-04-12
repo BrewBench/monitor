@@ -8,25 +8,23 @@
       <div class="modal-body settings">
       <div id="sketches">
       <div class="card-body">
-        <div class="pb-3">
-          <div class="row new pb-3">
-            <div class="col-lg-4 col-sm-6 pb-3">
-              <label class="adjust">Sketch Info</label>
-              <strong>Current Sketch Version:</strong> {{pkg.sketch_version}} <br/>
-              <strong>Your Sketch Version:</strong> {{settings.sketches.version}}
-            </div>
-            <div class="col-lg-4 col-sm-6 pb-3">
-              <label class="adjust">Required libraries</label>
-              <p>
-                <a href="https://www.brewbench.co/libs/DHTLib.zip">DHT Library</a> <br/>
-                <a href="https://www.brewbench.co/libs/cactus_io_DS18B20.zip">DS18B20 Library</a>
-              </p>
-            </div>
-            <div class="col-lg-4 col-sm-6 pb-3">
-              <label class="adjust">Other Links</label>
-              <a href="https://www.arduino.cc/en/Main/Software target="_blank"">Arduino IDE</a> <br/>
-              <a href="https://grafana.com/dashboards?search=BrewBench" target="_blank">Grafana Dashboards</a>
-            </div>
+        <div class="row new">
+          <div class="col-lg-4 col-sm-6">
+            <label class="adjust">Sketch Info</label>
+            <strong>Current Sketch Version:</strong> {{pkg.sketch_version}} <br/>
+            <strong>Your Sketch Version:</strong> {{settings.sketches.version}}
+          </div>
+          <div class="col-lg-4 col-sm-6">
+            <label class="adjust">Required libraries</label>
+            <p>
+              <a href="https://www.brewbench.co/libs/DHTLib.zip">DHT Library</a> <br/>
+              <a href="https://www.brewbench.co/libs/cactus_io_DS18B20.zip">DS18B20 Library</a>
+            </p>
+          </div>
+          <div class="col-lg-4 col-sm-6">
+            <label class="adjust">Other Links</label>
+            <a href="https://www.arduino.cc/en/Main/Software target="_blank"">Arduino IDE</a> <br/>
+            <a href="https://grafana.com/dashboards?search=BrewBench" target="_blank">Grafana Dashboards</a>
           </div>
         </div>
         <div class="pb-3">
@@ -81,7 +79,7 @@
                 <div class="col-12">
                   <div class="btn-group float-right">
                     <button type="button" class="btn btn-secondary" ng-click="streams.remove()" ng-disabled="!streams.connected()">Remove</button>
-                    <button type="button" class="btn btn-primary" ng-click="streams.connect()" ng-disabled="streams.connected()">Connect</button>
+                    <button type="button" class="btn btn-primary" ng-click="streams.connect()" ng-disabled="!settings.streams.username || !settings.streams.api_key">Connect</button>
                   </div>
               </div>
             </div>
@@ -109,7 +107,7 @@
                 </div>
               </div>
               <div class="row">
-                <div class="col-9">
+                <div class="col-5">
                   <label class="adjust">Url</label>
                   <input id="influxdbUrl" class="form-control" type="text" ng-model="settings.influxdb.url" placeholder="http://InfluxDBUrl">
                 </div>
@@ -117,9 +115,7 @@
                   <label class="adjust">Port</label>
                   <input class="form-control" style="width: 100%;" type="number" ng-model="settings.influxdb.port">
                 </div>
-              </div>
-              <div class="row">
-                <div class="col-12">
+                <div class="col-4">
                   <label class="adjust">Database</label>
                   <div class="input-group">
                     <div class="input-group-btn" ng-if="settings.influxdb.dbs && settings.influxdb.dbs.length">

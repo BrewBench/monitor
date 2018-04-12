@@ -419,6 +419,9 @@ $scope.updateABV();
     remove: () => {
       var defaultSettings = BrewService.reset();
       $scope.settings.streams = defaultSettings.streams;
+      _.each($scope.kettles, kettle => {
+        kettle.notify.streams = false;
+      });
     },
     connect: () => {
       if(!$scope.settings.streams.username || !$scope.settings.streams.api_key)
