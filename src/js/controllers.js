@@ -186,7 +186,7 @@ $scope.updateABV();
         if(kettle.arduino && kettle.arduino.id == arduino.id)
           delete kettle.arduino;
       });
-    }    
+    }
   };
 
   $scope.tplink = {
@@ -217,8 +217,12 @@ $scope.updateABV();
             if(!!plug.status){
               BrewService.tplink().info(plug).then(info => {
                 if(info && info.responseData){
-                  var sysinfo = JSON.parse(info.responseData).system.get_sysinfo;
-                  plug.info = sysinfo;
+                  plug.info = JSON.parse(info.responseData).system.get_sysinfo;
+                  if(JSON.parse(info.responseData).emeter.get_realtime.err_code == 0){
+                    plug.power = JSON.parse(info.responseData).emeter.get_realtime;
+                  } else {
+                    plug.power = null;
+                  }
                 }
               });
             }
@@ -232,17 +236,27 @@ $scope.updateABV();
       });
     },
     toggle: (device) => {
-      if(device.info.relay_state == 1){
-        BrewService.tplink().off(device).then(response => {
-          device.info.relay_state = 0;
-          return response;
-        });
-      } else {
-        BrewService.tplink().on(device).then(response => {
-          device.info.relay_state = 1;
-          return response;
-        });
-      }
+      var offOrOn = device.info.relay_state == 1 ? 0 : 1;
+      BrewService.tplink().toggle(device, offOrOn).then(response => {
+        device.info.relay_state = offOrOn;
+        return response;
+      }).then(toggleResponse => {
+        $timeout(() => {
+          // update the info
+          return BrewService.tplink().info(device).then(info => {
+            if(info && info.responseData){
+              device.info = JSON.parse(info.responseData).system.get_sysinfo;
+              if(JSON.parse(info.responseData).emeter.get_realtime.err_code == 0){
+                device.power = JSON.parse(info.responseData).emeter.get_realtime;
+              } else {
+                device.power = null;
+              }
+              return device;
+            }
+            return device;
+          });
+        }, 1000);
+      });
     }
   };
 

@@ -100,7 +100,7 @@
                 </ul>
               </div>
               <div class="col-lg-6 col-sm-12">
-                <label class="adjust">Slack</label> <a href="https://my.slack.com/services/new/incoming-webhook" target="_blank">Setup a Webhook Integrartion</a>
+                <label class="adjust">Slack</label> <a href="https://my.slack.com/services/new/incoming-webhook" target="_blank">Setup a Webhook Integration</a>
                 <div class="input-group">
                   <span class="input-group-addon" style="padding: 0;">
                     <a href="https://api.slack.com/incoming-webhooks" title="https://api.slack.com/incoming-webhooks" target="_blank"><img src="/assets/img/Slack_Mark_Web.png" width="45"></a>
@@ -154,8 +154,8 @@
             <table class="table table-striped table-responsive">
             <thead class="thead-inverse">
               <tr>
-                <th>URL</th>
                 <th>Online</th>
+                <th>URL</th>
                 <!-- <th>Password</th> -->
                 <th>Analog Ports</th>
                 <th>Digital Ports</th>
@@ -164,6 +164,7 @@
             </thead>
             <tbody>
               <tr ng-repeat="arduino in settings.arduinos">
+                <td><i class="fa fa-circle fa-lg" ng-class="{'orange':(!site.https && arduino.secure),'on':(!arduino.status.error && arduino.status.dt),'off':!!arduino.status.error}" aria-hidden="true"></i></td>
                 <td class="text-left">
                   <div class="input-group">
                     <span class="input-group-prepend">
@@ -176,7 +177,6 @@
                   <span class="text-muted" ng-show="(!arduino.status.error && arduino.status.dt)"><br/>&nbsp;Last Reported {{arduino.status.dt | moment}}</span>
                   <span class="text-danger" ng-show="(!!arduino.status.error)"><br/>&nbsp;Error Reported {{arduino.status.dt | moment}} {{arduino.status.error}}</span>
                 </td>
-                <td><i class="fa fa-circle fa-lg" ng-class="{'orange':(!site.https && arduino.secure),'on':(!arduino.status.error && arduino.status.dt),'off':!!arduino.status.error}" aria-hidden="true"></i></td>
                 <!-- <td class="text-left">
                   <input class="form-control" type="password" ng-model="arduino.password" ng-change="arduinos.update(arduino)"></input>
                 </td> -->
@@ -214,17 +214,29 @@
             <table class="table table-striped table-responsive tplinks">
               <thead class="thead-inverse">
                 <tr>
+                  <th>Online</th>
                   <th>Name</th>
                   <th>Type</th>
-                  <th>Online</th>
-                  <th>Power On/Off</th>
+                  <th>Power</th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody>
-                <tr ng-repeat="tp in settings.tplink.plugs">
-                  <td>{{ tp.alias }}</td>
-                  <td>{{ tp.deviceModel }}</td>
+                <tr ng-repeat="tp in settings.tplink.plugs | orderBy:'alias'">
                   <td><i class="fa fa-circle fa-lg" ng-class="{'on':!!tp.status, 'off':!tp.status}" aria-hidden="true"></i></td>
+                  <td>{{ tp.alias }}</td>
+                  <td>
+                    {{ tp.deviceModel }}
+                    <br/><span class="text-muted">{{tp.deviceName}}</span>
+                  </td>
+                  <td>
+                    <span ng-if="tp.power" class="text-muted">
+                      Current: {{tp.power.current | number:2}} A<br/>
+                      Power: {{tp.power.power | number:2}} w<br/>
+                      Total: {{tp.power.total | number:2}} kWh<br/>
+                      Voltage: {{tp.power.voltage | number:2}} V
+                    </span>
+                  </td>
                   <td>
                     <a href=""
                       ng-if="!!tp.status"

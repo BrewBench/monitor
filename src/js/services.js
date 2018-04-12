@@ -547,12 +547,8 @@ angular.module('brewbench-monitor')
             });
           return q.promise;
         },
-        on: (device) => {
-          var command = {"system":{"set_relay_state":{"state": 1 }}};
-          return this.tplink().command(device, command);
-        },
-        off: (device) => {
-          var command = {"system":{"set_relay_state":{"state": 0 }}};
+        toggle: (device, toggle) => {
+          var command = {"system":{"set_relay_state":{"state": toggle }}};
           return this.tplink().command(device, command);
         },
         info: (device) => {
