@@ -825,10 +825,10 @@ $scope.updateABV();
     kettle.temp.current = (parseFloat(kettle.temp.previous) + parseFloat(kettle.temp.adjust));
     // set raw
     kettle.temp.raw = response.raw;
-    //reset all kettles every resetChart
+    // reset all kettles every resetChart
     if(kettle.values.length > resetChart){
       $scope.kettles.map((k) => {
-        return k.values=[];
+        return k.values.shift();
       });
     }
 
@@ -1185,8 +1185,8 @@ $scope.updateABV();
         if( sketch.indexOf('Streams') !== -1){
           // streams connection
           var connection_string = `https://${$scope.settings.streams.username}.streams.brewbench.co`;
-          response.data = response.data.replace(/\[PROXY_CONNECTION\]/g, connection_string);
-          response.data = response.data.replace(/\[PROXY_AUTH\]/g, 'Authorization: Basic '+btoa($scope.settings.streams.username+':'+$scope.settings.streams.api_key));
+          response.data = response.data.replace(/\[STREAMS_CONNECTION\]/g, connection_string);
+          response.data = response.data.replace(/\[STREAMS_AUTH\]/g, 'Authorization: Basic '+btoa($scope.settings.streams.username+':'+$scope.settings.streams.api_key));
         } if( sketch.indexOf('InfluxDB') !== -1){
           // influx db connection
           var connection_string = `${$scope.settings.influxdb.url}`;

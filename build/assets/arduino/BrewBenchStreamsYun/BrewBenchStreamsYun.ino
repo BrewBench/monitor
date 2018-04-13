@@ -6,7 +6,7 @@
 // [headers]
 
 String HOSTNAME = "";
-JsonObject& jsonSettings;
+JsonObject& brewbenchSettings;
 const String VERSION = "3.3.0";
 const PROGMEM int FREQUENCY_SECONDS = [FREQUENCY_SECONDS];
 int secondCounter = 0;
@@ -317,18 +317,27 @@ void postTemp(const &data String){
   p.begin(F("curl"));
   p.addParameter(F("-k"));
   p.addParameter(F("-XPOST"));
+  p.addParameter(F("-H"));
   p.addParameter("User-Agent: BrewBench/"+VERSION);
   p.addParameter(F("-H"));
+  p.addParameter(F("Content-Type: application/json"));
   p.addParameter(F("-d"));
   p.addParameter(data);
-  p.addParameter(F("[PROXY_AUTH]"));
-  p.addParameter(F("[PROXY_CONNECTION]/settings"));
+  p.addParameter(F("[STREAMS_AUTH]"));
+  p.addParameter(F("[STREAMS_CONNECTION]/api/temps/settings"));
   p.runAsynchronously();
   while (p.available()) {
     jsonRaw = p.readString();
   }
-  jsonSettings = jsonBuffer.parseObject(jsonRaw);
-  /* if(jsonSettings["sessionId"]) */
+  // if there is a response then something changed and update brewbenchSettings
+  if(jsonRaw){
+    DynamicJsonBuffer jsonBuffer;
+    JsonObject &root = jsonBuffer.parseObject(jsonRaw);
+    // if parsing succeeds then update settings
+    if(root.success()){
+      brewbenchSettings = root;
+    }
+  }
 }
 
 // triggers void trigger(const String &type, const String &source, const String &spin, const float &temp, const int &target, const int &diff, const boolean &slack) {
@@ -361,7 +370,11 @@ void postTemp(const &data String){
 // triggers }
 
 void runActions(){
-  // [actions]
+  if(brewbenchSettings.length == 0)
+    return;
+  for (int k = 0; k < brewbenchSettings.length; k++) {
+    brewbenchSettings[k];
+  }
 }
 
 void getHostname(){

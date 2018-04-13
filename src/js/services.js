@@ -824,11 +824,11 @@ angular.module('brewbench-monitor')
         return q.promise;
     },
 
-    chartOptions: function(unit){
+    chartOptions: function(unit, area){
       return {
         chart: {
               type: 'lineChart',
-              noData: 'BrewBench Live',
+              noData: 'BrewBench Monitor',
               height: 350,
               margin : {
                   top: 20,
@@ -844,7 +844,11 @@ angular.module('brewbench-monitor')
               duration: 300,
               useInteractiveGuideline: true,
               clipVoronoi: false,
-
+              interpolate: 'basis',
+              legend: {
+                key: function (d) { return d.name }
+              },
+              isArea: function (d) { return false },
               xAxis: {
                   axisLabel: 'Time',
                   tickFormat: function(d) {
