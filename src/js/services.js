@@ -25,9 +25,9 @@ angular.module('brewbench-monitor')
         ,recipe: {'name':'','brewer':{name:'','email':''},'yeast':[],'hops':[],'grains':[],scale:'gravity',method:'papazian','og':1.050,'fg':1.010,'abv':0,'abw':0,'calories':0,'attenuation':0}
         ,notifications: {on:true,timers:true,high:true,low:true,target:true,slack:'',last:''}
         ,sounds: {on:true,alert:'/assets/audio/bike.mp3',timer:'/assets/audio/school.mp3'}
-        ,arduinos: [{id:btoa('brewbench'),url:'arduino.local',analog:5,digital:13,secure:false,status:{error:'',dt:''}}]
+        ,arduinos: [{id:btoa('brewbench'),url:'arduino.local',analog:5,digital:13,secure:false,version:'',status:{error:'',dt:''}}]
         ,tplink: {user: '', pass: '', token:'', status: '', plugs: []}
-        ,sketches: {frequency: 60, version: 0, ignore_version_error: false}
+        ,sketches: {frequency: 60}
         ,influxdb: {url: '', port: 8086, user: '', pass: '', db: '', dbs:[], status: ''}
         ,streams: {username: '', api_key: '', accessToken: null, status: '', session: {id: '', name: '', type: 'fermentation'}}
       };
@@ -64,7 +64,7 @@ angular.module('brewbench-monitor')
           ,sticky: false
           ,heater: {pin:'D2',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
           ,pump: {pin:'D3',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
-          ,temp: {pin:'A0',type:'Thermistor',hit:false,current:0,previous:0,adjust:0,target:170,diff:2,raw:0}
+          ,temp: {pin:'A0',type:'Thermistor',hit:false,current:0,previous:0,last:0,adjust:0,target:170,diff:2,raw:0}
           ,values: []
           ,timers: []
           ,knob: angular.copy(this.defaultKnobOptions(),{value:0,min:0,max:220})
@@ -79,7 +79,7 @@ angular.module('brewbench-monitor')
           ,sticky: false
           ,heater: {pin:'D4',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
           ,pump: {pin:'D5',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
-          ,temp: {pin:'A1',type:'Thermistor',hit:false,current:0,previous:0,adjust:0,target:152,diff:2,raw:0}
+          ,temp: {pin:'A1',type:'Thermistor',hit:false,current:0,previous:0,last:0,adjust:0,target:152,diff:2,raw:0}
           ,values: []
           ,timers: []
           ,knob: angular.copy(this.defaultKnobOptions(),{value:0,min:0,max:220})
@@ -94,7 +94,7 @@ angular.module('brewbench-monitor')
           ,sticky: false
           ,heater: {pin:'D6',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
           ,pump: {pin:'D7',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
-          ,temp: {pin:'A2',type:'Thermistor',hit:false,current:0,previous:0,adjust:0,target:200,diff:2,raw:0}
+          ,temp: {pin:'A2',type:'Thermistor',hit:false,current:0,previous:0,last:0,adjust:0,target:200,diff:2,raw:0}
           ,values: []
           ,timers: []
           ,knob: angular.copy(this.defaultKnobOptions(),{value:0,min:0,max:220})
@@ -211,17 +211,8 @@ angular.module('brewbench-monitor')
 
       $http(request)
         .then(response => {
-          if(!settings.shared &&
-            !settings.sketches.ignore_version_error &&
-            (response.headers('X-Sketch-Version') == null || response.headers('X-Sketch-Version') < settings.sketch_version)){
-            q.reject({version: response.headers('X-Sketch-Version')});
-          } else {
-            if(settings.sketches.version != response.headers('X-Sketch-Version')){
-              settings.sketches.version = response.headers('X-Sketch-Version');
-              this.settings('settings',settings);
-            }
-            q.resolve(response.data);
-          }
+          response.data.sketch_version = response.headers('X-Sketch-Version');
+          q.resolve(response.data);
         })
         .catch(err => {
           q.reject(err);
@@ -245,17 +236,8 @@ angular.module('brewbench-monitor')
 
       $http(request)
         .then(response => {
-          if(!settings.shared &&
-            !settings.sketches.ignore_version_error &&
-            (response.headers('X-Sketch-Version') == null || response.headers('X-Sketch-Version') < settings.sketch_version)){
-            q.reject({version: response.headers('X-Sketch-Version')});
-          } else {
-            if(settings.sketches.version != response.headers('X-Sketch-Version')){
-              settings.sketches.version = response.headers('X-Sketch-Version');
-              this.settings('settings',settings);
-            }
-            q.resolve(response.data);
-          }
+          response.data.sketch_version = response.headers('X-Sketch-Version');
+          q.resolve(response.data);
         })
         .catch(err => {
           q.reject(err);
@@ -277,17 +259,8 @@ angular.module('brewbench-monitor')
 
       $http(request)
         .then(response => {
-          if(!settings.shared &&
-            !settings.sketches.ignore_version_error &&
-            (response.headers('X-Sketch-Version') == null || response.headers('X-Sketch-Version') < settings.sketch_version)){
-            q.reject({version: response.headers('X-Sketch-Version')});
-          } else {
-            if(settings.sketches.version != response.headers('X-Sketch-Version')){
-              settings.sketches.version = response.headers('X-Sketch-Version');
-              this.settings('settings',settings);
-            }
-            q.resolve(response.data);
-          }
+          response.data.sketch_version = response.headers('X-Sketch-Version');
+          q.resolve(response.data);
         })
         .catch(err => {
           q.reject(err);
@@ -309,17 +282,8 @@ angular.module('brewbench-monitor')
 
       $http(request)
         .then(response => {
-          if(!settings.shared &&
-            !settings.sketches.ignore_version_error &&
-            (response.headers('X-Sketch-Version') == null || response.headers('X-Sketch-Version') < settings.sketch_version)){
-            q.reject({version: response.headers('X-Sketch-Version')});
-          } else {
-            if(settings.sketches.version != response.headers('X-Sketch-Version')){
-              settings.sketches.version = response.headers('X-Sketch-Version');
-              this.settings('settings',settings);
-            }
-            q.resolve(response.data);
-          }
+          response.data.sketch_version = response.headers('X-Sketch-Version');
+          q.resolve(response.data);
         })
         .catch(err => {
           q.reject(err);

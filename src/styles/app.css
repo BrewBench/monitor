@@ -535,6 +535,10 @@ sup.ref {
 .settings h4 .badge {
   font-size: 50%;
 }
+.badge.badge-prev {
+  position: relative;
+  margin-top: 10px;
+}
 .settings .block-border {
   border-left: 4px solid #2e6da4;
   padding-left: 15px;

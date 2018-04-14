@@ -167,6 +167,7 @@ $scope.updateABV();
         analog: 5,
         digital: 13,
         secure: false,
+        version: '',
         status: {error: '',dt: ''}
       });
       _.each($scope.kettles, kettle => {
@@ -270,7 +271,7 @@ $scope.updateABV();
         ,sticky: false
         ,heater: {pin:'D6',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
         ,pump: {pin:'D7',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
-        ,temp: {pin:'A0',type:'Thermistor',hit:false,current:0,previous:0,adjust:0,target:$scope.kettleTypes[0].target,diff:$scope.kettleTypes[0].diff,raw:0}
+        ,temp: {pin:'A0',type:'Thermistor',hit:false,current:0,previous:0,last:0,adjust:0,target:$scope.kettleTypes[0].target,diff:$scope.kettleTypes[0].diff,raw:0}
         ,values: []
         ,timers: []
         ,knob: angular.copy(BrewService.defaultKnobOptions(),{value:0,min:0,max:$scope.kettleTypes[0].target+$scope.kettleTypes[0].diff})
@@ -768,7 +769,7 @@ $scope.updateABV();
           kettle.message.count=0;
           kettle.message.message = $sce.trustAsHtml(`Connection error: ${message}`);
           kettle.message.location = location;
-          $scope.updateArduinoStatus(kettle, message);
+          $scope.updateArduinoStatus({kettle:kettle}, message);
           $scope.updateKnobCopy(kettle);
         } else {
           $scope.error.message = $sce.trustAsHtml(`Error: ${message}`);
@@ -776,16 +777,18 @@ $scope.updateABV();
       } else if(kettle){
         kettle.message.count=0;
         kettle.message.message = `Error connecting to ${BrewService.domain(kettle.arduino)}`;
-        $scope.updateArduinoStatus(kettle, kettle.message.message);
+        $scope.updateArduinoStatus({kettle:kettle}, kettle.message.message);
       } else {
         $scope.error.message = $sce.trustAsHtml('Connection error:');
       }
     }
   };
-  $scope.updateArduinoStatus = function(kettle, error){
-    var arduino = _.filter($scope.settings.arduinos, {id: kettle.arduino.id});
+  $scope.updateArduinoStatus = function(response, error){
+    var arduino = _.filter($scope.settings.arduinos, {id: response.kettle.arduino.id});
     if(arduino.length){
       arduino[0].status.dt = new Date();
+      if(response.sketch_version)
+        arduino[0].version = response.sketch_version;
       if(error)
         arduino[0].status.error = error;
       else
@@ -797,7 +800,7 @@ $scope.updateABV();
     if(kettle) {
       kettle.message.count=0;
       kettle.message.message = $sce.trustAsHtml('');
-      $scope.updateArduinoStatus(kettle);
+      $scope.updateArduinoStatus({kettle:kettle});
     } else {
       $scope.error.type = 'danger';
       $scope.error.message = $sce.trustAsHtml('');
@@ -818,6 +821,9 @@ $scope.updateABV();
     //update datatype
     response.temp = parseFloat(response.temp);
     response.raw = parseFloat(response.raw);
+
+    if(!!kettle.temp.current)
+      kettle.temp.last = kettle.temp.current;
     // temp response is in C
     kettle.temp.previous = ($scope.settings.unit == 'F') ?
       $filter('toFahrenheit')(response.temp) :
@@ -841,7 +847,7 @@ $scope.updateABV();
     kettle.values.push([date.getTime(),kettle.temp.current]);
 
     $scope.updateKnobCopy(kettle);
-    $scope.updateArduinoStatus(kettle);
+    $scope.updateArduinoStatus({kettle:kettle, sketch_version:response.sketch_version});
 
     //is temp too high?
     if(kettle.temp.current > kettle.temp.target+kettle.temp.diff){
@@ -1111,11 +1117,6 @@ $scope.updateABV();
       kettles[i].active = false;
     });
     return "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({"settings": $scope.settings,"kettles": kettles}));
-  };
-
-  $scope.ignoreVersionError = function(kettle){
-    $scope.settings.sketches.ignore_version_error = true;
-    $scope.resetError(kettle);
   };
 
   $scope.compileSketch = function(sketchName){
@@ -1437,6 +1438,7 @@ $scope.updateABV();
         kettle.temp.current = parseFloat(kettle.temp.current);
         kettle.temp.current = $filter('formatDegrees')(kettle.temp.current,unit);
         kettle.temp.previous = $filter('formatDegrees')(kettle.temp.previous,unit);
+        kettle.temp.last = $filter('formatDegrees')(kettle.temp.last,unit);
         kettle.temp.target = $filter('formatDegrees')(kettle.temp.target,unit);
         kettle.temp.target = $filter('round')(kettle.temp.target,0);
         if(!!kettle.temp.adjust){
