@@ -286,8 +286,8 @@
             value="(kettle.temp.current | round:0)"
             options="kettle.knob">
           </ui-knob><br/>
-          <span class="badge badge-pill badge-prev badge-danger" ng-show="kettle.temp.last && (kettle.temp.last | round:0) > (kettle.temp.current | round:0)" title="Last {{ kettle.temp.last }}&deg;{{settings.unit}}" >{{kettle.temp.last}}&deg;{{settings.unit}} &darr;</span>
-          <span class="badge badge-pill badge-prev badge-success" ng-show="kettle.temp.last && (kettle.temp.last | round:0) < (kettle.temp.current | round:0)" title="Last {{ kettle.temp.last }}&deg;{{settings.unit}}" >{{kettle.temp.last}}&deg;{{settings.unit}} &uarr;</span>
+          <span class="badge badge-pill badge-prev badge-danger" ng-show="kettle.temp.previous && (kettle.temp.previous | round:0) > (kettle.temp.current | round:0)" title="Last {{ kettle.temp.previous }}&deg;{{settings.unit}}" >{{kettle.temp.previous}}&deg;{{settings.unit}} &darr;</span>
+          <span class="badge badge-pill badge-prev badge-success" ng-show="kettle.temp.previous && (kettle.temp.previous | round:0) < (kettle.temp.current | round:0)" title="Last {{ kettle.temp.previous }}&deg;{{settings.unit}}" >{{kettle.temp.previous}}&deg;{{settings.unit}} &uarr;</span>
         </div>
         <div class="col" ng-if="shareAccess('fullAccess')">
           <div class="row">
@@ -404,9 +404,10 @@
         <li class="list-group-item">
           raw bits: {{ kettle.temp.raw }}<br/>
           bit calc temp: {{ BrewService.bitcalc(kettle) }} &deg;C<br/>
+          measured: {{ kettle.temp.measured }} &deg;{{ settings.unit }}<br/>
+          adjusted: {{ kettle.temp.adjust }} &deg;{{ settings.unit }}<br/>
           current: {{ kettle.temp.current }} &deg;{{ settings.unit }}<br/>
           previous: {{ kettle.temp.previous }} &deg;{{ settings.unit }}<br/>
-          adjusted: {{ kettle.temp.adjust }} &deg;{{ settings.unit }}<br/>
           <span ng-if="settings.unit=='F'">
             celsius: {{ kettle.temp.current ? (kettle.temp.current | toCelsius) : 0 }} &deg;C<br/>
           </span>

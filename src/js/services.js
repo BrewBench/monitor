@@ -64,7 +64,7 @@ angular.module('brewbench-monitor')
           ,sticky: false
           ,heater: {pin:'D2',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
           ,pump: {pin:'D3',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
-          ,temp: {pin:'A0',type:'Thermistor',hit:false,current:0,previous:0,last:0,adjust:0,target:170,diff:2,raw:0}
+          ,temp: {pin:'A0',type:'Thermistor',hit:false,current:0,measured:0,previous:0,adjust:0,target:170,diff:2,raw:0}
           ,values: []
           ,timers: []
           ,knob: angular.copy(this.defaultKnobOptions(),{value:0,min:0,max:220})
@@ -79,7 +79,7 @@ angular.module('brewbench-monitor')
           ,sticky: false
           ,heater: {pin:'D4',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
           ,pump: {pin:'D5',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
-          ,temp: {pin:'A1',type:'Thermistor',hit:false,current:0,previous:0,last:0,adjust:0,target:152,diff:2,raw:0}
+          ,temp: {pin:'A1',type:'Thermistor',hit:false,current:0,measured:0,previous:0,adjust:0,target:152,diff:2,raw:0}
           ,values: []
           ,timers: []
           ,knob: angular.copy(this.defaultKnobOptions(),{value:0,min:0,max:220})
@@ -94,7 +94,7 @@ angular.module('brewbench-monitor')
           ,sticky: false
           ,heater: {pin:'D6',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
           ,pump: {pin:'D7',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
-          ,temp: {pin:'A2',type:'Thermistor',hit:false,current:0,previous:0,last:0,adjust:0,target:200,diff:2,raw:0}
+          ,temp: {pin:'A2',type:'Thermistor',hit:false,current:0,measured:0,previous:0,adjust:0,target:200,diff:2,raw:0}
           ,values: []
           ,timers: []
           ,knob: angular.copy(this.defaultKnobOptions(),{value:0,min:0,max:220})

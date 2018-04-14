@@ -271,7 +271,7 @@ $scope.updateABV();
         ,sticky: false
         ,heater: {pin:'D6',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
         ,pump: {pin:'D7',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
-        ,temp: {pin:'A0',type:'Thermistor',hit:false,current:0,previous:0,last:0,adjust:0,target:$scope.kettleTypes[0].target,diff:$scope.kettleTypes[0].diff,raw:0}
+        ,temp: {pin:'A0',type:'Thermistor',hit:false,current:0,measured:0,previous:0,adjust:0,target:$scope.kettleTypes[0].target,diff:$scope.kettleTypes[0].diff,raw:0}
         ,values: []
         ,timers: []
         ,knob: angular.copy(BrewService.defaultKnobOptions(),{value:0,min:0,max:$scope.kettleTypes[0].target+$scope.kettleTypes[0].diff})
@@ -823,13 +823,13 @@ $scope.updateABV();
     response.raw = parseFloat(response.raw);
 
     if(!!kettle.temp.current)
-      kettle.temp.last = kettle.temp.current;
+      kettle.temp.previous = kettle.temp.current;
     // temp response is in C
-    kettle.temp.previous = ($scope.settings.unit == 'F') ?
+    kettle.temp.measured = ($scope.settings.unit == 'F') ?
       $filter('toFahrenheit')(response.temp) :
       $filter('round')(response.temp,2);
     // add adjustment
-    kettle.temp.current = (parseFloat(kettle.temp.previous) + parseFloat(kettle.temp.adjust));
+    kettle.temp.current = (parseFloat(kettle.temp.measured) + parseFloat(kettle.temp.adjust));
     // set raw
     kettle.temp.raw = response.raw;
     // reset all kettles every resetChart
@@ -1305,7 +1305,7 @@ $scope.updateABV();
 
     // Window Notification
     if("Notification" in window){
-      //close the previous notification
+      //close the measured notification
       if(notification)
         notification.close();
 
@@ -1437,8 +1437,8 @@ $scope.updateABV();
         kettle.temp.target = parseFloat(kettle.temp.target);
         kettle.temp.current = parseFloat(kettle.temp.current);
         kettle.temp.current = $filter('formatDegrees')(kettle.temp.current,unit);
+        kettle.temp.measured = $filter('formatDegrees')(kettle.temp.measured,unit);
         kettle.temp.previous = $filter('formatDegrees')(kettle.temp.previous,unit);
-        kettle.temp.last = $filter('formatDegrees')(kettle.temp.last,unit);
         kettle.temp.target = $filter('formatDegrees')(kettle.temp.target,unit);
         kettle.temp.target = $filter('round')(kettle.temp.target,0);
         if(!!kettle.temp.adjust){
@@ -1574,7 +1574,7 @@ $scope.updateABV();
       kettle.temp[field]--;
 
     if(field == 'adjust'){
-      kettle.temp.current = (parseFloat(kettle.temp.previous) + parseFloat(kettle.temp.adjust));
+      kettle.temp.current = (parseFloat(kettle.temp.measured) + parseFloat(kettle.temp.adjust));
     }
 
     //update knob after 1 seconds, otherwise we get a lot of refresh on the knob when clicking plus or minus
