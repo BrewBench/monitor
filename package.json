@@ -39,12 +39,6 @@
     "email": "andrew@andrewvantassel.com",
     "url": "https://andrewvantassel.com"
   },
-  "contributors": [
-    {
-      "name": "Lee Kendrick",
-      "url": "http://leekendrick.info"
-    }
-  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/brewbench/monitor/issues"

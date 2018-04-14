@@ -26,7 +26,6 @@ $scope.water;
 $scope.lovibond;
 $scope.pkg;
 $scope.kettleTypes = BrewService.kettleTypes();
-$scope.chartOptions = BrewService.chartOptions();
 $scope.showSettings = true;
 $scope.error = {message: '', type: 'danger'};
 $scope.slider = {
@@ -87,6 +86,7 @@ $scope.getLovibondColor = function(range){
 
 //default settings values
 $scope.settings = BrewService.settings('settings') || BrewService.reset();
+$scope.chartOptions = BrewService.chartOptions({unit: $scope.settings.unit, chart: $scope.settings.chart, session: $scope.settings.streams.session});
 $scope.kettles = BrewService.settings('kettles') || BrewService.defaultKettles();
 $scope.share = (!$state.params.file && BrewService.settings('share')) ? BrewService.settings('share') : {
       file: $state.params.file || null
@@ -810,7 +810,8 @@ $scope.updateABV();
     }
 
     $scope.resetError(kettle);
-
+    // needed for charts
+    kettle.key = kettle.name;
     var temps = [];
     //chart date
     var date = new Date();
@@ -991,6 +992,8 @@ $scope.updateABV();
         BrewService.temp(kettle)
           .then(response => $scope.updateTemp(response, kettle))
           .catch(err => {
+            // udpate chart with current
+            kettle.values.push([date.getTime(),kettle.temp.current]);
             kettle.message.count++;
             if(kettle.message.count==7)
               $scope.setErrorMessage(err, kettle);
@@ -1443,12 +1446,18 @@ $scope.updateABV();
           else
             kettle.temp.adjust = $filter('round')(kettle.temp.adjust*1.8,0);
         }
+        // update chart values
+        if(kettle.values.length){
+            _.each(kettle.values, (v, i) => {
+              kettle.values[i] = [kettle.values[i][0],$filter('formatDegrees')(kettle.values[i][1],unit)];
+          });
+        }
         // update knob
         kettle.knob.value = kettle.temp.current;
         kettle.knob.max = kettle.temp.target+kettle.temp.diff+10;
         $scope.updateKnobCopy(kettle);
       });
-      $scope.chartOptions = BrewService.chartOptions(unit);
+      $scope.chartOptions = BrewService.chartOptions({unit: $scope.settings.unit, chart: $scope.settings.chart, session: $scope.settings.streams.session});
     }
   };
 
@@ -1516,6 +1525,8 @@ $scope.updateABV();
         allSensors.push(BrewService.temp($scope.kettles[i])
           .then(response => $scope.updateTemp(response, $scope.kettles[i]))
           .catch(err => {
+            // udpate chart with current
+            kettle.values.push([date.getTime(),kettle.temp.current]);
             if($scope.kettles[i].error.count)
               $scope.kettles[i].error.count++;
             else

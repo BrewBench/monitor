@@ -28,9 +28,9 @@
         <strong>{{error.type}}</strong> <span ng-bind-html="error.message">{{error.message}}</span>
       </div>
       <div class="pb-5">
-        <a href="" class="chart-toggle float-right" ng-click="settings.chart=!settings.chart" ng-class="{'on':settings.chart,'off':!settings.chart}">
+        <a href="" class="chart-toggle float-right" ng-click="settings.chart=!settings.chart" ng-class="{'on':settings.chart.show,'off':!settings.chart.show}">
         <i class="fa fa-area-chart"
-          ng-class="{'on':settings.chart,'off':!settings.chart}"
+          ng-class="{'on':settings.chart.show,'off':!settings.chart.show}"
           aria-hidden="true"></i>
         </a>
       </div>

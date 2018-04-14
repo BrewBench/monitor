@@ -78,7 +78,7 @@ npm run build
 
 ## About
 
-[BrewBench](https://brewbench.co) is a brew monitor and controller Developed by [Andrew Van Tassel](https://www.andrewvantassel.com) and [Lee Kendrick](http://www.leekendrick.info) &copy;2017.  
+[BrewBench](https://brewbench.co) is a brew monitor and controller Developed by [Andrew Van Tassel](https://www.andrewvantassel.com) &copy;2018.  
 
 ## Help
 

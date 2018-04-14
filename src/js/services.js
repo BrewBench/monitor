@@ -20,7 +20,7 @@ angular.module('brewbench-monitor')
         ,pollSeconds: 10
         ,unit: 'F'
         ,layout: 'card'
-        ,chart: true
+        ,chart: {show: true, military: false, area: false}
         ,shared: false
         ,recipe: {'name':'','brewer':{name:'','email':''},'yeast':[],'hops':[],'grains':[],scale:'gravity',method:'papazian','og':1.050,'fg':1.010,'abv':0,'abw':0,'calories':0,'attenuation':0}
         ,notifications: {on:true,timers:true,high:true,low:true,target:true,slack:'',last:''}
@@ -824,10 +824,14 @@ angular.module('brewbench-monitor')
         return q.promise;
     },
 
-    chartOptions: function(unit, area){
+    chartOptions: function(options){
       return {
         chart: {
               type: 'lineChart',
+              title: {
+                enable: !!options.session,
+                text: !!options.session ? options.session : ''
+              },
               noData: 'BrewBench Monitor',
               height: 350,
               margin : {
@@ -848,18 +852,21 @@ angular.module('brewbench-monitor')
               legend: {
                 key: function (d) { return d.name }
               },
-              isArea: function (d) { return false },
+              isArea: function (d) { return !!options.chart.area },
               xAxis: {
                   axisLabel: 'Time',
                   tickFormat: function(d) {
-                      return d3.time.format('%I:%M:%S')(new Date(d))
+                      if(!!options.chart.military)
+                        return d3.time.format('%H:%M:%S')(new Date(d)).toLowerCase();
+                      else
+                        return d3.time.format('%I:%M:%S%p')(new Date(d)).toLowerCase();
                   },
                   orient: 'bottom',
                   tickPadding: 20,
                   axisLabelDistance: 40,
                   staggerLabels: true
               },
-              forceY: (!unit || unit=='F') ? [0,220] : [-17,104],
+              forceY: (!options.unit || options.unit=='F') ? [0,220] : [-17,104],
               yAxis: {
                   axisLabel: 'Temperature',
                   tickFormat: function(d){
