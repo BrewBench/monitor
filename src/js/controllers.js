@@ -428,7 +428,7 @@ $scope.updateABV();
       if(!$scope.settings.streams.username || !$scope.settings.streams.api_key)
         return;
       $scope.settings.streams.status = 'Connecting';
-      BrewService.streams().ping()
+      return BrewService.streams().auth(true)
         .then(response => {
           $scope.settings.streams.status = 'Connected';
         })
@@ -442,25 +442,36 @@ $scope.updateABV();
         if(!kettle.notify.streams)
           return;
       }
+      kettle.message.location = 'sketches';
+      kettle.message.type = 'info';
       kettle.message.message = $sce.trustAsHtml('Saving Streams');
-      BrewService.streams().kettles.save(kettle)
+      return BrewService.streams().kettles.save(kettle)
         .then(response => {
-          kettle.id = response.data.response.id;
+          var kettleResponse = response.kettle;
+          // update kettle vars
+          kettle.id = kettleResponse.id;
+          // update arduino id
+          _.each($scope.settings.arduinos, arduino => {
+            if(arduino.id == kettle.arduino.id)
+              arduino.id = kettleResponse.deviceId;
+          });
+          kettle.arduino.id = kettleResponse.deviceId;
+          // update session vars
+          $scope.streams.session = kettleResponse.session;
+
           kettle.message.type = 'success';
           if(kettle.notify.streams){
-            kettle.message.location = 'sketches';
             kettle.message.message = $sce.trustAsHtml('Streams Updated');
           } else {
-            kettle.message.location = 'sketches';
             kettle.message.message = $sce.trustAsHtml('Streams Updated');
           }
         })
         .catch(err => {
           kettle.notify.streams = !kettle.notify.streams;
           if(err && err.data && err.data.error && err.data.error.message)
-            $scope.setErrorMessage(err.data.error.message, kettle, 'sketches');
+            $scope.setErrorMessage(err.data.error.message, kettle);
           else
-            $scope.setErrorMessage(err, kettle, 'sketches');
+            $scope.setErrorMessage(err, kettle);
         });
     }
   };
@@ -768,7 +779,8 @@ $scope.updateABV();
           kettle.message.type = 'danger';
           kettle.message.count=0;
           kettle.message.message = $sce.trustAsHtml(`Connection error: ${message}`);
-          kettle.message.location = location;
+          if(location)
+            kettle.message.location = location;
           $scope.updateArduinoStatus({kettle:kettle}, message);
           $scope.updateKnobCopy(kettle);
         } else {
@@ -776,7 +788,7 @@ $scope.updateABV();
         }
       } else if(kettle){
         kettle.message.count=0;
-        kettle.message.message = `Error connecting to ${BrewService.domain(kettle.arduino)}`;
+        kettle.message.message = $sce.trustAsHtml(`Error connecting to ${BrewService.domain(kettle.arduino)}`);
         $scope.updateArduinoStatus({kettle:kettle}, kettle.message.message);
       } else {
         $scope.error.message = $sce.trustAsHtml('Connection error:');

@@ -3,17 +3,21 @@ angular.module('brewbench-monitor')
 
   return {
 
-    accessToken: 'v0jybQms9kXNvVf6OEthPXXYSlQOjzyo1jIgW8MI8dNLjG4Pl0WmvMhEAhd0zZgo',
-
     //cookies size 4096 bytes
     clear: function(){
       if(window.localStorage){
         window.localStorage.removeItem('settings');
         window.localStorage.removeItem('kettles');
         window.localStorage.removeItem('share');
+        window.localStorage.removeItem('accessToken');
       }
     },
-
+    accessToken: function(token){
+      if(token)
+        return window.localStorage.setItem('accessToken',token);
+      else
+        return window.localStorage.getItem('accessToken');
+    },
     reset: function(){
       const defaultSettings = {
         debug: false
@@ -29,7 +33,7 @@ angular.module('brewbench-monitor')
         ,tplink: {user: '', pass: '', token:'', status: '', plugs: []}
         ,sketches: {frequency: 60}
         ,influxdb: {url: '', port: 8086, user: '', pass: '', db: '', dbs:[], status: ''}
-        ,streams: {username: '', api_key: '', accessToken: null, status: '', session: {id: '', name: '', type: 'fermentation'}}
+        ,streams: {username: '', api_key: '', status: '', session: {id: '', name: '', type: 'fermentation'}}
       };
       return defaultSettings;
     },
@@ -522,22 +526,21 @@ angular.module('brewbench-monitor')
 
     streams: function(){
       var settings = this.settings('settings');
-      var url = `https://${settings.streams.username}.streams.brewbench.co`;
-      var request = {url: url, headers: {}, timeout: settings.pollSeconds*10000};
+      var request = {url: 'http://localhost:3001/api', headers: {}, timeout: settings.pollSeconds*10000};
 
       return {
-        auth: async () => {
+        auth: async (ping) => {
           var q = $q.defer();
-          if(settings.streams.api_key){
-            request.url = `http://localhost:3001/api/users/auth`;
+          if(settings.streams.api_key && settings.streams.username){
+            request.url += (ping) ? '/users/ping' : '/users/auth';
             request.method = 'POST';
             request.headers['Content-Type'] ='application/json';
             request.headers['X-API-Key'] = `${settings.streams.api_key}`;
             request.headers['X-BB-User'] = `${settings.streams.username}`;
             $http(request)
               .then(response => {
-                if(response && response.data && response.data.accessToken)
-                  this.accessToken = response.data.accessToken;
+                if(response && response.data && response.data.access && response.data.access.id)
+                  this.accessToken(response.data.access.id);
                 q.resolve(response);
               })
               .catch(err => {
@@ -548,38 +551,19 @@ angular.module('brewbench-monitor')
           }
           return q.promise;
         },
-        ping: () => {
-          var q = $q.defer();
-          if(settings.streams.api_key){
-            request.withCredentials = true;
-            request.headers['Authorization'] = 'Basic '+btoa(settings.streams.username+':'+settings.streams.api_key);
-          }
-          request.url += '/ping';
-          request.method = 'GET';
-          $http(request)
-            .then(response => {
-              q.resolve(response);
-            })
-            .catch(err => {
-              q.reject(err);
-            });
-            return q.promise;
-        },
         kettles: {
           save: async (kettle) => {
             var q = $q.defer();
-            if(!this.accessToken){
+            if(!this.accessToken()){
               var auth = await this.streams().auth();
-              if(!this.accessToken){
+              if(!this.accessToken()){
                 q.reject('Sorry Bad Authentication');
                 return q.promise;
               }
             }
             var updatedKettle = angular.copy(kettle);
             delete updatedKettle.values;
-            delete updatedKettle.knob;
-            delete updatedKettle.timers;
-            request.url = 'http://localhost:3001/api/kettles/arm';
+            request.url += '/kettles/arm';
             request.method = 'POST';
             request.data = {
               session: settings.streams.session,
@@ -587,10 +571,10 @@ angular.module('brewbench-monitor')
               notifications: settings.notifications
             };
             request.headers['Content-Type'] = 'application/json';
-            request.headers['Authorization'] = this.accessToken;
+            request.headers['Authorization'] = this.accessToken();
             $http(request)
               .then(response => {
-                q.resolve(response);
+                q.resolve(response.data);
               })
               .catch(err => {
                 q.reject(err);
@@ -601,24 +585,24 @@ angular.module('brewbench-monitor')
         sessions: {
           get: async () => {
             var q = $q.defer();
-            if(!this.accessToken){
+            if(!this.accessToken()){
               var auth = await this.streams().auth();
-              if(!this.accessToken){
+              if(!this.accessToken()){
                 q.reject('Sorry Bad Authentication');
                 return q.promise;
               }
             }
-            request.url = 'http://localhost:3001/api/sessions';
+            request.url += '/sessions';
             request.method = 'POST';
             request.data = {
               sessionId: sessionId,
               kettle: kettle
             };
             request.headers['Content-Type'] = 'application/json';
-            request.headers['Authorization'] = this.accessToken;
+            request.headers['Authorization'] = this.accessToken();
             $http(request)
               .then(response => {
-                q.resolve(response);
+                q.resolve(response.data);
               })
               .catch(err => {
                 q.reject(err);
