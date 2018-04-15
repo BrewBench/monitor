@@ -407,7 +407,7 @@ $scope.updateABV();
             $scope.setErrorMessage("Opps, there was a problem creating the database.");
           }
         });
-    }
+     }
   };
 
   $scope.streams = {
@@ -457,7 +457,7 @@ $scope.updateABV();
           });
           kettle.arduino.id = kettleResponse.deviceId;
           // update session vars
-          $scope.streams.session = kettleResponse.session;
+          _.merge($scope.settings.streams.session, kettleResponse.session);
 
           kettle.message.type = 'success';
           if(kettle.notify.streams){
@@ -473,6 +473,14 @@ $scope.updateABV();
           else
             $scope.setErrorMessage(err, kettle);
         });
+    },
+    sessions: {
+      save: () => {
+        return BrewService.streams().sessions.save($scope.settings.streams.session)
+          .then(response => {
+
+          });
+      }
     }
   };
 
@@ -1440,6 +1448,7 @@ $scope.updateABV();
       kettle.pump = {pin:'D2',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false};
       delete kettle.cooler;
     }
+    $scope.updateStreams(kettle);
   };
 
   $scope.changeUnits = function(unit){
@@ -1569,9 +1578,7 @@ $scope.updateABV();
   };
 
   $scope.removeKettle = function(kettle,$index){
-    if($scope.streams.connected() && kettle.notify.streams){
-      $scope.streams.kettles(kettle);
-    }
+    $scope.updateStreams(kettle);
     $scope.kettles.splice($index,1);
   };
 
@@ -1594,11 +1601,15 @@ $scope.updateABV();
       //update max
       kettle.knob.max = kettle.temp['target']+kettle.temp['diff']+10;
       $scope.updateKnobCopy(kettle);
-      //update streams
-      if($scope.streams.connected() && kettle.notify.streams){
-        $scope.streams.kettles(kettle);
-      }
+      $scope.updateStreams(kettle);
     },1000);
+  };
+
+  $scope.updateStreams = function(kettle){
+    //update streams
+    if($scope.streams.connected() && kettle.notify.streams){
+      $scope.streams.kettles(kettle);
+    }
   };
 
   $scope.loadConfig() // load config

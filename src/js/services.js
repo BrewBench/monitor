@@ -29,7 +29,7 @@ angular.module('brewbench-monitor')
         ,recipe: {'name':'','brewer':{name:'','email':''},'yeast':[],'hops':[],'grains':[],scale:'gravity',method:'papazian','og':1.050,'fg':1.010,'abv':0,'abw':0,'calories':0,'attenuation':0}
         ,notifications: {on:true,timers:true,high:true,low:true,target:true,slack:'',last:''}
         ,sounds: {on:true,alert:'/assets/audio/bike.mp3',timer:'/assets/audio/school.mp3'}
-        ,arduinos: [{id:btoa('brewbench'),url:'arduino.local',analog:5,digital:13,secure:false,version:'',status:{error:'',dt:''}}]
+        ,arduinos: [{id:'local-'+btoa('brewbench'),url:'arduino.local',analog:5,digital:13,secure:false,version:'',status:{error:'',dt:''}}]
         ,tplink: {user: '', pass: '', token:'', status: '', plugs: []}
         ,sketches: {frequency: 60}
         ,influxdb: {url: '', port: 8086, user: '', pass: '', db: '', dbs:[], status: ''}
@@ -72,7 +72,7 @@ angular.module('brewbench-monitor')
           ,values: []
           ,timers: []
           ,knob: angular.copy(this.defaultKnobOptions(),{value:0,min:0,max:220})
-          ,arduino: {id: btoa('brewbench'),url:'arduino.local',analog:5,digital:13,secure:false}
+          ,arduino: {id: 'local-'+btoa('brewbench'),url:'arduino.local',analog:5,digital:13,secure:false}
           ,message: {type:'error',message:'',version:'',count:0,location:''}
           ,notify: {slack: false, dweet: false, streams: false}
         },{
@@ -87,7 +87,7 @@ angular.module('brewbench-monitor')
           ,values: []
           ,timers: []
           ,knob: angular.copy(this.defaultKnobOptions(),{value:0,min:0,max:220})
-          ,arduino: {id: btoa('brewbench'),url:'arduino.local',analog:5,digital:13,secure:false}
+          ,arduino: {id: 'local-'+btoa('brewbench'),url:'arduino.local',analog:5,digital:13,secure:false}
           ,message: {type:'error',message:'',version:'',count:0,location:''}
           ,notify: {slack: false, dweet: false, streams: false}
         },{
@@ -102,7 +102,7 @@ angular.module('brewbench-monitor')
           ,values: []
           ,timers: []
           ,knob: angular.copy(this.defaultKnobOptions(),{value:0,min:0,max:220})
-          ,arduino: {id: btoa('brewbench'),url:'arduino.local',analog:5,digital:13,secure:false}
+          ,arduino: {id: 'local-'+btoa('brewbench'),url:'arduino.local',analog:5,digital:13,secure:false}
           ,message: {type:'error',message:'',version:'',count:0,location:''}
           ,notify: {slack: false, dweet: false, streams: false}
         }];
@@ -593,10 +593,36 @@ angular.module('brewbench-monitor')
               }
             }
             request.url += '/sessions';
-            request.method = 'POST';
+            request.method = 'GET';
             request.data = {
               sessionId: sessionId,
               kettle: kettle
+            };
+            request.headers['Content-Type'] = 'application/json';
+            request.headers['Authorization'] = this.accessToken();
+            $http(request)
+              .then(response => {
+                q.resolve(response.data);
+              })
+              .catch(err => {
+                q.reject(err);
+              });
+              return q.promise;
+          },
+          save: async (session) => {
+            var q = $q.defer();
+            if(!this.accessToken()){
+              var auth = await this.streams().auth();
+              if(!this.accessToken()){
+                q.reject('Sorry Bad Authentication');
+                return q.promise;
+              }
+            }
+            request.url += '/sessions/'+session.id;
+            request.method = 'PATCH';
+            request.data = {
+              name: session.name,
+              type: session.type
             };
             request.headers['Content-Type'] = 'application/json';
             request.headers['Authorization'] = this.accessToken();

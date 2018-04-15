@@ -21,7 +21,7 @@
               <div class="dropdown-divider"></div>
               <button ng-repeat="arduino in settings.arduinos | orderBy:'url'"
                 ng-class="{'active': kettle.arduino && kettle.arduino.id == arduino.id}"
-                ng-click="kettle.arduino=arduino"
+                ng-click="kettle.arduino=arduino;updateStreams(kettle);"
                 class="dropdown-item" type="button">
                 {{arduino.url}}
               </button>
@@ -63,7 +63,7 @@
                   <button ng-if="BrewService.sensorTypes(kettle.temp.type).analog"
                       ng-repeat="p in getPortRange(kettle.arduino.analog) track by $index"
                       ng-class="{'active': kettle.temp.pin=='A'+p}"
-                      ng-click="kettle.temp.pin='A'+p;"
+                      ng-click="kettle.temp.pin='A'+p;updateStreams(kettle);"
                       class="dropdown-item" type="button">
                     A{{p}} <span class="pininuse" ng-show="pinInUse('A'+p,kettle.arduino.id,true)">(In Use)</span>
                   </button>
@@ -73,7 +73,7 @@
                   <button ng-if="BrewService.sensorTypes(kettle.temp.type).digital"
                       ng-repeat="p in getPortRange(kettle.arduino.digital) track by $index"
                       ng-class="{'active': kettle.temp.pin=='D'+p}"
-                      ng-click="kettle.temp.pin='D'+p;"
+                      ng-click="kettle.temp.pin='D'+p;updateStreams(kettle);"
                       class="dropdown-item" type="button">
                     D{{p}} <span class="pininuse" ng-show="pinInUse('D'+p,kettle.arduino.id,false)">(In Use)</span>
                   </button>
@@ -86,7 +86,7 @@
                 <div class="dropdown-menu scrollable-menu" ng-init="sensors = BrewService.sensorTypes()">
                   <button ng-repeat="s in sensors track by $index"
                       ng-class="{'active': kettle.temp.type==s.name}"
-                      ng-click="kettle.temp.type=s.name;"
+                      ng-click="kettle.temp.type=s.name;updateStreams(kettle);"
                       class="dropdown-item" type="button">
                     {{s.name}}
                   </button>
@@ -118,7 +118,7 @@
                 <button ng-if="settings.tplink.plugs"
                      ng-repeat="tp in settings.tplink.plugs track by $index"
                      ng-class="{'active': kettle.heater.pin=='TP-'+tp.deviceId}"
-                     ng-click="kettle.heater.pin='TP-'+tp.deviceId; kettle.heater.pwm=false;"
+                     ng-click="kettle.heater.pin='TP-'+tp.deviceId; kettle.heater.pwm=false;updateStreams(kettle);"
                      class="dropdown-item" type="button">
                    {{ tp.alias }} <i class="fa fa-circle" ng-class="{'on':!!tp.status, 'off':!tp.status}" aria-hidden="true"></i> <span class="pininuse" ng-show="pinInUse('TP-'+tp.deviceId,kettle.arduino.id,false)">(In Use)</span>
                 </button>
@@ -127,7 +127,7 @@
                 <div class="dropdown-divider"></div>
                 <button ng-repeat="p in getPortRange(kettle.arduino.analog) track by $index"
                     ng-class="{'active': kettle.heater.pin=='A'+p}"
-                    ng-click="kettle.heater.pin='A'+p; kettle.heater.pwm=false;"
+                    ng-click="kettle.heater.pin='A'+p; kettle.heater.pwm=false;updateStreams(kettle);"
                     class="dropdown-item" type="button">
                   A{{p}} <span class="pininuse" ng-show="pinInUse('A'+p,kettle.arduino.id,true)">(In Use)</span>
                 </button>
@@ -136,7 +136,7 @@
                 <div class="dropdown-divider"></div>
                 <button ng-repeat="p in getPortRange(kettle.arduino.digital) track by $index"
                     ng-class="{'active': kettle.heater.pin=='D'+p}"
-                    ng-click="kettle.heater.pin='D'+p;"
+                    ng-click="kettle.heater.pin='D'+p;updateStreams(kettle);"
                     class="dropdown-item" type="button">
                   D{{p}} <span class="pininuse" ng-show="pinInUse('D'+p,kettle.arduino.id,false)">(In Use)</span>
                 </button>
