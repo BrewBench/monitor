@@ -303,6 +303,7 @@ float actionsCommand(const String &source, const String &spin, const String &typ
   String data = "{\"hostname\":\""+String(HOSTNAME)+"\",\"pin\":\""+String(spin)+"\",\"temp\":"+String(temp)+",\"raw\":"+String(raw)+"";
   data += ",\"sensor\":\""+String(type)+"\"";
   data += ",\"source\":\""+String(source)+"\"";
+  data += ",\"adjust\":\""+String(adjustTemp)+"\"";
 // DHT  if(humidity) data += ",\"humidity\":"+String(humidity)+"";
   data += "}";
 

@@ -964,8 +964,17 @@ button {
   color: #ccc;
 }
 
-.fa-circle.orange, .badge-streams.saving {
+/* orange */
+.fa-circle.orange, .badge-streams.status-0 {
   color: #f2711c;
+}
+/* red */
+.badge-streams.status-1 {
+  color: #c82f2f;
+}
+/*  green */
+.badge-streams.status-2 {
+  color: #49a37f;
 }
 
 .tplinks .fa-power-off.on, .chart-toggle .fa-area-chart.on {

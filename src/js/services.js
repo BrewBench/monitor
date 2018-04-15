@@ -23,7 +23,6 @@ angular.module('brewbench-monitor')
         debug: false
         ,pollSeconds: 10
         ,unit: 'F'
-        ,layout: 'card'
         ,chart: {show: true, military: false, area: false}
         ,shared: false
         ,recipe: {'name':'','brewer':{name:'','email':''},'yeast':[],'hops':[],'grains':[],scale:'gravity',method:'papazian','og':1.050,'fg':1.010,'abv':0,'abw':0,'calories':0,'attenuation':0}
@@ -552,6 +551,30 @@ angular.module('brewbench-monitor')
           return q.promise;
         },
         kettles: {
+          get: async () => {
+            var q = $q.defer();
+            if(!this.accessToken()){
+              var auth = await this.streams().auth();
+              if(!this.accessToken()){
+                q.reject('Sorry Bad Authentication');
+                return q.promise;
+              }
+            }
+            var updatedKettle = angular.copy(kettle);
+            delete updatedKettle.values;
+            request.url += '/kettles';
+            request.method = 'GET';
+            request.headers['Content-Type'] = 'application/json';
+            request.headers['Authorization'] = this.accessToken();
+            $http(request)
+              .then(response => {
+                q.resolve(response.data);
+              })
+              .catch(err => {
+                q.reject(err);
+              });
+              return q.promise;
+          },
           save: async (kettle) => {
             var q = $q.defer();
             if(!this.accessToken()){

@@ -410,7 +410,7 @@
       </ul>
     </div>
     <div class="extra" ng-if="shareAccess('fullAccess')">
-      <span ng-if="kettle.notify.streams" class="badge badge-pill badge-dark badge-streams float-left" ng-class="{'saving':kettle.message.message=='Saving Streams'}">
+      <span ng-if="kettle.notify.streams" class="badge badge-pill badge-dark badge-streams float-left status-{{ kettle.message.status }}">
         <img src="/assets/img/brewbench-colors.png" width="25" style="border-radius:10px;"/> Streaming
       </span>
       <i class="fa fa-1x float-right" ng-class="{'fa-chevron-left':!showRemoveKettle,'fa-chevron-right':showRemoveKettle}" aria-hidden="true" ng-click="showRemoveKettle=!showRemoveKettle"></i>

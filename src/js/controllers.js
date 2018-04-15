@@ -329,10 +329,12 @@ $scope.updateABV();
         } else {
           $scope.share_success = false;
         }
+        BrewService.settings('share',$scope.share);
       })
       .catch(err => {
         $scope.share_status = err;
         $scope.share_success = false;
+        BrewService.settings('share',$scope.share);
       });
   };
 
@@ -444,7 +446,7 @@ $scope.updateABV();
       }
       kettle.message.location = 'sketches';
       kettle.message.type = 'info';
-      kettle.message.message = $sce.trustAsHtml('Saving Streams');
+      kettle.message.status = 0;
       return BrewService.streams().kettles.save(kettle)
         .then(response => {
           var kettleResponse = response.kettle;
@@ -460,18 +462,15 @@ $scope.updateABV();
           _.merge($scope.settings.streams.session, kettleResponse.session);
 
           kettle.message.type = 'success';
-          if(kettle.notify.streams){
-            kettle.message.message = $sce.trustAsHtml('Streams Updated');
-          } else {
-            kettle.message.message = $sce.trustAsHtml('Streams Updated');
-          }
+          kettle.message.status = 2;
         })
         .catch(err => {
           kettle.notify.streams = !kettle.notify.streams;
-          if(err && err.data && err.data.error && err.data.error.message)
+          kettle.message.status = 1;
+          if(err && err.data && err.data.error && err.data.error.message){
             $scope.setErrorMessage(err.data.error.message, kettle);
-          else
-            $scope.setErrorMessage(err, kettle);
+            console.error('BrewBench Streams Error', err);
+          }
         });
     },
     sessions: {
@@ -1618,20 +1617,14 @@ $scope.updateABV();
       if(!!loaded)
         $scope.processTemps(); // start polling
     });
-  // scope watch
-  $scope.$watch('settings',function(newValue,oldValue){
-    BrewService.settings('settings',newValue);
-  },true);
 
-  $scope.$watch('kettles',function(newValue,oldValue){
-    BrewService.settings('kettles',newValue);
-  },true);
-
-  $scope.$watch('share',function(newValue,oldValue){
-    BrewService.settings('share',newValue);
-  },true);
-});
-
-$( document ).ready(function() {
-  $('[data-toggle="tooltip"]').tooltip();
+  // update local cache
+  $scope.updateLocal = function(){
+    $timeout(function(){
+      BrewService.settings('settings', $scope.settings);
+      BrewService.settings('kettles',$scope.kettles);
+      $scope.updateLocal();
+    },5000);
+  }
+  $scope.updateLocal();
 });
