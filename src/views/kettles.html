@@ -286,15 +286,15 @@
             value="(kettle.temp.current | round:0)"
             options="kettle.knob">
           </ui-knob><br/>
-          <span class="badge badge-pill badge-prev badge-danger" ng-show="kettle.temp.previous && (kettle.temp.previous | round:0) > (kettle.temp.current | round:0)" title="Last {{ kettle.temp.previous }}&deg;{{settings.unit}}" >{{kettle.temp.previous}}&deg;{{settings.unit}} &darr;</span>
-          <span class="badge badge-pill badge-prev badge-success" ng-show="kettle.temp.previous && (kettle.temp.previous | round:0) < (kettle.temp.current | round:0)" title="Last {{ kettle.temp.previous }}&deg;{{settings.unit}}" >{{kettle.temp.previous}}&deg;{{settings.unit}} &uarr;</span>
+          <span class="badge badge-pill badge-prev badge-danger" ng-show="kettle.temp.previous && (kettle.temp.previous | round:0) > (kettle.temp.current | round:0)" title="Last {{ kettle.temp.previous }}&deg;{{settings.general.unit}}" >{{kettle.temp.previous}}&deg;{{settings.general.unit}} &darr;</span>
+          <span class="badge badge-pill badge-prev badge-success" ng-show="kettle.temp.previous && (kettle.temp.previous | round:0) < (kettle.temp.current | round:0)" title="Last {{ kettle.temp.previous }}&deg;{{settings.general.unit}}" >{{kettle.temp.previous}}&deg;{{settings.general.unit}} &uarr;</span>
         </div>
         <div class="col" ng-if="shareAccess('fullAccess')">
           <div class="row">
             <div class="col">
               <label class="adjust">Target</label>
               <div class="btn-group" role="group">
-                <a class="btn btn-light"><editable type="number" model="kettle.temp.target">{{kettle.temp.target}}</editable>&deg;{{settings.unit}}</a>
+                <a class="btn btn-light"><editable type="number" model="kettle.temp.target">{{kettle.temp.target}}</editable>&deg;{{settings.general.unit}}</a>
                 <a class="btn btn-light" ng-click="changeValue(kettle,'target',false)"><i class="fa fa-minus fa-lg"></i></a>
                 <a class="btn btn-light" ng-click="changeValue(kettle,'target',true)"><i class="fa fa-plus fa-lg"></i></a>
               </div>
@@ -304,7 +304,7 @@
             <div class="col">
               <label class="adjust">Diff</label>
               <div class="btn-group" role="group">
-                <a class="btn btn-light"><editable type="number" model="kettle.temp.diff">{{kettle.temp.diff}}</editable>&deg;{{settings.unit}}</a>
+                <a class="btn btn-light"><editable type="number" model="kettle.temp.diff">{{kettle.temp.diff}}</editable>&deg;{{settings.general.unit}}</a>
                 <a class="btn btn-light" ng-click="changeValue(kettle,'diff',false)"><i class="fa fa-minus fa-lg"></i></a>
                 <a class="btn btn-light" ng-click="changeValue(kettle,'diff',true)"><i class="fa fa-plus fa-lg"></i></a>
               </div>
@@ -314,7 +314,7 @@
             <div class="col">
               <label class="adjust">Adjust</label>
               <div class="btn-group" role="group">
-                <a class="btn btn-light"><editable type="number" model="kettle.temp.adjust" placeholder="0">{{kettle.temp.adjust}}</editable>&deg;{{settings.unit}}</a>
+                <a class="btn btn-light"><editable type="number" model="kettle.temp.adjust" placeholder="0">{{kettle.temp.adjust}}</editable>&deg;{{settings.general.unit}}</a>
                 <a class="btn btn-light" ng-click="changeValue(kettle,'adjust',false)"><i class="fa fa-minus fa-lg"></i></a>
                 <a class="btn btn-light" ng-click="changeValue(kettle,'adjust',true)"><i class="fa fa-plus fa-lg"></i></a>
               </div>
@@ -398,20 +398,20 @@
         </div>
       </div>
     </div>
-    <div ng-if="settings.debug">
+    <div ng-if="settings.general.debug">
       <label class="adjust" style="margin-left: 14px;">Debug</label>
       <ul class="list-group list-group-flush">
         <li class="list-group-item">
           raw bits: {{ kettle.temp.raw }}<br/>
           bit calc temp: {{ BrewService.bitcalc(kettle) }} &deg;C<br/>
-          measured: {{ kettle.temp.measured }} &deg;{{ settings.unit }}<br/>
-          adjusted: {{ kettle.temp.adjust }} &deg;{{ settings.unit }}<br/>
-          current: {{ kettle.temp.current }} &deg;{{ settings.unit }}<br/>
-          previous: {{ kettle.temp.previous }} &deg;{{ settings.unit }}<br/>
-          <span ng-if="settings.unit=='F'">
+          measured: {{ kettle.temp.measured }} &deg;{{ settings.general.unit }}<br/>
+          adjusted: {{ kettle.temp.adjust }} &deg;{{ settings.general.unit }}<br/>
+          current: {{ kettle.temp.current }} &deg;{{ settings.general.unit }}<br/>
+          previous: {{ kettle.temp.previous }} &deg;{{ settings.general.unit }}<br/>
+          <span ng-if="settings.general.unit=='F'">
             celsius: {{ kettle.temp.current ? (kettle.temp.current | toCelsius) : 0 }} &deg;C<br/>
           </span>
-          <span ng-if="settings.unit=='C'">
+          <span ng-if="settings.general.unit=='C'">
             fahrenheit: {{ kettle.temp.current ? (kettle.temp.current | toFahrenheit) : 0 }} &deg;F
           </span>
         </li>

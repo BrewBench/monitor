@@ -8,9 +8,9 @@
 #include "cactus_io_DS18B20.h"
 
 String HOSTNAME = "";
-const String VERSION = "3.3.0";
-
+const String VERSION = "4.0.0";
 BridgeServer server;
+
 dht DHT;
 
 // https://learn.adafruit.com/thermistor/using-a-thermistor
@@ -26,7 +26,7 @@ dht DHT;
 // the value of the 'other' resistor
 #define SERIESRESISTOR 10000
 
-int samples[NUMSAMPLES];
+uint16_t samples[NUMSAMPLES];
 
 float Thermistor(float average) {
    // convert the value to resistance

@@ -20,17 +20,13 @@ angular.module('brewbench-monitor')
     },
     reset: function(){
       const defaultSettings = {
-        debug: false
-        ,pollSeconds: 10
-        ,unit: 'F'
+        general: {debug: false, pollSeconds: 10, unit: 'F', shared: false}
         ,chart: {show: true, military: false, area: false}
-        ,shared: false
         ,recipe: {'name':'','brewer':{name:'','email':''},'yeast':[],'hops':[],'grains':[],scale:'gravity',method:'papazian','og':1.050,'fg':1.010,'abv':0,'abw':0,'calories':0,'attenuation':0}
         ,notifications: {on:true,timers:true,high:true,low:true,target:true,slack:'',last:''}
         ,sounds: {on:true,alert:'/assets/audio/bike.mp3',timer:'/assets/audio/school.mp3'}
         ,arduinos: [{id:'local-'+btoa('brewbench'),url:'arduino.local',analog:5,digital:13,secure:false,version:'',status:{error:'',dt:''}}]
         ,tplink: {user: '', pass: '', token:'', status: '', plugs: []}
-        ,sketches: {frequency: 60}
         ,influxdb: {url: '', port: 8086, user: '', pass: '', db: '', dbs:[], status: ''}
         ,streams: {username: '', api_key: '', status: '', session: {id: '', name: '', type: 'fermentation'}}
       };
@@ -205,7 +201,7 @@ angular.module('brewbench-monitor')
       var q = $q.defer();
       var url = this.domain(kettle.arduino)+'/arduino/'+kettle.temp.type+'/'+kettle.temp.pin;
       var settings = this.settings('settings');
-      var request = {url: url, method: 'GET', timeout: settings.pollSeconds*10000};
+      var request = {url: url, method: 'GET', timeout: settings.general.pollSeconds*10000};
 
       if(kettle.arduino.password){
         request.withCredentials = true;
@@ -230,7 +226,7 @@ angular.module('brewbench-monitor')
       var q = $q.defer();
       var url = this.domain(kettle.arduino)+'/arduino/digital/'+sensor+'/'+value;
       var settings = this.settings('settings');
-      var request = {url: url, method: 'GET', timeout: settings.pollSeconds*10000};
+      var request = {url: url, method: 'GET', timeout: settings.general.pollSeconds*10000};
 
       if(kettle.arduino.password){
         request.withCredentials = true;
@@ -253,7 +249,7 @@ angular.module('brewbench-monitor')
       var q = $q.defer();
       var url = this.domain(kettle.arduino)+'/arduino/analog/'+sensor+'/'+value;
       var settings = this.settings('settings');
-      var request = {url: url, method: 'GET', timeout: settings.pollSeconds*10000};
+      var request = {url: url, method: 'GET', timeout: settings.general.pollSeconds*10000};
 
       if(kettle.arduino.password){
         request.withCredentials = true;
@@ -276,7 +272,7 @@ angular.module('brewbench-monitor')
       var q = $q.defer();
       var url = this.domain(kettle.arduino)+'/arduino/digital/'+sensor;
       var settings = this.settings('settings');
-      var request = {url: url, method: 'GET', timeout: settings.pollSeconds*10000};
+      var request = {url: url, method: 'GET', timeout: settings.general.pollSeconds*10000};
 
       if(kettle.arduino.password){
         request.withCredentials = true;
@@ -525,7 +521,7 @@ angular.module('brewbench-monitor')
 
     streams: function(){
       var settings = this.settings('settings');
-      var request = {url: 'http://localhost:3001/api', headers: {}, timeout: settings.pollSeconds*10000};
+      var request = {url: 'http://localhost:3001/api', headers: {}, timeout: settings.general.pollSeconds*10000};
 
       return {
         auth: async (ping) => {
@@ -560,8 +556,6 @@ angular.module('brewbench-monitor')
                 return q.promise;
               }
             }
-            var updatedKettle = angular.copy(kettle);
-            delete updatedKettle.values;
             request.url += '/kettles';
             request.method = 'GET';
             request.headers['Content-Type'] = 'application/json';
@@ -585,7 +579,11 @@ angular.module('brewbench-monitor')
               }
             }
             var updatedKettle = angular.copy(kettle);
+            // remove not needed data
             delete updatedKettle.values;
+            delete updatedKettle.message;
+            delete updatedKettle.timers;
+            delete updatedKettle.knob;
             request.url += '/kettles/arm';
             request.method = 'POST';
             request.data = {

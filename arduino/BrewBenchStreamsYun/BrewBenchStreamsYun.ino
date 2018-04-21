@@ -6,12 +6,12 @@
 // [headers]
 
 String HOSTNAME = "";
-JsonObject& brewbenchSettings;
-const String VERSION = "3.3.0";
-const PROGMEM int FREQUENCY_SECONDS = [FREQUENCY_SECONDS];
+const String VERSION = "4.0.0";
+const PROGMEM int FREQUENCY_SECONDS = 60;
 int secondCounter = 0;
-
 BridgeServer server;
+JsonObject& brewbenchSettings;
+
 // DHT dht DHT;
 
 // https://learn.adafruit.com/thermistor/using-a-thermistor
@@ -27,7 +27,7 @@ BridgeServer server;
 // the value of the 'other' resistor
 #define SERIESRESISTOR 10000
 
-int samples[NUMSAMPLES];
+uint16_t samples[NUMSAMPLES];
 
 float Thermistor(float average) {
    // convert the value to resistance
@@ -205,41 +205,27 @@ void postData(const String &connection, const String &data, const String &dataTy
   while(p.running());
 }
 
-// triggers void dweetAutoCommand(const String &source, const String &brewer, const String &beer, const float &temp){
-// triggers   postData(F("https://dweet.io/dweet/for/brewbench"), "{\"brewer\":\""+brewer+"\",\"beer\":\""+beer+"\",\"source\":\""+source+"\",\"temp\":"+String(temp)+"}", "", F("Content-Type: application/json"), "");
-// triggers }
+void dweetAutoCommand(const String &source, const String &brewer, const String &beer, const float &temp){
+  postData(F("https://dweet.io/dweet/for/brewbench"), "{\"brewer\":\""+brewer+"\",\"beer\":\""+beer+"\",\"source\":\""+source+"\",\"temp\":"+String(temp)+"}", "", F("Content-Type: application/json"), "");
+}
 
-// triggers void digitalAutoCommand(int pin, int value) {
-// triggers   pinMode(pin, OUTPUT);
-// triggers   if(value == 1)
-// triggers     digitalWrite(pin, LOW);//turn on relay
-// triggers   else if(value == 0)
-// triggers     digitalWrite(pin, HIGH);//turn off relay
-// triggers }
+void digitalAutoCommand(int pin, int value) {
+  pinMode(pin, OUTPUT);
+  if(value == 1)
+    digitalWrite(pin, LOW);//turn on relay
+  else if(value == 0)
+    digitalWrite(pin, HIGH);//turn off relay
+}
 
-// triggers void analogAutoCommand(int pin, int value) {
-// triggers   pinMode(pin, OUTPUT);
-// triggers   analogWrite(pin, value);
-// triggers }
+void analogAutoCommand(int pin, int value) {
+  pinMode(pin, OUTPUT);
+  analogWrite(pin, value);
+}
 
-// triggers void slackAutoCommand(const String &type, const String &source, const float &temp) {
-// triggers   String msg = "";
-// triggers   String color = "";
-// triggers   if(type=="heat"){
-// triggers     msg = source+" temp is "+String(temp)+"\u00B0 and is heating";
-// triggers     color = F("danger");
-// triggers   } else if(type=="cool"){
-// triggers     msg = source+" temp is "+String(temp)+"\u00B0 and is cooling";
-// triggers     color = F("#3498DB");
-// triggers   }
-// triggers   String data = "{\"attachments\": [{\"fallback\": "+msg+",\"title\": \""+source+"\",\"fields\": [{\"value\": "+msg+"}],\"color\": \""+color+"\",\"mrkdwn_in\": [\"text\", \"fallback\", \"fields\"],\"thumb_url\": \"https://monitor.brewbench.co/assets/img/fermenter.png\"}]}";
-// triggers   postData(F("[SLACK_CONNECTION]"), "payload="+data, "", F("Content-Type: application/x-www-form-urlencoded"), "");
-// triggers }
-
-// triggers void tplinkAutoCommand(const String &deviceId, const int &value){
-// triggers   String data = "{\"method\":\"passthrough\",\"params\":{\"deviceId\":\""+String(deviceId)+"\",\"requestData\":\"{\\\"system\\\":{\\\"set_relay_state\\\":{\\\"state\\\":"+String(value)+"}}}\"}}";
-// triggers   postData(F("[TPLINK_CONNECTION]"), data, "", F("Content-Type: application/json"), "");
-// triggers }
+void tplinkAutoCommand(const String &deviceId, const int &value){
+  String data = "{\"method\":\"passthrough\",\"params\":{\"deviceId\":\""+String(deviceId)+"\",\"requestData\":\"{\\\"system\\\":{\\\"set_relay_state\\\":{\\\"state\\\":"+String(value)+"}}}\"}}";
+  postData(F("[TPLINK_CONNECTION]"), data, "", F("Content-Type: application/json"), "");
+}
 
 float actionsCommand(const String &source, const String &spin, const String &type, const int &adjustTemp) {
   float temp = 0.00;
@@ -325,7 +311,7 @@ void postTemp(const &data String){
   p.addParameter(F("-d"));
   p.addParameter(data);
   p.addParameter(F("[STREAMS_AUTH]"));
-  p.addParameter(F("[STREAMS_CONNECTION]/api/temps/settings"));
+  p.addParameter(F("[STREAMS_CONNECTION]/api/temps/arduino"));
   p.runAsynchronously();
   while (p.available()) {
     jsonRaw = p.readString();
@@ -341,40 +327,46 @@ void postTemp(const &data String){
   }
 }
 
-// triggers void trigger(const String &type, const String &source, const String &spin, const float &temp, const int &target, const int &diff, const boolean &slack) {
-// triggers   String pinType = spin.substring(0,1);
-// triggers   String deviceId = "";
-// triggers   int pinNumber = -1;
-// triggers   int changeTo = 0;
-// triggers   if(pinType == "T"){ //TP Link
-// triggers     deviceId = spin.substring(3);
-// triggers   } else {
-// triggers     pinNumber = spin.substring(1).toInt();
-// triggers   }
+void trigger(const String &type, const String &source, const String &spin, const float &temp, const int &target, const int &diff) {
+  String pinType = spin.substring(0,1);
+  String deviceId = "";
+  int pinNumber = -1;
+  int changeTo = 0;
+  if(pinType == "T"){ //TP Link
+    deviceId = spin.substring(3);
+  } else {
+    pinNumber = spin.substring(1).toInt();
+  }
 
-// triggers   if(type == "heat"){
-// triggers     if( temp < (target+diff) )
-// triggers       changeTo = 1;
-// triggers   } else if(type == "cool"){
-// triggers     if( temp > (target+diff) )
-// triggers       changeTo = 1;
-// triggers   }
-// triggers   if(pinType == "A")
-// triggers     analogAutoCommand(pinNumber, changeTo);
-// triggers   else if(pinType == "D")
-// triggers     digitalAutoCommand(pinNumber, changeTo);
-// triggers   else if(pinType == "T" && deviceId)
-// triggers     tplinkAutoCommand(deviceId, changeTo);
-
-// triggers   if(slack && changeTo == 1)
-// triggers     slackAutoCommand(type, source, temp);
-// triggers }
+  if(type == "heat"){
+    if( temp < (target+diff) )
+      changeTo = 1;
+  } else if(type == "cool"){
+    if( temp > (target+diff) )
+      changeTo = 1;
+  }
+  if(pinType == "A")
+    analogAutoCommand(pinNumber, changeTo);
+  else if(pinType == "D")
+    digitalAutoCommand(pinNumber, changeTo);
+  else if(pinType == "T" && deviceId)
+    tplinkAutoCommand(deviceId, changeTo);
+}
 
 void runActions(){
-  if(brewbenchSettings.length == 0)
+  if(!brewbenchSettings || brewbenchSettings['kettles'].length == 0)
     return;
-  for (int k = 0; k < brewbenchSettings.length; k++) {
-    brewbenchSettings[k];
+  float temp = 0.00;
+  for (int k = 0; k < brewbenchSettings['kettles'].length; k++) {
+    if(brewbenchSettings['kettles'][k]['notify']['streams'] ==  false)
+      continue;
+    temp = actionsCommand(brewbenchSettings['kettles'][k]['name'], brewbenchSettings['kettles'][k]['temp']['pin'], brewbenchSettings['kettles'][k]['temp']['type'], brewbenchSettings['kettles'][k]['temp']['adjust'])
+    if(brewbenchSettings['kettles'][k]['heater']['sketch'] == true){
+      trigger("heat", brewbenchSettings['kettles'][k]['name'], brewbenchSettings['kettles'][k]['heater']['pin'], temp, brewbenchSettings['kettles'][k]['temp']['target'], brewbenchSettings['kettles'][k]['temp']['diff']);
+    }
+    if(brewbenchSettings['kettles'][k]['cooler']['sketch'] == true){
+      trigger("cool", brewbenchSettings['kettles'][k]['name'], brewbenchSettings['kettles'][k]['cooler']['pin'], temp, brewbenchSettings['kettles'][k]['temp']['target'], brewbenchSettings['kettles'][k]['temp']['diff']);
+    }
   }
 }
 

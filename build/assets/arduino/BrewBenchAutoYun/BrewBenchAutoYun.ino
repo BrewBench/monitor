@@ -5,11 +5,11 @@
 // [headers]
 
 String HOSTNAME = "";
-const String VERSION = "3.3.0";
-const PROGMEM int FREQUENCY_SECONDS = [FREQUENCY_SECONDS];
+const String VERSION = "4.0.0";
+const PROGMEM int FREQUENCY_SECONDS = 60;
 int secondCounter = 0;
-
 BridgeServer server;
+
 // DHT dht DHT;
 
 // https://learn.adafruit.com/thermistor/using-a-thermistor
@@ -25,7 +25,7 @@ BridgeServer server;
 // the value of the 'other' resistor
 #define SERIESRESISTOR 10000
 
-int samples[NUMSAMPLES];
+uint16_t samples[NUMSAMPLES];
 
 float Thermistor(float average) {
    // convert the value to resistance

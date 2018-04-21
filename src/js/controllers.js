@@ -86,7 +86,10 @@ $scope.getLovibondColor = function(range){
 
 //default settings values
 $scope.settings = BrewService.settings('settings') || BrewService.reset();
-$scope.chartOptions = BrewService.chartOptions({unit: $scope.settings.unit, chart: $scope.settings.chart, session: $scope.settings.streams.session});
+// general check and update
+if(!$scope.settings.general)
+  return $scope.clearSettings();
+$scope.chartOptions = BrewService.chartOptions({unit: $scope.settings.general.unit, chart: $scope.settings.chart, session: $scope.settings.streams.session});
 $scope.kettles = BrewService.settings('kettles') || BrewService.defaultKettles();
 $scope.share = (!$state.params.file && BrewService.settings('share')) ? BrewService.settings('share') : {
       file: $state.params.file || null
@@ -275,7 +278,7 @@ $scope.updateABV();
         ,values: []
         ,timers: []
         ,knob: angular.copy(BrewService.defaultKnobOptions(),{value:0,min:0,max:$scope.kettleTypes[0].target+$scope.kettleTypes[0].diff})
-        ,arduino: $scope.settings.arduinos.length ? $scope.settings.arduinos[0] : null
+        ,arduino: {id: 'local-'+btoa('brewbench'),url:'arduino.local',analog:5,digital:13,secure:false}
         ,message: {type:'error',message:'',version:'',count:0,location:''}
         ,notify: {slack: false, dweet: false, streams: false}
     });
@@ -484,7 +487,7 @@ $scope.updateABV();
   };
 
   $scope.shareAccess = function(access){
-      if($scope.settings.shared){
+      if($scope.settings.general.shared){
         if(access){
           if(access == 'embed'){
             return !!(window.frameElement);
@@ -502,7 +505,7 @@ $scope.updateABV();
   $scope.loadShareFile = function(){
     BrewService.clear();
     $scope.settings = BrewService.reset();
-    $scope.settings.shared = true;
+    $scope.settings.general.shared = true;
     return BrewService.loadShareFile($scope.share.file, $scope.share.password || null)
       .then(function(contents) {
         if(contents){
@@ -723,7 +726,7 @@ $scope.updateABV();
 
   // check if pump or heater are running
   $scope.init = () => {
-    $scope.showSettings = !$scope.settings.shared;
+    $scope.showSettings = !$scope.settings.general.shared;
     if($scope.share.file)
       return $scope.loadShareFile();
 
@@ -753,7 +756,7 @@ $scope.updateABV();
   };
 
   $scope.setErrorMessage = function(err, kettle, location){
-    if(!!$scope.settings.shared){
+    if(!!$scope.settings.general.shared){
       $scope.error.type = 'warning';
       $scope.error.message = $sce.trustAsHtml('The monitor seems to be off-line, re-connecting...');
     } else {
@@ -844,7 +847,7 @@ $scope.updateABV();
     if(!!kettle.temp.current)
       kettle.temp.previous = kettle.temp.current;
     // temp response is in C
-    kettle.temp.measured = ($scope.settings.unit == 'F') ?
+    kettle.temp.measured = ($scope.settings.general.unit == 'F') ?
       $filter('toFahrenheit')(response.temp) :
       $filter('round')(response.temp,2);
     // add adjustment
@@ -1153,9 +1156,9 @@ $scope.updateABV();
         });
         currentSketch = _.find(sketches,{name:arduinoName});
       }
-      var target = ($scope.settings.unit=='F') ? $filter('toCelsius')(kettle.temp.target) : kettle.temp.target;
+      var target = ($scope.settings.general.unit=='F') ? $filter('toCelsius')(kettle.temp.target) : kettle.temp.target;
       kettle.temp.adjust = parseFloat(kettle.temp.adjust);
-      var adjust = ($scope.settings.unit=='F' && !!kettle.temp.adjust) ? $filter('round')(kettle.temp.adjust*0.555,3) : kettle.temp.adjust;
+      var adjust = ($scope.settings.general.unit=='F' && !!kettle.temp.adjust) ? $filter('round')(kettle.temp.adjust*0.555,3) : kettle.temp.adjust;
       if(kettle.temp.type.indexOf('DHT') !== -1 && currentSketch.headers.indexOf('#include <dht.h>') === -1){
         currentSketch.headers.push('// https://www.brewbench.co/libs/DHTLib.zip');
         currentSketch.headers.push('#include <dht.h>');
@@ -1204,7 +1207,6 @@ $scope.updateABV();
           .replace('// [headers]', headers.length ? headers.join('\n') : '')
           .replace('[TPLINK_CONNECTION]', tplink_connection_string)
           .replace('[SLACK_CONNECTION]', $scope.settings.notifications.slack)
-          .replace('[FREQUENCY_SECONDS]', $scope.settings.sketches.frequency ? parseInt($scope.settings.sketches.frequency,10) : 60);
         if( sketch.indexOf('Streams') !== -1){
           // streams connection
           var connection_string = `https://${$scope.settings.streams.username}.streams.brewbench.co`;
@@ -1427,7 +1429,7 @@ $scope.updateABV();
   $scope.changeKettleType = function(kettle){
     //don't allow changing kettles on shared sessions
     //this could be dangerous if doing this remotely
-    if($scope.settings.shared)
+    if($scope.settings.general.shared)
       return;
     // find current kettle
     var kettleIndex = _.findIndex($scope.kettleTypes, {type: kettle.type});
@@ -1451,8 +1453,8 @@ $scope.updateABV();
   };
 
   $scope.changeUnits = function(unit){
-    if($scope.settings.unit != unit){
-      $scope.settings.unit = unit;
+    if($scope.settings.general.unit != unit){
+      $scope.settings.general.unit = unit;
       _.each($scope.kettles,function(kettle){
         kettle.temp.target = parseFloat(kettle.temp.target);
         kettle.temp.current = parseFloat(kettle.temp.current);
@@ -1479,7 +1481,7 @@ $scope.updateABV();
         kettle.knob.max = kettle.temp.target+kettle.temp.diff+10;
         $scope.updateKnobCopy(kettle);
       });
-      $scope.chartOptions = BrewService.chartOptions({unit: $scope.settings.unit, chart: $scope.settings.chart, session: $scope.settings.streams.session});
+      $scope.chartOptions = BrewService.chartOptions({unit: $scope.settings.general.unit, chart: $scope.settings.chart, session: $scope.settings.streams.session});
     }
   };
 

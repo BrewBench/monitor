@@ -182,7 +182,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr ng-repeat="kettle in kettles | orderBy:'name' track by $index">
+                  <tr ng-repeat="kettle in kettles track by $index">
                     <td>
                       <img ng-if="kettle.type != 'air'" class="type" ng-src="/assets/img/{{kettle.type}}.svg" width="30" height="30"/>
                       <i ng-if="kettle.type == 'air'" class="fa fa-thermometer-quarter fa-2x type" height="30"></i>
