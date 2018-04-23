@@ -4,6 +4,17 @@ You can download sketches from [BrewBench Monitor](http://monitor.brewbench.co)
 
 ## Setup the Arduino
 
+There is a lot of network activity amd the arduino has issues over time and it's a good idea to do a network restart,
+
+Add a cron job for this.
+
+```sh
+ssh root@arduino.local
+crontab -e
+# daily network restart at midnight
+0 0  * * * /etc/init.d/network restart
+```
+
 ### Choose a Temperature Sensor
 
   * [Thermistors](https://learn.adafruit.com/thermistor/using-a-thermistor) (Analog) 10K or 100K resistor

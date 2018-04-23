@@ -358,6 +358,9 @@ $scope.updateABV();
   };
 
   $scope.influxdb = {
+    brewbenchHosted: () => {
+      return ($scope.settings.influxdb.url.indexOf('streams.brewbench.co') !== -1);
+    },
     remove: () => {
       var defaultSettings = BrewService.reset();
       $scope.settings.influxdb = defaultSettings.influxdb;
@@ -366,17 +369,21 @@ $scope.updateABV();
       $scope.settings.influxdb.status = 'Connecting';
       BrewService.influxdb().ping()
         .then(response => {
-          if(response.status == 204){
+          if(response.status == 204 || response.status == 200){
             $('#influxdbUrl').removeClass('is-invalid');
             $scope.settings.influxdb.status = 'Connected';
-            //get list of databases
-            BrewService.influxdb().dbs()
+            if($scope.influxdb.brewbenchHosted()){
+              $scope.settings.influxdb.db = $scope.settings.influxdb.user;
+            } else {
+              //get list of databases
+              BrewService.influxdb().dbs()
               .then(response => {
                 if(response.length){
                   var dbs = [].concat.apply([], response);
                   $scope.settings.influxdb.dbs = _.remove(dbs, (db) => db != "_internal");
                 }
               });
+            }
           } else {
             $('#influxdbUrl').addClass('is-invalid');
             $scope.settings.influxdb.status = 'Failed to Connect';
@@ -404,10 +411,12 @@ $scope.updateABV();
           }
         })
         .catch(err => {
-          if(err.status == 401 || err.status == 403){
+          if(err.status && (err.status == 401 || err.status == 403)){
             $('#influxdbUser').addClass('is-invalid');
             $('#influxdbPass').addClass('is-invalid');
             $scope.setErrorMessage("Enter your Username and Password for InfluxDB");
+          } else if(err){
+            $scope.setErrorMessage(err);
           } else {
             $scope.setErrorMessage("Opps, there was a problem creating the database.");
           }
@@ -685,7 +694,6 @@ $scope.updateABV();
     if(!$scope.pkg){
       config.push(BrewService.pkg().then(function(response){
           $scope.pkg = response;
-          $scope.settings.sketch_version = response.sketch_version;
         })
       );
     }
@@ -775,10 +783,8 @@ $scope.updateABV();
       else if(err.config && err.config.url)
         message = err.config.url;
       else if(err.version){
-        if(kettle) kettle.message.version = err.version;
-        message = 'Sketch Version is out of date.  <a href="" data-toggle="modal" data-target="#settingsModal">Download here</a>.'+
-          '<br/>Your Version: '+err.version+
-          '<br/>Current Version: '+$scope.settings.sketch_version;
+        if(kettle)
+          kettle.message.version = err.version;
       } else {
         message = JSON.stringify(err);
         if(message == '{}') message = '';
@@ -1176,11 +1182,7 @@ $scope.updateABV();
       if(kettle.cooler && kettle.cooler.sketch){
         currentSketch.triggers = true;
         currentSketch.actions.push('trigger(F("cool"),F("'+kettle.name.replace(/[^a-zA-Z0-9-.]/g, "")+'"),F("'+kettle.cooler.pin+'"),temp,'+target+','+kettle.temp.diff+','+!!kettle.notify.slack+');');
-      }
-      if(kettle.notify.dweet){
-        currentSketch.triggers = true;
-        currentSketch.actions.push('dweetAutoCommand(F("'+kettle.name.replace(/[^a-zA-Z0-9-.]/g, "")+'"),F("'+$scope.settings.recipe.brewer.name+'"),F("'+$scope.settings.recipe.name+'"),temp);');
-      }
+      }      
     });
     _.each(sketches, (sketch, i) => {
       if(sketch.triggers){
@@ -1198,32 +1200,40 @@ $scope.updateABV();
   function downloadSketch(name, actions, hasTriggers, headers, sketch){
     // tp link connection
     var tplink_connection_string = BrewService.tplink().connection();
-    var autogen = '/* Sketch Auto Generated from http://monitor.brewbench.co on '+moment().format('YYYY-MM-DD HH:MM:SS')+' for '+name+'*/\n';
+    var autogen = '/* Sketch Auto Generated from http://monitor.brewbench.co on '+moment().format('YYYY-MM-DD HH:MM:SS')+' for '+name+' */\n';
     $http.get('assets/arduino/'+sketch+'/'+sketch+'.ino')
       .then(response => {
         // replace variables
         response.data = autogen+response.data
           .replace('// [actions]', actions.length ? actions.join('\n') : '')
           .replace('// [headers]', headers.length ? headers.join('\n') : '')
-          .replace('[TPLINK_CONNECTION]', tplink_connection_string)
-          .replace('[SLACK_CONNECTION]', $scope.settings.notifications.slack)
+          .replace(/\[VERSION\]/g, $scope.pkg.sketch_version)
+          .replace(/\[TPLINK_CONNECTION\]/g, tplink_connection_string)
+          .replace(/\[SLACK_CONNECTION\]/g, $scope.settings.notifications.slack)
         if( sketch.indexOf('Streams') !== -1){
           // streams connection
           var connection_string = `https://${$scope.settings.streams.username}.streams.brewbench.co`;
+          connection_string = 'http://10.0.1.14:3001';
           response.data = response.data.replace(/\[STREAMS_CONNECTION\]/g, connection_string);
           response.data = response.data.replace(/\[STREAMS_AUTH\]/g, 'Authorization: Basic '+btoa($scope.settings.streams.username+':'+$scope.settings.streams.api_key));
         } if( sketch.indexOf('InfluxDB') !== -1){
           // influx db connection
           var connection_string = `${$scope.settings.influxdb.url}`;
-          if( !!$scope.settings.influxdb.port )
-            connection_string += `:${$scope.settings.influxdb.port}`;
-          connection_string += '/write?';
-          // add user/pass
-          if(!!$scope.settings.influxdb.user && !!$scope.settings.influxdb.pass)
+          if($scope.influxdb.brewbenchHosted()){
+            connection_string += '/bbp';
+            response.data = response.data.replace(/\[INFLUXDB_AUTH\]/g, 'Authorization: Basic '+btoa($scope.settings.influxdb.user+':'+$scope.settings.influxdb.pass));
+          } else {
+            if( !!$scope.settings.influxdb.port )
+              connection_string += `:${$scope.settings.influxdb.port}`;
+            connection_string += '/write?';
+            // add user/pass
+            if(!!$scope.settings.influxdb.user && !!$scope.settings.influxdb.pass)
             connection_string += `u=${$scope.settings.influxdb.user}&p=${$scope.settings.influxdb.pass}&`
-          // add db
-          connection_string += 'db='+($scope.settings.influxdb.db || 'session-'+moment().format('YYYY-MM-DD'));
-          response.data = response.data.replace('[PROXY_CONNECTION]', connection_string);
+            // add db
+            connection_string += 'db='+($scope.settings.influxdb.db || 'session-'+moment().format('YYYY-MM-DD'));
+            response.data = response.data.replace(/\[INFLUXDB_AUTH\]/g, '');
+          }
+          response.data = response.data.replace(/\[INFLUXDB_CONNECTION\]/g, connection_string);
         }
         if(headers.indexOf('#include <dht.h>') !== -1){
           response.data = response.data.replace(/\/\/ DHT /g, '');

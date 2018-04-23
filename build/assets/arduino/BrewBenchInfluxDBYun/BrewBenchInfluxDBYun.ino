@@ -1,12 +1,10 @@
 #include <Process.h>
-#include <Bridge.h>
 #include <BridgeServer.h>
 #include <BridgeClient.h>
 // [headers]
 
 String HOSTNAME = "";
-const String VERSION = "4.0.0";
-const PROGMEM int FREQUENCY_SECONDS = 60;
+const PROGMEM uint8_t FREQUENCY_SECONDS = 60;
 int secondCounter = 0;
 BridgeServer server;
 
@@ -46,34 +44,29 @@ void processRest(BridgeClient client) {
   String command = client.readStringUntil('/');
   command.trim();
 
-  if (command == "digital") {
-    responseOkHeader(client);
-    digitalCommand(client);
-  }
-  if (command == "analog") {
-    responseOkHeader(client);
-    analogCommand(client);
-  }
-  if (command == "Thermistor" || command == "DS18B20" || command == "PT100" ||
-    command == "DHT11" || command == "DHT12" || command == "DHT21" ||
-    command == "DHT22" || command == "DHT33" || command == "DHT44") {
-      responseOkHeader(client);
-      tempCommand(client, command);
-  }
-}
-
-void responseOkHeader(BridgeClient client){
   client.println(F("Status: 200"));
   client.println(F("Access-Control-Allow-Origin: *"));
   client.println(F("Access-Control-Allow-Methods: GET"));
   client.println(F("Access-Control-Expose-Headers: X-Sketch-Version"));
-  client.println("X-Sketch-Version: "+VERSION);
+  client.println(F("X-Sketch-Version: [VERSION]"));
   client.println(F("Content-Type: application/json"));
   client.println(F("Connection: close"));
   client.println();
+
+  if (command == "digital") {
+    adCommand(client, true);
+  }
+  if (command == "analog") {
+    adCommand(client, false);
+  }
+  if (command == "Thermistor" || command == "DS18B20" || command == "PT100" ||
+    command == "DHT11" || command == "DHT12" || command == "DHT21" ||
+    command == "DHT22" || command == "DHT33" || command == "DHT44") {
+      tempCommand(client, command);
+  }
 }
 
-void digitalCommand(BridgeClient client) {
+void adCommand(BridgeClient client, const boolean digital) {
   String spin = client.readString();
   spin.trim();
   int pin = spin.substring(1,spin.indexOf("/")).toInt();
@@ -81,40 +74,28 @@ void digitalCommand(BridgeClient client) {
 
   if (spin.indexOf("/") != -1) {
     pinMode(pin, OUTPUT);
-    if(value == 1)
-      digitalWrite(pin, LOW);//turn on relay
-    else
-      digitalWrite(pin, HIGH);//turn off relay
-  }
-  else {
+    if(digital){
+      if(value == 1)
+        digitalWrite(pin, LOW);//turn on relay
+      else
+        digitalWrite(pin, HIGH);//turn off relay
+    } else {
+      analogWrite(pin, value);//0 - 255
+    }
+  } else {
     pinMode(pin, INPUT);
-    value = digitalRead(pin);
+    if(digital){
+      value = digitalRead(pin);
+    } else {
+      value = analogRead(pin);
+    }
   }
 
   // Send JSON response to client
-  client.print("{\"pin\":\""+spin.substring(0,spin.indexOf("/"))+"\",\"value\":"+String(value)+"}");
+  client.print("{\"hostname\":\""+String(HOSTNAME)+"\",\"pin\":\""+String(spin)+String(pin)+"\",\"value\":"+String(value)+"}");
 }
 
-// https://www.arduino.cc/en/Reference/AnalogWrite
-void analogCommand(BridgeClient client) {
-  String spin = client.readString();
-  spin.trim();
-  int pin = spin.substring(1,spin.indexOf("/")).toInt();
-  int value = spin.substring(spin.indexOf("/")+1).toInt();
-
-  if (spin.indexOf("/") != -1) {
-    pinMode(pin, OUTPUT);
-    analogWrite(pin, value);//0 - 255
-  }
-  else {
-    value = analogRead(pin);
-  }
-
-  // Send JSON response to client
-  client.print("{\"pin\":\""+String(spin)+String(pin)+"\",\"value\":"+String(value)+"}");
-}
-
-void tempCommand(BridgeClient client, const String type) {
+void tempCommand(BridgeClient client, const String &type) {
   String spin = client.readString();
   spin.trim();
   int pin = spin.substring(1).toInt();
@@ -184,7 +165,7 @@ void postData(const String &connection, const String &data, const String &dataTy
   p.begin(F("curl"));
   p.addParameter(F("-k"));
   p.addParameter(F("-XPOST"));
-  p.addParameter("User-Agent: BrewBench/"+VERSION);
+  p.addParameter(F("User-Agent: BrewBench/[VERSION]"));
   if(contentType != ""){
     p.addParameter(F("-H"));
     p.addParameter(contentType);
@@ -198,10 +179,6 @@ void postData(const String &connection, const String &data, const String &dataTy
   p.runAsynchronously();
   while(p.running());
 }
-
-// triggers void dweetAutoCommand(const String &source, const String &brewer, const String &beer, const float &temp){
-// triggers   postData(F("https://dweet.io/dweet/for/brewbench"), "{\"brewer\":\""+brewer+"\",\"beer\":\""+beer+"\",\"source\":\""+source+"\",\"temp\":"+String(temp)+"}", "", F("Content-Type: application/json"));
-// triggers }
 
 // triggers void digitalAutoCommand(int pin, int value) {
 // triggers   pinMode(pin, OUTPUT);
@@ -235,7 +212,7 @@ void postData(const String &connection, const String &data, const String &dataTy
 // triggers   postData(F("[TPLINK_CONNECTION]"), data, "", F("Content-Type: application/json"));
 // triggers }
 
-float actionsCommand(const String &source, const String &spin, const String &type, const int &adjustTemp) {
+float actionsCommand(const String &source, const String &spin, const String &type, const float &adjustTemp) {
   float temp = 0.00;
   float raw = 0.00;
 // DHT  float humidity = 0.00;
@@ -299,7 +276,7 @@ float actionsCommand(const String &source, const String &spin, const String &typ
   // Add humidity if we have it
 // DHT  if(humidity) data += "\nhumidity,sensor="+type+",pin="+spin+",source="+source+" value="+String(humidity);
 
-  postData(F("[INFLUXDB_CONNECTION]"), data, F("--data-binary"), "");
+  postData(F("[INFLUXDB_CONNECTION]"), data, F("--data-binary"), "[INFLUXDB_AUTH]");
 
   return temp;
 }
@@ -339,12 +316,9 @@ void runActions(){
 
 void getHostname(){
   Process p;
-  char c;
   p.runShellCommand("hostname");
   while(p.available() > 0) {
-   c = p.read();
-   Serial.print(c);
-   HOSTNAME.concat(c);
+   HOSTNAME = p.readString();
   }
   HOSTNAME.trim();
 }

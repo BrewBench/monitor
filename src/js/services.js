@@ -584,6 +584,7 @@ angular.module('brewbench-monitor')
             delete updatedKettle.message;
             delete updatedKettle.timers;
             delete updatedKettle.knob;
+            updatedKettle.temp.adjust = (settings.general.unit=='F' && !!updatedKettle.temp.adjust) ? $filter('round')(updatedKettle.temp.adjust*0.555,3) : updatedKettle.temp.adjust;
             request.url += '/kettles/arm';
             request.method = 'POST';
             request.data = {
@@ -706,8 +707,15 @@ angular.module('brewbench-monitor')
 
       return {
         ping: () => {
-          $http({url: `${influxConnection}/ping`, method: 'GET'})
+          var request = {url: `${influxConnection}`, method: 'GET'};
+          if(influxConnection.indexOf('streams.brewbench.co') !== -1){
+            request.url = `${influxConnection}/ping`;
+            request.headers = {'Content-Type': 'application/json',
+              'Authorization': 'Basic '+btoa(settings.influxdb.user+':'+settings.influxdb.pass)};
+          }
+          $http(request)
             .then(response => {
+              console.log(response)
               q.resolve(response);
             })
             .catch(err => {
@@ -716,6 +724,9 @@ angular.module('brewbench-monitor')
             return q.promise;
         },
         dbs: () => {
+          if(influxConnection.indexOf('streams.brewbench.co') !== -1){
+            q.resolve([settings.influxdb.user]);
+          } else {
           $http({url: `${influxConnection}/query?u=${settings.influxdb.user}&p=${settings.influxdb.pass}&q=${encodeURIComponent('show databases')}`, method: 'GET'})
             .then(response => {
               if(response.data &&
@@ -732,9 +743,13 @@ angular.module('brewbench-monitor')
             .catch(err => {
               q.reject(err);
             });
-            return q.promise;
+          }
+          return q.promise;
         },
         createDB: (name) => {
+          if(influxConnection.indexOf('streams.brewbench.co') !== -1){
+            q.reject('Database already exists');
+          } else {
           $http({url: `${influxConnection}/query?u=${settings.influxdb.user}&p=${settings.influxdb.pass}&q=${encodeURIComponent(`CREATE DATABASE "${name}"`)}`, method: 'POST'})
             .then(response => {
               q.resolve(response);
@@ -742,7 +757,8 @@ angular.module('brewbench-monitor')
             .catch(err => {
               q.reject(err);
             });
-            return q.promise;
+          }
+          return q.promise;
         }
       };
     },

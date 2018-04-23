@@ -1,11 +1,13 @@
 #include <Process.h>
 #include <BridgeServer.h>
 #include <BridgeClient.h>
+#include <ArduinoJson.h>
 // [headers]
 
 String HOSTNAME = "";
+String brewbenchSettings = "[]";
 const PROGMEM uint8_t FREQUENCY_SECONDS = 60;
-int secondCounter = 0;
+uint8_t secondCounter = 0;
 BridgeServer server;
 
 // DHT dht DHT;
@@ -59,6 +61,9 @@ void processRest(BridgeClient client) {
   if (command == "analog") {
     adCommand(client, false);
   }
+  if (command == "settings") {
+    settingsCommand(client);
+  }
   if (command == "Thermistor" || command == "DS18B20" || command == "PT100" ||
     command == "DHT11" || command == "DHT12" || command == "DHT21" ||
     command == "DHT22" || command == "DHT33" || command == "DHT44") {
@@ -69,8 +74,8 @@ void processRest(BridgeClient client) {
 void adCommand(BridgeClient client, const boolean digital) {
   String spin = client.readString();
   spin.trim();
-  int pin = spin.substring(1,spin.indexOf("/")).toInt();
-  int value = spin.substring(spin.indexOf("/")+1).toInt();
+  uint8_t pin = spin.substring(1,spin.indexOf("/")).toInt();
+  uint8_t value = spin.substring(spin.indexOf("/")+1).toInt();
 
   if (spin.indexOf("/") != -1) {
     pinMode(pin, OUTPUT);
@@ -95,13 +100,26 @@ void adCommand(BridgeClient client, const boolean digital) {
   client.print("{\"hostname\":\""+String(HOSTNAME)+"\",\"pin\":\""+String(spin)+String(pin)+"\",\"value\":"+String(value)+"}");
 }
 
+// update and get streams settings
+void settingsCommand(BridgeClient client){
+  postStreams("{\"hostname\":\""+String(HOSTNAME)+"\"}", true);
+  DynamicJsonBuffer jsonBuffer;
+  JsonArray &root = jsonBuffer.parseArray(brewbenchSettings);
+  // if parsing succeeds then update settings
+  if(root.success() && root.size() > 0){
+    client.print("{\"parse\": \"OK\",\"settings\":"+brewbenchSettings+"}");
+  } else {
+    client.print("{\"parse\": \"NOT OK\",\"settings\":"+brewbenchSettings+"}");
+  }
+}
+
 void tempCommand(BridgeClient client, const String &type) {
   String spin = client.readString();
   spin.trim();
-  int pin = spin.substring(1).toInt();
+  uint8_t pin = spin.substring(1).toInt();
   float temp = 0.00;
   float raw = 0.00;
-  // DHT float humidity = 0.00;
+// DHT float humidity = 0.00;
 
   if( spin.substring(0,1) == "A" )
     raw = analogRead(pin);
@@ -135,7 +153,7 @@ void tempCommand(BridgeClient client, const String &type) {
   // DS18B20 temp = ds.getTemperature_C();
   // DS18B20 }
   // DHT else if(type == "DHT11" || type == "DHT12" || type == "DHT21" || type == "DHT22" || type == "DHT33" || type == "DHT44"){
-  // DHT   int chk = -1;
+  // DHT   uint8_t chk = -1;
   // DHT if(type == "DHT11")
   // DHT   chk = DHT.read11(pin);
   // DHT else if(type == "DHT12")
@@ -153,70 +171,18 @@ void tempCommand(BridgeClient client, const String &type) {
   // DHT     humidity = DHT.humidity;
   // DHT   }
   // DHT }
-  String data = "{\"pin\":\""+String(spin)+"\",\"temp\":"+String(temp)+",\"raw\":"+String(raw)+"";
+  String data = "{\"hostname\":\""+String(HOSTNAME)+"\",\"pin\":\""+String(spin)+"\",\"temp\":"+String(temp)+",\"raw\":"+String(raw)+"";
 // DHT  if(humidity) data += ",\"humidity\":"+String(humidity)+"";
   data += "}";
   // Send JSON response to client
   client.print(data);
 }
 
-void postData(const String &connection, const String &data, const String &dataType, const String &contentType){
-  Process p;
-  p.begin(F("curl"));
-  p.addParameter(F("-k"));
-  p.addParameter(F("-XPOST"));
-  p.addParameter(F("User-Agent: BrewBench/[VERSION]"));
-  if(contentType != ""){
-    p.addParameter(F("-H"));
-    p.addParameter(contentType);
-  }
-  if(dataType == "")
-    p.addParameter(F("-d"));
-  else
-    p.addParameter(dataType);
-  p.addParameter(data);
-  p.addParameter(connection);
-  p.runAsynchronously();
-  while(p.running());
-}
-
-// triggers void digitalAutoCommand(int pin, int value) {
-// triggers   pinMode(pin, OUTPUT);
-// triggers   if(value == 1)
-// triggers     digitalWrite(pin, LOW);//turn on relay
-// triggers   else if(value == 0)
-// triggers     digitalWrite(pin, HIGH);//turn off relay
-// triggers }
-
-// triggers void analogAutoCommand(int pin, int value) {
-// triggers   pinMode(pin, OUTPUT);
-// triggers   analogWrite(pin, value);
-// triggers }
-
-// triggers void slackAutoCommand(const String &type, const String &source, const float &temp) {
-// triggers   String msg = "";
-// triggers   String color = "";
-// triggers   if(type=="heat"){
-// triggers     msg = source+" temp is "+String(temp)+"\u00B0 and is heating";
-// triggers     color = F("danger");
-// triggers   } else if(type=="cool"){
-// triggers     msg = source+" temp is "+String(temp)+"\u00B0 and is cooling";
-// triggers     color = F("#3498DB");
-// triggers   }
-// triggers   String data = "{\"attachments\": [{\"fallback\": "+msg+",\"title\": \""+source+"\",\"fields\": [{\"value\": "+msg+"}],\"color\": \""+color+"\",\"mrkdwn_in\": [\"text\", \"fallback\", \"fields\"],\"thumb_url\": \"https://monitor.brewbench.co/assets/img/fermenter.png\"}]}";
-// triggers   postData(F("[SLACK_CONNECTION]"), "payload="+data, "", F("Content-Type: application/x-www-form-urlencoded"));
-// triggers }
-
-// triggers void tplinkAutoCommand(const String &deviceId, const int &value){
-// triggers   String data = "{\"method\":\"passthrough\",\"params\":{\"deviceId\":\""+String(deviceId)+"\",\"requestData\":\"{\\\"system\\\":{\\\"set_relay_state\\\":{\\\"state\\\":"+String(value)+"}}}\"}}";
-// triggers   postData(F("[TPLINK_CONNECTION]"), data, "", F("Content-Type: application/json"));
-// triggers }
-
-float actionsCommand(const String &source, const String &spin, const String &type, const float &adjustTemp) {
+float actionsCommand(const String &source, const String &spin, const String &type, const char &adjustTemp) {
   float temp = 0.00;
   float raw = 0.00;
 // DHT  float humidity = 0.00;
-  int pin = spin.substring(1).toInt();
+  uint8_t pin = spin.substring(1).toInt();
 
   if( spin.substring(0,1) == "A" )
     raw = analogRead(pin);
@@ -250,7 +216,7 @@ float actionsCommand(const String &source, const String &spin, const String &typ
   // DS18B20 temp = ds.getTemperature_C();
   // DS18B20 }
   // DHT else if(type == "DHT11" || type == "DHT12" || type == "DHT21" || type == "DHT22" || type == "DHT33" || type == "DHT44"){
-  // DHT   int chk = -1;
+  // DHT   uint8_t chk = -1;
   // DHT if(type == "DHT11")
   // DHT   chk = DHT.read11(pin);
   // DHT else if(type == "DHT12")
@@ -271,47 +237,98 @@ float actionsCommand(const String &source, const String &spin, const String &typ
   // adjust temp if we have it
   if(temp) temp = temp+adjustTemp;
   // Send JSON response to client
-  String data = "temperature,sensor="+type+",pin="+spin+",source="+source+" value="+String(temp);
-  data += "\nbits,sensor="+type+",pin="+spin+",source="+source+" value="+String(raw);
-  // Add humidity if we have it
-// DHT  if(humidity) data += "\nhumidity,sensor="+type+",pin="+spin+",source="+source+" value="+String(humidity);
+  String data = "{\"hostname\":\""+String(HOSTNAME)+"\",\"pin\":\""+String(spin)+"\",\"temp\":"+String(temp)+",\"raw\":"+String(raw)+"";
+  data += ",\"sensor\":\""+String(type)+"\"";
+  data += ",\"source\":\""+String(source)+"\"";
+  data += ",\"adjust\":\""+String(adjustTemp)+"\"";
+// DHT  if(humidity) data += ",\"humidity\":"+String(humidity)+"";
+  data += "}";
 
-  postData(F("[INFLUXDB_CONNECTION]"), data, F("--data-binary"), "[INFLUXDB_AUTH]");
+  postStreams(data, false);
 
   return temp;
 }
 
-// triggers void trigger(const String &type, const String &source, const String &spin, const float &temp, const int &target, const int &diff, const boolean &slack) {
-// triggers   String pinType = spin.substring(0,1);
-// triggers   String deviceId = "";
-// triggers   int pinNumber = -1;
-// triggers   int changeTo = 0;
-// triggers   if(pinType == "T"){ //TP Link
-// triggers     deviceId = spin.substring(3);
-// triggers   } else {
-// triggers     pinNumber = spin.substring(1).toInt();
-// triggers   }
+void postStreams(const String &data, const bool &getSetup){
+  Process p;
+  p.begin(F("curl"));
+  p.addParameter(F("-k"));
+  p.addParameter(F("-XPOST"));
+  p.addParameter(F("-H"));
+  p.addParameter(F("User-Agent: BrewBench/[VERSION]"));
+  p.addParameter(F("-H"));
+  p.addParameter(F("Content-Type: application/json"));
+  p.addParameter(F("-d"));
+  p.addParameter(data);
+  p.addParameter(F("-H"));
+  p.addParameter(F("[STREAMS_AUTH]"));
+  if(getSetup)
+    p.addParameter(F("[STREAMS_CONNECTION]/api/kettles/setup"));
+  else
+    p.addParameter(F("[STREAMS_CONNECTION]/api/temps/arduino"));
+  p.runAsynchronously();
+  while(p.running());
+  String updateSettings = "";
+  while(p.available()) {
+    updateSettings = p.readString();
+  }
+  if(updateSettings != ""){
+    DynamicJsonBuffer jsonBuffer;
+    JsonArray &root = jsonBuffer.parseArray(updateSettings);
+    // if parsing succeeds then update settings
+    if(root.success() && root.size() > 0){
+      brewbenchSettings = updateSettings;
+    }
+  }
+}
 
-// triggers   if(type == "heat"){
-// triggers     if( temp < (target+diff) )
-// triggers       changeTo = 1;
-// triggers   } else if(type == "cool"){
-// triggers     if( temp > (target+diff) )
-// triggers       changeTo = 1;
-// triggers   }
-// triggers   if(pinType == "A")
-// triggers     analogAutoCommand(pinNumber, changeTo);
-// triggers   else if(pinType == "D")
-// triggers     digitalAutoCommand(pinNumber, changeTo);
-// triggers   else if(pinType == "T" && deviceId)
-// triggers     tplinkAutoCommand(deviceId, changeTo);
+void trigger(const String &type, const String &spin, const float &temp, const uint8_t &target, const char &diff) {
+  String pinType = spin.substring(0,1);
+  if(pinType == "T") //TP Link
+    return;
 
-// triggers   if(slack && changeTo == 1)
-// triggers     slackAutoCommand(type, source, temp);
-// triggers }
+  uint8_t pin = spin.substring(1).toInt();
+  uint8_t changeTo = 0;
+
+  if(type == "heat"){
+    if( temp < (target+diff) )
+      changeTo = 1;
+  } else if(type == "cool"){
+    if( temp > (target+diff) )
+      changeTo = 1;
+  }
+  if(pinType == "A"){
+    pinMode(pin, OUTPUT);
+    analogWrite(pin, changeTo);
+  }
+  else if(pinType == "D"){
+    pinMode(pin, OUTPUT);
+    if(changeTo == 1)
+      digitalWrite(pin, LOW);//turn on relay
+    else if(changeTo == 0)
+      digitalWrite(pin, HIGH);//turn off relay
+  }
+}
 
 void runActions(){
-  // [actions]
+  DynamicJsonBuffer jsonBuffer;
+  JsonArray &root = jsonBuffer.parseArray(brewbenchSettings);
+  // if parsing succeeds then update settings
+  if(root.success() && root.size() > 0){
+    for (uint8_t k = 0; k < root.size(); k++) {
+      float temp = 0.00;
+      JsonObject& kettle = root[k];
+      temp = actionsCommand(kettle["name"], kettle["temp_pin"], kettle["temp_type"], kettle["temp_adjust"]);
+      if(kettle["heat_pin"]){
+        trigger("heat", kettle["heat_pin"], temp, kettle["temp_target"], kettle["temp_diff"]);
+      }
+      if(kettle["cool_pin"]){
+        trigger("cool", kettle["cool_pin"], temp, kettle["temp_target"], kettle["temp_diff"]);
+      }
+    }
+  } else {
+    postStreams("{\"hostname\":\""+String(HOSTNAME)+"\"}", true);
+  }
 }
 
 void getHostname(){
@@ -332,6 +349,8 @@ void setup() {
   // server.noListenOnLocalhost();
   server.begin();
   getHostname();
+  // setup streams
+  postStreams("{\"hostname\":\""+String(HOSTNAME)+"\"}", true);
 }
 
 void loop() {

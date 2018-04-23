@@ -1,6 +1,6 @@
 # Change Log
 
-## 3.3.0 - 2018-03-21
+## 4.0.0 - 2018-04-27
 
 ### Added
 - [BrewBench Streams](https://app.brewbench.co) Sketch

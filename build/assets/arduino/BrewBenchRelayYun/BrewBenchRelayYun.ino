@@ -98,7 +98,7 @@ void adCommand(BridgeClient client, const boolean digital) {
 void tempCommand(BridgeClient client, const String &type) {
   String spin = client.readString();
   spin.trim();
-  int pin = spin.substring(1).toInt();
+  uint8_t pin = spin.substring(1).toInt();
   float temp = 0.00;
   float raw = 0.00;
   // DHT float humidity = 0.00;
@@ -154,7 +154,7 @@ void tempCommand(BridgeClient client, const String &type) {
   // DHT   }
   // DHT }
   String data = "{\"pin\":\""+String(spin)+"\",\"temp\":"+String(temp)+",\"raw\":"+String(raw)+"";
-// DHT  if(humidity) data += ",\"humidity\":"+String(humidity)+"";
+  // DHT if(humidity) data += ",\"humidity\":"+String(humidity)+"";
   data += "}";
   // Send JSON response to client
   client.print(data);
@@ -166,10 +166,9 @@ void postData(const String &connection, const String &data, const String &dataTy
   p.addParameter(F("-k"));
   p.addParameter(F("-XPOST"));
   p.addParameter(F("User-Agent: BrewBench/[VERSION]"));
-  if(contentType != ""){
-    p.addParameter(F("-H"));
+  p.addParameter(F("-H"));
+  if(contentType != "")
     p.addParameter(contentType);
-  }
   if(dataType == "")
     p.addParameter(F("-d"));
   else
@@ -216,7 +215,7 @@ float actionsCommand(const String &source, const String &spin, const String &typ
   float temp = 0.00;
   float raw = 0.00;
 // DHT  float humidity = 0.00;
-  int pin = spin.substring(1).toInt();
+  uint8_t pin = spin.substring(1).toInt();
 
   if( spin.substring(0,1) == "A" )
     raw = analogRead(pin);
@@ -270,22 +269,14 @@ float actionsCommand(const String &source, const String &spin, const String &typ
   // DHT }
   // adjust temp if we have it
   if(temp) temp = temp+adjustTemp;
-  // Send JSON response to client
-  String data = "temperature,sensor="+type+",pin="+spin+",source="+source+" value="+String(temp);
-  data += "\nbits,sensor="+type+",pin="+spin+",source="+source+" value="+String(raw);
-  // Add humidity if we have it
-// DHT  if(humidity) data += "\nhumidity,sensor="+type+",pin="+spin+",source="+source+" value="+String(humidity);
-
-  postData(F("[INFLUXDB_CONNECTION]"), data, F("--data-binary"), "[INFLUXDB_AUTH]");
-
   return temp;
 }
 
-// triggers void trigger(const String &type, const String &source, const String &spin, const float &temp, const int &target, const int &diff, const boolean &slack) {
+// triggers void trigger(const String &type, const String &source, const String &spin, const float &temp, const uint8_t &target, const char &diff, const boolean slack) {
 // triggers   String pinType = spin.substring(0,1);
 // triggers   String deviceId = "";
 // triggers   int pinNumber = -1;
-// triggers   int changeTo = 0;
+// triggers   uint8_t changeTo = 0;
 // triggers   if(pinType == "T"){ //TP Link
 // triggers     deviceId = spin.substring(3);
 // triggers   } else {
