@@ -27,7 +27,7 @@ angular.module('brewbench-monitor')
         ,sounds: {on:true,alert:'/assets/audio/bike.mp3',timer:'/assets/audio/school.mp3'}
         ,arduinos: [{id:'local-'+btoa('brewbench'),url:'arduino.local',analog:5,digital:13,secure:false,version:'',status:{error:'',dt:''}}]
         ,tplink: {user: '', pass: '', token:'', status: '', plugs: []}
-        ,influxdb: {url: '', port: 8086, user: '', pass: '', db: '', dbs:[], status: ''}
+        ,influxdb: {url: '', port: '', user: '', pass: '', db: '', dbs:[], status: ''}
         ,streams: {username: '', api_key: '', status: '', session: {id: '', name: '', type: 'fermentation'}}
       };
       return defaultSettings;
@@ -702,14 +702,14 @@ angular.module('brewbench-monitor')
       var q = $q.defer();
       var settings = this.settings('settings');
       var influxConnection = `${settings.influxdb.url}`;
-      if( !!settings.influxdb.port )
-        influxConnection += `:${settings.influxdb.port}`
+      if( !!settings.influxdb.port && influxConnection.indexOf('streams.brewbench.co') === -1)
+        influxConnection += `:${settings.influxdb.port}`;
 
       return {
         ping: (influxdb) => {
           if(influxdb && influxdb.url){
             influxConnection = `${influxdb.url}`;
-            if( !!influxdb.port )
+            if( !!influxdb.port && influxConnection.indexOf('streams.brewbench.co') === -1)
               influxConnection += `:${influxdb.port}`
           }
           var request = {url: `${influxConnection}`, method: 'GET'};

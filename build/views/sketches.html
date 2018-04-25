@@ -105,13 +105,13 @@
                 </div>
               </div>
               <div class="row">
-                <div ng-class="{'col-5': !influxdb.brewbenchHosted(), 'col-9': influxdb.brewbenchHosted()}">
+                <div ng-class="{'col-5': !influxdb.brewbenchHosted(), 'col-12': influxdb.brewbenchHosted()}">
                   <label class="adjust">Url</label>
                   <input id="influxdbUrl" class="form-control" type="text" ng-model="settings.influxdb.url" placeholder="http://InfluxDBUrl">
                 </div>
-                <div class="col-3">
+                <div class="col-3" ng-show="!influxdb.brewbenchHosted()">
                   <label class="adjust">Port</label>
-                  <input class="form-control" style="width: 100%;" type="number" ng-model="settings.influxdb.port">
+                  <input class="form-control" style="width: 100%;" type="number" ng-model="settings.influxdb.port" placeholder="8086">
                 </div>
                 <div class="col-4" ng-if="!influxdb.brewbenchHosted()">
                   <label class="adjust">Database</label>
