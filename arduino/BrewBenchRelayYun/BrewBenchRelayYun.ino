@@ -153,7 +153,7 @@ void tempCommand(BridgeClient client, const String &type) {
   // DHT     humidity = DHT.humidity;
   // DHT   }
   // DHT }
-  String data = "{\"pin\":\""+String(spin)+"\",\"temp\":"+String(temp)+",\"raw\":"+String(raw)+"";
+  String data = "{\"hostname\":\""+String(HOSTNAME)+"\",\"pin\":\""+String(spin)+"\",\"temp\":"+String(temp)+",\"raw\":"+String(raw)+"";
   // DHT if(humidity) data += ",\"humidity\":"+String(humidity)+"";
   data += "}";
   // Send JSON response to client
@@ -170,7 +170,7 @@ void postData(const String &connection, const String &data, const String &dataTy
   if(contentType != ""){
     p.addParameter(F("-H"));
     p.addParameter(contentType);
-  }    
+  }
   if(dataType == "")
     p.addParameter(F("-d"));
   else

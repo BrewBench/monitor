@@ -153,7 +153,7 @@ void tempCommand(BridgeClient client, const String &type) {
   // DHT     humidity = DHT.humidity;
   // DHT   }
   // DHT }
-  String data = "{\"pin\":\""+String(spin)+"\",\"temp\":"+String(temp)+",\"raw\":"+String(raw)+"";
+  String data = "{\"hostname\":\""+String(HOSTNAME)+"\",\"pin\":\""+String(spin)+"\",\"temp\":"+String(temp)+",\"raw\":"+String(raw)+"";
 // DHT  if(humidity) data += ",\"humidity\":"+String(humidity)+"";
   data += "}";
   // Send JSON response to client
@@ -273,8 +273,8 @@ float actionsCommand(const String &source, const String &spin, const String &typ
   // adjust temp if we have it
   if(temp) temp = temp+adjustTemp;
   // Send JSON response to client
-  String data = "temperature,sensor="+type+",pin="+spin+",source="+source+" value="+String(temp);
-  data += "\nbits,sensor="+type+",pin="+spin+",source="+source+" value="+String(raw);
+  String data = "temperature,sensor="+type+",pin="+spin+",source="+source+",host="+String(HOSTNAME)+" value="+String(temp);
+  data += "\nbits,sensor="+type+",pin="+spin+",source="+source+",host="+String(HOSTNAME)+" value="+String(raw);
   // Add humidity if we have it
 // DHT  if(humidity) data += "\nhumidity,sensor="+type+",pin="+spin+",source="+source+" value="+String(humidity);
 
