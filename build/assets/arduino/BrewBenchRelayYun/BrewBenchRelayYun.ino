@@ -165,10 +165,12 @@ void postData(const String &connection, const String &data, const String &dataTy
   p.begin(F("curl"));
   p.addParameter(F("-k"));
   p.addParameter(F("-XPOST"));
-  p.addParameter(F("User-Agent: BrewBench/[VERSION]"));
   p.addParameter(F("-H"));
-  if(contentType != "")
+  p.addParameter(F("User-Agent: BrewBench/[VERSION]"));
+  if(contentType != ""){
+    p.addParameter(F("-H"));
     p.addParameter(contentType);
+  }    
   if(dataType == "")
     p.addParameter(F("-d"));
   else

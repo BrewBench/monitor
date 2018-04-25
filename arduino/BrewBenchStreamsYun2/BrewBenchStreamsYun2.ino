@@ -258,10 +258,10 @@ void postStreams(const String &data, const bool &getSetup){
   p.addParameter(F("User-Agent: BrewBench/[VERSION]"));
   p.addParameter(F("-H"));
   p.addParameter(F("Content-Type: application/json"));
-  p.addParameter(F("-d"));
-  p.addParameter(data);
   p.addParameter(F("-H"));
   p.addParameter(F("[STREAMS_AUTH]"));
+  p.addParameter(F("-d"));
+  p.addParameter(data);
   if(getSetup)
     p.addParameter(F("[STREAMS_CONNECTION]/api/kettles/setup"));
   else

@@ -240,10 +240,10 @@ void postStreams(const String &data){
   p.addParameter(F("User-Agent: BrewBench/[VERSION]"));
   p.addParameter(F("-H"));
   p.addParameter(F("Content-Type: application/json"));
-  p.addParameter(F("-d"));
-  p.addParameter(data);
   p.addParameter(F("-H"));
   p.addParameter(F("[STREAMS_AUTH]"));
+  p.addParameter(F("-d"));
+  p.addParameter(data);
   p.addParameter(F("[STREAMS_CONNECTION]/api/temps/arduino"));
   p.runAsynchronously();
   while(p.running());

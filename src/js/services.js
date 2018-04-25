@@ -706,12 +706,22 @@ angular.module('brewbench-monitor')
         influxConnection += `:${settings.influxdb.port}`
 
       return {
-        ping: () => {
+        ping: (influxdb) => {
+          if(influxdb && influxdb.url){
+            influxConnection = `${influxdb.url}`;
+            if( !!influxdb.port )
+              influxConnection += `:${influxdb.port}`
+          }
           var request = {url: `${influxConnection}`, method: 'GET'};
           if(influxConnection.indexOf('streams.brewbench.co') !== -1){
             request.url = `${influxConnection}/ping`;
-            request.headers = {'Content-Type': 'application/json',
-              'Authorization': 'Basic '+btoa(settings.influxdb.user+':'+settings.influxdb.pass)};
+            if(influxdb && influxdb.user && influxdb.pass){
+              request.headers = {'Content-Type': 'application/json',
+                'Authorization': 'Basic '+btoa(influxdb.user+':'+influxdb.pass)};
+            } else {
+              request.headers = {'Content-Type': 'application/json',
+                'Authorization': 'Basic '+btoa(settings.influxdb.user+':'+settings.influxdb.pass)};
+            }
           }
           $http(request)
             .then(response => {

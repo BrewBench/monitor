@@ -367,7 +367,7 @@ $scope.updateABV();
     },
     connect: () => {
       $scope.settings.influxdb.status = 'Connecting';
-      BrewService.influxdb().ping()
+      BrewService.influxdb().ping($scope.settings.influxdb)
         .then(response => {
           if(response.status == 204 || response.status == 200){
             $('#influxdbUrl').removeClass('is-invalid');
@@ -1182,7 +1182,7 @@ $scope.updateABV();
       if(kettle.cooler && kettle.cooler.sketch){
         currentSketch.triggers = true;
         currentSketch.actions.push('trigger(F("cool"),F("'+kettle.name.replace(/[^a-zA-Z0-9-.]/g, "")+'"),F("'+kettle.cooler.pin+'"),temp,'+target+','+kettle.temp.diff+','+!!kettle.notify.slack+');');
-      }      
+      }
     });
     _.each(sketches, (sketch, i) => {
       if(sketch.triggers){
@@ -1222,6 +1222,9 @@ $scope.updateABV();
           if($scope.influxdb.brewbenchHosted()){
             connection_string += '/bbp';
             response.data = response.data.replace(/\[INFLUXDB_AUTH\]/g, 'Authorization: Basic '+btoa($scope.settings.influxdb.user+':'+$scope.settings.influxdb.pass));
+            var additional_post_params = 'p.addParameter(F("-H"));\n';
+            additional_post_params += '  p.addParameter(F("X-API-KEY: '+$scope.settings.influxdb.pass+'"));';
+            response.data = response.data.replace('// additional_post_params', additional_post_params);
           } else {
             if( !!$scope.settings.influxdb.port )
               connection_string += `:${$scope.settings.influxdb.port}`;
