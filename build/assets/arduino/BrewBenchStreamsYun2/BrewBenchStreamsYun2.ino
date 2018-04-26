@@ -4,7 +4,7 @@
 #include <ArduinoJson.h>
 // [headers]
 
-String HOSTNAME = "";
+String HOSTNAME = "notset";
 String brewbenchSettings = "[]";
 const PROGMEM uint8_t FREQUENCY_SECONDS = 60;
 uint8_t secondCounter = 0;
@@ -334,10 +334,13 @@ void runActions(){
 void getHostname(){
   Process p;
   p.runShellCommand("hostname");
-  while(p.available() > 0) {
+  while(p.running());
+  if(p.available() > 0) {
    HOSTNAME = p.readString();
   }
   HOSTNAME.trim();
+  if(HOSTNAME == "")
+    HOSTNAME = "missing";
 }
 
 void setup() {
