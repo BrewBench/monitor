@@ -1250,7 +1250,10 @@ $scope.updateABV();
         var streamSketch = document.createElement('a');
         streamSketch.setAttribute('download', sketch+'-'+name+'.ino');
         streamSketch.setAttribute('href', "data:text/ino;charset=utf-8," + encodeURIComponent(response.data));
+        streamSketch.style.display = 'none';
+        document.body.appendChild(streamSketch);
         streamSketch.click();
+        document.body.removeChild(streamSketch);
       })
       .catch(err => {
         $scope.setErrorMessage(`Failed to download sketch ${err.message}`);
