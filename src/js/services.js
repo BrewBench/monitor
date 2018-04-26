@@ -205,7 +205,7 @@ angular.module('brewbench-monitor')
 
       if(kettle.arduino.password){
         request.withCredentials = true;
-        request.headers = {'Authorization': 'Basic '+btoa('root:'+kettle.arduino.password)};
+        request.headers = {'Authorization': 'Basic '+btoa('root:'+kettle.arduino.password.trim())};
       }
 
       $http(request)
@@ -230,7 +230,7 @@ angular.module('brewbench-monitor')
 
       if(kettle.arduino.password){
         request.withCredentials = true;
-        request.headers = {'Authorization': 'Basic '+btoa('root:'+kettle.arduino.password)};
+        request.headers = {'Authorization': 'Basic '+btoa('root:'+kettle.arduino.password.trim())};
       }
 
       $http(request)
@@ -253,7 +253,7 @@ angular.module('brewbench-monitor')
 
       if(kettle.arduino.password){
         request.withCredentials = true;
-        request.headers = {'Authorization': 'Basic '+btoa('root:'+kettle.arduino.password)};
+        request.headers = {'Authorization': 'Basic '+btoa('root:'+kettle.arduino.password.trim())};
       }
 
       $http(request)
@@ -276,7 +276,7 @@ angular.module('brewbench-monitor')
 
       if(kettle.arduino.password){
         request.withCredentials = true;
-        request.headers = {'Authorization': 'Basic '+btoa('root:'+kettle.arduino.password)};
+        request.headers = {'Authorization': 'Basic '+btoa('root:'+kettle.arduino.password.trim())};
       }
 
       $http(request)
@@ -355,7 +355,7 @@ angular.module('brewbench-monitor')
       var query = `url=${arduino.url}`
 
       if(arduino.password)
-        query += '&auth='+btoa('root:'+arduino.password);
+        query += '&auth='+btoa('root:'+arduino.password.trim());
 
       $http({url: 'https://monitor.brewbench.co/share/test/?'+query, method: 'GET'})
         .then(response => {
@@ -717,10 +717,10 @@ angular.module('brewbench-monitor')
             request.url = `${influxConnection}/ping`;
             if(influxdb && influxdb.user && influxdb.pass){
               request.headers = {'Content-Type': 'application/json',
-                'Authorization': 'Basic '+btoa(influxdb.user+':'+influxdb.pass)};
+                'Authorization': 'Basic '+btoa(influxdb.user.trim()+':'+influxdb.pass.trim())};
             } else {
               request.headers = {'Content-Type': 'application/json',
-                'Authorization': 'Basic '+btoa(settings.influxdb.user+':'+settings.influxdb.pass)};
+                'Authorization': 'Basic '+btoa(settings.influxdb.user.trim()+':'+settings.influxdb.pass.trim())};
             }
           }
           $http(request)
@@ -737,7 +737,7 @@ angular.module('brewbench-monitor')
           if(influxConnection.indexOf('streams.brewbench.co') !== -1){
             q.resolve([settings.influxdb.user]);
           } else {
-          $http({url: `${influxConnection}/query?u=${settings.influxdb.user}&p=${settings.influxdb.pass}&q=${encodeURIComponent('show databases')}`, method: 'GET'})
+          $http({url: `${influxConnection}/query?u=${settings.influxdb.user.trim()}&p=${settings.influxdb.pass.trim()}&q=${encodeURIComponent('show databases')}`, method: 'GET'})
             .then(response => {
               if(response.data &&
                 response.data.results &&
@@ -760,7 +760,7 @@ angular.module('brewbench-monitor')
           if(influxConnection.indexOf('streams.brewbench.co') !== -1){
             q.reject('Database already exists');
           } else {
-          $http({url: `${influxConnection}/query?u=${settings.influxdb.user}&p=${settings.influxdb.pass}&q=${encodeURIComponent(`CREATE DATABASE "${name}"`)}`, method: 'POST'})
+          $http({url: `${influxConnection}/query?u=${settings.influxdb.user.trim()}&p=${settings.influxdb.pass.trim()}&q=${encodeURIComponent(`CREATE DATABASE "${name}"`)}`, method: 'POST'})
             .then(response => {
               q.resolve(response);
             })

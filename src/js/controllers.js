@@ -1215,13 +1215,13 @@ $scope.updateABV();
           var connection_string = `https://${$scope.settings.streams.username}.streams.brewbench.co`;
           connection_string = 'http://10.0.1.14:3001';
           response.data = response.data.replace(/\[STREAMS_CONNECTION\]/g, connection_string);
-          response.data = response.data.replace(/\[STREAMS_AUTH\]/g, 'Authorization: Basic '+btoa($scope.settings.streams.username+':'+$scope.settings.streams.api_key));
+          response.data = response.data.replace(/\[STREAMS_AUTH\]/g, 'Authorization: Basic '+btoa($scope.settings.streams.username.trim()+':'+$scope.settings.streams.api_key.trim()));
         } if( sketch.indexOf('InfluxDB') !== -1){
           // influx db connection
           var connection_string = `${$scope.settings.influxdb.url}`;
           if($scope.influxdb.brewbenchHosted()){
             connection_string += '/bbp';
-            response.data = response.data.replace(/\[INFLUXDB_AUTH\]/g, 'Authorization: Basic '+btoa($scope.settings.influxdb.user+':'+$scope.settings.influxdb.pass));
+            response.data = response.data.replace(/\[INFLUXDB_AUTH\]/g, 'Authorization: Basic '+btoa($scope.settings.influxdb.user.trim()+':'+$scope.settings.influxdb.pass.trim()));
             var additional_post_params = 'p.addParameter(F("-H"));\n';
             additional_post_params += '  p.addParameter(F("X-API-KEY: '+$scope.settings.influxdb.pass+'"));';
             response.data = response.data.replace('// additional_post_params', additional_post_params);
