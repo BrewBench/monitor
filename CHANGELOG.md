@@ -7,6 +7,7 @@
 - raw analogRead/digitalRead value in response
 - Debug settings option to view raw and unformatted temps
 - Arduino online status
+- Support for ADS1115 16bit Analog to Digital Convertor (ADC)
 
 ### Updated
 - Cleaned up Arduino and Settings styles

@@ -95,6 +95,8 @@ Download the [Arduino IDE](https://www.arduino.cc/en/Main/Software) >= 1.8.5
 
 * Analog to Digital Convertor runs on Address 0x48
 
+* Sketches for use with 5V
+
 * http://henrysbench.capnfatz.com/henrys-bench/arduino-voltage-measurements/arduino-ads1115-module-getting-started-tutorial/
 
 * http://www.instructables.com/id/16-bit-I2C-Temperature-Monitor-Using-Arduino/

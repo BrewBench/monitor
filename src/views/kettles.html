@@ -413,7 +413,8 @@
       <label class="adjust" style="margin-left: 14px;">Debug</label>
       <ul class="list-group list-group-flush">
         <li class="list-group-item">
-          raw bits: {{ kettle.temp.raw }}<br/>
+          raw read: {{ kettle.temp.raw }}<br/>
+          volts: {{ kettle.temp.volts }}<br/>
           bit calc temp: {{ BrewService.bitcalc(kettle) }} &deg;C<br/>
           measured: {{ kettle.temp.measured }} &deg;{{ settings.general.unit }}<br/>
           adjusted: {{ kettle.temp.adjust }} &deg;{{ settings.general.unit }}<br/>

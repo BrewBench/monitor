@@ -63,7 +63,7 @@ angular.module('brewbench-monitor')
           ,sticky: false
           ,heater: {pin:'D2',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
           ,pump: {pin:'D3',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
-          ,temp: {pin:'A0',type:'Thermistor',adc:false,hit:false,current:0,measured:0,previous:0,adjust:0,target:170,diff:2,raw:0}
+          ,temp: {pin:'A0',type:'Thermistor',adc:false,hit:false,current:0,measured:0,previous:0,adjust:0,target:170,diff:2,raw:0,volts:0}
           ,values: []
           ,timers: []
           ,knob: angular.copy(this.defaultKnobOptions(),{value:0,min:0,max:220})
@@ -78,7 +78,7 @@ angular.module('brewbench-monitor')
           ,sticky: false
           ,heater: {pin:'D4',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
           ,pump: {pin:'D5',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
-          ,temp: {pin:'A1',type:'Thermistor',adc:false,hit:false,current:0,measured:0,previous:0,adjust:0,target:152,diff:2,raw:0}
+          ,temp: {pin:'A1',type:'Thermistor',adc:false,hit:false,current:0,measured:0,previous:0,adjust:0,target:152,diff:2,raw:0,volts:0}
           ,values: []
           ,timers: []
           ,knob: angular.copy(this.defaultKnobOptions(),{value:0,min:0,max:220})
@@ -93,7 +93,7 @@ angular.module('brewbench-monitor')
           ,sticky: false
           ,heater: {pin:'D6',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
           ,pump: {pin:'D7',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
-          ,temp: {pin:'A2',type:'Thermistor',adc:false,hit:false,current:0,measured:0,previous:0,adjust:0,target:200,diff:2,raw:0}
+          ,temp: {pin:'A2',type:'Thermistor',adc:false,hit:false,current:0,measured:0,previous:0,adjust:0,target:200,diff:2,raw:0,volts:0}
           ,values: []
           ,timers: []
           ,knob: angular.copy(this.defaultKnobOptions(),{value:0,min:0,max:220})
@@ -680,16 +680,25 @@ angular.module('brewbench-monitor')
         // the value of the 'other' resistor
         const SERIESRESISTOR = 10000;
        // convert the value to resistance
-       average = 1023 / average - 1;
-       average = SERIESRESISTOR / average;
+       // Are we using ADC?
+       if(kettle.temp.pin.indexOf('C') === 0){
+         average = (average * (5.0 / 65535)) / 0.0001;
+         var ln = Math.log(average / THERMISTORNOMINAL);
+         var kelvin = 1 / (0.0033540170 + (0.00025617244 * ln) + (0.0000021400943 * ln * ln) + (-0.000000072405219 * ln * ln * ln));
+          // kelvin to celsius
+         return kelvin - 273.15;
+       } else {
+         average = 1023 / average - 1;
+         average = SERIESRESISTOR / average;
 
-       var steinhart = average / THERMISTORNOMINAL;     // (R/Ro)
-       steinhart = Math.log(steinhart);                  // ln(R/Ro)
-       steinhart /= BCOEFFICIENT;                   // 1/B * ln(R/Ro)
-       steinhart += 1.0 / (TEMPERATURENOMINAL + 273.15); // + (1/To)
-       steinhart = 1.0 / steinhart;                 // Invert
-       steinhart -= 273.15;
-       return steinhart;
+         var steinhart = average / THERMISTORNOMINAL;     // (R/Ro)
+         steinhart = Math.log(steinhart);                  // ln(R/Ro)
+         steinhart /= BCOEFFICIENT;                   // 1/B * ln(R/Ro)
+         steinhart += 1.0 / (TEMPERATURENOMINAL + 273.15); // + (1/To)
+         steinhart = 1.0 / steinhart;                 // Invert
+         steinhart -= 273.15;
+         return steinhart;
+       }
      } else if(kettle.temp.type == 'PT100'){
        if (raw>409){
         return (150*fmap(raw,410,1023,0,614))/614;

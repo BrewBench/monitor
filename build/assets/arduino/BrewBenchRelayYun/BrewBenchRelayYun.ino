@@ -106,12 +106,14 @@ void tempCommand(BridgeClient client, String type) {
   uint8_t pin = spin.substring(1).toInt();
   float temp = 0.00;
   float raw = 0.00;
+  float volts = 0.00;
   // DHT float humidity = 0.00;
   // ADC int16_t adc0 = 0;
   float resistance = 0.0;
 
   if( spin.substring(0,1) == "A" ){
     raw = analogRead(pin);
+    volts = raw * 0.0049;
   }
   else if( spin.substring(0,1) == "D" ){
     raw = digitalRead(pin);
@@ -120,6 +122,7 @@ void tempCommand(BridgeClient client, String type) {
   // ADC   adc0 = ads.readADC_SingleEnded(pin);
   // ADC   // raw adc value
   // ADC   raw = adc0;
+  // ADC   volts = (raw * 0.1875)/1000;
   // ADC }
 
   if(type == "Thermistor"){
@@ -176,7 +179,9 @@ void tempCommand(BridgeClient client, String type) {
   // DHT     humidity = DHT.humidity;
   // DHT   }
   // DHT }
-  String data = "{\"hostname\":\""+String(HOSTNAME)+"\",\"pin\":\""+String(spin)+"\",\"temp\":"+String(temp)+",\"raw\":"+String(raw)+"";
+  String data = "{\"hostname\":\""+String(HOSTNAME)+"\",\"pin\":\""+String(spin)+"\",\"temp\":"+String(temp);
+  data += ",\"raw\":"+String(raw);
+  data += ",\"volts\":"+String(volts);
   // DHT if(humidity) data += ",\"humidity\":"+String(humidity)+"";
   data += "}";
   // Send JSON response to client

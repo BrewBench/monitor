@@ -123,11 +123,13 @@ void tempCommand(BridgeClient client, String type) {
   float temp = 0.00;
   float raw = 0.00;
   float humidity = 0.00;
+  float volts = 0.00;
   int16_t adc0 = 0;
   float resistance = 0.0;
 
   if( spin.substring(0,1) == "A" ){
     raw = analogRead(pin);
+    volts = raw * 0.0049;
   }
   else if( spin.substring(0,1) == "D" ){
     raw = digitalRead(pin);
@@ -136,6 +138,7 @@ void tempCommand(BridgeClient client, String type) {
     adc0 = ads.readADC_SingleEnded(pin);
     // raw adc value
     raw = adc0;
+    volts = (raw * 0.1875)/1000;
   }
 
   if(type == "Thermistor"){
@@ -192,7 +195,10 @@ void tempCommand(BridgeClient client, String type) {
       humidity = DHT.humidity;
     }
   }
-  String data = "{\"hostname\":\""+String(HOSTNAME)+"\",\"pin\":\""+String(spin)+"\",\"temp\":"+String(temp)+",\"raw\":"+String(raw)+"";
+  String data = "{\"hostname\":\""+String(HOSTNAME)+"\",\"pin\":\""+String(spin)+"\",\"temp\":"+String(temp);
+  data += ",\"raw\":"+String(raw);
+  data += ",\"volts\":"+String(volts);
+
   if(humidity)
     data += ",\"humidity\":"+String(humidity)+"}";
   else

@@ -276,7 +276,7 @@ $scope.updateABV();
         ,sticky: false
         ,heater: {pin:'D6',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
         ,pump: {pin:'D7',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
-        ,temp: {pin:'A0',type:'Thermistor',adc:false,hit:false,current:0,measured:0,previous:0,adjust:0,target:$scope.kettleTypes[0].target,diff:$scope.kettleTypes[0].diff,raw:0}
+        ,temp: {pin:'A0',type:'Thermistor',adc:false,hit:false,current:0,measured:0,previous:0,adjust:0,target:$scope.kettleTypes[0].target,diff:$scope.kettleTypes[0].diff,raw:0,volts:0}
         ,values: []
         ,timers: []
         ,knob: angular.copy(BrewService.defaultKnobOptions(),{value:0,min:0,max:$scope.kettleTypes[0].target+$scope.kettleTypes[0].diff})
@@ -851,6 +851,7 @@ $scope.updateABV();
     //update datatype
     response.temp = parseFloat(response.temp);
     response.raw = parseFloat(response.raw);
+    response.volts = parseFloat(response.volts);
 
     if(!!kettle.temp.current)
       kettle.temp.previous = kettle.temp.current;
@@ -862,6 +863,7 @@ $scope.updateABV();
     kettle.temp.current = (parseFloat(kettle.temp.measured) + parseFloat(kettle.temp.adjust));
     // set raw
     kettle.temp.raw = response.raw;
+    kettle.temp.volts = response.volts;
     // reset all kettles every resetChart
     if(kettle.values.length > resetChart){
       $scope.kettles.map((k) => {
@@ -1175,7 +1177,8 @@ $scope.updateABV();
         currentSketch.headers.push('// https://www.brewbench.co/libs/cactus_io_DS18B20.zip');
         currentSketch.headers.push('#include "cactus_io_DS18B20.h"');
       }
-      if(!!kettle.temp.type.adc && currentSketch.headers.indexOf('#include <Adafruit_ADS1015.h>') === -1){
+      // Are we using ADC?
+      if(kettle.temp.pin.indexOf('C') === 0 && currentSketch.headers.indexOf('#include <Adafruit_ADS1015.h>') === -1){
         currentSketch.headers.push('#include <Wire.h>"');
         currentSketch.headers.push('#include <Adafruit_ADS1015.h>');
       }
