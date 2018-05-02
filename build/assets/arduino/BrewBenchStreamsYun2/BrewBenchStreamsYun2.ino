@@ -113,7 +113,7 @@ void settingsCommand(BridgeClient client){
   }
 }
 
-void tempCommand(BridgeClient client, const String &type) {
+void tempCommand(BridgeClient client, const String type) {
   String spin = client.readString();
   spin.trim();
   uint8_t pin = spin.substring(1).toInt();
@@ -178,7 +178,7 @@ void tempCommand(BridgeClient client, const String &type) {
   client.print(data);
 }
 
-float actionsCommand(const String &source, const String &spin, const String &type, const char &adjustTemp) {
+float actionsCommand(const String source, const String spin, const String type, const char adjustTemp) {
   float temp = 0.00;
   float raw = 0.00;
 // DHT  float humidity = 0.00;
@@ -249,7 +249,7 @@ float actionsCommand(const String &source, const String &spin, const String &typ
   return temp;
 }
 
-void postStreams(const String &data, const bool &getSetup){
+void postStreams(const String data, const bool getSetup){
   Process p;
   p.begin(F("curl"));
   p.addParameter(F("-k"));
@@ -282,7 +282,7 @@ void postStreams(const String &data, const bool &getSetup){
   }
 }
 
-void trigger(const String &type, const String &spin, const float &temp, const uint8_t &target, const char &diff) {
+void trigger(const String type, const String spin, const float temp, const uint8_t target, const char diff) {
   String pinType = spin.substring(0,1);
   if(pinType == "T") //TP Link
     return;

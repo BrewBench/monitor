@@ -1,6 +1,7 @@
 #include <Process.h>
 #include <BridgeServer.h>
 #include <BridgeClient.h>
+#include <avr/wdt.h>
 // https://www.brewbench.co/libs/DHTLib.zip
 #include <dht.h>
 // https://www.brewbench.co/libs/cactus_io_DS18B20.zip
@@ -25,6 +26,12 @@ dht DHT;
 #define SERIESRESISTOR 10000
 
 uint16_t samples[NUMSAMPLES];
+
+void reboot() {
+  wdt_disable();
+  wdt_enable(WDTO_15MS);
+  while (1) {}
+}
 
 float Thermistor(float average) {
    // convert the value to resistance
@@ -59,6 +66,10 @@ void processRest(BridgeClient client) {
   }
   if (command == "analog") {
     adCommand(client, false);
+  }
+  if (command == "reboot") {
+    client.print("{\"reboot\":true}");
+    reboot();
   }
   if (command == "Thermistor" || command == "DS18B20" || command == "PT100" ||
       command == "DHT11" || command == "DHT12" || command == "DHT21" ||

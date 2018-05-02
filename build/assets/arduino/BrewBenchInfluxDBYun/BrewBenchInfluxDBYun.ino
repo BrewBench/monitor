@@ -95,7 +95,7 @@ void adCommand(BridgeClient client, const boolean digital) {
   client.print("{\"hostname\":\""+String(HOSTNAME)+"\",\"pin\":\""+String(spin)+String(pin)+"\",\"value\":"+String(value)+"}");
 }
 
-void tempCommand(BridgeClient client, const String &type) {
+void tempCommand(BridgeClient client, const String type) {
   String spin = client.readString();
   spin.trim();
   int pin = spin.substring(1).toInt();
@@ -160,7 +160,7 @@ void tempCommand(BridgeClient client, const String &type) {
   client.print(data);
 }
 
-void postData(const String &connection, const String &data, const String &dataType, const String &contentType){
+void postData(const String connection, const String data, const String dataType, const String contentType){
   Process p;
   p.begin(F("curl"));
   p.addParameter(F("-k"));
@@ -195,7 +195,7 @@ void postData(const String &connection, const String &data, const String &dataTy
 // triggers   analogWrite(pin, value);
 // triggers }
 
-// triggers void slackAutoCommand(const String &type, const String &source, const float &temp) {
+// triggers void slackAutoCommand(const String type, const String source, const float temp) {
 // triggers   String msg = "";
 // triggers   String color = "";
 // triggers   if(type=="heat"){
@@ -209,12 +209,12 @@ void postData(const String &connection, const String &data, const String &dataTy
 // triggers   postData(F("[SLACK_CONNECTION]"), "payload="+data, "", F("Content-Type: application/x-www-form-urlencoded"));
 // triggers }
 
-// triggers void tplinkAutoCommand(const String &deviceId, const int &value){
+// triggers void tplinkAutoCommand(const String deviceId, const int value){
 // triggers   String data = "{\"method\":\"passthrough\",\"params\":{\"deviceId\":\""+String(deviceId)+"\",\"requestData\":\"{\\\"system\\\":{\\\"set_relay_state\\\":{\\\"state\\\":"+String(value)+"}}}\"}}";
 // triggers   postData(F("[TPLINK_CONNECTION]"), data, "", F("Content-Type: application/json"));
 // triggers }
 
-float actionsCommand(const String &source, const String &spin, const String &type, const float &adjustTemp) {
+float actionsCommand(const String source, const String spin, const String type, const float adjustTemp) {
   float temp = 0.00;
   float raw = 0.00;
 // DHT  float humidity = 0.00;
@@ -283,7 +283,7 @@ float actionsCommand(const String &source, const String &spin, const String &typ
   return temp;
 }
 
-// triggers void trigger(const String &type, const String &source, const String &spin, const float &temp, const int &target, const int &diff, const boolean &slack) {
+// triggers void trigger(const String type, const String source, const String spin, const float temp, const int target, const int diff, const boolean slack) {
 // triggers   String pinType = spin.substring(0,1);
 // triggers   String deviceId = "";
 // triggers   int pinNumber = -1;
