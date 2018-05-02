@@ -1179,7 +1179,7 @@ $scope.updateABV();
       }
       // Are we using ADC?
       if(kettle.temp.pin.indexOf('C') === 0 && currentSketch.headers.indexOf('#include <Adafruit_ADS1015.h>') === -1){
-        currentSketch.headers.push('#include <Wire.h>"');
+        currentSketch.headers.push('#include <Wire.h>');
         currentSketch.headers.push('#include <Adafruit_ADS1015.h>');
       }
       currentSketch.actions.push('actionsCommand(F("'+kettle.name.replace(/[^a-zA-Z0-9-.]/g, "")+'"),F("'+kettle.temp.pin+'"),F("'+kettle.temp.type+'"),'+adjust+');');
