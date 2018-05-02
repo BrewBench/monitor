@@ -89,6 +89,15 @@ Download the [Arduino IDE](https://www.arduino.cc/en/Main/Software) >= 1.8.5
     * http://wiki.dragino.com/index.php?title=Getting_Start_with_Arduino_Yun#Automatically_Add_Board_Profile_in_Arduino_IDE
 
 ### ESP8266
+* TBD
+
+### ADS1115
+
+* Analog to Digital Convertor runs on Address 0x48
+
+* http://henrysbench.capnfatz.com/henrys-bench/arduino-voltage-measurements/arduino-ads1115-module-getting-started-tutorial/
+
+* http://www.instructables.com/id/16-bit-I2C-Temperature-Monitor-Using-Arduino/
 
 
 ## Monitoring

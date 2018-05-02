@@ -168,6 +168,7 @@
                   <!-- <th>Password</th> -->
                   <th>Analog Ports</th>
                   <th>Digital Ports</th>
+                  <th>ADC Ports</th>
                   <th></th>
                 </tr>
               </thead>
@@ -196,6 +197,7 @@
                   </td> -->
                   <td class="text-left"><input class="form-control" type="number" step="1" min="0" ng-model="arduino.analog" ng-change="arduinos.update(arduino)"></td>
                   <td class="text-left"><input class="form-control" type="number" step="1" min="0" ng-model="arduino.digital" ng-change="arduinos.update(arduino)"></td>
+                  <td class="text-left"><input class="form-control" type="number" step="1" min="0" ng-model="arduino.adc" ng-change="arduinos.update(arduino)"></td>
                   <td><a href="" ng-click="arduinos.delete($index, arduino)"><i class="fa fa-trash fa-2x text-danger"></i></a></td>
                 </tr>
               </tbody>

@@ -9,6 +9,7 @@ uint8_t secondCounter = 0;
 BridgeServer server;
 
 // DHT dht DHT;
+// ADC Adafruit_ADS1115 ads(0x48);
 
 // https://learn.adafruit.com/thermistor/using-a-thermistor
 // resistance at 25 degrees C
@@ -53,11 +54,8 @@ void processRest(BridgeClient client) {
   client.println(F("Connection: close"));
   client.println();
 
-  if (command == "digital") {
-    adCommand(client, true);
-  }
-  if (command == "analog") {
-    adCommand(client, false);
+  if (command == "digital" || command == "analog" || command == "adc") {
+    adCommand(client, command);
   }
   if (command == "Thermistor" || command == "DS18B20" || command == "PT100" ||
     command == "DHT11" || command == "DHT12" || command == "DHT21" ||
@@ -66,64 +64,89 @@ void processRest(BridgeClient client) {
   }
 }
 
-void adCommand(BridgeClient client, const boolean digital) {
+void adCommand(BridgeClient client, const String type) {
   String spin = client.readString();
   spin.trim();
   uint8_t pin = spin.substring(1,spin.indexOf("/")).toInt();
-  uint8_t value = spin.substring(spin.indexOf("/")+1).toInt();
+  int16_t value = spin.substring(spin.indexOf("/")+1).toInt();
 
+  // write
   if (spin.indexOf("/") != -1) {
     pinMode(pin, OUTPUT);
-    if(digital){
+    if( type == "analog" ){
+      analogWrite(pin, value);//0 - 255
+    }
+    else if( type == "digital" ){
       if(value == 1)
         digitalWrite(pin, LOW);//turn on relay
       else
         digitalWrite(pin, HIGH);//turn off relay
-    } else {
-      analogWrite(pin, value);//0 - 255
     }
   } else {
+    // read
     pinMode(pin, INPUT);
-    if(digital){
-      value = digitalRead(pin);
-    } else {
+    if( type == "analog" ){
       value = analogRead(pin);
     }
+    else if( type == "digital" ){
+      value = digitalRead(pin);
+    }
+    // ADC else if( type == "adc" ){
+    // ADC   value = ads.readADC_SingleEnded(pin);
+    // ADC }
   }
 
   // Send JSON response to client
-  client.print("{\"hostname\":\""+String(HOSTNAME)+"\",\"pin\":\""+String(spin)+String(pin)+"\",\"value\":"+String(value)+"}");
+  client.print("{\"hostname\":\""+String(HOSTNAME)+"\",\"pin\":\""+String(spin)+"\",\"value\":"+String(value)+"}");
 }
 
-void tempCommand(BridgeClient client, const String type) {
+void tempCommand(BridgeClient client, String type) {
   String spin = client.readString();
   spin.trim();
   uint8_t pin = spin.substring(1).toInt();
   float temp = 0.00;
   float raw = 0.00;
-// DHT float humidity = 0.00;
+  // DHT float humidity = 0.00;
+  // ADC int16_t adc0 = 0;
+  float resistance = 0.0;
 
-  if( spin.substring(0,1) == "A" )
+  if( spin.substring(0,1) == "A" ){
     raw = analogRead(pin);
-  else
+  }
+  else if( spin.substring(0,1) == "D" ){
     raw = digitalRead(pin);
+  }
+  // ADC else if( spin.substring(0,1) == "C" ){
+  // ADC   adc0 = ads.readADC_SingleEnded(pin);
+  // ADC   // raw adc value
+  // ADC   raw = adc0;
+  // ADC }
 
   if(type == "Thermistor"){
-    samples[0] = raw;
-    uint8_t i;
-    // take N samples in a row, with a slight delay
-    for (i=1; i< NUMSAMPLES; i++) {
-      samples[i] = analogRead(pin);
-      delay(10);
+    if( spin.substring(0,1) == "A" ){
+      samples[0] = raw;
+      uint8_t i;
+      // take N samples in a row, with a slight delay
+      for (i=1; i< NUMSAMPLES; i++) {
+        samples[i] = analogRead(pin);
+        delay(10);
+      }
+      // average all the samples out
+      for (i=0; i< NUMSAMPLES; i++) {
+         resistance += samples[i];
+      }
+      resistance /= NUMSAMPLES;
+      raw = resistance;
+      temp = Thermistor(resistance);
     }
-    // average all the samples out
-    float average = 0;
-    for (i=0; i< NUMSAMPLES; i++) {
-       average += samples[i];
-    }
-    average /= NUMSAMPLES;
-    raw = average;
-    temp = Thermistor(average);
+    // ADC else if( spin.substring(0,1) == "C" ){
+    // ADC   // resistance = (voltage) / current
+    // ADC   resistance = (adc0 * (5.0 / 65535)) / 0.0001;
+    // ADC   float ln = log(resistance / THERMISTORNOMINAL);
+    // ADC   float kelvin = 1 / (0.0033540170 + (0.00025617244 * ln) + (0.0000021400943 * ln * ln) + (-0.000000072405219 * ln * ln * ln));
+    // ADC   // kelvin to celsius
+    // ADC   temp = kelvin - 273.15;
+    // ADC }
   } else if(type == "PT100"){
     if (raw>409){
       temp = (150*map(raw,410,1023,0,614))/614;
@@ -163,30 +186,49 @@ void tempCommand(BridgeClient client, const String type) {
 float actionsCommand(const String source, const String spin, const String type, const float adjustTemp) {
   float temp = 0.00;
   float raw = 0.00;
-// DHT  float humidity = 0.00;
   uint8_t pin = spin.substring(1).toInt();
 
-  if( spin.substring(0,1) == "A" )
+  // DHT float humidity = 0.00;
+  // ADC int16_t adc0 = 0;
+  float resistance = 0.0;
+
+  if( spin.substring(0,1) == "A" ){
     raw = analogRead(pin);
-  else
+  }
+  else if( spin.substring(0,1) == "D" ){
     raw = digitalRead(pin);
+  }
+  // ADC else if( spin.substring(0,1) == "C" ){
+  // ADC   adc0 = ads.readADC_SingleEnded(pin);
+  // ADC   // raw adc value
+  // ADC   raw = adc0;
+  // ADC }
 
   if(type == "Thermistor"){
-    samples[0] = raw;
-    uint8_t i;
-    // take N samples in a row, with a slight delay
-    for (i=1; i< NUMSAMPLES; i++) {
-      samples[i] = analogRead(pin);
-      delay(10);
+    if( spin.substring(0,1) == "A" ){
+      samples[0] = raw;
+      uint8_t i;
+      // take N samples in a row, with a slight delay
+      for (i=1; i< NUMSAMPLES; i++) {
+        samples[i] = analogRead(pin);
+        delay(10);
+      }
+      // average all the samples out
+      for (i=0; i< NUMSAMPLES; i++) {
+         resistance += samples[i];
+      }
+      resistance /= NUMSAMPLES;
+      raw = resistance;
+      temp = Thermistor(resistance);
     }
-    // average all the samples out
-    float average = 0;
-    for (i=0; i< NUMSAMPLES; i++) {
-       average += samples[i];
-    }
-    average /= NUMSAMPLES;
-    raw = average;
-    temp = Thermistor(average);
+    // ADC else if( spin.substring(0,1) == "C" ){
+    // ADC   // resistance = (voltage) / current
+    // ADC   resistance = (adc0 * (5.0 / 65535)) / 0.0001;
+    // ADC   float ln = log(resistance / THERMISTORNOMINAL);
+    // ADC   float kelvin = 1 / (0.0033540170 + (0.00025617244 * ln) + (0.0000021400943 * ln * ln) + (-0.000000072405219 * ln * ln * ln));
+    // ADC   // kelvin to celsius
+    // ADC   temp = kelvin - 273.15;
+    // ADC }
   } else if(type == "PT100"){
     if (raw>409){
       temp = (150*map(raw,410,1023,0,614))/614;
@@ -301,6 +343,7 @@ void setup() {
   // Uncomment for REST API with password
   // server.noListenOnLocalhost();
   server.begin();
+  // ADC ads.begin();
   getHostname();
 }
 

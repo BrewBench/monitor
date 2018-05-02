@@ -169,6 +169,7 @@ $scope.updateABV();
         url: 'arduino.local',
         analog: 5,
         digital: 13,
+        adc: 0,
         secure: false,
         version: '',
         status: {error: '',dt: ''}
@@ -266,6 +267,7 @@ $scope.updateABV();
 
   $scope.addKettle = function(type){
     if(!$scope.kettles) $scope.kettles = [];
+    var arduino = $scope.settings.arduinos.length ? $scope.settings.arduinos[0] : {id: 'local-'+btoa('brewbench'),url:'arduino.local',analog:5,digital:13,adc:0,secure:false};
     $scope.kettles.push({
         name: type ? _.find($scope.kettleTypes,{type: type}).name : $scope.kettleTypes[0].name
         ,id: null
@@ -274,11 +276,11 @@ $scope.updateABV();
         ,sticky: false
         ,heater: {pin:'D6',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
         ,pump: {pin:'D7',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
-        ,temp: {pin:'A0',type:'Thermistor',hit:false,current:0,measured:0,previous:0,adjust:0,target:$scope.kettleTypes[0].target,diff:$scope.kettleTypes[0].diff,raw:0}
+        ,temp: {pin:'A0',type:'Thermistor',adc:false,hit:false,current:0,measured:0,previous:0,adjust:0,target:$scope.kettleTypes[0].target,diff:$scope.kettleTypes[0].diff,raw:0}
         ,values: []
         ,timers: []
         ,knob: angular.copy(BrewService.defaultKnobOptions(),{value:0,min:0,max:$scope.kettleTypes[0].target+$scope.kettleTypes[0].diff})
-        ,arduino: {id: 'local-'+btoa('brewbench'),url:'arduino.local',analog:5,digital:13,secure:false}
+        ,arduino: arduino
         ,message: {type:'error',message:'',version:'',count:0,location:''}
         ,notify: {slack: false, dweet: false, streams: false}
     });
@@ -304,17 +306,17 @@ $scope.updateABV();
         return pin;
   };
 
-  $scope.pinInUse = function(pin,arduinoId,analog){
+  $scope.pinInUse = function(pin,arduinoId){
     var kettle = _.find($scope.kettles, function(kettle){
       return (
         (kettle.arduino.id==arduinoId) &&
-        ((analog && kettle.temp.type=='Thermistor' && kettle.temp.pin==pin) ||
-        (!analog && kettle.temp.type=='DS18B20' && kettle.temp.pin==pin) ||
-        (kettle.temp.type=='PT100' && kettle.temp.pin==pin) ||
-        (!analog && kettle.heater.pin==pin) ||
-        (!analog && kettle.cooler && kettle.cooler.pin==pin) ||
-        (!analog && !kettle.cooler && kettle.pump.pin==pin)
-      ));
+        (
+          (kettle.temp.pin==pin) ||
+          (kettle.heater.pin==pin) ||
+          (kettle.cooler && kettle.cooler.pin==pin) ||
+          (!kettle.cooler && kettle.pump.pin==pin)
+        )
+      );
     });
     return kettle || false;
   };
@@ -1169,9 +1171,13 @@ $scope.updateABV();
         currentSketch.headers.push('// https://www.brewbench.co/libs/DHTLib.zip');
         currentSketch.headers.push('#include <dht.h>');
       }
-      else if(kettle.temp.type.indexOf('DS18B20') !== -1 && currentSketch.headers.indexOf('#include "cactus_io_DS18B20.h"') === -1){
+      if(kettle.temp.type.indexOf('DS18B20') !== -1 && currentSketch.headers.indexOf('#include "cactus_io_DS18B20.h"') === -1){
         currentSketch.headers.push('// https://www.brewbench.co/libs/cactus_io_DS18B20.zip');
         currentSketch.headers.push('#include "cactus_io_DS18B20.h"');
+      }
+      if(!!kettle.temp.type.adc && currentSketch.headers.indexOf('#include <Adafruit_ADS1015.h>') === -1){
+        currentSketch.headers.push('#include <Wire.h>"');
+        currentSketch.headers.push('#include <Adafruit_ADS1015.h>');
       }
       currentSketch.actions.push('actionsCommand(F("'+kettle.name.replace(/[^a-zA-Z0-9-.]/g, "")+'"),F("'+kettle.temp.pin+'"),F("'+kettle.temp.type+'"),'+adjust+');');
       //look for triggers
@@ -1243,6 +1249,9 @@ $scope.updateABV();
         }
         if(headers.indexOf('#include "cactus_io_DS18B20.h"') !== -1){
           response.data = response.data.replace(/\/\/ DS18B20 /g, '');
+        }
+        if(headers.indexOf('#include <Adafruit_ADS1015.h>') !== -1){
+          response.data = response.data.replace(/\/\/ ADC /g, '');
         }
         if(hasTriggers){
           response.data = response.data.replace(/\/\/ triggers /g, '');

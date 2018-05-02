@@ -25,7 +25,7 @@ angular.module('brewbench-monitor')
         ,recipe: {'name':'','brewer':{name:'','email':''},'yeast':[],'hops':[],'grains':[],scale:'gravity',method:'papazian','og':1.050,'fg':1.010,'abv':0,'abw':0,'calories':0,'attenuation':0}
         ,notifications: {on:true,timers:true,high:true,low:true,target:true,slack:'',last:''}
         ,sounds: {on:true,alert:'/assets/audio/bike.mp3',timer:'/assets/audio/school.mp3'}
-        ,arduinos: [{id:'local-'+btoa('brewbench'),url:'arduino.local',analog:5,digital:13,secure:false,version:'',status:{error:'',dt:''}}]
+        ,arduinos: [{id:'local-'+btoa('brewbench'),url:'arduino.local',analog:5,digital:13,adc:0,secure:false,version:'',status:{error:'',dt:''}}]
         ,tplink: {user: '', pass: '', token:'', status: '', plugs: []}
         ,influxdb: {url: '', port: '', user: '', pass: '', db: '', dbs:[], status: ''}
         ,streams: {username: '', api_key: '', status: '', session: {id: '', name: '', type: 'fermentation'}}
@@ -63,11 +63,11 @@ angular.module('brewbench-monitor')
           ,sticky: false
           ,heater: {pin:'D2',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
           ,pump: {pin:'D3',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
-          ,temp: {pin:'A0',type:'Thermistor',hit:false,current:0,measured:0,previous:0,adjust:0,target:170,diff:2,raw:0}
+          ,temp: {pin:'A0',type:'Thermistor',adc:false,hit:false,current:0,measured:0,previous:0,adjust:0,target:170,diff:2,raw:0}
           ,values: []
           ,timers: []
           ,knob: angular.copy(this.defaultKnobOptions(),{value:0,min:0,max:220})
-          ,arduino: {id: 'local-'+btoa('brewbench'),url:'arduino.local',analog:5,digital:13,secure:false}
+          ,arduino: {id: 'local-'+btoa('brewbench'),url:'arduino.local',analog:5,digital:13,adc:0,secure:false}
           ,message: {type:'error',message:'',version:'',count:0,location:''}
           ,notify: {slack: false, dweet: false, streams: false}
         },{
@@ -78,11 +78,11 @@ angular.module('brewbench-monitor')
           ,sticky: false
           ,heater: {pin:'D4',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
           ,pump: {pin:'D5',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
-          ,temp: {pin:'A1',type:'Thermistor',hit:false,current:0,measured:0,previous:0,adjust:0,target:152,diff:2,raw:0}
+          ,temp: {pin:'A1',type:'Thermistor',adc:false,hit:false,current:0,measured:0,previous:0,adjust:0,target:152,diff:2,raw:0}
           ,values: []
           ,timers: []
           ,knob: angular.copy(this.defaultKnobOptions(),{value:0,min:0,max:220})
-          ,arduino: {id: 'local-'+btoa('brewbench'),url:'arduino.local',analog:5,digital:13,secure:false}
+          ,arduino: {id: 'local-'+btoa('brewbench'),url:'arduino.local',analog:5,digital:13,adc:0,secure:false}
           ,message: {type:'error',message:'',version:'',count:0,location:''}
           ,notify: {slack: false, dweet: false, streams: false}
         },{
@@ -93,11 +93,11 @@ angular.module('brewbench-monitor')
           ,sticky: false
           ,heater: {pin:'D6',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
           ,pump: {pin:'D7',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
-          ,temp: {pin:'A2',type:'Thermistor',hit:false,current:0,measured:0,previous:0,adjust:0,target:200,diff:2,raw:0}
+          ,temp: {pin:'A2',type:'Thermistor',adc:false,hit:false,current:0,measured:0,previous:0,adjust:0,target:200,diff:2,raw:0}
           ,values: []
           ,timers: []
           ,knob: angular.copy(this.defaultKnobOptions(),{value:0,min:0,max:220})
-          ,arduino: {id: 'local-'+btoa('brewbench'),url:'arduino.local',analog:5,digital:13,secure:false}
+          ,arduino: {id: 'local-'+btoa('brewbench'),url:'arduino.local',analog:5,digital:13,adc:0,secure:false}
           ,message: {type:'error',message:'',version:'',count:0,location:''}
           ,notify: {slack: false, dweet: false, streams: false}
         }];

@@ -1,3 +1,4 @@
+/* Sketch Auto Generated from http://monitor.brewbench.co on 2018-05-02 10:05:83 for brewbench.local */
 #include <Process.h>
 #include <BridgeServer.h>
 #include <BridgeClient.h>
@@ -6,9 +7,13 @@
 #include <dht.h>
 // https://www.brewbench.co/libs/cactus_io_DS18B20.zip
 #include "cactus_io_DS18B20.h"
+// https://github.com/adafruit/Adafruit_ADS1X15
+#include <Wire.h>
+#include <Adafruit_ADS1015.h>
 
 String HOSTNAME = "notset";
 BridgeServer server;
+Adafruit_ADS1115 ads(0x48);
 
 dht DHT;
 
@@ -61,11 +66,8 @@ void processRest(BridgeClient client) {
   client.println(F("Connection: close"));
   client.println();
 
-  if (command == "digital") {
-    adCommand(client, true);
-  }
-  if (command == "analog") {
-    adCommand(client, false);
+  if (command == "digital" || command == "analog" || command == "adc") {
+    adCommand(client, command);
   }
   if (command == "reboot") {
     client.print("{\"reboot\":true}");
@@ -78,33 +80,40 @@ void processRest(BridgeClient client) {
   }
 }
 
-void adCommand(BridgeClient client, const boolean digital) {
+void adCommand(BridgeClient client, const String type) {
   String spin = client.readString();
   spin.trim();
   uint8_t pin = spin.substring(1,spin.indexOf("/")).toInt();
-  uint8_t value = spin.substring(spin.indexOf("/")+1).toInt();
+  int16_t value = spin.substring(spin.indexOf("/")+1).toInt();
 
+  // write
   if (spin.indexOf("/") != -1) {
     pinMode(pin, OUTPUT);
-    if(digital){
+    if( type == "analog" ){
+      analogWrite(pin, value);//0 - 255
+    }
+    else if( type == "digital" ){
       if(value == 1)
         digitalWrite(pin, LOW);//turn on relay
       else
         digitalWrite(pin, HIGH);//turn off relay
-    } else {
-      analogWrite(pin, value);//0 - 255
     }
   } else {
+    // read
     pinMode(pin, INPUT);
-    if(digital){
-      value = digitalRead(pin);
-    } else {
+    if( type == "analog" ){
       value = analogRead(pin);
+    }
+    else if( type == "digital" ){
+      value = digitalRead(pin);
+    }
+    else if( type == "adc" ){
+      value = ads.readADC_SingleEnded(pin);
     }
   }
 
   // Send JSON response to client
-  client.print("{\"hostname\":\""+String(HOSTNAME)+"\",\"pin\":\""+String(spin)+String(pin)+"\",\"value\":"+String(value)+"}");
+  client.print("{\"hostname\":\""+String(HOSTNAME)+"\",\"pin\":\""+String(spin)+"\",\"value\":"+String(value)+"}");
 }
 
 void tempCommand(BridgeClient client, String type) {
@@ -114,28 +123,46 @@ void tempCommand(BridgeClient client, String type) {
   float temp = 0.00;
   float raw = 0.00;
   float humidity = 0.00;
+  int16_t adc0 = 0;
+  float resistance = 0.0;
 
-  if( spin.substring(0,1) == "A" )
+  if( spin.substring(0,1) == "A" ){
     raw = analogRead(pin);
-  else
+  }
+  else if( spin.substring(0,1) == "D" ){
     raw = digitalRead(pin);
+  }
+  else if( spin.substring(0,1) == "C" ){
+    adc0 = ads.readADC_SingleEnded(pin);
+    // raw adc value
+    raw = adc0;
+  }
 
   if(type == "Thermistor"){
-    samples[0] = raw;
-    uint8_t i;
-    // take N samples in a row, with a slight delay
-    for (i=1; i< NUMSAMPLES; i++) {
-      samples[i] = analogRead(pin);
-      delay(10);
+    if( spin.substring(0,1) == "A" ){
+      samples[0] = raw;
+      uint8_t i;
+      // take N samples in a row, with a slight delay
+      for (i=1; i< NUMSAMPLES; i++) {
+        samples[i] = analogRead(pin);
+        delay(10);
+      }
+      // average all the samples out
+      for (i=0; i< NUMSAMPLES; i++) {
+         resistance += samples[i];
+      }
+      resistance /= NUMSAMPLES;
+      raw = resistance;
+      temp = Thermistor(resistance);
     }
-    // average all the samples out
-    float average = 0;
-    for (i=0; i< NUMSAMPLES; i++) {
-       average += samples[i];
+    else if( spin.substring(0,1) == "C" ){
+      // resistance = (voltage) / current
+      resistance = (adc0 * (5.0 / 65535)) / 0.0001;
+      float ln = log(resistance / THERMISTORNOMINAL);
+      float kelvin = 1 / (0.0033540170 + (0.00025617244 * ln) + (0.0000021400943 * ln * ln) + (-0.000000072405219 * ln * ln * ln));
+      // kelvin to celsius
+      temp = kelvin - 273.15;
     }
-    average /= NUMSAMPLES;
-    raw = average;
-    temp = Thermistor(average);
   } else if(type == "PT100"){
     if (raw>409){
       temp = (150*map(raw,410,1023,0,614))/614;
@@ -195,6 +222,7 @@ void setup() {
   // server.noListenOnLocalhost();
   server.begin();
   getHostname();
+  ads.begin();
 }
 
 void loop() {
