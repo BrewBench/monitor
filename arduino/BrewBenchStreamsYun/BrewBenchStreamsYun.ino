@@ -191,6 +191,7 @@ void tempCommand(BridgeClient client, String type) {
 float actionsCommand(const String source, const String spin, const String type, const float adjustTemp) {
   float temp = 0.00;
   float raw = 0.00;
+  float volts = 0.00;
   uint8_t pin = spin.substring(1).toInt();
 
   // DHT float humidity = 0.00;
@@ -199,6 +200,7 @@ float actionsCommand(const String source, const String spin, const String type, 
 
   if( spin.substring(0,1) == "A" ){
     raw = analogRead(pin);
+    volts = raw * 0.0049;
   }
   else if( spin.substring(0,1) == "D" ){
     raw = digitalRead(pin);
@@ -211,6 +213,9 @@ float actionsCommand(const String source, const String spin, const String type, 
 
   if(type == "Thermistor"){
     if( spin.substring(0,1) == "A" ){
+      // don't post if a sensor isn't connected
+      if( volts < 2.6 )
+        return -1;
       samples[0] = raw;
       uint8_t i;
       // take N samples in a row, with a slight delay
@@ -297,6 +302,7 @@ void postStreams(const String data){
 }
 
 void trigger(const String type, const String spin, const float temp, const uint8_t target, const char diff) {
+  if(!temp || temp == -1) return;
   String pinType = spin.substring(0,1);
   if(pinType == "T") //TP Link
     return;

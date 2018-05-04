@@ -12,9 +12,9 @@ $scope.clearSettings = function(e){
 if( $state.current.name == 'reset')
   $scope.clearSettings();
 
-var notification = null
-  ,resetChart = 100
-  ,timeout = null;//reset chart after 100 polls
+var notification = null,
+  resetChart = 100,
+  timeout = null;//reset chart after 100 polls
 
 $scope.BrewService = BrewService;
 $scope.site = {https: !!(document.location.protocol=='https:')
@@ -851,7 +851,8 @@ $scope.updateABV();
     //update datatype
     response.temp = parseFloat(response.temp);
     response.raw = parseFloat(response.raw);
-    response.volts = parseFloat(response.volts);
+    if(response.volts)
+      response.volts = parseFloat(response.volts);
 
     if(!!kettle.temp.current)
       kettle.temp.previous = kettle.temp.current;
@@ -863,7 +864,18 @@ $scope.updateABV();
     kettle.temp.current = (parseFloat(kettle.temp.measured) + parseFloat(kettle.temp.adjust));
     // set raw
     kettle.temp.raw = response.raw;
-    kettle.temp.volts = response.volts;
+    // volt check
+    if(response.volts){
+      kettle.temp.volts = response.volts;
+      if(kettle.temp.type == 'Thermistor' &&
+        kettle.temp.pin.indexOf('A')===0 &&
+        response.volts < 2.6)
+        {
+          $scope.setErrorMessage('Sensor is not connected', kettle);
+          return;
+        }
+    }
+
     // reset all kettles every resetChart
     if(kettle.values.length > resetChart){
       $scope.kettles.map((k) => {

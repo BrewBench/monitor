@@ -416,6 +416,7 @@
           raw read: {{ kettle.temp.raw }}<br/>
           volts: {{ kettle.temp.volts }}<br/>
           bit calc temp: {{ BrewService.bitcalc(kettle) }} &deg;C<br/>
+          bit calc temp: {{ BrewService.bitcalc(kettle) | toFahrenheit }} &deg;F<br/>
           measured: {{ kettle.temp.measured }} &deg;{{ settings.general.unit }}<br/>
           adjusted: {{ kettle.temp.adjust }} &deg;{{ settings.general.unit }}<br/>
           current: {{ kettle.temp.current }} &deg;{{ settings.general.unit }}<br/>
