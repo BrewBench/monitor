@@ -1035,7 +1035,7 @@ $scope.updateABV();
   $scope.startStopKettle = function(kettle){
       kettle.active = !kettle.active;
       $scope.resetError(kettle);
-
+      var date = new Date();
       if(kettle.active){
         kettle.knob.subText.text = 'starting...';
 
@@ -1583,6 +1583,7 @@ $scope.updateABV();
 
   $scope.processTemps = function(){
     var allSensors = [];
+    var date = new Date();
     //only process active sensors
     _.each($scope.kettles, (k, i) => {
       if($scope.kettles[i].active){
