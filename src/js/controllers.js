@@ -879,7 +879,7 @@ $scope.updateABV();
       kettle.temp.volts = response.volts;
       if(kettle.temp.type == 'Thermistor' &&
         kettle.temp.pin.indexOf('A')===0 &&
-        response.volts < 2.6)
+        response.volts < 2.5)
         {
           $scope.setErrorMessage('Sensor is not connected', kettle);
           return;
@@ -1213,7 +1213,9 @@ $scope.updateABV();
         currentSketch.headers.push('#include <Wire.h>');
         currentSketch.headers.push('#include <Adafruit_ADS1015.h>');
       }
-      currentSketch.actions.push('actionsCommand(F("'+kettle.name.replace(/[^a-zA-Z0-9-.]/g, "")+'"),F("'+kettle.temp.pin+'"),F("'+kettle.temp.type+'"),'+adjust+');');
+      var kettleType = kettle.temp.type;
+      if(kettle.temp.vcc) kettleType += kettle.temp.vcc;
+      currentSketch.actions.push('actionsCommand(F("'+kettle.name.replace(/[^a-zA-Z0-9-.]/g, "")+'"),F("'+kettle.temp.pin+'"),F("'+kettleType+'"),'+adjust+');');
       //look for triggers
       if(kettle.heater && kettle.heater.sketch){
         currentSketch.triggers = true;

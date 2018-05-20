@@ -243,7 +243,7 @@ float actionsCommand(const String source, const String spin, const String type, 
   if(type == "Thermistor"){
     if( spin.substring(0,1) == "A" ){
       // don't post if a sensor isn't connected
-      if( volts < 2.6 )
+      if( volts < 2.5 )
         return -1;
       samples[0] = raw;
       uint8_t i;
@@ -304,7 +304,7 @@ float actionsCommand(const String source, const String spin, const String type, 
   // DHT   chk = DHT.read44(pin);
   // DHT if( chk == DHTLIB_OK ){
   // DHT     temp = DHT.temperature;
-  // DHT     percent = DHT.percent;
+  // DHT     percent = DHT.humidity;
   // DHT   }
   // DHT }
   // adjust temp if we have it

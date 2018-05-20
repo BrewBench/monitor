@@ -187,13 +187,13 @@ void tempCommand(BridgeClient client, String type) {
   // DHT   chk = DHT.read44(pin);
   // DHT if( chk == DHTLIB_OK ){
   // DHT     temp = DHT.temperature;
-  // DHT     percent = DHT.percent;
+  // DHT     percent = DHT.humidity;
   // DHT   }
   // DHT }
   String data = "{\"hostname\":\""+String(HOSTNAME)+"\",\"pin\":\""+String(spin)+"\",\"temp\":"+String(temp);
   data += ",\"raw\":"+String(raw);
   data += ",\"volts\":"+String(volts);
-  // DHT if(percent) data += ",\"percent\":"+String(percent)+"";
+  if(percent) data += ",\"percent\":"+String(percent)+"";
   data += "}";
   // Send JSON response to client
   client.print(data);
@@ -279,7 +279,7 @@ float actionsCommand(const String source, const String spin, const String type, 
   if(type == "Thermistor"){
     if( spin.substring(0,1) == "A" ){
       // don't post if a sensor isn't connected
-      if( volts < 2.6 )
+      if( volts < 2.5 )
         return -1;
       samples[0] = raw;
       uint8_t i;
@@ -347,10 +347,13 @@ float actionsCommand(const String source, const String spin, const String type, 
   if(temp) temp = temp+adjustTemp;
   // Send JSON response to client
   String data = "temperature,sensor="+type+",pin="+spin+",source="+source+",host="+String(HOSTNAME)+" value="+String(temp);
+  if(type.substring(0,13) == "SoilMoistureD"){
+    data = "percent,sensor="+type+",pin="+spin+",source="+source+",host="+String(HOSTNAME)+" value="+String(percent);
+  } else if(percent){
+    data += "\npercent,sensor="+type+",pin="+spin+",source="+source+",host="+String(HOSTNAME)+" value="+String(percent);
+  }
   data += "\nbits,sensor="+type+",pin="+spin+",source="+source+",host="+String(HOSTNAME)+" value="+String(raw);
-  // Add percent if we have it
-  if(percent) data += "\npercent,sensor="+type+",pin="+spin+",source="+source+" value="+String(percent);
-
+  
   postData(F("[INFLUXDB_CONNECTION]"), data, F("--data-binary"), "[INFLUXDB_AUTH]");
 
   return temp;
