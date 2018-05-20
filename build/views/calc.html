@@ -16,17 +16,14 @@
           </div>
           </div>
         </div>
-        <div class="row pb-3">
-          <div class="col">
-            <div class="input-group">
-              <span class="input-group-addon">Original Gravity</span>
-              <input type="text" step="{{settings.recipe.scale=='gravity' ? 0.001 : 0.5}}" class="form-control" ng-change="updateABV()" ng-model="settings.recipe.og" value="{{settings.recipe.og}}" placeholder="Original Gravity">
-            </div>
-            <br>
-            <div class="input-group">
-              <span class="input-group-addon">Final Gravity</span>
-              <input type="text" step="{{settings.recipe.scale=='gravity' ? 0.001 : 0.5}}" class="form-control" ng-change="updateABV()" ng-model="settings.recipe.fg" value="{{settings.recipe.fg}}" placeholder="Final Gravity">
-            </div>
+        <div class="row pb-3 form-inline" style="position: relative; left: 30px;">
+          <div class="form-group mb-2">
+            <label><strong>Original Gravity</strong></label> &nbsp;
+            <input type="number" step="{{settings.recipe.scale=='gravity' ? 0.001 : 0.5}}" class="form-control" ng-change="updateABV()" ng-model="settings.recipe.og" value="{{settings.recipe.og}}" placeholder="Original Gravity">
+          </div>&nbsp;&nbsp;
+          <div class="form-group mb-2">
+            <label><strong>Final Gravity</strong></label> &nbsp;
+            <input type="number" step="{{settings.recipe.scale=='gravity' ? 0.001 : 0.5}}" class="form-control" ng-change="updateABV()" ng-model="settings.recipe.fg" value="{{settings.recipe.fg}}" placeholder="Final Gravity">
           </div>
         </div>
         <div class="row pb-3">
