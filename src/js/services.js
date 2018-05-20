@@ -146,7 +146,7 @@ angular.module('brewbench-monitor')
         ,{'name':'Hot Liquor','type':'water','target':170,'diff':2}
         ,{'name':'Fermenter','type':'fermenter','target':74,'diff':2}
         ,{'name':'Air','type':'air','target':74,'diff':2}
-        ,{'name':'Soil','type':'hubspot','target':60,'diff':2}
+        ,{'name':'Soil','type':'leaf','target':60,'diff':2}
       ];
       if(type)
         return _.filter(kettles, {'type': type})[0];

@@ -524,6 +524,9 @@ sup.ref {
 .settings .fa-thermometer-quarter {
   padding: 0 5px 0 5px;
 }
+.settings .fa-leaf {
+  padding: 10px 1px 10px 1px;
+}
 .settings ul {
   padding: 10px;
 }
@@ -1059,6 +1062,14 @@ button {
 
 .fa-thermometer-quarter, .fa-power-off {
   color: #777;
+}
+
+.kettles a.kettle-type.leaf {
+  padding: 12px 6px 9px 10px;
+}
+
+.fa-leaf {
+  color: #65350f;
 }
 
 .kettles .btn-warning .fa-power-off, .kettles .btn-success .fa-power-off {

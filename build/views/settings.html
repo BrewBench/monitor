@@ -128,8 +128,9 @@
             <label class="adjust">Add a kettle</label>
             <div class="btn-group item" ng-repeat="kettle in kettleTypes">
               <button type="button" class="btn btn-light {{kettle.type}}" ng-click="addKettle(kettle.type)">
-                <img ng-if="kettle.type != 'air'" class="type" ng-src="/assets/img/{{kettle.type}}.svg" height="30"/>
+                <img ng-if="['air','leaf'].indexOf(kettle.type) === -1" class="type" ng-src="/assets/img/{{kettle.type}}.svg" height="30"/>
                 <i ng-if="kettle.type == 'air'" class="fa fa-thermometer-quarter fa-2x type"></i>
+                <i ng-if="kettle.type == 'leaf'" class="fa fa-leaf fa-lg type"></i>
               </button>
               <div class="floating ui blue circular label">{{kettleCount(kettle.type)}}</div>
             </div>

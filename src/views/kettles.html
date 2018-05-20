@@ -40,9 +40,10 @@
 
       <div class="row">
         <div class="col">
-          <a href="" ng-click="changeKettleType(kettle)" class="kettle-type" ng-class="{'svg': kettle.type != 'air'}">
-            <img ng-if="kettle.type != 'air'" class="type {{ kettle.type }}" ng-src="/assets/img/{{kettle.type}}.svg" width="30" height="30"/>
+          <a href="" ng-click="changeKettleType(kettle)" class="kettle-type {{ kettle.type }}" ng-class="{'svg': ['air','leaf'].indexOf(kettle.type) === -1}">
+            <img ng-if="['air','leaf'].indexOf(kettle.type) === -1" class="type {{ kettle.type }}" ng-src="/assets/img/{{kettle.type}}.svg" width="30" height="30"/>
             <i ng-if="kettle.type == 'air'" class="fa fa-thermometer-quarter fa-2x type" height="30"></i>
+            <i ng-if="kettle.type == 'leaf'" class="fa fa-leaf fa-lg type" height="30"></i>
           </a>&nbsp;
           <h3><editable type="text" model="kettle.name"></editable></h3>
         </div>
@@ -380,7 +381,7 @@
               </div>
             </div>
           </div>
-          <div class="row" ng-if="kettle.type!='fermenter' && kettle.type!='air' && kettle.type!='hubspot'">
+          <div class="row" ng-if="kettle.type!='fermenter' && kettle.type!='air' && kettle.type!='leaf'">
             <div class="col">
               <label class="adjust">Timers</label>
               <!--  grain timers -->
