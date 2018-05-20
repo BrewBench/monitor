@@ -75,8 +75,9 @@ void processRest(BridgeClient client) {
   }
   if (command == "Thermistor" || command == "DS18B20" || command == "PT100" ||
       command == "DHT11" || command == "DHT12" || command == "DHT21" ||
-      command == "DHT22" || command == "DHT33" || command == "DHT44") {
-    tempCommand(client, command);
+      command == "DHT22" || command == "DHT33" || command == "DHT44" ||
+      command.substring(0,13) == "SoilMoistureD") {
+    sensorCommand(client, command);
   }
 }
 
@@ -116,13 +117,13 @@ void adCommand(BridgeClient client, const String type) {
   client.print("{\"hostname\":\""+String(HOSTNAME)+"\",\"pin\":\""+String(spin)+"\",\"value\":"+String(value)+"}");
 }
 
-void tempCommand(BridgeClient client, String type) {
+void sensorCommand(BridgeClient client, String type) {
   String spin = client.readString();
   spin.trim();
   uint8_t pin = spin.substring(1).toInt();
   float temp = 0.00;
   float raw = 0.00;
-  float humidity = 0.00;
+  float percent = 0.00;
   float volts = 0.00;
   int16_t adc0 = 0;
   float resistance = 0.0;
@@ -192,15 +193,23 @@ void tempCommand(BridgeClient client, String type) {
       chk = DHT.read44(pin);
     if( chk == DHTLIB_OK ){
       temp = DHT.temperature;
-      humidity = DHT.humidity;
+      percent = DHT.humidity;
     }
+  } else if(type.substring(0,13) == "SoilMoistureD"){
+    uint8_t dpin = type.substring(13).toInt();
+    pinMode(dpin, OUTPUT);
+    digitalWrite(dpin, HIGH);
+    delay(10);
+    raw = analogRead(pin);
+    digitalWrite(dpin, LOW);
+    percent = map(raw, 0, 880, 0, 100);
   }
   String data = "{\"hostname\":\""+String(HOSTNAME)+"\",\"pin\":\""+String(spin)+"\",\"temp\":"+String(temp);
   data += ",\"raw\":"+String(raw);
   data += ",\"volts\":"+String(volts);
 
-  if(humidity)
-    data += ",\"humidity\":"+String(humidity)+"}";
+  if(percent)
+    data += ",\"percent\":"+String(percent)+"}";
   else
     data += "}";
   // Send JSON response to client

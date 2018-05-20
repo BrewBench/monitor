@@ -63,7 +63,7 @@ angular.module('brewbench-monitor')
           ,sticky: false
           ,heater: {pin:'D2',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
           ,pump: {pin:'D3',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
-          ,temp: {pin:'A0',type:'Thermistor',adc:false,hit:false,current:0,measured:0,previous:0,adjust:0,target:170,diff:2,raw:0,volts:0}
+          ,temp: {pin:'A0',vcc:'',type:'Thermistor',adc:false,hit:false,current:0,measured:0,previous:0,adjust:0,target:170,diff:2,raw:0,volts:0}
           ,values: []
           ,timers: []
           ,knob: angular.copy(this.defaultKnobOptions(),{value:0,min:0,max:220})
@@ -78,7 +78,7 @@ angular.module('brewbench-monitor')
           ,sticky: false
           ,heater: {pin:'D4',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
           ,pump: {pin:'D5',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
-          ,temp: {pin:'A1',type:'Thermistor',adc:false,hit:false,current:0,measured:0,previous:0,adjust:0,target:152,diff:2,raw:0,volts:0}
+          ,temp: {pin:'A1',vcc:'',type:'Thermistor',adc:false,hit:false,current:0,measured:0,previous:0,adjust:0,target:152,diff:2,raw:0,volts:0}
           ,values: []
           ,timers: []
           ,knob: angular.copy(this.defaultKnobOptions(),{value:0,min:0,max:220})
@@ -93,7 +93,7 @@ angular.module('brewbench-monitor')
           ,sticky: false
           ,heater: {pin:'D6',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
           ,pump: {pin:'D7',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
-          ,temp: {pin:'A2',type:'Thermistor',adc:false,hit:false,current:0,measured:0,previous:0,adjust:0,target:200,diff:2,raw:0,volts:0}
+          ,temp: {pin:'A2',vcc:'',type:'Thermistor',adc:false,hit:false,current:0,measured:0,previous:0,adjust:0,target:200,diff:2,raw:0,volts:0}
           ,values: []
           ,timers: []
           ,knob: angular.copy(this.defaultKnobOptions(),{value:0,min:0,max:220})
@@ -132,6 +132,7 @@ angular.module('brewbench-monitor')
         ,{name: 'DHT22', analog: false, digital: true}
         ,{name: 'DHT33', analog: false, digital: true}
         ,{name: 'DHT44', analog: false, digital: true}
+        ,{name: 'SoilMoisture', analog: true, digital: false, vcc: true, percent: true}
       ];
       if(name)
         return _.filter(sensors, {'name': name})[0];
@@ -145,6 +146,7 @@ angular.module('brewbench-monitor')
         ,{'name':'Hot Liquor','type':'water','target':170,'diff':2}
         ,{'name':'Fermenter','type':'fermenter','target':74,'diff':2}
         ,{'name':'Air','type':'air','target':74,'diff':2}
+        ,{'name':'Soil','type':'hubspot','target':60,'diff':2}
       ];
       if(type)
         return _.filter(kettles, {'type': type})[0];
@@ -199,7 +201,9 @@ angular.module('brewbench-monitor')
     temp: function(kettle){
       if(!kettle.arduino) return $q.reject('Select an arduino to use.');
       var q = $q.defer();
-      var url = this.domain(kettle.arduino)+'/arduino/'+kettle.temp.type+'/'+kettle.temp.pin;
+      var url = this.domain(kettle.arduino)+'/arduino/'+kettle.temp.type
+      if(!!kettle.temp.vcc) url += kettle.temp.vcc;
+      url += '/'+kettle.temp.pin;
       var settings = this.settings('settings');
       var request = {url: url, method: 'GET', timeout: settings.general.pollSeconds*10000};
 

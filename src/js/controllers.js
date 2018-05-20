@@ -276,7 +276,7 @@ $scope.updateABV();
         ,sticky: false
         ,heater: {pin:'D6',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
         ,pump: {pin:'D7',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
-        ,temp: {pin:'A0',type:'Thermistor',adc:false,hit:false,current:0,measured:0,previous:0,adjust:0,target:$scope.kettleTypes[0].target,diff:$scope.kettleTypes[0].diff,raw:0,volts:0}
+        ,temp: {pin:'A0',vcc:'',type:'Thermistor',adc:false,hit:false,current:0,measured:0,previous:0,adjust:0,target:$scope.kettleTypes[0].target,diff:$scope.kettleTypes[0].diff,raw:0,volts:0}
         ,values: []
         ,timers: []
         ,knob: angular.copy(BrewService.defaultKnobOptions(),{value:0,min:0,max:$scope.kettleTypes[0].target+$scope.kettleTypes[0].diff})
@@ -312,6 +312,7 @@ $scope.updateABV();
         (kettle.arduino.id==arduinoId) &&
         (
           (kettle.temp.pin==pin) ||
+          (kettle.temp.vcc==pin) ||
           (kettle.heater.pin==pin) ||
           (kettle.cooler && kettle.cooler.pin==pin) ||
           (!kettle.cooler && kettle.pump.pin==pin)
@@ -319,6 +320,15 @@ $scope.updateABV();
       );
     });
     return kettle || false;
+  };
+
+  $scope.changeSensor = function(kettle){
+    if(!!BrewService.sensorTypes(kettle.temp.type).percent){
+      kettle.knob.unit = '\u0025';
+    } else {
+      kettle.knob.unit = '\u00B0';
+    }
+    kettle.temp.vcc = '';
   };
 
   $scope.createShare = function(){
@@ -838,7 +848,7 @@ $scope.updateABV();
   };
 
   $scope.updateTemp = function(response, kettle){
-    if(!response || !response.temp){
+    if(!response){
       return false;
     }
 
@@ -883,18 +893,27 @@ $scope.updateABV();
       });
     }
 
-    //DHT sensors have humidity
-    if( response.humidity ){
-      kettle.humidity = response.humidity;
+    //DHT sensors have humidity as a percent
+    //SoilMoistureD has moisture as a percent
+    if( response.percent ){
+      kettle.percent = response.percent;
     }
-
-    kettle.values.push([date.getTime(),kettle.temp.current]);
 
     $scope.updateKnobCopy(kettle);
     $scope.updateArduinoStatus({kettle:kettle, sketch_version:response.sketch_version});
 
+    var currentValue = kettle.temp.current;
+    var unitType = '\u00B0';
+    //percent?
+    if(!!BrewService.sensorTypes(kettle.temp.type).percent && !!kettle.percent){
+      currentValue = kettle.percent;
+      unitType = '\u0025';
+    } else {
+      kettle.values.push([date.getTime(),currentValue]);
+    }
+
     //is temp too high?
-    if(kettle.temp.current > kettle.temp.target+kettle.temp.diff){
+    if(currentValue > kettle.temp.target+kettle.temp.diff){
       //stop the heating element
       if(kettle.heater.auto && kettle.heater.running){
         temps.push($scope.toggleRelay(kettle, kettle.heater, false));
@@ -911,7 +930,7 @@ $scope.updateABV();
         }));
       }
     } //is temp too low?
-    else if(kettle.temp.current < kettle.temp.target-kettle.temp.diff){
+    else if(currentValue < kettle.temp.target-kettle.temp.diff){
       $scope.notify(kettle);
       //start the heating element
       if(kettle.heater.auto && !kettle.heater.running){
@@ -1315,6 +1334,16 @@ $scope.updateABV();
     if(kettle && kettle.low && kettle.heater.running)
       return;
 
+    var currentValue = kettle.temp.current;
+    var unitType = '\u00B0';
+    //percent?
+    if(!!BrewService.sensorTypes(kettle.temp.type).percent && !!kettle.percent){
+      currentValue = kettle.percent;
+      unitType = '\u0025';
+    } else {
+      kettle.values.push([date.getTime(),currentValue]);
+    }
+
     if(!!timer){ //kettle is a timer object
       if(!$scope.settings.notifications.timers)
         return;
@@ -1328,21 +1357,21 @@ $scope.updateABV();
     else if(kettle && kettle.high){
       if(!$scope.settings.notifications.high || $scope.settings.notifications.last=='high')
         return;
-      message = kettle.name+' is '+$filter('round')(kettle.high-kettle.temp.diff,0)+'\u00B0 high';
+      message = kettle.name+' is '+$filter('round')(kettle.high-kettle.temp.diff,0)+unitType+' high';
       color = 'danger';
       $scope.settings.notifications.last='high';
     }
     else if(kettle && kettle.low){
       if(!$scope.settings.notifications.low || $scope.settings.notifications.last=='low')
         return;
-      message = kettle.name+' is '+$filter('round')(kettle.low-kettle.temp.diff,0)+'\u00B0 low';
+      message = kettle.name+' is '+$filter('round')(kettle.low-kettle.temp.diff,0)+unitType+' low';
       color = '#3498DB';
       $scope.settings.notifications.last='low';
     }
     else if(kettle){
       if(!$scope.settings.notifications.target || $scope.settings.notifications.last=='target')
         return;
-      message = kettle.name+' is within the target at '+kettle.temp.current+'\u00B0';
+      message = kettle.name+' is within the target at '+currentValue+unitType;
       color = 'good';
       $scope.settings.notifications.last='target';
     }
@@ -1414,41 +1443,46 @@ $scope.updateABV();
       kettle.knob.barColor = '#777';
       kettle.knob.subText.text = 'not running';
       kettle.knob.subText.color = 'gray';
-
       return;
     } else if(kettle.message.message && kettle.message.type == 'danger'){
-        kettle.knob.trackColor = '#ddd';
-        kettle.knob.barColor = '#777';
-        kettle.knob.subText.text = 'error';
-        kettle.knob.subText.color = 'gray';
-
-        return;
+      kettle.knob.trackColor = '#ddd';
+      kettle.knob.barColor = '#777';
+      kettle.knob.subText.text = 'error';
+      kettle.knob.subText.color = 'gray';
+      return;
     }
-    //is temp too high?
-    if(kettle.temp.current > kettle.temp.target+kettle.temp.diff){
+    var currentValue = kettle.temp.current;
+    var unitType = '\u00B0';
+    //percent?
+    if(!!BrewService.sensorTypes(kettle.temp.type).percent && !!kettle.percent){
+      currentValue = kettle.percent;
+      unitType = '\u0025';
+    }
+    //is currentValue too high?
+    if(currentValue > kettle.temp.target+kettle.temp.diff){
       kettle.knob.barColor = 'rgba(255,0,0,.6)';
       kettle.knob.trackColor = 'rgba(255,0,0,.1)';
-      kettle.high = kettle.temp.current-kettle.temp.target;
+      kettle.high = currentValue-kettle.temp.target;
       kettle.low = null;
       if(kettle.cooler && kettle.cooler.running){
         kettle.knob.subText.text = 'cooling';
         kettle.knob.subText.color = 'rgba(52,152,219,1)';
       } else {
         //update knob text
-        kettle.knob.subText.text = $filter('round')(kettle.high-kettle.temp.diff,0)+'\u00B0 high';
+        kettle.knob.subText.text = $filter('round')(kettle.high-kettle.temp.diff,0)+unitType+' high';
         kettle.knob.subText.color = 'rgba(255,0,0,.6)';
       }
-    } else if(kettle.temp.current < kettle.temp.target-kettle.temp.diff){
+    } else if(currentValue < kettle.temp.target-kettle.temp.diff){
       kettle.knob.barColor = 'rgba(52,152,219,.5)';
       kettle.knob.trackColor = 'rgba(52,152,219,.1)';
-      kettle.low = kettle.temp.target-kettle.temp.current;
+      kettle.low = kettle.temp.target-currentValue;
       kettle.high = null;
       if(kettle.heater.running){
         kettle.knob.subText.text = 'heating';
         kettle.knob.subText.color = 'rgba(255,0,0,.6)';
       } else {
         //update knob text
-        kettle.knob.subText.text = $filter('round')(kettle.low-kettle.temp.diff,0)+'\u00B0 low';
+        kettle.knob.subText.text = $filter('round')(kettle.low-kettle.temp.diff,0)+unitType+' low';
         kettle.knob.subText.color = 'rgba(52,152,219,1)';
       }
     } else {
@@ -1458,11 +1492,6 @@ $scope.updateABV();
       kettle.knob.subText.color = 'gray';
       kettle.low = null;
       kettle.high = null;
-    }
-    // update subtext to include humidity
-    if(kettle.humidity){
-      kettle.knob.subText.text = kettle.humidity+'%';
-      kettle.knob.subText.color = 'gray';
     }
   };
 

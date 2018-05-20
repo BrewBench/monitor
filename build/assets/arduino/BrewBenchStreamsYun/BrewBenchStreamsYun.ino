@@ -59,7 +59,8 @@ void processRest(BridgeClient client) {
   }
   if (command == "Thermistor" || command == "DS18B20" || command == "PT100" ||
     command == "DHT11" || command == "DHT12" || command == "DHT21" ||
-    command == "DHT22" || command == "DHT33" || command == "DHT44") {
+    command == "DHT22" || command == "DHT33" || command == "DHT44" ||
+    command.substring(0,13) == "SoilMoistureD") {
       tempCommand(client, command);
   }
 }
@@ -107,7 +108,7 @@ void tempCommand(BridgeClient client, String type) {
   float temp = 0.00;
   float raw = 0.00;
   float volts = 0.00;
-  // DHT float humidity = 0.00;
+  // DHT float percent = 0.00;
   // ADC int16_t adc0 = 0;
   float resistance = 0.0;
 
@@ -176,13 +177,13 @@ void tempCommand(BridgeClient client, String type) {
   // DHT   chk = DHT.read44(pin);
   // DHT if( chk == DHTLIB_OK ){
   // DHT     temp = DHT.temperature;
-  // DHT     humidity = DHT.humidity;
+  // DHT     percent = DHT.humidity;
   // DHT   }
   // DHT }
   String data = "{\"hostname\":\""+String(HOSTNAME)+"\",\"pin\":\""+String(spin)+"\",\"temp\":"+String(temp);
   data += ",\"raw\":"+String(raw);
   data += ",\"volts\":"+String(volts);
-  // DHT if(humidity) data += ",\"humidity\":"+String(humidity)+"";
+  // DHT if(percent) data += ",\"percent\":"+String(percent)+"";
   data += "}";
   // Send JSON response to client
   client.print(data);
@@ -194,7 +195,7 @@ float actionsCommand(const String source, const String spin, const String type, 
   float volts = 0.00;
   uint8_t pin = spin.substring(1).toInt();
 
-  // DHT float humidity = 0.00;
+  // DHT float percent = 0.00;
   // ADC int16_t adc0 = 0;
   float resistance = 0.0;
 
@@ -265,7 +266,7 @@ float actionsCommand(const String source, const String spin, const String type, 
   // DHT   chk = DHT.read44(pin);
   // DHT if( chk == DHTLIB_OK ){
   // DHT     temp = DHT.temperature;
-  // DHT     humidity = DHT.humidity;
+  // DHT     percent = DHT.percent;
   // DHT   }
   // DHT }
   // adjust temp if we have it
@@ -275,7 +276,7 @@ float actionsCommand(const String source, const String spin, const String type, 
   data += ",\"sensor\":\""+String(type)+"\"";
   data += ",\"source\":\""+String(source)+"\"";
   data += ",\"adjust\":\""+String(adjustTemp)+"\"";
-// DHT  if(humidity) data += ",\"humidity\":"+String(humidity)+"";
+// DHT  if(percent) data += ",\"percent\":"+String(percent)+"";
   data += "}";
 
   postStreams(data);

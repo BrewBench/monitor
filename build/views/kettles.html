@@ -41,7 +41,7 @@
       <div class="row">
         <div class="col">
           <a href="" ng-click="changeKettleType(kettle)" class="kettle-type" ng-class="{'svg': kettle.type != 'air'}">
-            <img ng-if="kettle.type != 'air'" class="type" ng-src="/assets/img/{{kettle.type}}.svg" width="30" height="30"/>
+            <img ng-if="kettle.type != 'air'" class="type {{ kettle.type }}" ng-src="/assets/img/{{kettle.type}}.svg" width="30" height="30"/>
             <i ng-if="kettle.type == 'air'" class="fa fa-thermometer-quarter fa-2x type" height="30"></i>
           </a>&nbsp;
           <h3><editable type="text" model="kettle.name"></editable></h3>
@@ -51,7 +51,7 @@
       <div ng-if="shareAccess('fullAccess')">
         <div class="row">
           <div class="col">
-            <label class="adjust">Temp</label>
+            <label class="adjust">Sensor</label>
             <div class="btn-group">
               <div class="btn-group" ng-if="kettle.arduino">
                 <button type="button" class="btn btn-light dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -87,7 +87,6 @@
                       class="dropdown-item" type="button">
                     C{{p}} <span class="pininuse" ng-show="pinInUse('C'+p,kettle.arduino.id)">(In Use)</span>
                   </button>
-
                 </div>
               </div>
               <div class="btn-group" ng-if="kettle.arduino">
@@ -97,9 +96,39 @@
                 <div class="dropdown-menu scrollable-menu" ng-init="sensors = BrewService.sensorTypes()">
                   <button ng-repeat="s in sensors track by $index"
                       ng-class="{'active': kettle.temp.type==s.name}"
-                      ng-click="kettle.temp.type=s.name;updateStreams(kettle);"
+                      ng-click="kettle.temp.type=s.name;changeSensor(kettle);updateStreams(kettle);"
                       class="dropdown-item" type="button">
                     {{s.name}}
+                  </button>
+                </div>
+              </div>
+              <div class="btn-group" ng-if="kettle.arduino && BrewService.sensorTypes(kettle.temp.type).vcc">
+                <button type="button" class="btn btn-light dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  {{kettle.temp.vcc || 'VCC?'}} <span class="caret"></span>
+                </button>
+                <div class="dropdown-menu scrollable-menu">
+                  <h6 class="dropdown-header">VCC</h6>
+                  <div class="dropdown-divider"></div>
+                  <button ng-class="{'active': kettle.temp.vcc==''}"
+                      ng-click="kettle.temp.vcc='';updateStreams(kettle);"
+                      class="dropdown-item" type="button">
+                    None
+                  </button>
+                  <button ng-class="{'active': kettle.temp.vcc=='5V'}"
+                      ng-click="kettle.temp.vcc='5V';updateStreams(kettle);"
+                      class="dropdown-item" type="button">
+                    5V <span class="pininuse" ng-show="pinInUse('5V',kettle.arduino.id)">(In Use)</span>
+                  </button>
+                  <button ng-class="{'active': kettle.temp.vcc=='3V'}"
+                      ng-click="kettle.temp.vcc='3V';updateStreams(kettle);"
+                      class="dropdown-item" type="button">
+                    3.3V <span class="pininuse" ng-show="pinInUse('3V',kettle.arduino.id)">(In Use)</span>
+                  </button>
+                  <button ng-repeat="p in getPortRange(kettle.arduino.digital) track by $index"
+                      ng-class="{'active': kettle.temp.vcc=='D'+p}"
+                      ng-click="kettle.temp.vcc='D'+p;updateStreams(kettle);"
+                      class="dropdown-item" type="button">
+                    D{{p}} <span class="pininuse" ng-show="pinInUse('D'+p,kettle.arduino.id)">(In Use)</span>
                   </button>
                 </div>
               </div>
@@ -293,19 +322,35 @@
     <div class="card-body">
       <div class="row">
         <div class="col mr-auto">
-          <ui-knob ng-click="knobClick(kettle)"
+          <ui-knob ng-if="BrewService.sensorTypes(kettle.temp.type).percent"
+            ng-click="knobClick(kettle)"
+            value="(kettle.percent | round:0)"
+            options="kettle.knob">
+          </ui-knob>
+          <ui-knob ng-if="!BrewService.sensorTypes(kettle.temp.type).percent"
+            ng-click="knobClick(kettle)"
             value="(kettle.temp.current | round:0)"
             options="kettle.knob">
           </ui-knob><br/>
-          <span class="badge badge-pill badge-prev badge-danger" ng-show="kettle.temp.previous && (kettle.temp.previous | round:0) > (kettle.temp.current | round:0)" title="Last {{ kettle.temp.previous }}&deg;{{settings.general.unit}}" >{{kettle.temp.previous}}&deg;{{settings.general.unit}} &darr;</span>
-          <span class="badge badge-pill badge-prev badge-success" ng-show="kettle.temp.previous && (kettle.temp.previous | round:0) < (kettle.temp.current | round:0)" title="Last {{ kettle.temp.previous }}&deg;{{settings.general.unit}}" >{{kettle.temp.previous}}&deg;{{settings.general.unit}} &uarr;</span>
+          <span ng-if="kettle.percent && kettle.temp.type.indexOf('DHT') === 0">
+            Humidity {{ kettle.percent }}%
+            <br/>
+          </span>
+          <span class="badge badge-pill badge-prev badge-danger" ng-show="kettle.temp.previous && (kettle.temp.previous | round:0) > (kettle.temp.current | round:0)" title="Last {{ kettle.temp.previous }}">{{kettle.temp.previous}}
+            {{ !!BrewService.sensorTypes(kettle.temp.type).percent ? '%' : '&deg;'+settings.general.unit }} &darr;
+          </span>
+          <span class="badge badge-pill badge-prev badge-success" ng-show="kettle.temp.previous && (kettle.temp.previous | round:0) < (kettle.temp.current | round:0)" title="Last {{ kettle.temp.previous }}">{{kettle.temp.previous}}
+            {{ !!BrewService.sensorTypes(kettle.temp.type).percent ? '%' : '&deg;'+settings.general.unit }} &uarr;
+          </span>
         </div>
         <div class="col" ng-if="shareAccess('fullAccess')">
           <div class="row">
             <div class="col">
               <label class="adjust">Target</label>
               <div class="btn-group" role="group">
-                <a class="btn btn-light"><editable type="number" model="kettle.temp.target">{{kettle.temp.target}}</editable>&deg;{{settings.general.unit}}</a>
+                <a class="btn btn-light"><editable type="number" model="kettle.temp.target">{{kettle.temp.target}}</editable>
+                  {{ !!BrewService.sensorTypes(kettle.temp.type).percent ? '%' : '&deg;'+settings.general.unit }}
+                </a>
                 <a class="btn btn-light" ng-click="changeValue(kettle,'target',false)"><i class="fa fa-minus fa-lg"></i></a>
                 <a class="btn btn-light" ng-click="changeValue(kettle,'target',true)"><i class="fa fa-plus fa-lg"></i></a>
               </div>
@@ -315,7 +360,9 @@
             <div class="col">
               <label class="adjust">Diff</label>
               <div class="btn-group" role="group">
-                <a class="btn btn-light"><editable type="number" model="kettle.temp.diff">{{kettle.temp.diff}}</editable>&deg;{{settings.general.unit}}</a>
+                <a class="btn btn-light"><editable type="number" model="kettle.temp.diff">{{kettle.temp.diff}}</editable>
+                  {{ !!BrewService.sensorTypes(kettle.temp.type).percent ? '%' : '&deg;'+settings.general.unit }}
+                </a>
                 <a class="btn btn-light" ng-click="changeValue(kettle,'diff',false)"><i class="fa fa-minus fa-lg"></i></a>
                 <a class="btn btn-light" ng-click="changeValue(kettle,'diff',true)"><i class="fa fa-plus fa-lg"></i></a>
               </div>
@@ -325,13 +372,15 @@
             <div class="col">
               <label class="adjust">Adjust</label>
               <div class="btn-group" role="group">
-                <a class="btn btn-light"><editable type="number" model="kettle.temp.adjust" placeholder="0">{{kettle.temp.adjust}}</editable>&deg;{{settings.general.unit}}</a>
+                <a class="btn btn-light"><editable type="number" model="kettle.temp.adjust" placeholder="0">{{kettle.temp.adjust}}</editable>
+                  {{ !!BrewService.sensorTypes(kettle.temp.type).percent ? '%' : '&deg;'+settings.general.unit }}
+                </a>
                 <a class="btn btn-light" ng-click="changeValue(kettle,'adjust',false)"><i class="fa fa-minus fa-lg"></i></a>
                 <a class="btn btn-light" ng-click="changeValue(kettle,'adjust',true)"><i class="fa fa-plus fa-lg"></i></a>
               </div>
             </div>
           </div>
-          <div class="row" ng-if="kettle.type!='fermenter' && kettle.type!='air'">
+          <div class="row" ng-if="kettle.type!='fermenter' && kettle.type!='air' && kettle.type!='hubspot'">
             <div class="col">
               <label class="adjust">Timers</label>
               <!--  grain timers -->
@@ -417,6 +466,7 @@
           volts: {{ kettle.temp.volts }}<br/>
           bit calc temp: {{ BrewService.bitcalc(kettle) }} &deg;C<br/>
           bit calc temp: {{ BrewService.bitcalc(kettle) | toFahrenheit }} &deg;F<br/>
+          percent: {{ kettle.percent || 'N/A' }} %<br/>
           measured: {{ kettle.temp.measured }} &deg;{{ settings.general.unit }}<br/>
           adjusted: {{ kettle.temp.adjust }} &deg;{{ settings.general.unit }}<br/>
           current: {{ kettle.temp.current }} &deg;{{ settings.general.unit }}<br/>
