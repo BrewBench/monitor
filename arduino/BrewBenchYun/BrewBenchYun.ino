@@ -166,10 +166,20 @@ void sensorCommand(BridgeClient client, String type) {
       // kelvin to celsius
       temp = kelvin - 273.15;
     }
-  } else if(type == "PT100"){
+  }
+  else if(type == "PT100"){
     if (raw>409){
       temp = (150*map(raw,410,1023,0,614))/614;
     }
+  }
+  else if(type.substring(0,13) == "SoilMoistureD"){
+    uint8_t dpin = type.substring(13).toInt();
+    pinMode(dpin, OUTPUT);
+    digitalWrite(dpin, HIGH);
+    delay(10);
+    raw = analogRead(pin);
+    digitalWrite(dpin, LOW);
+    percent = map(raw, 0, 880, 0, 100);
   }
   else if(type == "DS18B20"){
     DS18B20 ds(pin);
@@ -194,14 +204,6 @@ void sensorCommand(BridgeClient client, String type) {
       temp = DHT.temperature;
       percent = DHT.humidity;
     }
-  } else if(type.substring(0,13) == "SoilMoistureD"){
-    uint8_t dpin = type.substring(13).toInt();
-    pinMode(dpin, OUTPUT);
-    digitalWrite(dpin, HIGH);
-    delay(10);
-    raw = analogRead(pin);
-    digitalWrite(dpin, LOW);
-    percent = map(raw, 0, 880, 0, 100);
   }
   String data = "{\"hostname\":\""+String(HOSTNAME)+"\",\"pin\":\""+String(spin)+"\",\"temp\":"+String(temp);
   data += ",\"raw\":"+String(raw);

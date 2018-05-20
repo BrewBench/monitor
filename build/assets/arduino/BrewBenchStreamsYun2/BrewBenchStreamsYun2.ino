@@ -126,7 +126,7 @@ void tempCommand(BridgeClient client, String type) {
   float temp = 0.00;
   float raw = 0.00;
   float volts = 0.00;
-  // DHT float percent = 0.00;
+  float percent = 0.00;
   // ADC int16_t adc0 = 0;
   float resistance = 0.0;
 
@@ -169,10 +169,20 @@ void tempCommand(BridgeClient client, String type) {
     // ADC   // kelvin to celsius
     // ADC   temp = kelvin - 273.15;
     // ADC }
-  } else if(type == "PT100"){
+  }
+  else if(type == "PT100"){
     if (raw>409){
       temp = (150*map(raw,410,1023,0,614))/614;
     }
+  }
+  else if(type.substring(0,13) == "SoilMoistureD"){
+    uint8_t dpin = type.substring(13).toInt();
+    pinMode(dpin, OUTPUT);
+    digitalWrite(dpin, HIGH);
+    delay(10);
+    raw = analogRead(pin);
+    digitalWrite(dpin, LOW);
+    percent = map(raw, 0, 880, 0, 100);
   }
   // DS18B20 else if(type == "DS18B20"){
   // DS18B20 DS18B20 ds(pin);
@@ -201,7 +211,7 @@ void tempCommand(BridgeClient client, String type) {
   String data = "{\"hostname\":\""+String(HOSTNAME)+"\",\"pin\":\""+String(spin)+"\",\"temp\":"+String(temp);
   data += ",\"raw\":"+String(raw);
   data += ",\"volts\":"+String(volts);
-  // DHT if(percent) data += ",\"percent\":"+String(percent)+"";
+  if(percent) data += ",\"percent\":"+String(percent)+"";
   data += "}";
   // Send JSON response to client
   client.print(data);
@@ -213,7 +223,7 @@ float actionsCommand(const String source, const String spin, const String type, 
   float volts = 0.00;
   uint8_t pin = spin.substring(1).toInt();
 
-  // DHT float percent = 0.00;
+  float percent = 0.00;
   // ADC int16_t adc0 = 0;
   float resistance = 0.0;
 
@@ -258,10 +268,20 @@ float actionsCommand(const String source, const String spin, const String type, 
     // ADC   // kelvin to celsius
     // ADC   temp = kelvin - 273.15;
     // ADC }
-  } else if(type == "PT100"){
+  }
+  else if(type == "PT100"){
     if (raw>409){
       temp = (150*map(raw,410,1023,0,614))/614;
     }
+  }
+  else if(type.substring(0,13) == "SoilMoistureD"){
+    uint8_t dpin = type.substring(13).toInt();
+    pinMode(dpin, OUTPUT);
+    digitalWrite(dpin, HIGH);
+    delay(10);
+    raw = analogRead(pin);
+    digitalWrite(dpin, LOW);
+    percent = map(raw, 0, 880, 0, 100);
   }
   // DS18B20 else if(type == "DS18B20"){
   // DS18B20 DS18B20 ds(pin);
@@ -294,7 +314,7 @@ float actionsCommand(const String source, const String spin, const String type, 
   data += ",\"sensor\":\""+String(type)+"\"";
   data += ",\"source\":\""+String(source)+"\"";
   data += ",\"adjust\":\""+String(adjustTemp)+"\"";
-// DHT  if(percent) data += ",\"percent\":"+String(percent)+"";
+  if(percent) data += ",\"percent\":"+String(percent)+"";
   data += "}";
 
   postStreams(data, false);
