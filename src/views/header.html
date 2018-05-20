@@ -25,7 +25,7 @@
         ng-if="kettle.active"
         ng-repeat="kettle in kettles track by $index"
         style="border: none;">
-          {{kettle.name}} {{kettle.temp.current|number:2}}&deg;{{settings.unit}}
+          {{kettle.name}} {{ !!BrewService.sensorTypes(kettle.temp.type).percent ? kettle.percent+'%' : (kettle.temp.current|number:2)+'&deg;'+settings.general.unit }}
       </a>
     </div>
   </div>

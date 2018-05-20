@@ -30,10 +30,13 @@
           <h4>
             BrewBench Basic
           </h4>
+          <div class="pb-2">
+            <span class="badge badge-pill badge-secondary">automated</span> <span class="badge badge-pill badge-secondary">control</span> <span class="badge badge-pill badge-secondary">brew session</span> <span class="badge badge-pill badge-secondary">fermentation</span> <span class="badge badge-pill badge-secondary">monitor</span> <span class="badge badge-pill badge-secondary">local</span>
+          </div>
           <div class="block-border">
             <div class="row new pb-3">
               <div class="col-10 pb-3">
-                <p>This is a basic sketch that lets you connect to all of the supported sensors.  Use this to configure and test all kettles before uploading any of the other sketches.</p>
+                <p>Control your brew session, setup a RIMS system or monitor your fermentation.  This is a basic sketch that lets you connect to all of the supported sensors.  We suggest using this to configure and test all kettles before uploading any of the other sketches.</p>
               </div>
               <div class="col-2">
                 <a class="btn btn-light float-right" href="" ng-click="compileSketch('Yun')" class="dropdown-item">Download Sketch</a>
@@ -49,14 +52,15 @@
               <sup class="badge badge-{{ getStatusClass(settings.streams.status) }} badge-pill">
                 {{ settings.streams.status || 'Not Connected'}}
               </sup>
-              <a href="https://app.brewbench.co" target="_blank" ng-if="settings.streams.status != 'Connected'">Signup</a>
-              <a href="https://app.brewbench.co/dashboard/{{ settings.streams.api_key }}" target="_blank" ng-if="settings.streams.status == 'Connected'">Dashboard</a>
             </h4>
+            <div class="pb-2">
+              <span class="badge badge-pill badge-secondary">automated</span> <span class="badge badge-pill badge-secondary">control</span> <span class="badge badge-pill badge-secondary">fermentation</span> <span class="badge badge-pill badge-secondary">monitor</span> <span class="badge badge-pill badge-secondary">remote</span> <span class="badge badge-pill badge-secondary">hosted</span>
+            </div>
             <div class="block-border">
               <div class="row">
                 <div class="col-10">
                   <p>
-                    As part of <a href="https://brewbench.co/hosted" target="_blank">BrewBench Hosted</a>, the Streams sketch will be dynamically created depending on what sensors are in use with your current configuration.  It will run in the background sending temperature data to your BrewBench Streams account for secure remote monitoring.
+                    As part of <a href="https://brewbench.co/hosted" target="_blank">BrewBench Hosted</a>, the Streams sketch will be dynamically created depending on what sensors are in use with your current configuration.  It will run in the background sending temperature data from your fermentation for secure remote monitoring.
                     <br/>Works with <strong>BrewBench Relay</strong> to trigger the heat / cool relays you have toggled on.
                   </p>
                 </div>
@@ -92,6 +96,9 @@
                 {{ settings.influxdb.status || 'Not Connected'}}
               </sup>
             </h4>
+            <div class="pb-2">
+              <span class="badge badge-pill badge-secondary">fermentation</span> <span class="badge badge-pill badge-secondary">monitor</span> <span class="badge badge-pill badge-secondary">remote</span> <span class="badge badge-pill badge-secondary">hosted</span> <span class="badge badge-pill badge-secondary">DIY</span>
+            </div>
             <div class="block-border">
               <div class="row">
                 <div class="col-10">
@@ -156,6 +163,9 @@
           <h4>
             BrewBench Relay
           </h4>
+          <div class="pb-2">
+            <span class="badge badge-pill badge-secondary">automated</span> <span class="badge badge-pill badge-secondary">fermentation</span> <span class="badge badge-pill badge-secondary">monitor</span> <span class="badge badge-pill badge-secondary">remote</span>
+          </div>
           <div class="block-border">
             <div class="row">
               <div class="col-10">
@@ -244,10 +254,18 @@
                         <strong>{{kettle.message.type}}</strong> <span ng-bind-html="kettle.message.message">{{kettle.message.message}}</span>
                       </div>
                     </td>
-                    <td>{{kettle.temp.current | number:2}}&deg;{{settings.unit}}</td>
-                    <td>{{kettle.temp.target}}&deg;{{settings.unit}}</td>
-                    <td>{{kettle.temp.diff}}&deg;{{settings.unit}}</td>
-                    <td>{{kettle.temp.adjust}}&deg;{{settings.unit}}</td>
+                    <td>
+                      {{ !!BrewService.sensorTypes(kettle.temp.type).percent ? kettle.percent+'%' : (kettle.temp.current | number:2)+'&deg;'+settings.general.unit }}
+                    </td>
+                    <td>
+                      {{kettle.temp.target}}{{ !!BrewService.sensorTypes(kettle.temp.type).percent ? '%' : '&deg;'+settings.general.unit }}
+                    </td>
+                    <td>
+                      {{kettle.temp.diff}}{{ !!BrewService.sensorTypes(kettle.temp.type).percent ? '%' : '&deg;'+settings.general.unit }}
+                    </td>
+                    <td>
+                      {{kettle.temp.adjust}}{{ !!BrewService.sensorTypes(kettle.temp.type).percent ? '%' : '&deg;'+settings.general.unit }}
+                    </td>
                   </tr>
                 </tbody>
               </table>

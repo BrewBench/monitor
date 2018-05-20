@@ -1,4 +1,3 @@
-/* Sketch Auto Generated from http://monitor.brewbench.co on 2018-05-02 10:05:83 for brewbench.local */
 #include <Process.h>
 #include <BridgeServer.h>
 #include <BridgeClient.h>

@@ -8,6 +8,8 @@
 - Debug settings option to view raw and unformatted temps
 - Arduino online status
 - Support for ADS1115 16bit Analog to Digital Convertor (ADC)
+- Soil Moisture sensor
+- Sensor percent support
 
 ### Updated
 - Cleaned up Arduino and Settings styles
