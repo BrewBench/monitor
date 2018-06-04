@@ -879,7 +879,7 @@ $scope.updateABV();
       kettle.temp.volts = response.volts;
       if(kettle.temp.type == 'Thermistor' &&
         kettle.temp.pin.indexOf('A')===0 &&
-        response.volts < 2.2)
+        response.volts < 2)
         {
           $scope.setErrorMessage('Sensor is not connected', kettle);
           return;
@@ -1264,7 +1264,7 @@ $scope.updateABV();
           if($scope.influxdb.brewbenchHosted()){
             connection_string += '/bbp';
             response.data = response.data.replace(/\[INFLUXDB_AUTH\]/g, 'Authorization: Basic '+btoa($scope.settings.influxdb.user.trim()+':'+$scope.settings.influxdb.pass.trim()));
-            var additional_post_params = 'p.addParameter(F("-H"));\n';
+            var additional_post_params = '  p.addParameter(F("-H"));\n';
             additional_post_params += '  p.addParameter(F("X-API-KEY: '+$scope.settings.influxdb.pass+'"));';
             response.data = response.data.replace('// additional_post_params', additional_post_params);
           } else {

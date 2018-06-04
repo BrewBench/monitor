@@ -245,7 +245,7 @@ float actionsCommand(const String source, const String spin, const String type, 
   if(type == "Thermistor"){
     if( spin.substring(0,1) == "A" ){
       // don't post if a sensor isn't connected
-      if( volts < 2.2 )
+      if( volts < 2 )
         return -1;
       samples[0] = raw;
       uint8_t i;

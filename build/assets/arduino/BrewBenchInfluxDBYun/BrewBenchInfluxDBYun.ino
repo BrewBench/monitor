@@ -281,7 +281,7 @@ float actionsCommand(const String source, const String spin, const String type, 
   if(type == "Thermistor"){
     if( spin.substring(0,1) == "A" ){
       // don't post if a sensor isn't connected
-      if( volts < 2.2 )
+      if( volts < 2 )
         return -1;
       samples[0] = raw;
       uint8_t i;
@@ -349,7 +349,9 @@ float actionsCommand(const String source, const String spin, const String type, 
   if(temp) temp = temp+adjustTemp;
   // Send JSON response to client
   String data = "temperature,sensor="+type+",pin="+spin+",source="+source+",host="+String(HOSTNAME)+" value="+String(temp);
-  if(type.substring(0,13) == "SoilMoistureD" || type.substring(0,3) == "DHT") {
+  if(type.substring(0,3) == "DHT"){
+    data += "percent,sensor="+type+",pin="+spin+",source="+source+",host="+String(HOSTNAME)+" value="+String(percent);
+  } else if(type.substring(0,13) == "SoilMoistureD") {
     data = "percent,sensor="+type+",pin="+spin+",source="+source+",host="+String(HOSTNAME)+" value="+String(percent);
   } else if(percent){
     data += "\npercent,sensor="+type+",pin="+spin+",source="+source+",host="+String(HOSTNAME)+" value="+String(percent);
@@ -358,7 +360,11 @@ float actionsCommand(const String source, const String spin, const String type, 
 
   postData(F("[INFLUXDB_CONNECTION]"), data, F("--data-binary"), "[INFLUXDB_AUTH]");
 
-  return temp;
+  if(type.substring(0,13) == "SoilMoistureD"){
+    return percent;
+  } else {
+    return temp;
+  }
 }
 
 // triggers void trigger(const String type, const String source, const String spin, const float temp, const int target, const int diff, const boolean slack) {
