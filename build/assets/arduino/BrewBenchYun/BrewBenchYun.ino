@@ -2,7 +2,7 @@
 #include <BridgeServer.h>
 #include <BridgeClient.h>
 #include <avr/wdt.h>
-// https://www.brewbench.co/libs/DHTLib.zip
+// https://www.brewbench.co/libs/DHTlib-1.2.8.zip
 #include <dht.h>
 // https://www.brewbench.co/libs/cactus_io_DS18B20.zip
 #include "cactus_io_DS18B20.h"
@@ -208,11 +208,10 @@ void sensorCommand(BridgeClient client, String type) {
   String data = "{\"hostname\":\""+String(HOSTNAME)+"\",\"pin\":\""+String(spin)+"\",\"temp\":"+String(temp);
   data += ",\"raw\":"+String(raw);
   data += ",\"volts\":"+String(volts);
-
-  if(percent)
-    data += ",\"percent\":"+String(percent)+"}";
-  else
-    data += "}";
+  if(percent || type.substring(0,13) == "SoilMoistureD" || type.substring(0,3) == "DHT") {
+    data += ",\"percent\":"+String(percent);
+  }
+  data += "}";
   // Send JSON response to client
   client.print(data);
 }

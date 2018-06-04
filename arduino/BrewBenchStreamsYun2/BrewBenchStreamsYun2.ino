@@ -66,7 +66,7 @@ void processRest(BridgeClient client) {
     command == "DHT11" || command == "DHT12" || command == "DHT21" ||
     command == "DHT22" || command == "DHT33" || command == "DHT44" ||
     command.substring(0,13) == "SoilMoistureD") {
-      tempCommand(client, command);
+      sensorCommand(client, command);
   }
 }
 
@@ -119,7 +119,7 @@ void settingsCommand(BridgeClient client){
   }
 }
 
-void tempCommand(BridgeClient client, String type) {
+void sensorCommand(BridgeClient client, String type) {
   String spin = client.readString();
   spin.trim();
   uint8_t pin = spin.substring(1).toInt();
@@ -211,7 +211,9 @@ void tempCommand(BridgeClient client, String type) {
   String data = "{\"hostname\":\""+String(HOSTNAME)+"\",\"pin\":\""+String(spin)+"\",\"temp\":"+String(temp);
   data += ",\"raw\":"+String(raw);
   data += ",\"volts\":"+String(volts);
-  if(percent) data += ",\"percent\":"+String(percent)+"";
+  if(percent || type.substring(0,13) == "SoilMoistureD" || type.substring(0,3) == "DHT") {
+    data += ",\"percent\":"+String(percent);
+  }
   data += "}";
   // Send JSON response to client
   client.print(data);
@@ -243,7 +245,7 @@ float actionsCommand(const String source, const String spin, const String type, 
   if(type == "Thermistor"){
     if( spin.substring(0,1) == "A" ){
       // don't post if a sensor isn't connected
-      if( volts < 2.5 )
+      if( volts < 2.2 )
         return -1;
       samples[0] = raw;
       uint8_t i;
@@ -314,7 +316,9 @@ float actionsCommand(const String source, const String spin, const String type, 
   data += ",\"sensor\":\""+String(type)+"\"";
   data += ",\"source\":\""+String(source)+"\"";
   data += ",\"adjust\":\""+String(adjustTemp)+"\"";
-  if(percent) data += ",\"percent\":"+String(percent)+"";
+  if(percent || type.substring(0,13) == "SoilMoistureD" || type.substring(0,3) == "DHT") {
+    data += ",\"percent\":"+String(percent);
+  }
   data += "}";
 
   postStreams(data, false);

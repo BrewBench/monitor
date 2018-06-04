@@ -32,7 +32,15 @@ crontab -e
 
   * DHT11, DHT12, DHT21, DHT22, DHT33, DHT44 Temperature and Humidity great addition for brew house monitoring.
 
-    <img src="../src/assets/img/DHT11.png?raw=true" alt="BrewBench DHT" align="center" width="400" />
+    They are also available under other names,
+
+    - DHT11 = RHT01 = ...
+    - DHT21 = RHT02= AM2301 = HM2301
+    - DHT22 = RHT03= AM2302
+    - DHT33 = RHT04 = AM2303
+    - DHT44 = RHT05
+
+  <img src="../src/assets/img/DHT11.png?raw=true" alt="BrewBench DHT" align="center" width="400" />
 
   * Ranco temperature controller (Uses a thermistor)
 

@@ -333,8 +333,8 @@
             value="(kettle.temp.current | round:0)"
             options="kettle.knob">
           </ui-knob><br/>
-          <span ng-if="kettle.percent && kettle.temp.type.indexOf('DHT') === 0">
-            Humidity {{ kettle.percent }}%
+          <span ng-if="kettle.temp.type.indexOf('DHT') === 0">
+            Humidity {{ kettle.percent || 0}}%
             <br/>
           </span>
           <span class="badge badge-pill badge-prev badge-danger" ng-show="kettle.temp.previous && (kettle.temp.previous | round:0) > (kettle.temp.current | round:0)" title="Last {{ kettle.temp.previous }}">{{kettle.temp.previous}}

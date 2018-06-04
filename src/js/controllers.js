@@ -879,7 +879,7 @@ $scope.updateABV();
       kettle.temp.volts = response.volts;
       if(kettle.temp.type == 'Thermistor' &&
         kettle.temp.pin.indexOf('A')===0 &&
-        response.volts < 2.5)
+        response.volts < 2.2)
         {
           $scope.setErrorMessage('Sensor is not connected', kettle);
           return;
@@ -895,7 +895,7 @@ $scope.updateABV();
 
     //DHT sensors have humidity as a percent
     //SoilMoistureD has moisture as a percent
-    if( response.percent ){
+    if( typeof response.percent != 'undefined'){
       kettle.percent = response.percent;
     }
 
@@ -905,7 +905,7 @@ $scope.updateABV();
     var currentValue = kettle.temp.current;
     var unitType = '\u00B0';
     //percent?
-    if(!!BrewService.sensorTypes(kettle.temp.type).percent && !!kettle.percent){
+    if(!!BrewService.sensorTypes(kettle.temp.type).percent && typeof kettle.percent != 'undefined'){
       currentValue = kettle.percent;
       unitType = '\u0025';
     } else {
@@ -1201,7 +1201,7 @@ $scope.updateABV();
       kettle.temp.adjust = parseFloat(kettle.temp.adjust);
       var adjust = ($scope.settings.general.unit=='F' && !!kettle.temp.adjust) ? $filter('round')(kettle.temp.adjust*0.555,3) : kettle.temp.adjust;
       if(kettle.temp.type.indexOf('DHT') !== -1 && currentSketch.headers.indexOf('#include <dht.h>') === -1){
-        currentSketch.headers.push('// https://www.brewbench.co/libs/DHTLib.zip');
+        currentSketch.headers.push('// https://www.brewbench.co/libs/DHTlib-1.2.8.zip');
         currentSketch.headers.push('#include <dht.h>');
       }
       if(kettle.temp.type.indexOf('DS18B20') !== -1 && currentSketch.headers.indexOf('#include "cactus_io_DS18B20.h"') === -1){
@@ -1339,7 +1339,7 @@ $scope.updateABV();
     var currentValue = kettle.temp.current;
     var unitType = '\u00B0';
     //percent?
-    if(!!BrewService.sensorTypes(kettle.temp.type).percent && !!kettle.percent){
+    if(!!BrewService.sensorTypes(kettle.temp.type).percent && typeof kettle.percent != 'undefined'){
       currentValue = kettle.percent;
       unitType = '\u0025';
     } else {
@@ -1456,7 +1456,7 @@ $scope.updateABV();
     var currentValue = kettle.temp.current;
     var unitType = '\u00B0';
     //percent?
-    if(!!BrewService.sensorTypes(kettle.temp.type).percent && !!kettle.percent){
+    if(!!BrewService.sensorTypes(kettle.temp.type).percent && typeof kettle.percent != 'undefined'){
       currentValue = kettle.percent;
       unitType = '\u0025';
     }
