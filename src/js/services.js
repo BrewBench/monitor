@@ -704,8 +704,8 @@ angular.module('brewbench-monitor')
          return steinhart;
        }
      } else if(kettle.temp.type == 'PT100'){
-       if (raw>409){
-        return (150*fmap(raw,410,1023,0,614))/614;
+       if (kettle.temp.raw && kettle.temp.raw>409){
+        return (150*fmap(kettle.temp.raw,410,1023,0,614))/614;
        }
      }
       return 'N/A';

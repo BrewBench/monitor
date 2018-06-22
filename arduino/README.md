@@ -97,7 +97,12 @@ Download the [Arduino IDE](https://www.arduino.cc/en/Main/Software) >= 1.8.5
     * http://wiki.dragino.com/index.php?title=Getting_Start_with_Arduino_Yun#Automatically_Add_Board_Profile_in_Arduino_IDE
 
 ### ESP8266
-* TBD
+
+https://hpclab.blogspot.com/2015/06/esp8266-arduino-ide-on-mac-os-x.html
+- `pip install esptool` will install to `/usr/local/bin/esptool.py`
+- Change the line for `tools.esptool.upload.pattern` in `/Users/$USER/Library/Arduino15/packages/esp8266/hardware/esp8266/2.4.1/platform.txt` to be
+  - `tools.esptool.upload.pattern="/usr/local/bin/esptool.py" --port "{serial.port}" write_flash 0x00000 "{build.path}/{build.project_name}.bin"`
+
 
 ### ADS1115
 

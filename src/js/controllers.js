@@ -1323,7 +1323,7 @@ $scope.updateABV();
       || $scope.settings.notifications.on === false){
         return;
     }
-
+    var date = new Date();
     // Desktop / Slack Notification
     var message,
       icon = '/assets/img/brewbench-logo.png',
