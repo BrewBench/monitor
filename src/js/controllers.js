@@ -1336,13 +1336,13 @@ $scope.updateABV();
     if(kettle && kettle.low && kettle.heater.running)
       return;
 
-    var currentValue = kettle.temp.current;
+    var currentValue = (kettle && kettle.temp) ? kettle.temp.current : 0;
     var unitType = '\u00B0';
     //percent?
-    if(!!BrewService.sensorTypes(kettle.temp.type).percent && typeof kettle.percent != 'undefined'){
+    if(kettle && !!BrewService.sensorTypes(kettle.temp.type).percent && typeof kettle.percent != 'undefined'){
       currentValue = kettle.percent;
       unitType = '\u0025';
-    } else {
+    } else if(kettle){
       kettle.values.push([date.getTime(),currentValue]);
     }
 
