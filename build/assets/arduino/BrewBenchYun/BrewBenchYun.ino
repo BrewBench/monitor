@@ -2,17 +2,17 @@
 #include <BridgeServer.h>
 #include <BridgeClient.h>
 #include <avr/wdt.h>
-// https://www.brewbench.co/libs/DHTlib-1.2.8.zip
+// https://www.brewbench.co/libs/DHTlib-1.2.9.zip
 #include <dht.h>
 // https://www.brewbench.co/libs/cactus_io_DS18B20.zip
 #include "cactus_io_DS18B20.h"
 // https://github.com/adafruit/Adafruit_ADS1X15
-#include <Wire.h>
-#include <Adafruit_ADS1015.h>
+// ADC #include <Wire.h>
+// ADC #include <Adafruit_ADS1015.h>
 
 String HOSTNAME = "notset";
 BridgeServer server;
-Adafruit_ADS1115 ads(0x48);
+// ADC Adafruit_ADS1115 ads(0x48);
 
 dht DHT;
 
@@ -107,13 +107,13 @@ void adCommand(BridgeClient client, const String type) {
     else if( type == "digital" ){
       value = digitalRead(pin);
     }
-    else if( type == "adc" ){
-      value = ads.readADC_SingleEnded(pin);
-    }
+    // ADC else if( type == "adc" ){
+    // ADC   value = ads.readADC_SingleEnded(pin);
+    // ADC }
   }
 
   // Send JSON response to client
-  client.print("{\"hostname\":\""+String(HOSTNAME)+"\",\"pin\":\""+String(spin)+"\",\"value\":"+String(value)+"}");
+  client.print("{\"hostname\":\""+String(HOSTNAME)+"\",\"pin\":\""+String(spin)+"\",\"value\":"+String(value)+"\",\"sensor\":\""+String(type)+"\"}");
 }
 
 void sensorCommand(BridgeClient client, String type) {
@@ -124,7 +124,7 @@ void sensorCommand(BridgeClient client, String type) {
   float raw = 0.00;
   float percent = 0.00;
   float volts = 0.00;
-  int16_t adc0 = 0;
+  // ADC int16_t adc0 = 0;
   float resistance = 0.0;
 
   if( spin.substring(0,1) == "A" ){
@@ -134,12 +134,12 @@ void sensorCommand(BridgeClient client, String type) {
   else if( spin.substring(0,1) == "D" ){
     raw = digitalRead(pin);
   }
-  else if( spin.substring(0,1) == "C" ){
-    adc0 = ads.readADC_SingleEnded(pin);
-    // raw adc value
-    raw = adc0;
-    volts = (raw * 0.1875)/1000;
-  }
+  // ADC else if( spin.substring(0,1) == "C" ){
+  // ADC   adc0 = ads.readADC_SingleEnded(pin);
+  // ADC   // raw adc value
+  // ADC   raw = adc0;
+  // ADC   volts = (raw * 0.1875)/1000;
+  // ADC }
 
   if(type == "Thermistor"){
     if( spin.substring(0,1) == "A" ){
@@ -158,14 +158,14 @@ void sensorCommand(BridgeClient client, String type) {
       raw = resistance;
       temp = Thermistor(resistance);
     }
-    else if( spin.substring(0,1) == "C" ){
-      // resistance = (voltage) / current
-      resistance = (adc0 * (5.0 / 65535)) / 0.0001;
-      float ln = log(resistance / THERMISTORNOMINAL);
-      float kelvin = 1 / (0.0033540170 + (0.00025617244 * ln) + (0.0000021400943 * ln * ln) + (-0.000000072405219 * ln * ln * ln));
-      // kelvin to celsius
-      temp = kelvin - 273.15;
-    }
+    // ADC else if( spin.substring(0,1) == "C" ){
+    // ADC   // resistance = (voltage) / current
+    // ADC   resistance = (adc0 * (5.0 / 65535)) / 0.0001;
+    // ADC   float ln = log(resistance / THERMISTORNOMINAL);
+    // ADC   float kelvin = 1 / (0.0033540170 + (0.00025617244 * ln) + (0.0000021400943 * ln * ln) + (-0.000000072405219 * ln * ln * ln));
+    // ADC   // kelvin to celsius
+    // ADC   temp = kelvin - 273.15;
+    // ADC }
   }
   else if(type == "PT100"){
     if (raw>409){
@@ -205,7 +205,7 @@ void sensorCommand(BridgeClient client, String type) {
       percent = DHT.humidity;
     }
   }
-  String data = "{\"hostname\":\""+String(HOSTNAME)+"\",\"pin\":\""+String(spin)+"\",\"temp\":"+String(temp);
+  String data = "{\"hostname\":\""+String(HOSTNAME)+"\",\"pin\":\""+String(spin)+"\",\"temp\":"+String(temp)+",\"sensor\":\""+String(type)+"\"";
   data += ",\"raw\":"+String(raw);
   data += ",\"volts\":"+String(volts);
   if(percent || type.substring(0,13) == "SoilMoistureD" || type.substring(0,3) == "DHT") {
@@ -237,7 +237,7 @@ void setup() {
   // server.noListenOnLocalhost();
   server.begin();
   getHostname();
-  ads.begin();
+  // ADC ads.begin();
 }
 
 void loop() {

@@ -288,9 +288,9 @@ float actionsCommand(const String source, const String spin, const String type, 
   data += ",\"sensor\":\""+String(type)+"\"";
   data += ",\"source\":\""+String(source)+"\"";
   data += ",\"adjust\":\""+String(adjustTemp)+"\"";
-  if(percent || type.substring(0,13) == "SoilMoistureD" || type.substring(0,3) == "DHT") {
-    data += ",\"percent\":"+String(percent);
-  }
+  // DHT if(percent || type.substring(0,13) == "SoilMoistureD" || type.substring(0,3) == "DHT") {
+  // DHT   data += ",\"percent\":"+String(percent);
+  // DHT }
   data += "}";
 
   postStreams(data);

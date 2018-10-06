@@ -1201,7 +1201,7 @@ $scope.updateABV();
       kettle.temp.adjust = parseFloat(kettle.temp.adjust);
       var adjust = ($scope.settings.general.unit=='F' && !!kettle.temp.adjust) ? $filter('round')(kettle.temp.adjust*0.555,3) : kettle.temp.adjust;
       if(kettle.temp.type.indexOf('DHT') !== -1 && currentSketch.headers.indexOf('#include <dht.h>') === -1){
-        currentSketch.headers.push('// https://www.brewbench.co/libs/DHTlib-1.2.8.zip');
+        currentSketch.headers.push('// https://www.brewbench.co/libs/DHTlib-1.2.9.zip');
         currentSketch.headers.push('#include <dht.h>');
       }
       if(kettle.temp.type.indexOf('DS18B20') !== -1 && currentSketch.headers.indexOf('#include "cactus_io_DS18B20.h"') === -1){
@@ -1210,6 +1210,7 @@ $scope.updateABV();
       }
       // Are we using ADC?
       if(kettle.temp.pin.indexOf('C') === 0 && currentSketch.headers.indexOf('#include <Adafruit_ADS1015.h>') === -1){
+        currentSketch.headers.push('// https://github.com/adafruit/Adafruit_ADS1X15');
         currentSketch.headers.push('#include <Wire.h>');
         currentSketch.headers.push('#include <Adafruit_ADS1015.h>');
       }
@@ -1255,7 +1256,6 @@ $scope.updateABV();
         if( sketch.indexOf('Streams') !== -1){
           // streams connection
           var connection_string = `https://${$scope.settings.streams.username}.streams.brewbench.co`;
-          connection_string = 'http://10.0.1.14:3001';
           response.data = response.data.replace(/\[STREAMS_CONNECTION\]/g, connection_string);
           response.data = response.data.replace(/\[STREAMS_AUTH\]/g, 'Authorization: Basic '+btoa($scope.settings.streams.username.trim()+':'+$scope.settings.streams.api_key.trim()));
         } if( sketch.indexOf('InfluxDB') !== -1){
