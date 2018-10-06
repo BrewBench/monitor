@@ -349,10 +349,11 @@ float actionsCommand(const String source, const String spin, const String type, 
   if(temp) temp = temp+adjustTemp;
   // Send JSON response to client
   String data = "temperature,sensor="+type+",pin="+spin+",source="+source+",host="+String(HOSTNAME)+" value="+String(temp);
-  if(type.substring(0,3) == "DHT"){
+  // SoilMoistureD only has percent so replace data
+  if(type.substring(0,13) == "SoilMoistureD") {
+    data = "percent,sensor="+type+",pin="+spin+",source="+source+",host="+String(HOSTNAME)+" value="+String(percent);
+  } else if(type.substring(0,3) == "DHT"){
     data += "\npercent,sensor="+type+",pin="+spin+",source="+source+",host="+String(HOSTNAME)+" value="+String(percent);
-  } else if(type.substring(0,13) == "SoilMoistureD") {
-    data = "\npercent,sensor="+type+",pin="+spin+",source="+source+",host="+String(HOSTNAME)+" value="+String(percent);
   } else if(percent){
     data += "\npercent,sensor="+type+",pin="+spin+",source="+source+",host="+String(HOSTNAME)+" value="+String(percent);
   }
@@ -403,7 +404,7 @@ void runActions(){
 
 void getHostname(){
   Process p;
-  p.runShellCommand("hostname");
+  p.runShellCommand("uname -n");
   while(p.running());
   if(p.available() > 0) {
    HOSTNAME = p.readString();

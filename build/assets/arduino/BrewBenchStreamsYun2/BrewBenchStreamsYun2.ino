@@ -411,7 +411,7 @@ void runActions(){
 
 void getHostname(){
   Process p;
-  p.runShellCommand("hostname");
+  p.runShellCommand("uname -n");
   while(p.running());
   if(p.available() > 0) {
    HOSTNAME = p.readString();
