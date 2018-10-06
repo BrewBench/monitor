@@ -391,7 +391,7 @@ void getHostname(){
    HOSTNAME = p.readString();
   }
   HOSTNAME.trim();
-  if(HOSTNAME == "")
+  if(!HOSTNAME || HOSTNAME == "")
     HOSTNAME = "missing";
 }
 
@@ -405,6 +405,7 @@ void setup() {
   server.begin();
   // ADC ads.begin();
   getHostname();
+  runActions();
 }
 
 void loop() {

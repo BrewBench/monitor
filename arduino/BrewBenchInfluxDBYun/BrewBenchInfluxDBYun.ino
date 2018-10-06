@@ -352,12 +352,14 @@ float actionsCommand(const String source, const String spin, const String type, 
   // SoilMoistureD only has percent so replace data
   if(type.substring(0,13) == "SoilMoistureD") {
     data = "percent,sensor="+type+",pin="+spin+",source="+source+",host="+String(HOSTNAME)+" value="+String(percent);
+    data += "\nbits,sensor="+type+",pin="+spin+",source="+source+",host="+String(HOSTNAME)+" value="+String(raw);
   } else if(type.substring(0,3) == "DHT"){
     data += "\npercent,sensor="+type+",pin="+spin+",source="+source+",host="+String(HOSTNAME)+" value="+String(percent);
   } else if(percent){
     data += "\npercent,sensor="+type+",pin="+spin+",source="+source+",host="+String(HOSTNAME)+" value="+String(percent);
+  } else {
+    data += "\nbits,sensor="+type+",pin="+spin+",source="+source+",host="+String(HOSTNAME)+" value="+String(raw);
   }
-  data += "\nbits,sensor="+type+",pin="+spin+",source="+source+",host="+String(HOSTNAME)+" value="+String(raw);
 
   postData(F("[INFLUXDB_CONNECTION]"), data, F("--data-binary"), "[INFLUXDB_AUTH]");
 
@@ -410,7 +412,7 @@ void getHostname(){
    HOSTNAME = p.readString();
   }
   HOSTNAME.trim();
-  if(HOSTNAME == "")
+  if(!HOSTNAME || HOSTNAME == "")
     HOSTNAME = "missing";
 }
 
@@ -424,6 +426,7 @@ void setup() {
   server.begin();
   // ADC ads.begin();
   getHostname();
+  runActions();
 }
 
 void loop() {

@@ -417,7 +417,7 @@ void getHostname(){
    HOSTNAME = p.readString();
   }
   HOSTNAME.trim();
-  if(HOSTNAME == "")
+  if(!HOSTNAME || HOSTNAME == "")
     HOSTNAME = "missing";
 }
 
