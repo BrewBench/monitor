@@ -20,6 +20,10 @@ $scope.BrewService = BrewService;
 $scope.site = {https: !!(document.location.protocol=='https:')
   , https_url: `https://${document.location.host}`
 };
+$scope.wifi = {
+  ssid: '',
+  ssid_pass: ''
+};
 $scope.hops;
 $scope.grains;
 $scope.water;
@@ -884,16 +888,19 @@ $scope.updateABV();
     kettle.temp.current = (parseFloat(kettle.temp.measured) + parseFloat(kettle.temp.adjust));
     // set raw
     kettle.temp.raw = response.raw;
+    kettle.temp.volts = response.volts;
+
     // volt check
-    if(response.volts){
-      kettle.temp.volts = response.volts;
+    if(kettle.temp.volts){
       if(kettle.temp.type == 'Thermistor' &&
-        kettle.temp.pin.indexOf('A')===0 &&
-        response.volts < 2)
-        {
+        kettle.temp.pin.indexOf('A') === 0 &&
+        kettle.temp.volts < 2){
           $scope.setErrorMessage('Sensor is not connected', kettle);
           return;
-        }
+      }
+    } else if(!kettle.temp.volts && !kettle.temp.raw){
+      $scope.setErrorMessage('Sensor is not connected', kettle);
+      return;
     }
 
     // reset all kettles every resetChart
@@ -1265,9 +1272,16 @@ $scope.updateABV();
           .replace('// [actions]', actions.length ? actions.join('\n') : '')
           .replace('// [headers]', headers.length ? headers.join('\n') : '')
           .replace(/\[VERSION\]/g, $scope.pkg.sketch_version)
-          .replace(/\[HOSTNAME\]/g, name.replace('.local',''))
+          .replace(/\[HOSTNAME\]/g, name)
           .replace(/\[TPLINK_CONNECTION\]/g, tplink_connection_string)
-          .replace(/\[SLACK_CONNECTION\]/g, $scope.settings.notifications.slack)
+          .replace(/\[SLACK_CONNECTION\]/g, $scope.settings.notifications.slack);
+
+        if($scope.wifi.ssid){
+          response.data = response.data.replace(/\[SSID\]/g, $scope.wifi.ssid);
+        }
+        if($scope.wifi.ssid_pass){
+          response.data = response.data.replace(/\[SSID_PASS\]/g, $scope.wifi.ssid_pass);
+        }
         if( sketch.indexOf('Streams') !== -1){
           // streams connection
           var connection_string = `https://${$scope.settings.streams.username}.streams.brewbench.co`;
@@ -1278,10 +1292,18 @@ $scope.updateABV();
           var connection_string = `${$scope.settings.influxdb.url}`;
           if($scope.influxdb.brewbenchHosted()){
             connection_string += '/bbp';
-            response.data = response.data.replace(/\[INFLUXDB_AUTH\]/g, 'Authorization: Basic '+btoa($scope.settings.influxdb.user.trim()+':'+$scope.settings.influxdb.pass.trim()));
-            var additional_post_params = '  p.addParameter(F("-H"));\n';
-            additional_post_params += '  p.addParameter(F("X-API-KEY: '+$scope.settings.influxdb.pass+'"));';
-            response.data = response.data.replace('// additional_post_params', additional_post_params);
+            if(sketch.indexOf('ESP') !== -1){
+              // does not support https
+              if(connection_string.indexOf('https:') === 0)
+                connection_string = connection_string.replace('https:','http:');
+              response.data = response.data.replace(/\[INFLUXDB_AUTH\]/g, btoa($scope.settings.influxdb.user.trim()+':'+$scope.settings.influxdb.pass.trim()));
+              response.data = response.data.replace(/\[API_KEY\]/g, $scope.settings.influxdb.pass);
+            } else {
+              response.data = response.data.replace(/\[INFLUXDB_AUTH\]/g, 'Authorization: Basic '+btoa($scope.settings.influxdb.user.trim()+':'+$scope.settings.influxdb.pass.trim()));
+              var additional_post_params = '  p.addParameter(F("-H"));\n';
+              additional_post_params += '  p.addParameter(F("X-API-KEY: '+$scope.settings.influxdb.pass+'"));';
+              response.data = response.data.replace('// additional_post_params', additional_post_params);
+            }
           } else {
             if( !!$scope.settings.influxdb.port )
               connection_string += `:${$scope.settings.influxdb.port}`;

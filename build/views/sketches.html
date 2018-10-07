@@ -36,8 +36,24 @@
                 <p>Control your brew session, setup a RIMS system or monitor your fermentation.  This is a basic sketch that lets you connect to all of the supported sensors.  We suggest using this to configure and test all kettles before uploading any of the other sketches.</p>
               </div>
               <div class="col-2">
-                <a class="btn btn-light float-right" href="" ng-click="compileSketch('Yun')" class="dropdown-item">Download Yun Sketch</a>
-                <a class="btn btn-light float-right" href="" ng-click="compileSketch('ESP')" class="dropdown-item">Download ESP Sketch</a>
+                <a class="btn btn-light float-right" href="" ng-click="compileSketch('Yun')" class="dropdown-item">Download Yun Sketch</a><br><br>
+                <div class="dropdown float-right">
+                  <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Download ESP Sketch
+                  </button>
+                  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="text-align: center; padding: 10px;">
+                    <p>Enter your WiFi info to include in the sketch.</p>
+                    <div class="form-group">
+                      <input type="text" class="form-control" ng-model="wifi.ssid" placeholder="WiFi SSID"/>
+                    </div>
+                    <div class="form-group">
+                      <input type="text" class="form-control" ng-model="wifi.ssid_pass" placeholder="WiFi SSID Password"/>
+                    </div>
+                    <div class="form-group">
+                      <a href="" ng-click="compileSketch('ESP')" class="btn btn-primary" ng-class="{'disabled':settings.influxdb.status != 'Connected'}">Download ESP Sketch</a>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -100,7 +116,24 @@
                   </p>
                 </div>
                 <div class="col-2">
-                  <a href="" ng-click="compileSketch('InfluxDBYun')" class="btn btn-light float-right" ng-class="{'disabled':settings.influxdb.status != 'Connected'}">Download Sketch</a>
+                  <a href="" ng-click="compileSketch('InfluxDBYun')" class="btn btn-light float-right" ng-class="{'disabled':settings.influxdb.status != 'Connected'}">Download Yun Sketch</a><br><br>
+                  <div class="dropdown float-right">
+                    <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      Download ESP Sketch
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="text-align: center; padding: 10px;">
+                      <p>Enter your WiFi info to include in the sketch.</p>
+                      <div class="form-group">
+                        <input type="text" class="form-control" ng-model="wifi.ssid" placeholder="WiFi SSID"/>
+                      </div>
+                      <div class="form-group">
+                        <input type="text" class="form-control" ng-model="wifi.ssid_pass" placeholder="WiFi SSID Password"/>
+                      </div>
+                      <div class="form-group">
+                        <a href="" ng-click="compileSketch('InfluxDBESP')" class="btn btn-primary" ng-class="{'disabled':settings.influxdb.status != 'Connected'}">Download ESP Sketch</a>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
               <div class="row">

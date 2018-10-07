@@ -1,11 +1,9 @@
 #include <ESP8266WiFi.h>
-#include <WiFiClient.h>
 #include <ESP8266WebServer.h>
 #include <ESP8266mDNS.h>
 // [headers]
 
-String HOSTNAME = "[HOSTNAME]";
-
+String HOSTNAME = "[HOSTNAME_TBD]";
 const char* ssid     = "[SSID]";
 const char* password = "[SSID_PASS]";
 
@@ -47,48 +45,36 @@ void setupRest() {
 
   server.on("/", [](){
     String data = "{\"BrewBench\": {\"board\": \""+String(ARDUINO_BOARD)+"\", \"version\": \"[VERSION]\"}}";
-    server.sendHeader("Access-Control-Allow-Origin", "*");
-    server.sendHeader("Access-Control-Allow-Methods", "GET");
-    server.sendHeader("Access-Control-Expose-Headers", "X-Sketch-Version");
-    server.sendHeader("X-Sketch-Version", "[VERSION]");
-    server.sendHeader("Connection", "close");
+    sendHeaders();
     server.send(200, "application/json", data);
   });
 
   server.on("/arduino/info", [](){
     String data = "{\"BrewBench\": {\"board\": \""+String(ARDUINO_BOARD)+"\", \"version\": \"[VERSION]\"}}";
-    server.sendHeader("Access-Control-Allow-Origin", "*");
-    server.sendHeader("Access-Control-Allow-Methods", "GET");
-    server.sendHeader("Access-Control-Expose-Headers", "X-Sketch-Version");
-    server.sendHeader("X-Sketch-Version", "[VERSION]");
-    server.sendHeader("Connection", "close");
+    sendHeaders();
     server.send(200, "application/json", data);
   });
 
   server.on("/arduino/Thermistor", [](){
-    server.sendHeader("Access-Control-Allow-Origin", "*");
-    server.sendHeader("Access-Control-Allow-Methods", "GET");
-    server.sendHeader("Access-Control-Expose-Headers", "X-Sketch-Version");
-    server.sendHeader("X-Sketch-Version", "[VERSION]");
-    server.sendHeader("Connection", "close");
+    sendHeaders();
     processRest("Thermistor");
   });
   // DHT server.on("/arduino/DHT11", [](){
-  // DHT   server.sendHeader("Access-Control-Allow-Origin", "*");
-  // DHT   server.sendHeader("Access-Control-Allow-Methods", "GET");
-  // DHT   server.sendHeader("Access-Control-Expose-Headers", "X-Sketch-Version");
-  // DHT   server.sendHeader("X-Sketch-Version", "[VERSION]");
-  // DHT   server.sendHeader("Connection", "close");
+  // DHT   sendHeaders();
   // DHT   processRest("DHT11");
   // DHT });
   // DHT server.on("/arduino/DHT22", [](){
-  // DHT   server.sendHeader("Access-Control-Allow-Origin", "*");
-  // DHT   server.sendHeader("Access-Control-Allow-Methods", "GET");
-  // DHT   server.sendHeader("Access-Control-Expose-Headers", "X-Sketch-Version");
-  // DHT   server.sendHeader("X-Sketch-Version", "[VERSION]");
-  // DHT   server.sendHeader("Connection", "close");
+  // DHT   sendHeaders();
   // DHT   processRest("DHT22");
   // DHT });
+}
+
+void sendHeaders(){
+  server.sendHeader("Access-Control-Allow-Origin", "*");
+  server.sendHeader("Access-Control-Allow-Methods", "GET");
+  server.sendHeader("Access-Control-Expose-Headers", "X-Sketch-Version");
+  server.sendHeader("X-Sketch-Version", "[VERSION]");
+  server.sendHeader("Connection", "close");
 }
 
 void processRest(const String command) {
@@ -134,7 +120,7 @@ void handleNotFound() {
 
 String adCommand(const String dpin, const String apin, int16_t value, const String type) {
   uint8_t pin;
-  if(dpin)
+  if( dpin != "" )
     pin = gpio(dpin);
   else
     pin = apin.substring(1).toInt();
@@ -163,12 +149,16 @@ String adCommand(const String dpin, const String apin, int16_t value, const Stri
   }
 
   // Send JSON response to client
-  return "{\"hostname\":\""+String(HOSTNAME)+"\",\"pin\":\""+String(pin)+"\",\"value\":"+String(value)+"\",\"sensor\":\""+String(type)+"\"}";
+  String data = "{\"hostname\":\""+String(HOSTNAME)+"\",\"pin\":\""+String(dpin)+"\",\"value\":"+String(value)+"\",\"sensor\":\""+String(type)+"\"}";
+  if( apin != "" )
+    data = "{\"hostname\":\""+String(HOSTNAME)+"\",\"pin\":\""+String(apin)+"\",\"value\":"+String(value)+"\",\"sensor\":\""+String(type)+"\"}";
+
+  return data;
 }
 
 String sensorCommand(const String dpin, const String apin, const String type) {
   uint8_t pin;
-  if(dpin)
+  if( dpin != "" )
     pin = gpio(dpin);
   else
     pin = apin.substring(1).toInt();
@@ -179,16 +169,16 @@ String sensorCommand(const String dpin, const String apin, const String type) {
   // ADC int16_t adc0 = 0;
   float resistance = 0.0;
 
-  if( apin ){
+  if( apin != "" ){
     raw = analogRead(pin);
     volts = raw * 0.0049;
   }
-  else if( dpin ){
+  else if( dpin != "" ){
     raw = digitalRead(pin);
   }
 
   if(type == "Thermistor"){
-    if( apin ){
+    if( apin != "" ){
       samples[0] = raw;
       uint8_t i;
       // take N samples in a row, with a slight delay
@@ -230,10 +220,13 @@ String sensorCommand(const String dpin, const String apin, const String type) {
   // DHT     temp = dht.getTemperature();
   // DHT     percent = dht.getHumidity();
   // DHT   }
-  }
-  String data = "{\"hostname\":\""+String(HOSTNAME)+"\",\"pin\":\""+String(pin)+"\",\"temp\":"+String(temp)+",\"sensor\":\""+String(type)+"\"";
-  data += ",\"raw\":"+String(raw);
-  data += ",\"volts\":"+String(volts);
+  // DHT   if(isnan(temp)) temp = 0;
+  // DHT   if(isnan(percent)) percent = 0;
+  // DHT }
+  String data = "{\"hostname\":\""+String(HOSTNAME)+"\",\"pin\":\""+String(dpin)+"\",\"temp\":"+String(temp)+",\"sensor\":\""+String(type)+"\"";
+  if( apin != "" )
+    data = "{\"hostname\":\""+String(HOSTNAME)+"\",\"pin\":\""+String(apin)+"\",\"temp\":"+String(temp)+",\"sensor\":\""+String(type)+"\"";
+  data += ",\"raw\":"+String(raw)+",\"volts\":"+String(volts);
   if(percent || type == "SoilMoisture" || type.substring(0,3) == "DHT") {
     data += ",\"percent\":"+String(percent);
   }
@@ -277,7 +270,17 @@ void connect(){
   while (WiFi.status() != WL_CONNECTED) {
     delay(50);
   }
+  Serial.print("IP: ");
   Serial.println(WiFi.localIP());
+
+  // Start the mDNS responder to set hostname bbesp.local
+  if (MDNS.begin("bbesp"))
+    HOSTNAME = "bbesp.local";
+  else
+    HOSTNAME = WiFi.hostname();
+
+  Serial.print("Host: ");
+  Serial.println(HOSTNAME);
 }
 
 void setup() {
@@ -292,7 +295,6 @@ void setup() {
 
   server.onNotFound(handleNotFound);
 
-  MDNS.addService("http", "tcp", 80);
 }
 
 void loop() {

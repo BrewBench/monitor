@@ -1,9 +1,10 @@
 #include <ESP8266WiFi.h>
+#include <WiFiClient.h>
 #include <ESP8266WebServer.h>
 #include <ESP8266mDNS.h>
 // [headers]
 
-String HOSTNAME = "[HOSTNAME_TBD]";
+String HOSTNAME = "[HOSTNAME]";
 const char* ssid     = "[SSID]";
 const char* password = "[SSID_PASS]";
 
@@ -45,18 +46,18 @@ void setupRest() {
 
   server.on("/", [](){
     String data = "{\"BrewBench\": {\"board\": \""+String(ARDUINO_BOARD)+"\", \"version\": \"[VERSION]\"}}";
-    sendHeaders();
+    sendHeaders()
     server.send(200, "application/json", data);
   });
 
   server.on("/arduino/info", [](){
     String data = "{\"BrewBench\": {\"board\": \""+String(ARDUINO_BOARD)+"\", \"version\": \"[VERSION]\"}}";
-    sendHeaders();
+    sendHeaders()
     server.send(200, "application/json", data);
   });
 
   server.on("/arduino/Thermistor", [](){
-    sendHeaders();
+    sendHeaders()
     processRest("Thermistor");
   });
   // DHT server.on("/arduino/DHT11", [](){
@@ -272,15 +273,10 @@ void connect(){
   }
   Serial.print("IP: ");
   Serial.println(WiFi.localIP());
-
-  // Start the mDNS responder to set hostname bbesp.local
-  if (MDNS.begin("bbesp"))
-    HOSTNAME = "bbesp.local";
-  else
-    HOSTNAME = WiFi.hostname();
-
   Serial.print("Host: ");
-  Serial.println(HOSTNAME);
+  Serial.println(WiFi.hostname());
+  // update hostname
+  HOSTNAME = WiFi.hostname();
 }
 
 void setup() {
@@ -295,6 +291,7 @@ void setup() {
 
   server.onNotFound(handleNotFound);
 
+  MDNS.addService("http", "tcp", 80);
 }
 
 void loop() {

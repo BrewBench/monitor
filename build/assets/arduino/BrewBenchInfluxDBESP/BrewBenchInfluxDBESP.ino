@@ -1,13 +1,19 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
+#include <ESP8266HTTPClient.h>
 #include <ESP8266mDNS.h>
+#include <WiFiClient.h>
 // [headers]
 
 String HOSTNAME = "[HOSTNAME_TBD]";
+const PROGMEM uint8_t FREQUENCY_SECONDS = 60;
+uint8_t secondCounter = 0;
 const char* ssid     = "[SSID]";
 const char* password = "[SSID_PASS]";
 
 ESP8266WebServer server(80);
+
+HTTPClient http;
 
 // DHT DHTesp dht;
 
@@ -234,6 +240,117 @@ String sensorCommand(const String dpin, const String apin, const String type) {
   return data;
 }
 
+float actionsCommand(const String source, const String spin, const String type, const float adjustTemp) {
+  float temp = 0.00;
+  float raw = 0.00;
+  float volts = 0.00;
+  uint8_t pin;
+  if( spin.substring(0,1) == "A" )
+    pin = spin.substring(1).toInt();
+  else
+    pin = gpio(spin);
+
+  float percent = 0.00;
+  // ADC int16_t adc0 = 0;
+  float resistance = 0.0;
+
+  if( spin.substring(0,1) == "A" ){
+    raw = analogRead(pin);
+    volts = raw * 0.0049;
+  }
+  else if( spin.substring(0,1) == "D" ){
+    raw = digitalRead(pin);
+  }
+
+  if(type == "Thermistor"){
+    if( spin.substring(0,1) == "A" ){
+      // don't post if a sensor isn't connected
+      if( volts < 2 )
+        return -1;
+      samples[0] = raw;
+      uint8_t i;
+      // take N samples in a row, with a slight delay
+      for (i=1; i< NUMSAMPLES; i++) {
+        samples[i] = analogRead(pin);
+        delay(10);
+      }
+      // average all the samples out
+      for (i=0; i< NUMSAMPLES; i++) {
+         resistance += samples[i];
+      }
+      resistance /= NUMSAMPLES;
+      raw = resistance;
+      temp = Thermistor(resistance);
+    }
+  }
+  else if(type == "PT100"){
+    if (raw>409){
+      temp = (150*map(raw,410,1023,0,614))/614;
+    }
+  }
+  else if(type.substring(0,13) == "SoilMoistureD"){
+    uint8_t dpin = type.substring(13).toInt();
+    pinMode(dpin, OUTPUT);
+    digitalWrite(dpin, HIGH);
+    delay(10);
+    raw = analogRead(pin);
+    digitalWrite(dpin, LOW);
+    percent = map(raw, 0, 880, 0, 100);
+  }
+  // DHT else if(type == "DHT11" || type == "DHT12"){
+  // DHT   if(type == "DHT11"){
+  // DHT     dht.setup(pin, DHTesp::DHT11);
+  // DHT     delay(dht.getMinimumSamplingPeriod());
+  // DHT     temp = dht.getTemperature();
+  // DHT     percent = dht.getHumidity();
+  // DHT   } else if(type == "DHT22"){
+  // DHT     dht.setup(pin, DHTesp::DHT22);
+  // DHT     delay(dht.getMinimumSamplingPeriod());
+  // DHT     temp = dht.getTemperature();
+  // DHT     percent = dht.getHumidity();
+  // DHT   }
+  // DHT   if(isnan(temp)) temp = 0;
+  // DHT   if(isnan(percent)) percent = 0;
+  // DHT }
+  // adjust temp if we have it
+  if(temp) temp = temp+adjustTemp;
+  // Send JSON response to client
+  String data = "temperature,sensor="+type+",pin="+spin+",source="+source+",host="+String(HOSTNAME)+" value="+String(temp);
+  // SoilMoistureD only has percent so replace data
+  if(type.substring(0,13) == "SoilMoistureD") {
+    data = "percent,sensor="+type+",pin="+spin+",source="+source+",host="+String(HOSTNAME)+" value="+String(percent);
+    data += "\nbits,sensor="+type+",pin="+spin+",source="+source+",host="+String(HOSTNAME)+" value="+String(raw);
+  } else if(type.substring(0,3) == "DHT"){
+    data += "\npercent,sensor="+type+",pin="+spin+",source="+source+",host="+String(HOSTNAME)+" value="+String(percent);
+  } else if(percent){
+    data += "\npercent,sensor="+type+",pin="+spin+",source="+source+",host="+String(HOSTNAME)+" value="+String(percent);
+  } else {
+    data += "\nbits,sensor="+type+",pin="+spin+",source="+source+",host="+String(HOSTNAME)+" value="+String(raw);
+  }
+
+  postData(data);
+
+  if(type.substring(0,13) == "SoilMoistureD"){
+    return percent;
+  } else {
+    return temp;
+  }
+}
+
+void postData(const String data){
+
+  if(http.begin("[INFLUXDB_CONNECTION]")){
+    http.setAuthorization("[INFLUXDB_AUTH]");
+    http.addHeader("X-API-KEY", "[API_KEY]");
+    http.addHeader("User-Agent", "BrewBench/[VERSION]");
+    int response = http.POST(data);
+    Serial.print("InfluxDB POST Response: ");
+    Serial.println(response);
+    http.end();
+  }
+
+}
+
 uint8_t gpio(String spin){
   switch( spin.substring(1).toInt() ){
     case 0:
@@ -283,6 +400,10 @@ void connect(){
   Serial.println(HOSTNAME);
 }
 
+void runActions(){
+  // [actions]
+}
+
 void setup() {
 
   Serial.begin(115200);
@@ -295,9 +416,20 @@ void setup() {
 
   server.onNotFound(handleNotFound);
 
+  http.setReuse(true);
+
+  runActions();
 }
 
 void loop() {
   server.handleClient();
+
+  secondCounter+=1;
+  if( secondCounter == FREQUENCY_SECONDS ){
+    // reset the secondCounter
+    secondCounter = 0;
+    runActions();
+  }
+
   delay(1000);
 }

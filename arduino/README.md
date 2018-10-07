@@ -96,13 +96,19 @@ Download the [Arduino IDE](https://www.arduino.cc/en/Main/Software) >= 1.8.5
 
     * http://wiki.dragino.com/index.php?title=Getting_Start_with_Arduino_Yun#Automatically_Add_Board_Profile_in_Arduino_IDE
 
-### ESP8266
+### ESP8266, ESP32
 
-https://hpclab.blogspot.com/2015/06/esp8266-arduino-ide-on-mac-os-x.html
-- `pip install esptool` will install to `/usr/local/bin/esptool.py`
-- Change the line for `tools.esptool.upload.pattern` in `/Users/$USER/Library/Arduino15/packages/esp8266/hardware/esp8266/2.4.1/platform.txt` to be
-  - `tools.esptool.upload.pattern="/usr/local/bin/esptool.py" --port "{serial.port}" write_flash 0x00000 "{build.path}/{build.project_name}.bin"`
+Install this driver for the board to show up on the USB port
 
+https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers
+
+Open the serial monitor on `115200` baud to get the IP address after uploading the sketch.  The sketch will attempt to set the DNS name to `bbesp.local`
+
+- ESP8266
+  - [ESP8266 on Amazon](https://smile.amazon.com/HiLetgo-Internet-Development-Wireless-Micropython/dp/B010N1SPRK/ref=sr_1_3?s=electronics&ie=UTF8&qid=1538931027&sr=1-3&keywords=esp8266)
+  - Board: Node_MCU 1.0 (ESP-12E Module)
+- ESP32
+  - [ESP32 on Amazon](https://smile.amazon.com/gp/product/B0718T232Z/ref=ox_sc_act_title_1?smid=A30QSGOJR8LMXA&psc=1)
 
 ### ADS1115
 
