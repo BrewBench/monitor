@@ -1,0 +1,301 @@
+#include <ESP8266WiFi.h>
+#include <WiFiClient.h>
+#include <ESP8266WebServer.h>
+#include <ESP8266mDNS.h>
+// [headers]
+
+String HOSTNAME = "[HOSTNAME]";
+
+const char* ssid     = "[SSID]";
+const char* password = "[SSID_PASS]";
+
+ESP8266WebServer server(80);
+
+// DHT DHTesp dht;
+
+// https://learn.adafruit.com/thermistor/using-a-thermistor
+// resistance at 25 degrees C
+#define THERMISTORNOMINAL 10000
+// temp. for nominal resistance (almost always 25 C)
+#define TEMPERATURENOMINAL 25
+// how many samples to take and average, more takes longer
+// but is more 'smooth'
+#define NUMSAMPLES 5
+// The beta coefficient of the thermistor (usually 3000-4000)
+#define BCOEFFICIENT 3950
+// the value of the 'other' resistor
+#define SERIESRESISTOR 10000
+
+uint16_t samples[NUMSAMPLES];
+
+float Thermistor(float average) {
+   // convert the value to resistance
+   average = 1023 / average - 1;
+   average = SERIESRESISTOR / average;
+
+   float steinhart = average / THERMISTORNOMINAL;     // (R/Ro)
+   steinhart = log(steinhart);                  // ln(R/Ro)
+   steinhart /= BCOEFFICIENT;                   // 1/B * ln(R/Ro)
+   steinhart += 1.0 / (TEMPERATURENOMINAL + 273.15); // + (1/To)
+   steinhart = 1.0 / steinhart;                 // Invert
+   steinhart -= 273.15;
+
+   return steinhart;
+}
+
+void setupRest() {
+
+  server.on("/", [](){
+    String data = "{\"BrewBench\": {\"board\": \""+String(ARDUINO_BOARD)+"\", \"version\": \"[VERSION]\"}}";
+    server.sendHeader("Access-Control-Allow-Origin", "*");
+    server.sendHeader("Access-Control-Allow-Methods", "GET");
+    server.sendHeader("Access-Control-Expose-Headers", "X-Sketch-Version");
+    server.sendHeader("X-Sketch-Version", "[VERSION]");
+    server.sendHeader("Connection", "close");
+    server.send(200, "application/json", data);
+  });
+
+  server.on("/arduino/info", [](){
+    String data = "{\"BrewBench\": {\"board\": \""+String(ARDUINO_BOARD)+"\", \"version\": \"[VERSION]\"}}";
+    server.sendHeader("Access-Control-Allow-Origin", "*");
+    server.sendHeader("Access-Control-Allow-Methods", "GET");
+    server.sendHeader("Access-Control-Expose-Headers", "X-Sketch-Version");
+    server.sendHeader("X-Sketch-Version", "[VERSION]");
+    server.sendHeader("Connection", "close");
+    server.send(200, "application/json", data);
+  });
+
+  server.on("/arduino/Thermistor", [](){
+    server.sendHeader("Access-Control-Allow-Origin", "*");
+    server.sendHeader("Access-Control-Allow-Methods", "GET");
+    server.sendHeader("Access-Control-Expose-Headers", "X-Sketch-Version");
+    server.sendHeader("X-Sketch-Version", "[VERSION]");
+    server.sendHeader("Connection", "close");
+    processRest("Thermistor");
+  });
+  // DHT server.on("/arduino/DHT11", [](){
+  // DHT   server.sendHeader("Access-Control-Allow-Origin", "*");
+  // DHT   server.sendHeader("Access-Control-Allow-Methods", "GET");
+  // DHT   server.sendHeader("Access-Control-Expose-Headers", "X-Sketch-Version");
+  // DHT   server.sendHeader("X-Sketch-Version", "[VERSION]");
+  // DHT   server.sendHeader("Connection", "close");
+  // DHT   processRest("DHT11");
+  // DHT });
+  // DHT server.on("/arduino/DHT22", [](){
+  // DHT   server.sendHeader("Access-Control-Allow-Origin", "*");
+  // DHT   server.sendHeader("Access-Control-Allow-Methods", "GET");
+  // DHT   server.sendHeader("Access-Control-Expose-Headers", "X-Sketch-Version");
+  // DHT   server.sendHeader("X-Sketch-Version", "[VERSION]");
+  // DHT   server.sendHeader("Connection", "close");
+  // DHT   processRest("DHT22");
+  // DHT });
+}
+
+void processRest(const String command) {
+  String apin = "";
+  String dpin = "";
+  int16_t value;
+  for (uint8_t i = 0; i < server.args(); i++) {
+    if( server.argName(i) == "dpin" )
+      dpin = server.arg(i);
+    if( server.argName(i) == "apin" )
+      apin = server.arg(i);
+    else if( server.argName(i) == "value" )
+      value = server.arg(i).toInt();
+  }
+  String data = "";
+
+  if (command == "digital" || command == "analog" || command == "adc") {
+    data = adCommand(dpin, apin, value, command);
+  }
+  else if (command == "Thermistor" || command == "DS18B20" || command == "PT100" ||
+      command == "DHT11" || command == "DHT22" || command == "SoilMoisture") {
+    data = sensorCommand(dpin, apin, command);
+  }
+  server.send(200, "application/json", data);
+}
+
+void handleNotFound() {
+  String message = "File Not Found\n\n";
+  message += "URI: ";
+  message += server.uri();
+  message += "\nMethod: ";
+  message += (server.method() == HTTP_GET) ? "GET" : "POST";
+  message += "\nArguments: ";
+  message += server.args();
+  message += "\n";
+
+  for (uint8_t i = 0; i < server.args(); i++) {
+    message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
+  }
+
+  server.send(404, "text/plain", message);
+}
+
+String adCommand(const String dpin, const String apin, int16_t value, const String type) {
+  uint8_t pin;
+  if(dpin)
+    pin = gpio(dpin);
+  else
+    pin = apin.substring(1).toInt();
+
+  // write
+  if (value) {
+    pinMode(pin, OUTPUT);
+    if( type == "analog" ){
+      analogWrite(pin, value);//0 - 255
+    }
+    else if( type == "digital" ){
+      if(value == 1)
+        digitalWrite(pin, LOW);//turn on relay
+      else
+        digitalWrite(pin, HIGH);//turn off relay
+    }
+  } else {
+    // read
+    pinMode(pin, INPUT);
+    if( type == "analog" ){
+      value = analogRead(pin);
+    }
+    else if( type == "digital" ){
+      value = digitalRead(pin);
+    }
+  }
+
+  // Send JSON response to client
+  return "{\"hostname\":\""+String(HOSTNAME)+"\",\"pin\":\""+String(pin)+"\",\"value\":"+String(value)+"\",\"sensor\":\""+String(type)+"\"}";
+}
+
+String sensorCommand(const String dpin, const String apin, const String type) {
+  uint8_t pin;
+  if(dpin)
+    pin = gpio(dpin);
+  else
+    pin = apin.substring(1).toInt();
+  float temp = 0.00;
+  float raw = 0.00;
+  float percent = 0.00;
+  float volts = 0.00;
+  // ADC int16_t adc0 = 0;
+  float resistance = 0.0;
+
+  if( apin ){
+    raw = analogRead(pin);
+    volts = raw * 0.0049;
+  }
+  else if( dpin ){
+    raw = digitalRead(pin);
+  }
+
+  if(type == "Thermistor"){
+    if( apin ){
+      samples[0] = raw;
+      uint8_t i;
+      // take N samples in a row, with a slight delay
+      for (i=1; i< NUMSAMPLES; i++) {
+        samples[i] = analogRead(pin);
+        delay(10);
+      }
+      // average all the samples out
+      for (i=0; i< NUMSAMPLES; i++) {
+         resistance += samples[i];
+      }
+      resistance /= NUMSAMPLES;
+      raw = resistance;
+      temp = Thermistor(resistance);
+    }
+  }
+  else if(type == "PT100"){
+    if (raw>409){
+      temp = (150*map(raw,410,1023,0,614))/614;
+    }
+  }
+  else if(type == "SoilMoisture"){
+    pinMode(pin, OUTPUT);
+    digitalWrite(pin, HIGH);
+    delay(10);
+    raw = analogRead(apin.substring(1).toInt());
+    digitalWrite(pin, LOW);
+    percent = map(raw, 0, 880, 0, 100);
+  }
+  // DHT else if(type == "DHT11" || type == "DHT12"){
+  // DHT   if(type == "DHT11"){
+  // DHT     dht.setup(pin, DHTesp::DHT11);
+  // DHT     delay(dht.getMinimumSamplingPeriod());
+  // DHT     temp = dht.getTemperature();
+  // DHT     percent = dht.getHumidity();
+  // DHT   } else if(type == "DHT22"){
+  // DHT     dht.setup(pin, DHTesp::DHT22);
+  // DHT     delay(dht.getMinimumSamplingPeriod());
+  // DHT     temp = dht.getTemperature();
+  // DHT     percent = dht.getHumidity();
+  // DHT   }
+  }
+  String data = "{\"hostname\":\""+String(HOSTNAME)+"\",\"pin\":\""+String(pin)+"\",\"temp\":"+String(temp)+",\"sensor\":\""+String(type)+"\"";
+  data += ",\"raw\":"+String(raw);
+  data += ",\"volts\":"+String(volts);
+  if(percent || type == "SoilMoisture" || type.substring(0,3) == "DHT") {
+    data += ",\"percent\":"+String(percent);
+  }
+  data += "}";
+  return data;
+}
+
+uint8_t gpio(String spin){
+  switch( spin.substring(1).toInt() ){
+    case 0:
+      return 16;
+    case 1:
+      return 5;
+    case 2:
+      return 4;
+    case 3:
+      return 0;
+    case 4:
+      return 2;
+    case 5:
+      return 14;
+    case 6:
+      return 12;
+    case 7:
+      return 13;
+    case 8:
+      return 15;
+    case 9:
+      return 3;
+    case 10:
+      return 1;
+  }
+  return -1;
+}
+
+void connect(){
+  WiFi.mode(WIFI_STA);
+  if (String(WiFi.SSID()) != String(ssid)) {
+    WiFi.begin(ssid, password);
+  }
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(50);
+  }
+  Serial.println(WiFi.localIP());
+}
+
+void setup() {
+
+  Serial.begin(115200);
+
+  connect();
+
+  setupRest();
+
+  server.begin();
+
+  server.onNotFound(handleNotFound);
+
+  MDNS.addService("http", "tcp", 80);
+}
+
+void loop() {
+  server.handleClient();
+  delay(1000);
+}

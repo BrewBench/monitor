@@ -167,6 +167,7 @@ $scope.updateABV();
       $scope.settings.arduinos.push({
         id: btoa(now+''+$scope.settings.arduinos.length+1),
         url: 'arduino.local',
+        board: '',
         analog: 5,
         digital: 13,
         adc: 0,
@@ -191,6 +192,15 @@ $scope.updateABV();
         if(kettle.arduino && kettle.arduino.id == arduino.id)
           delete kettle.arduino;
       });
+    },
+    connect: (arduino) => {
+      BrewService.connect(arduino)
+        .then(info => {
+          if(info && info.BrewBench){
+            arduino.board = info.BrewBench.board;
+            arduino.version = info.BrewBench.version;
+          }
+        });
     }
   };
 
@@ -1200,9 +1210,13 @@ $scope.updateABV();
       var target = ($scope.settings.general.unit=='F') ? $filter('toCelsius')(kettle.temp.target) : kettle.temp.target;
       kettle.temp.adjust = parseFloat(kettle.temp.adjust);
       var adjust = ($scope.settings.general.unit=='F' && !!kettle.temp.adjust) ? $filter('round')(kettle.temp.adjust*0.555,3) : kettle.temp.adjust;
-      if(kettle.temp.type.indexOf('DHT') !== -1 && currentSketch.headers.indexOf('#include <dht.h>') === -1){
+      if(!BrewService.isESP(kettle.arduino) && kettle.temp.type.indexOf('DHT') !== -1 && currentSketch.headers.indexOf('#include <dht.h>') === -1){
         currentSketch.headers.push('// https://www.brewbench.co/libs/DHTlib-1.2.9.zip');
         currentSketch.headers.push('#include <dht.h>');
+      }
+      else if(BrewService.isESP(kettle.arduino) && kettle.temp.type.indexOf('DHT') !== -1 && currentSketch.headers.indexOf('#include "DHTesp.h"') === -1){
+        currentSketch.headers.push('// https://github.com/beegee-tokyo/DHTesp');
+        currentSketch.headers.push('#include "DHTesp.h"');
       }
       if(kettle.temp.type.indexOf('DS18B20') !== -1 && currentSketch.headers.indexOf('#include "cactus_io_DS18B20.h"') === -1){
         currentSketch.headers.push('// https://www.brewbench.co/libs/cactus_io_DS18B20.zip');
@@ -1251,6 +1265,7 @@ $scope.updateABV();
           .replace('// [actions]', actions.length ? actions.join('\n') : '')
           .replace('// [headers]', headers.length ? headers.join('\n') : '')
           .replace(/\[VERSION\]/g, $scope.pkg.sketch_version)
+          .replace(/\[HOSTNAME\]/g, name.replace('.local',''))
           .replace(/\[TPLINK_CONNECTION\]/g, tplink_connection_string)
           .replace(/\[SLACK_CONNECTION\]/g, $scope.settings.notifications.slack)
         if( sketch.indexOf('Streams') !== -1){
@@ -1280,7 +1295,7 @@ $scope.updateABV();
           }
           response.data = response.data.replace(/\[INFLUXDB_CONNECTION\]/g, connection_string);
         }
-        if(headers.indexOf('#include <dht.h>') !== -1){
+        if(headers.indexOf('#include <dht.h>') !== -1 || headers.indexOf('#include "DHTesp.h"') !== -1){
           response.data = response.data.replace(/\/\/ DHT /g, '');
         }
         if(headers.indexOf('#include "cactus_io_DS18B20.h"') !== -1){

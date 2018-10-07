@@ -3,7 +3,7 @@
 #include <BridgeClient.h>
 // [headers]
 
-String HOSTNAME = "notset";
+String HOSTNAME = "[HOSTNAME]";
 const PROGMEM uint8_t FREQUENCY_SECONDS = 60;
 uint8_t secondCounter = 0;
 BridgeServer server;
@@ -57,11 +57,14 @@ void processRest(BridgeClient client) {
   if (command == "digital" || command == "analog" || command == "adc") {
     adCommand(client, command);
   }
-  if (command == "Thermistor" || command == "DS18B20" || command == "PT100" ||
+  else if (command == "Thermistor" || command == "DS18B20" || command == "PT100" ||
     command == "DHT11" || command == "DHT12" || command == "DHT21" ||
     command == "DHT22" || command == "DHT33" || command == "DHT44" ||
     command.substring(0,13) == "SoilMoistureD") {
       sensorCommand(client, command);
+  }
+  else {
+    client.print("{\"BrewBench\": {\"board\": \"YUN\", \"version\": \"[VERSION]\"}}");
   }
 }
 

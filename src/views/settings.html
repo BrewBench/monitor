@@ -191,6 +191,8 @@
                   <td>
                     <span ng-show="arduino.version" class="badge badge-pill" ng-class="{'badge-success':pkg.sketch_version==arduino.version, 'badge-warning':pkg.sketch_version!=arduino.version}">
                     {{arduino.version}}</span>
+                    <span ng-show="!arduino.version" style="cursor: pointer;" class="badge badge-pill badge-secondary" ng-click="arduinos.connect(arduino)">
+                    Connect</span>
                     <small ng-show="arduino.version && pkg.sketch_version!=arduino.version"><a href="" data-dismiss="modal" data-toggle="modal" data-target="#sketchesModal">{{pkg.sketch_version}} is Available</a></small>
                   </td>
                   <!-- <td class="text-left">

@@ -6,11 +6,9 @@
 #include <dht.h>
 // https://www.brewbench.co/libs/cactus_io_DS18B20.zip
 #include "cactus_io_DS18B20.h"
-// https://github.com/adafruit/Adafruit_ADS1X15
-// ADC #include <Wire.h>
-// ADC #include <Adafruit_ADS1015.h>
+// [headers]
 
-String HOSTNAME = "notset";
+String HOSTNAME = "[HOSTNAME]";
 BridgeServer server;
 // ADC Adafruit_ADS1115 ads(0x48);
 
@@ -68,15 +66,18 @@ void processRest(BridgeClient client) {
   if (command == "digital" || command == "analog" || command == "adc") {
     adCommand(client, command);
   }
-  if (command == "reboot") {
+  else if (command == "reboot") {
     client.print("{\"reboot\":true}");
     reboot();
   }
-  if (command == "Thermistor" || command == "DS18B20" || command == "PT100" ||
+  else if (command == "Thermistor" || command == "DS18B20" || command == "PT100" ||
       command == "DHT11" || command == "DHT12" || command == "DHT21" ||
       command == "DHT22" || command == "DHT33" || command == "DHT44" ||
       command.substring(0,13) == "SoilMoistureD") {
     sensorCommand(client, command);
+  }
+  else {
+    client.print("{\"BrewBench\": {\"board\": \"YUN\", \"version\": \"[VERSION]\"}}");
   }
 }
 

@@ -25,7 +25,7 @@ angular.module('brewbench-monitor')
         ,recipe: {'name':'','brewer':{name:'','email':''},'yeast':[],'hops':[],'grains':[],scale:'gravity',method:'papazian','og':1.050,'fg':1.010,'abv':0,'abw':0,'calories':0,'attenuation':0}
         ,notifications: {on:true,timers:true,high:true,low:true,target:true,slack:'',last:''}
         ,sounds: {on:true,alert:'/assets/audio/bike.mp3',timer:'/assets/audio/school.mp3'}
-        ,arduinos: [{id:'local-'+btoa('brewbench'),url:'arduino.local',analog:5,digital:13,adc:0,secure:false,version:'',status:{error:'',dt:''}}]
+        ,arduinos: [{id:'local-'+btoa('brewbench'),board:'',url:'arduino.local',analog:5,digital:13,adc:0,secure:false,version:'',status:{error:'',dt:''}}]
         ,tplink: {user: '', pass: '', token:'', status: '', plugs: []}
         ,influxdb: {url: '', port: '', user: '', pass: '', db: '', dbs:[], status: ''}
         ,streams: {username: '', api_key: '', status: '', session: {id: '', name: '', type: 'fermentation'}}
@@ -171,6 +171,10 @@ angular.module('brewbench-monitor')
       return domain;
     },
 
+    isESP: function(arduino){
+      return !!(arduino.board && arduino.board.indexOf('ESP') !== -1);
+    },
+
     slack: function(webhook_url, msg, color, icon, kettle){
       var q = $q.defer();
 
@@ -194,6 +198,22 @@ angular.module('brewbench-monitor')
       return q.promise;
     },
 
+    connect: function(arduino){
+      var q = $q.defer();
+      var url = this.domain(arduino)+'/arduino/info';
+      var settings = this.settings('settings');
+      var request = {url: url, method: 'GET', timeout: settings.general.pollSeconds*10000};
+      $http(request)
+        .then(response => {
+          if(response.headers('X-Sketch-Version'))
+            response.data.sketch_version = response.headers('X-Sketch-Version');
+          q.resolve(response.data);
+        })
+        .catch(err => {
+          q.reject(err);
+        });
+      return q.promise;
+    },
     // Thermistor, DS18B20, or PT100
     // https://learn.adafruit.com/thermistor/using-a-thermistor
     // https://www.adafruit.com/product/381)
@@ -201,9 +221,19 @@ angular.module('brewbench-monitor')
     temp: function(kettle){
       if(!kettle.arduino) return $q.reject('Select an arduino to use.');
       var q = $q.defer();
-      var url = this.domain(kettle.arduino)+'/arduino/'+kettle.temp.type
-      if(!!kettle.temp.vcc) url += kettle.temp.vcc;
-      url += '/'+kettle.temp.pin;
+      var url = this.domain(kettle.arduino)+'/arduino/'+kettle.temp.type;
+      if(this.isESP(kettle.arduino)){
+        if(kettle.temp.pin.indexOf('A') === 0)
+          url += '?apin='+kettle.temp.pin;
+        else
+          url += '?dpin='+kettle.temp.pin;
+        if(!!kettle.temp.vcc) //SoilMoisture logic
+          url += '&dpin='+kettle.temp.vcc;
+      } else {
+        if(!!kettle.temp.vcc) //SoilMoisture logic
+          url += kettle.temp.vcc;
+        url += '/'+kettle.temp.pin;
+      }
       var settings = this.settings('settings');
       var request = {url: url, method: 'GET', timeout: settings.general.pollSeconds*10000};
 
@@ -228,7 +258,12 @@ angular.module('brewbench-monitor')
     digital: function(kettle,sensor,value){
       if(!kettle.arduino) return $q.reject('Select an arduino to use.');
       var q = $q.defer();
-      var url = this.domain(kettle.arduino)+'/arduino/digital/'+sensor+'/'+value;
+      var url = this.domain(kettle.arduino)+'/arduino/digital';
+      if(this.isESP(kettle.arduino)){
+        url += '?dpin='+sensor+'&value='+value;
+      } else {
+        url += '/'+sensor+'/'+value;
+      }
       var settings = this.settings('settings');
       var request = {url: url, method: 'GET', timeout: settings.general.pollSeconds*10000};
 
@@ -251,7 +286,12 @@ angular.module('brewbench-monitor')
     analog: function(kettle,sensor,value){
       if(!kettle.arduino) return $q.reject('Select an arduino to use.');
       var q = $q.defer();
-      var url = this.domain(kettle.arduino)+'/arduino/analog/'+sensor+'/'+value;
+      var url = this.domain(kettle.arduino)+'/arduino/analog';
+      if(this.isESP(kettle.arduino)){
+        url += '?apin='+sensor+'&value='+value;
+      } else {
+        url += '/'+sensor+'/'+value;
+      }
       var settings = this.settings('settings');
       var request = {url: url, method: 'GET', timeout: settings.general.pollSeconds*10000};
 
@@ -274,7 +314,12 @@ angular.module('brewbench-monitor')
     digitalRead: function(kettle,sensor,timeout){
       if(!kettle.arduino) return $q.reject('Select an arduino to use.');
       var q = $q.defer();
-      var url = this.domain(kettle.arduino)+'/arduino/digital/'+sensor;
+      var url = this.domain(kettle.arduino)+'/arduino/digital';
+      if(this.isESP(kettle.arduino)){
+        url += '?dpin='+sensor;
+      } else {
+        url += '/'+sensor;
+      }
       var settings = this.settings('settings');
       var request = {url: url, method: 'GET', timeout: settings.general.pollSeconds*10000};
 
