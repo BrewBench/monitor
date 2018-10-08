@@ -169,10 +169,19 @@ void sensorCommand(BridgeClient client, String type) {
     digitalWrite(dpin, LOW);
     percent = map(raw, 0, 880, 0, 100);
   }
-  // DS18B20 else if(type == "DS18B20"){
-  // DS18B20 DS18B20 ds(pin);
-  // DS18B20 ds.readSensor();
-  // DS18B20 temp = ds.getTemperature_C();
+  // DS18B20 else if(type.substring(0,7) == "DS18B20"){
+  // DS18B20   // format DS18B20-index
+  // DS18B20   int16_t index;
+  // DS18B20   if( type.length() > 7 )
+  // DS18B20     index = type.substring(8).toInt();
+  // DS18B20   OneWire oneWire(pin);
+  // DS18B20   DallasTemperature sensors(&oneWire);
+  // DS18B20   sensors.begin();
+  // DS18B20   sensors.requestTemperatures();
+  // DS18B20   if( index )
+  // DS18B20     temp = sensors.getTempCByIndex(index);
+  // DS18B20   else
+  // DS18B20     temp = sensors.getTempCByIndex(0);
   // DS18B20 }
   // DHT else if(type == "DHT11" || type == "DHT12" || type == "DHT21" || type == "DHT22" || type == "DHT33" || type == "DHT44"){
   // DHT   uint8_t chk = -1;
@@ -260,11 +269,20 @@ float actionsCommand(const String source, const String spin, const String type, 
       temp = (150*map(raw,410,1023,0,614))/614;
     }
   }
-  // DS18B20 else if(type == "DS18B20"){
-  // DS18B20 DS18B20 ds(pin);
-  // DS18B20 ds.readSensor();
-  // DS18B20 temp = ds.getTemperature_C();
-  // DS18B20 }
+  // DS18B20 else if(type.substring(0,7) == "DS18B20"){
+  // DS18B20   // format DS18B20-index
+  // DS18B20   int16_t index;
+  // DS18B20   if( type.length() > 7 )
+  // DS18B20     index = type.substring(8).toInt();
+  // DS18B20   OneWire oneWire(pin);
+  // DS18B20   DallasTemperature sensors(&oneWire);
+  // DS18B20   sensors.begin();
+  // DS18B20   sensors.requestTemperatures();
+  // DS18B20   if( index )
+  // DS18B20     temp = sensors.getTempCByIndex(index);
+  // DS18B20   else
+  // DS18B20     temp = sensors.getTempCByIndex(0);
+  // DS18B20 }  
   // DHT else if(type == "DHT11" || type == "DHT12" || type == "DHT21" || type == "DHT22" || type == "DHT33" || type == "DHT44"){
   // DHT   uint8_t chk = -1;
   // DHT if(type == "DHT11")

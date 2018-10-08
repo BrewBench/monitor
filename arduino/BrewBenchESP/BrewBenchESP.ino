@@ -57,6 +57,7 @@ void processRest(const String command) {
   String apin = "";
   String dpin = "";
   int16_t value;
+  int16_t index;
   for (uint8_t i = 0; i < server.args(); i++) {
     if( server.argName(i) == "dpin" )
       dpin = server.arg(i);
@@ -64,6 +65,8 @@ void processRest(const String command) {
       apin = server.arg(i);
     else if( server.argName(i) == "value" )
       value = server.arg(i).toInt();
+    else if( server.argName(i) == "index" )
+      index = server.arg(i).toInt();
   }
   String data = "";
 
@@ -72,7 +75,7 @@ void processRest(const String command) {
   }
   else if (command == "DS18B20" || command == "PT100" ||
       command == "DHT11" || command == "DHT22" || command == "SoilMoisture") {
-    data = sensorCommand(dpin, apin, command);
+    data = sensorCommand(dpin, apin, index, command);
   }
   server.send(200, "application/json", data);
 }
@@ -132,7 +135,7 @@ String adCommand(const String dpin, const String apin, int16_t value, const Stri
   return data;
 }
 
-String sensorCommand(const String dpin, const String apin, const String type) {
+String sensorCommand(const String dpin, const String apin, const int16_t index, const String type) {
   uint8_t pin;
   if( dpin != "" )
     pin = gpio(dpin);
@@ -164,7 +167,10 @@ String sensorCommand(const String dpin, const String apin, const String type) {
     DallasTemperature sensors(&oneWire);
     sensors.begin();
     sensors.requestTemperatures();
-    temp = sensors.getTempCByIndex(0);
+    if( index )
+      temp = sensors.getTempCByIndex(index);
+    else
+      temp = sensors.getTempCByIndex(0);
   }
   else if(type == "SoilMoisture"){
     pinMode(pin, OUTPUT);

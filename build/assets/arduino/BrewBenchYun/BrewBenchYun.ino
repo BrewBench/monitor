@@ -4,9 +4,8 @@
 #include <avr/wdt.h>
 // https://www.brewbench.co/libs/DHTlib-1.2.9.zip
 #include <dht.h>
-// https://www.brewbench.co/libs/cactus_io_DS18B20.zip
-#include "cactus_io_DS18B20.h"
-// [headers]
+#include <OneWire.h>
+#include <DallasTemperature.h>
 
 String HOSTNAME = "[HOSTNAME]";
 BridgeServer server;
@@ -182,10 +181,19 @@ void sensorCommand(BridgeClient client, String type) {
     digitalWrite(dpin, LOW);
     percent = map(raw, 0, 880, 0, 100);
   }
-  else if(type == "DS18B20"){
-    DS18B20 ds(pin);
-    ds.readSensor();
-    temp = ds.getTemperature_C();
+  else if(type.substring(0,7) == "DS18B20"){
+    // format DS18B20-index
+    int16_t index;
+    if( type.length() > 7 )
+      index = type.substring(8).toInt();
+    OneWire oneWire(pin);
+    DallasTemperature sensors(&oneWire);
+    sensors.begin();
+    sensors.requestTemperatures();
+    if( index )
+      temp = sensors.getTempCByIndex(index);
+    else
+      temp = sensors.getTempCByIndex(0);
   }
   else if(type == "DHT11" || type == "DHT12" || type == "DHT21" || type == "DHT22" || type == "DHT33" || type == "DHT44"){
     int chk = -1;

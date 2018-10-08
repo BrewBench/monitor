@@ -304,7 +304,7 @@ $scope.updateABV();
         ,sticky: false
         ,heater: {pin:'D6',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
         ,pump: {pin:'D7',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
-        ,temp: {pin:'A0',vcc:'',type:'Thermistor',adc:false,hit:false,current:0,measured:0,previous:0,adjust:0,target:$scope.kettleTypes[0].target,diff:$scope.kettleTypes[0].diff,raw:0,volts:0}
+        ,temp: {pin:'A0',vcc:'',index:'',type:'Thermistor',adc:false,hit:false,current:0,measured:0,previous:0,adjust:0,target:$scope.kettleTypes[0].target,diff:$scope.kettleTypes[0].diff,raw:0,volts:0}
         ,values: []
         ,timers: []
         ,knob: angular.copy(BrewService.defaultKnobOptions(),{value:0,min:0,max:$scope.kettleTypes[0].target+$scope.kettleTypes[0].diff})
@@ -357,6 +357,7 @@ $scope.updateABV();
       kettle.knob.unit = '\u00B0';
     }
     kettle.temp.vcc = '';
+    kettle.temp.index = '';
   };
 
   $scope.createShare = function(){
@@ -1243,16 +1244,10 @@ $scope.updateABV();
         currentSketch.headers.push('#include "DHTesp.h"');
       }
       if(kettle.temp.type.indexOf('DS18B20') !== -1){
-        if(BrewService.isESP(kettle.arduino)){
-          if(currentSketch.headers.indexOf('#include <OneWire.h>') === -1)
-            currentSketch.headers.push('#include <OneWire.h>');
-          if(currentSketch.headers.indexOf('#include <DallasTemperature.h>') === -1)
-            currentSketch.headers.push('#include <DallasTemperature.h>');
-        }
-        else if(currentSketch.headers.indexOf('#include "cactus_io_DS18B20.h"') === -1){
-          currentSketch.headers.push('// https://www.brewbench.co/libs/cactus_io_DS18B20.zip');
-          currentSketch.headers.push('#include "cactus_io_DS18B20.h"');
-        }
+        if(currentSketch.headers.indexOf('#include <OneWire.h>') === -1)
+          currentSketch.headers.push('#include <OneWire.h>');
+        if(currentSketch.headers.indexOf('#include <DallasTemperature.h>') === -1)
+          currentSketch.headers.push('#include <DallasTemperature.h>');
       }
       // Are we using ADC?
       if(kettle.temp.pin.indexOf('C') === 0 && currentSketch.headers.indexOf('#include <Adafruit_ADS1015.h>') === -1){
@@ -1264,6 +1259,7 @@ $scope.updateABV();
       }
       var kettleType = kettle.temp.type;
       if(kettle.temp.vcc) kettleType += kettle.temp.vcc;
+      if(kettle.temp.index) kettleType += '-'+kettle.temp.index;
       currentSketch.actions.push('actionsCommand(F("'+kettle.name.replace(/[^a-zA-Z0-9-.]/g, "")+'"),F("'+kettle.temp.pin+'"),F("'+kettleType+'"),'+adjust+');');
       //look for triggers
       if(kettle.heater && kettle.heater.sketch){

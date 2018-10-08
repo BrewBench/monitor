@@ -133,6 +133,20 @@
                   </button>
                 </div>
               </div>
+              <div class="btn-group" ng-if="kettle.arduino && kettle.temp.type == 'DS18B20'">
+                <button type="button" class="btn btn-light dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  {{(kettle.temp.index >= 0) ? kettle.temp.index : 'Index?'}} <span class="caret"></span>
+                </button>
+                <div class="dropdown-menu scrollable-menu">
+                  <h6 class="dropdown-header">Index</h6>
+                  <div class="dropdown-divider"></div>
+                  <button ng-repeat="n in [].constructor(20) track by $index" ng-class="{'active': kettle.temp.index==$index}"
+                      ng-click="kettle.temp.index=$index;updateStreams(kettle);"
+                      class="dropdown-item" type="button">
+                    {{$index}} <span class="pininuse" ng-show="$index == 0">Default</span>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>

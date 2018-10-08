@@ -134,7 +134,7 @@ String adCommand(const String dpin, const String apin, int16_t value, const Stri
   return data;
 }
 
-String sensorCommand(const String dpin, const String apin, const String type) {
+String sensorCommand(const String dpin, const String apin, const int16_t index, const String type) {
   uint8_t pin;
   if( dpin != "" )
     pin = gpio(dpin);
@@ -160,12 +160,19 @@ String sensorCommand(const String dpin, const String apin, const String type) {
       temp = (150*map(raw,410,1023,0,614))/614;
     }
   }
-  // DS18B20 else if(type == "DS18B20"){
+  // DS18B20 else if(type.substring(0,7) == "DS18B20"){
+  // DS18B20   // format DS18B20-index
+  // DS18B20   int16_t index;
+  // DS18B20   if( type.length() > 7 )
+  // DS18B20     index = type.substring(8).toInt();
   // DS18B20   OneWire oneWire(pin);
   // DS18B20   DallasTemperature sensors(&oneWire);
   // DS18B20   sensors.begin();
   // DS18B20   sensors.requestTemperatures();
-  // DS18B20   temp = sensors.getTempCByIndex(0);
+  // DS18B20   if( index )
+  // DS18B20     temp = sensors.getTempCByIndex(index);
+  // DS18B20   else
+  // DS18B20     temp = sensors.getTempCByIndex(0);
   // DS18B20 }
   else if(type == "SoilMoisture"){
     pinMode(pin, OUTPUT);
@@ -201,7 +208,7 @@ String sensorCommand(const String dpin, const String apin, const String type) {
   return data;
 }
 
-float actionsCommand(const String source, const String spin, const String type, const float adjustTemp) {
+float actionsCommand(const String source, const String spin, const String type, const int16_t index, const float adjustTemp) {
   float temp = 0.00;
   float raw = 0.00;
   float volts = 0.00;
@@ -228,12 +235,19 @@ float actionsCommand(const String source, const String spin, const String type, 
       temp = (150*map(raw,410,1023,0,614))/614;
     }
   }
-  // DS18B20 else if(type == "DS18B20"){
+  // DS18B20 else if(type.substring(0,7) == "DS18B20"){
+  // DS18B20   // format DS18B20-index
+  // DS18B20   int16_t index;
+  // DS18B20   if( type.length() > 7 )
+  // DS18B20     index = type.substring(8).toInt();
   // DS18B20   OneWire oneWire(pin);
   // DS18B20   DallasTemperature sensors(&oneWire);
   // DS18B20   sensors.begin();
   // DS18B20   sensors.requestTemperatures();
-  // DS18B20   temp = sensors.getTempCByIndex(0);
+  // DS18B20   if( index )
+  // DS18B20     temp = sensors.getTempCByIndex(index);
+  // DS18B20   else
+  // DS18B20     temp = sensors.getTempCByIndex(0);
   // DS18B20 }
   else if(type.substring(0,13) == "SoilMoistureD"){
     uint8_t dpin = type.substring(13).toInt();
