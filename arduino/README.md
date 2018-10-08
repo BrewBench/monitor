@@ -110,6 +110,12 @@ Open the serial monitor on `115200` baud to get the IP address after uploading t
 - ESP32
   - [ESP32 on Amazon](https://smile.amazon.com/gp/product/B0718T232Z/ref=ox_sc_act_title_1?smid=A30QSGOJR8LMXA&psc=1)
 
+This board only supports sensors
+
+- PT100
+- DHT11 and DHT22
+- DS18B20
+
 ### ADS1115
 
 * Analog to Digital Convertor runs on Address 0x48
