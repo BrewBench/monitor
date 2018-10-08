@@ -57,11 +57,12 @@ void processRest(BridgeClient client) {
   if (command == "digital" || command == "analog" || command == "adc") {
     adCommand(client, command);
   }
-  else if (command == "Thermistor" || command == "DS18B20" || command == "PT100" ||
-    command == "DHT11" || command == "DHT12" || command == "DHT21" ||
-    command == "DHT22" || command == "DHT33" || command == "DHT44" ||
-    command.substring(0,13) == "SoilMoistureD") {
-      sensorCommand(client, command);
+  else if (command == "Thermistor" || command == "PT100" ||
+      command == "DHT11" || command == "DHT12" || command == "DHT21" ||
+      command == "DHT22" || command == "DHT33" || command == "DHT44" ||
+      command.substring(0,13) == "SoilMoistureD" ||
+      command.substring(0,7) == "DS18B20") {
+    sensorCommand(client, command);
   }
   else {
     client.print("{\"BrewBench\": {\"board\": \"YUN\", \"version\": \"[VERSION]\"}}");
@@ -346,7 +347,7 @@ float actionsCommand(const String source, const String spin, const String type, 
   // DS18B20     temp = sensors.getTempCByIndex(index);
   // DS18B20   else
   // DS18B20     temp = sensors.getTempCByIndex(0);
-  // DS18B20 }  
+  // DS18B20 }
   // DHT else if(type == "DHT11" || type == "DHT12" || type == "DHT21" || type == "DHT22" || type == "DHT33" || type == "DHT44"){
   // DHT   int chk = -1;
   // DHT if(type == "DHT11")

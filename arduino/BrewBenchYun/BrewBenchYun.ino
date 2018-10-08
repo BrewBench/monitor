@@ -69,10 +69,11 @@ void processRest(BridgeClient client) {
     client.print("{\"reboot\":true}");
     reboot();
   }
-  else if (command == "Thermistor" || command == "DS18B20" || command == "PT100" ||
+  else if (command == "Thermistor" || command == "PT100" ||
       command == "DHT11" || command == "DHT12" || command == "DHT21" ||
       command == "DHT22" || command == "DHT33" || command == "DHT44" ||
-      command.substring(0,13) == "SoilMoistureD") {
+      command.substring(0,13) == "SoilMoistureD" ||
+      command.substring(0,7) == "DS18B20") {
     sensorCommand(client, command);
   }
   else {
