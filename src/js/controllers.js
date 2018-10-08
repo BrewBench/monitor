@@ -901,6 +901,9 @@ $scope.updateABV();
     } else if(!kettle.temp.volts && !kettle.temp.raw){
       $scope.setErrorMessage('Sensor is not connected', kettle);
       return;
+    } else if(kettle.temp.type == 'DS18B20' && response.temp == -127){
+      $scope.setErrorMessage('Sensor is not connected', kettle);
+      return;
     }
 
     // reset all kettles every resetChart

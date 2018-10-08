@@ -44,11 +44,12 @@
                   <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="text-align: center; padding: 10px;">
                     <p>Enter your WiFi info to automatically connect to your network.</p>
                     <div class="form-group">
-                      <input type="text" class="form-control" ng-model="wifi.ssid" placeholder="WiFi SSID"/>
+                      <input type="text" class="form-control" ng-model="wifi.ssid" placeholder="WiFi Network"/>
                     </div>
                     <div class="form-group">
-                      <input type="text" class="form-control" ng-model="wifi.ssid_pass" placeholder="WiFi SSID Password"/>
+                      <input type="text" class="form-control" ng-model="wifi.ssid_pass" placeholder="WiFi Password"/>
                     </div>
+                    <p>WiFi info is not stored</p>
                     <div class="form-group">
                       <a href="" ng-click="compileSketch('ESP')" class="btn btn-primary" ng-class="{'disabled':settings.influxdb.status != 'Connected'}">Download ESP Sketch</a>
                     </div>
@@ -124,11 +125,12 @@
                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="text-align: center; padding: 10px;">
                       <p>Enter your WiFi info to automatically connect to your network.</p>
                       <div class="form-group">
-                        <input type="text" class="form-control" ng-model="wifi.ssid" placeholder="WiFi SSID"/>
+                        <input type="text" class="form-control" ng-model="wifi.ssid" placeholder="WiFi Network"/>
                       </div>
                       <div class="form-group">
-                        <input type="text" class="form-control" ng-model="wifi.ssid_pass" placeholder="WiFi SSID Password"/>
+                        <input type="text" class="form-control" ng-model="wifi.ssid_pass" placeholder="WiFi Password"/>
                       </div>
+                      <p>WiFi info is not stored</p>
                       <div class="form-group">
                         <a href="" ng-click="compileSketch('InfluxDBESP')" class="btn btn-primary" ng-class="{'disabled':settings.influxdb.status != 'Connected'}">Download ESP Sketch</a>
                       </div>
