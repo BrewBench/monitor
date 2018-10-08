@@ -1,45 +1,17 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
 #include <ESP8266mDNS.h>
-// [headers]
+// https://github.com/beegee-tokyo/DHTesp
+#include "DHTesp.h"
+#include <OneWire.h>
+#include <DallasTemperature.h>
 
 String HOSTNAME = "[HOSTNAME_TBD]";
 const char* ssid     = "[SSID]";
 const char* password = "[SSID_PASS]";
 
 ESP8266WebServer server(80);
-
-// DHT DHTesp dht;
-
-// https://learn.adafruit.com/thermistor/using-a-thermistor
-// resistance at 25 degrees C
-#define THERMISTORNOMINAL 10000
-// temp. for nominal resistance (almost always 25 C)
-#define TEMPERATURENOMINAL 25
-// how many samples to take and average, more takes longer
-// but is more 'smooth'
-#define NUMSAMPLES 5
-// The beta coefficient of the thermistor (usually 3000-4000)
-#define BCOEFFICIENT 3950
-// the value of the 'other' resistor
-#define SERIESRESISTOR 10000
-
-uint16_t samples[NUMSAMPLES];
-
-float Thermistor(float average) {
-   // convert the value to resistance
-   average = 1023 / average - 1;
-   average = SERIESRESISTOR / average;
-
-   float steinhart = average / THERMISTORNOMINAL;     // (R/Ro)
-   steinhart = log(steinhart);                  // ln(R/Ro)
-   steinhart /= BCOEFFICIENT;                   // 1/B * ln(R/Ro)
-   steinhart += 1.0 / (TEMPERATURENOMINAL + 273.15); // + (1/To)
-   steinhart = 1.0 / steinhart;                 // Invert
-   steinhart -= 273.15;
-
-   return steinhart;
-}
+DHTesp dht;
 
 void setupRest() {
 
@@ -55,18 +27,22 @@ void setupRest() {
     server.send(200, "application/json", data);
   });
 
-  server.on("/arduino/Thermistor", [](){
+  server.on("/arduino/PT100", [](){
     sendHeaders();
-    processRest("Thermistor");
+    processRest("PT100");
   });
-  // DHT server.on("/arduino/DHT11", [](){
-  // DHT   sendHeaders();
-  // DHT   processRest("DHT11");
-  // DHT });
-  // DHT server.on("/arduino/DHT22", [](){
-  // DHT   sendHeaders();
-  // DHT   processRest("DHT22");
-  // DHT });
+  server.on("/arduino/DS18B20", [](){
+    sendHeaders();
+    processRest("DS18B20");
+  });
+  server.on("/arduino/DHT11", [](){
+    sendHeaders();
+    processRest("DHT11");
+  });
+  server.on("/arduino/DHT22", [](){
+    sendHeaders();
+    processRest("DHT22");
+  });
 }
 
 void sendHeaders(){
@@ -94,7 +70,7 @@ void processRest(const String command) {
   if (command == "digital" || command == "analog" || command == "adc") {
     data = adCommand(dpin, apin, value, command);
   }
-  else if (command == "Thermistor" || command == "DS18B20" || command == "PT100" ||
+  else if (command == "DS18B20" || command == "PT100" ||
       command == "DHT11" || command == "DHT22" || command == "SoilMoisture") {
     data = sensorCommand(dpin, apin, command);
   }
@@ -177,28 +153,18 @@ String sensorCommand(const String dpin, const String apin, const String type) {
     raw = digitalRead(pin);
   }
 
-  if(type == "Thermistor"){
-    if( apin != "" ){
-      samples[0] = raw;
-      uint8_t i;
-      // take N samples in a row, with a slight delay
-      for (i=1; i< NUMSAMPLES; i++) {
-        samples[i] = analogRead(pin);
-        delay(10);
-      }
-      // average all the samples out
-      for (i=0; i< NUMSAMPLES; i++) {
-         resistance += samples[i];
-      }
-      resistance /= NUMSAMPLES;
-      raw = resistance;
-      temp = Thermistor(resistance);
-    }
-  }
-  else if(type == "PT100"){
+  // Start sensors
+  if(type == "PT100"){
     if (raw>409){
       temp = (150*map(raw,410,1023,0,614))/614;
     }
+  }
+  else if(type == "DS18B20"){
+    OneWire oneWire(pin);
+    DallasTemperature sensors(&oneWire);
+    sensors.begin();
+    sensors.requestTemperatures();
+    temp = sensors.getTempCByIndex(0);
   }
   else if(type == "SoilMoisture"){
     pinMode(pin, OUTPUT);
@@ -208,21 +174,22 @@ String sensorCommand(const String dpin, const String apin, const String type) {
     digitalWrite(pin, LOW);
     percent = map(raw, 0, 880, 0, 100);
   }
-  // DHT else if(type == "DHT11" || type == "DHT12"){
-  // DHT   if(type == "DHT11"){
-  // DHT     dht.setup(pin, DHTesp::DHT11);
-  // DHT     delay(dht.getMinimumSamplingPeriod());
-  // DHT     temp = dht.getTemperature();
-  // DHT     percent = dht.getHumidity();
-  // DHT   } else if(type == "DHT22"){
-  // DHT     dht.setup(pin, DHTesp::DHT22);
-  // DHT     delay(dht.getMinimumSamplingPeriod());
-  // DHT     temp = dht.getTemperature();
-  // DHT     percent = dht.getHumidity();
-  // DHT   }
-  // DHT   if(isnan(temp)) temp = 0;
-  // DHT   if(isnan(percent)) percent = 0;
-  // DHT }
+  else if(type == "DHT11" || type == "DHT12"){
+    if(type == "DHT11"){
+      dht.setup(pin, DHTesp::DHT11);
+      delay(dht.getMinimumSamplingPeriod());
+      temp = dht.getTemperature();
+      percent = dht.getHumidity();
+    } else if(type == "DHT22"){
+      dht.setup(pin, DHTesp::DHT22);
+      delay(dht.getMinimumSamplingPeriod());
+      temp = dht.getTemperature();
+      percent = dht.getHumidity();
+    }
+    if(isnan(temp)) temp = 0;
+    if(isnan(percent)) percent = 0;
+  }
+
   String data = "{\"hostname\":\""+String(HOSTNAME)+"\",\"pin\":\""+String(dpin)+"\",\"temp\":"+String(temp)+",\"sensor\":\""+String(type)+"\"";
   if( apin != "" )
     data = "{\"hostname\":\""+String(HOSTNAME)+"\",\"pin\":\""+String(apin)+"\",\"temp\":"+String(temp)+",\"sensor\":\""+String(type)+"\"";
@@ -231,6 +198,7 @@ String sensorCommand(const String dpin, const String apin, const String type) {
     data += ",\"percent\":"+String(percent);
   }
   data += "}";
+
   return data;
 }
 

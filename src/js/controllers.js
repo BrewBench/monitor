@@ -1225,15 +1225,25 @@ $scope.updateABV();
         currentSketch.headers.push('// https://github.com/beegee-tokyo/DHTesp');
         currentSketch.headers.push('#include "DHTesp.h"');
       }
-      if(kettle.temp.type.indexOf('DS18B20') !== -1 && currentSketch.headers.indexOf('#include "cactus_io_DS18B20.h"') === -1){
-        currentSketch.headers.push('// https://www.brewbench.co/libs/cactus_io_DS18B20.zip');
-        currentSketch.headers.push('#include "cactus_io_DS18B20.h"');
+      if(kettle.temp.type.indexOf('DS18B20') !== -1){
+        if(BrewService.isESP(kettle.arduino)){
+          if(currentSketch.headers.indexOf('#include <OneWire.h>') === -1)
+            currentSketch.headers.push('#include <OneWire.h>');
+          if(currentSketch.headers.indexOf('#include <DallasTemperature.h>') === -1)
+            currentSketch.headers.push('#include <DallasTemperature.h>');
+        }
+        else if(currentSketch.headers.indexOf('#include "cactus_io_DS18B20.h"') === -1){
+          currentSketch.headers.push('// https://www.brewbench.co/libs/cactus_io_DS18B20.zip');
+          currentSketch.headers.push('#include "cactus_io_DS18B20.h"');
+        }
       }
       // Are we using ADC?
       if(kettle.temp.pin.indexOf('C') === 0 && currentSketch.headers.indexOf('#include <Adafruit_ADS1015.h>') === -1){
         currentSketch.headers.push('// https://github.com/adafruit/Adafruit_ADS1X15');
-        currentSketch.headers.push('#include <Wire.h>');
-        currentSketch.headers.push('#include <Adafruit_ADS1015.h>');
+        if(currentSketch.headers.indexOf('#include <OneWire.h>') === -1)
+          currentSketch.headers.push('#include <Wire.h>');
+        if(currentSketch.headers.indexOf('#include <Adafruit_ADS1015.h>') === -1)
+          currentSketch.headers.push('#include <Adafruit_ADS1015.h>');
       }
       var kettleType = kettle.temp.type;
       if(kettle.temp.vcc) kettleType += kettle.temp.vcc;
@@ -1320,7 +1330,7 @@ $scope.updateABV();
         if(headers.indexOf('#include <dht.h>') !== -1 || headers.indexOf('#include "DHTesp.h"') !== -1){
           response.data = response.data.replace(/\/\/ DHT /g, '');
         }
-        if(headers.indexOf('#include "cactus_io_DS18B20.h"') !== -1){
+        if(headers.indexOf('#include "cactus_io_DS18B20.h"') !== -1 || headers.indexOf('#include <DallasTemperature.h>') !== -1){
           response.data = response.data.replace(/\/\/ DS18B20 /g, '');
         }
         if(headers.indexOf('#include <Adafruit_ADS1015.h>') !== -1){

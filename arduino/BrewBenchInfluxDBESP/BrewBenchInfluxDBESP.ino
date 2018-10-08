@@ -12,40 +12,8 @@ const char* ssid     = "[SSID]";
 const char* password = "[SSID_PASS]";
 
 ESP8266WebServer server(80);
-
 HTTPClient http;
-
 // DHT DHTesp dht;
-
-// https://learn.adafruit.com/thermistor/using-a-thermistor
-// resistance at 25 degrees C
-#define THERMISTORNOMINAL 10000
-// temp. for nominal resistance (almost always 25 C)
-#define TEMPERATURENOMINAL 25
-// how many samples to take and average, more takes longer
-// but is more 'smooth'
-#define NUMSAMPLES 5
-// The beta coefficient of the thermistor (usually 3000-4000)
-#define BCOEFFICIENT 3950
-// the value of the 'other' resistor
-#define SERIESRESISTOR 10000
-
-uint16_t samples[NUMSAMPLES];
-
-float Thermistor(float average) {
-   // convert the value to resistance
-   average = 1023 / average - 1;
-   average = SERIESRESISTOR / average;
-
-   float steinhart = average / THERMISTORNOMINAL;     // (R/Ro)
-   steinhart = log(steinhart);                  // ln(R/Ro)
-   steinhart /= BCOEFFICIENT;                   // 1/B * ln(R/Ro)
-   steinhart += 1.0 / (TEMPERATURENOMINAL + 273.15); // + (1/To)
-   steinhart = 1.0 / steinhart;                 // Invert
-   steinhart -= 273.15;
-
-   return steinhart;
-}
 
 void setupRest() {
 
@@ -61,10 +29,14 @@ void setupRest() {
     server.send(200, "application/json", data);
   });
 
-  server.on("/arduino/Thermistor", [](){
+  server.on("/arduino/PT100", [](){
     sendHeaders();
-    processRest("Thermistor");
+    processRest("PT100");
   });
+  // DS18B20 server.on("/arduino/DS18B20", [](){
+  // DS18B20   sendHeaders();
+  // DS18B20   processRest("DS18B20");
+  // DS18B20 });
   // DHT server.on("/arduino/DHT11", [](){
   // DHT   sendHeaders();
   // DHT   processRest("DHT11");
@@ -100,7 +72,7 @@ void processRest(const String command) {
   if (command == "digital" || command == "analog" || command == "adc") {
     data = adCommand(dpin, apin, value, command);
   }
-  else if (command == "Thermistor" || command == "DS18B20" || command == "PT100" ||
+  else if (command == "DS18B20" || command == "PT100" ||
       command == "DHT11" || command == "DHT22" || command == "SoilMoisture") {
     data = sensorCommand(dpin, apin, command);
   }
@@ -183,29 +155,18 @@ String sensorCommand(const String dpin, const String apin, const String type) {
     raw = digitalRead(pin);
   }
 
-  if(type == "Thermistor"){
-    if( apin != "" ){
-      samples[0] = raw;
-      uint8_t i;
-      // take N samples in a row, with a slight delay
-      for (i=1; i< NUMSAMPLES; i++) {
-        samples[i] = analogRead(pin);
-        delay(10);
-      }
-      // average all the samples out
-      for (i=0; i< NUMSAMPLES; i++) {
-         resistance += samples[i];
-      }
-      resistance /= NUMSAMPLES;
-      raw = resistance;
-      temp = Thermistor(resistance);
-    }
-  }
-  else if(type == "PT100"){
+  if(type == "PT100"){
     if (raw>409){
       temp = (150*map(raw,410,1023,0,614))/614;
     }
   }
+  // DS18B20 else if(type == "DS18B20"){
+  // DS18B20   OneWire oneWire(pin);
+  // DS18B20   DallasTemperature sensors(&oneWire);
+  // DS18B20   sensors.begin();
+  // DS18B20   sensors.requestTemperatures();
+  // DS18B20   temp = sensors.getTempCByIndex(0);
+  // DS18B20 }
   else if(type == "SoilMoisture"){
     pinMode(pin, OUTPUT);
     digitalWrite(pin, HIGH);
@@ -262,32 +223,18 @@ float actionsCommand(const String source, const String spin, const String type, 
     raw = digitalRead(pin);
   }
 
-  if(type == "Thermistor"){
-    if( spin.substring(0,1) == "A" ){
-      // don't post if a sensor isn't connected
-      if( volts < 2 )
-        return -1;
-      samples[0] = raw;
-      uint8_t i;
-      // take N samples in a row, with a slight delay
-      for (i=1; i< NUMSAMPLES; i++) {
-        samples[i] = analogRead(pin);
-        delay(10);
-      }
-      // average all the samples out
-      for (i=0; i< NUMSAMPLES; i++) {
-         resistance += samples[i];
-      }
-      resistance /= NUMSAMPLES;
-      raw = resistance;
-      temp = Thermistor(resistance);
-    }
-  }
-  else if(type == "PT100"){
+  if(type == "PT100"){
     if (raw>409){
       temp = (150*map(raw,410,1023,0,614))/614;
     }
   }
+  // DS18B20 else if(type == "DS18B20"){
+  // DS18B20   OneWire oneWire(pin);
+  // DS18B20   DallasTemperature sensors(&oneWire);
+  // DS18B20   sensors.begin();
+  // DS18B20   sensors.requestTemperatures();
+  // DS18B20   temp = sensors.getTempCByIndex(0);
+  // DS18B20 }
   else if(type.substring(0,13) == "SoilMoistureD"){
     uint8_t dpin = type.substring(13).toInt();
     pinMode(dpin, OUTPUT);
