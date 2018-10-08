@@ -177,7 +177,7 @@ $scope.updateABV();
         adc: 0,
         secure: false,
         version: '',
-        status: {error: '',dt: ''}
+        status: {error: '',dt: '',message:''}
       });
       _.each($scope.kettles, kettle => {
         if(!kettle.arduino)
@@ -198,11 +198,25 @@ $scope.updateABV();
       });
     },
     connect: (arduino) => {
+      arduino.status.dt = '';
+      arduino.status.error = '';
+      arduino.status.message = 'Connecting...';
       BrewService.connect(arduino)
         .then(info => {
           if(info && info.BrewBench){
+            event.srcElement.innerHTML = 'Connect';
             arduino.board = info.BrewBench.board;
             arduino.version = info.BrewBench.version;
+            arduino.status.dt = new Date();
+            arduino.status.error = '';
+            arduino.status.message = '';
+          }
+        })
+        .catch(err => {
+          if(err && err.status == -1){
+            arduino.status.dt = '';
+            arduino.status.message = '';
+            arduino.status.error = 'Could not connect';
           }
         });
     }
