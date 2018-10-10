@@ -28,6 +28,30 @@
         </div>
         <div class="pb-3">
           <h4>
+            Sensors
+          </h4>
+          <div class="block-border">
+            <div class="row new pb-3">
+              <div class="col-10 pb-3">
+                Some sensors require additional libraries.  Check sensors you want included in the sketch.
+                <ul class="tg-list">
+                  <li class="tg-list-item">
+                    <label><b>DHT</b></label>
+                    <input class="tgl tgl-ios" id="DHT" type="checkbox" ng-model="settings.sensors.DHT" ng-checked="settings.sensors.DHT"/>
+                    <label class="tgl-btn" for="DHT"></label>
+                  </li>
+                  <li class="tg-list-item">
+                    <label><b>DS18B20</b></label>
+                    <input class="tgl tgl-ios" id="DS18B20" type="checkbox" ng-model="settings.sensors.DS18B20" ng-checked="settings.sensors.DS18B20"/>
+                    <label class="tgl-btn" for="DS18B20"></label>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="pb-3">
+          <h4>
             BrewBench Basic
           </h4>
           <div class="block-border">

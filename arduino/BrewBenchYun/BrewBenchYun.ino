@@ -184,14 +184,14 @@ void sensorCommand(BridgeClient client, String type) {
   }
   else if(type.substring(0,7) == "DS18B20"){
     // format DS18B20-index
-    int16_t index;
+    int16_t index = -1;
     if( type.length() > 7 )
       index = type.substring(8).toInt();
     OneWire oneWire(pin);
     DallasTemperature sensors(&oneWire);
     sensors.begin();
     sensors.requestTemperatures();
-    if( index )
+    if( index > 0 )
       temp = sensors.getTempCByIndex(index);
     else
       temp = sensors.getTempCByIndex(0);

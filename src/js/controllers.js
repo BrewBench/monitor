@@ -1235,15 +1235,19 @@ $scope.updateABV();
       var target = ($scope.settings.general.unit=='F') ? $filter('toCelsius')(kettle.temp.target) : kettle.temp.target;
       kettle.temp.adjust = parseFloat(kettle.temp.adjust);
       var adjust = ($scope.settings.general.unit=='F' && !!kettle.temp.adjust) ? $filter('round')(kettle.temp.adjust*0.555,3) : kettle.temp.adjust;
-      if(!BrewService.isESP(kettle.arduino) && kettle.temp.type.indexOf('DHT') !== -1 && currentSketch.headers.indexOf('#include <dht.h>') === -1){
-        currentSketch.headers.push('// https://www.brewbench.co/libs/DHTlib-1.2.9.zip');
-        currentSketch.headers.push('#include <dht.h>');
+      if(!BrewService.isESP(kettle.arduino) &&
+        ($scope.settings.sensors.DHT || kettle.temp.type.indexOf('DHT') !== -1) &&
+        currentSketch.headers.indexOf('#include <dht.h>') === -1){
+          currentSketch.headers.push('// https://www.brewbench.co/libs/DHTlib-1.2.9.zip');
+          currentSketch.headers.push('#include <dht.h>');
       }
-      else if(BrewService.isESP(kettle.arduino) && kettle.temp.type.indexOf('DHT') !== -1 && currentSketch.headers.indexOf('#include "DHTesp.h"') === -1){
-        currentSketch.headers.push('// https://github.com/beegee-tokyo/DHTesp');
-        currentSketch.headers.push('#include "DHTesp.h"');
+      else if(BrewService.isESP(kettle.arduino) &&
+        ($scope.settings.sensors.DHT || kettle.temp.type.indexOf('DHT') !== -1) &&
+        currentSketch.headers.indexOf('#include "DHTesp.h"') === -1){
+          currentSketch.headers.push('// https://github.com/beegee-tokyo/DHTesp');
+          currentSketch.headers.push('#include "DHTesp.h"');
       }
-      if(kettle.temp.type.indexOf('DS18B20') !== -1){
+      if($scope.settings.sensors.DS18B20 || kettle.temp.type.indexOf('DS18B20') !== -1){
         if(currentSketch.headers.indexOf('#include <OneWire.h>') === -1)
           currentSketch.headers.push('#include <OneWire.h>');
         if(currentSketch.headers.indexOf('#include <DallasTemperature.h>') === -1)
@@ -1343,7 +1347,7 @@ $scope.updateABV();
         if(headers.indexOf('#include <dht.h>') !== -1 || headers.indexOf('#include "DHTesp.h"') !== -1){
           response.data = response.data.replace(/\/\/ DHT /g, '');
         }
-        if(headers.indexOf('#include "cactus_io_DS18B20.h"') !== -1 || headers.indexOf('#include <DallasTemperature.h>') !== -1){
+        if(headers.indexOf('#include <DallasTemperature.h>') !== -1){
           response.data = response.data.replace(/\/\/ DS18B20 /g, '');
         }
         if(headers.indexOf('#include <Adafruit_ADS1015.h>') !== -1){

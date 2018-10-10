@@ -56,12 +56,12 @@ void sendHeaders(){
 void processRest(const String command) {
   String apin = "";
   String dpin = "";
-  int16_t value;
-  int16_t index;
+  int16_t value = -1;
+  int16_t index = -1;
   for (uint8_t i = 0; i < server.args(); i++) {
     if( server.argName(i) == "dpin" )
       dpin = server.arg(i);
-    if( server.argName(i) == "apin" )
+    else if( server.argName(i) == "apin" )
       apin = server.arg(i);
     else if( server.argName(i) == "value" )
       value = server.arg(i).toInt();
@@ -105,7 +105,7 @@ String adCommand(const String dpin, const String apin, int16_t value, const Stri
     pin = apin.substring(1).toInt();
 
   // write
-  if (value) {
+  if ( value >= 0 ) {
     pinMode(pin, OUTPUT);
     if( type == "analog" ){
       analogWrite(pin, value);//0 - 255
@@ -167,7 +167,7 @@ String sensorCommand(const String dpin, const String apin, const int16_t index, 
     DallasTemperature sensors(&oneWire);
     sensors.begin();
     sensors.requestTemperatures();
-    if( index )
+    if( index > 0 )
       temp = sensors.getTempCByIndex(index);
     else
       temp = sensors.getTempCByIndex(0);

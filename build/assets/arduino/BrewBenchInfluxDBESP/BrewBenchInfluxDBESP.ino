@@ -58,14 +58,17 @@ void sendHeaders(){
 void processRest(const String command) {
   String apin = "";
   String dpin = "";
-  int16_t value;
+  int16_t value = -1;
+  int16_t index = -1;
   for (uint8_t i = 0; i < server.args(); i++) {
     if( server.argName(i) == "dpin" )
       dpin = server.arg(i);
-    if( server.argName(i) == "apin" )
+    else if( server.argName(i) == "apin" )
       apin = server.arg(i);
     else if( server.argName(i) == "value" )
       value = server.arg(i).toInt();
+    else if( server.argName(i) == "index" )
+      index = server.arg(i).toInt();
   }
   String data = "";
 
@@ -74,7 +77,7 @@ void processRest(const String command) {
   }
   else if (command == "DS18B20" || command == "PT100" ||
       command == "DHT11" || command == "DHT22" || command == "SoilMoisture") {
-    data = sensorCommand(dpin, apin, command);
+    data = sensorCommand(dpin, apin, index, command);
   }
   server.send(200, "application/json", data);
 }
@@ -104,7 +107,7 @@ String adCommand(const String dpin, const String apin, int16_t value, const Stri
     pin = apin.substring(1).toInt();
 
   // write
-  if (value) {
+  if ( value >= 0 ) {
     pinMode(pin, OUTPUT);
     if( type == "analog" ){
       analogWrite(pin, value);//0 - 255
@@ -161,15 +164,11 @@ String sensorCommand(const String dpin, const String apin, const int16_t index, 
     }
   }
   // DS18B20 else if(type.substring(0,7) == "DS18B20"){
-  // DS18B20   // format DS18B20-index
-  // DS18B20   int16_t index;
-  // DS18B20   if( type.length() > 7 )
-  // DS18B20     index = type.substring(8).toInt();
   // DS18B20   OneWire oneWire(pin);
   // DS18B20   DallasTemperature sensors(&oneWire);
   // DS18B20   sensors.begin();
   // DS18B20   sensors.requestTemperatures();
-  // DS18B20   if( index )
+  // DS18B20   if( index > 0 )
   // DS18B20     temp = sensors.getTempCByIndex(index);
   // DS18B20   else
   // DS18B20     temp = sensors.getTempCByIndex(0);
@@ -208,7 +207,7 @@ String sensorCommand(const String dpin, const String apin, const int16_t index, 
   return data;
 }
 
-float actionsCommand(const String source, const String spin, const String type, const int16_t index, const float adjustTemp) {
+float actionsCommand(const String source, const String spin, const String type, const float adjustTemp) {
   float temp = 0.00;
   float raw = 0.00;
   float volts = 0.00;
@@ -237,14 +236,14 @@ float actionsCommand(const String source, const String spin, const String type, 
   }
   // DS18B20 else if(type.substring(0,7) == "DS18B20"){
   // DS18B20   // format DS18B20-index
-  // DS18B20   int16_t index;
+  // DS18B20   int16_t index = -1;
   // DS18B20   if( type.length() > 7 )
   // DS18B20     index = type.substring(8).toInt();
   // DS18B20   OneWire oneWire(pin);
   // DS18B20   DallasTemperature sensors(&oneWire);
   // DS18B20   sensors.begin();
   // DS18B20   sensors.requestTemperatures();
-  // DS18B20   if( index )
+  // DS18B20   if( index > 0 )
   // DS18B20     temp = sensors.getTempCByIndex(index);
   // DS18B20   else
   // DS18B20     temp = sensors.getTempCByIndex(0);
