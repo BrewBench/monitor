@@ -5,7 +5,7 @@
 #include <WiFiClient.h>
 // [headers]
 
-String HOSTNAME = "[HOSTNAME_TBD]";
+String HOSTNAME = "[HOSTNAME]";
 const PROGMEM uint8_t FREQUENCY_SECONDS = 60;
 uint8_t secondCounter = 0;
 const char* ssid     = "[SSID]";
@@ -13,7 +13,25 @@ const char* password = "[SSID_PASS]";
 
 ESP8266WebServer server(80);
 HTTPClient http;
+
 // DHT DHTesp dht;
+
+// how many samples to take and average, more takes longer
+// but is more 'smooth'
+#define NUMSAMPLES 5
+// the value of the 'other' resistor
+#define SERIESRESISTOR 147000
+
+uint16_t samples[NUMSAMPLES];
+
+float Thermistor(float average) {
+  float V_NTC = average / 1024;
+  float R_NTC = (SERIESRESISTOR * V_NTC) / (3.3 - V_NTC);
+  R_NTC = log(R_NTC);
+  float Temp = 1 / (0.001129148 + (0.000234125 + (0.0000000876741 * R_NTC * R_NTC ))* R_NTC );
+  Temp = Temp - 273.15;
+  return Temp;
+}
 
 void setupRest() {
 
@@ -29,6 +47,10 @@ void setupRest() {
     server.send(200, "application/json", data);
   });
 
+  server.on("/arduino/Thermistor", [](){
+    sendHeaders();
+    processRest("Thermistor");
+  });
   server.on("/arduino/PT100", [](){
     sendHeaders();
     processRest("PT100");
@@ -75,7 +97,7 @@ void processRest(const String command) {
   if (command == "digital" || command == "analog" || command == "adc") {
     data = adCommand(dpin, apin, value, command);
   }
-  else if (command == "DS18B20" || command == "PT100" ||
+  else if (command == "Thermistor" || command == "DS18B20" || command == "PT100" ||
       command == "DHT11" || command == "DHT22" || command == "SoilMoisture") {
     data = sensorCommand(dpin, apin, index, command);
   }
@@ -158,7 +180,23 @@ String sensorCommand(const String dpin, const String apin, const int16_t index, 
     raw = digitalRead(pin);
   }
 
-  if(type == "PT100"){
+  if(type == "Thermistor"){
+    samples[0] = raw;
+    uint8_t i;
+    // take N samples in a row, with a slight delay
+    for (i=1; i< NUMSAMPLES; i++) {
+      samples[i] = analogRead(pin);
+      delay(10);
+    }
+    // average all the samples out
+    for (i=0; i< NUMSAMPLES; i++) {
+       resistance += samples[i];
+    }
+    resistance /= NUMSAMPLES;
+    raw = resistance;
+    temp = Thermistor(resistance);
+  }
+  else if(type == "PT100"){
     if (raw>409){
       temp = (150*map(raw,410,1023,0,614))/614;
     }
@@ -229,7 +267,23 @@ float actionsCommand(const String source, const String spin, const String type, 
     raw = digitalRead(pin);
   }
 
-  if(type == "PT100"){
+  if(type == "Thermistor"){
+    samples[0] = raw;
+    uint8_t i;
+    // take N samples in a row, with a slight delay
+    for (i=1; i< NUMSAMPLES; i++) {
+      samples[i] = analogRead(pin);
+      delay(10);
+    }
+    // average all the samples out
+    for (i=0; i< NUMSAMPLES; i++) {
+       resistance += samples[i];
+    }
+    resistance /= NUMSAMPLES;
+    raw = resistance;
+    temp = Thermistor(resistance);
+  }
+  else if(type == "PT100"){
     if (raw>409){
       temp = (150*map(raw,410,1023,0,614))/614;
     }
@@ -351,13 +405,13 @@ void connect(){
   Serial.println(WiFi.localIP());
 
   // Start the mDNS responder to set hostname bbesp.local
-  if (MDNS.begin("bbesp"))
-    HOSTNAME = "bbesp.local";
+  if (MDNS.begin("[HOSTNAME]"))
+    HOSTNAME = "[HOSTNAME]";
   else
     HOSTNAME = WiFi.hostname();
 
   Serial.print("Host: ");
-  Serial.println(HOSTNAME);
+  Serial.println(HOSTNAME+".local");
 }
 
 void runActions(){

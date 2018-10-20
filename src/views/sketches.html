@@ -73,6 +73,10 @@
                     <div class="form-group">
                       <input type="text" class="form-control" ng-model="wifi.ssid_pass" placeholder="WiFi Password"/>
                     </div>
+                    <div class="form-group">
+                      <input type="text" class="form-control" ng-model="wifi.hostname" placeholder="Desired Hostname"/>
+                      Defaults to: bbesp
+                    </div>
                     <p>WiFi info is not stored</p>
                     <div class="form-group">
                       <a href="" ng-click="compileSketch('ESP')" class="btn btn-primary" ng-class="{'disabled':settings.influxdb.status != 'Connected'}">Download ESP Sketch</a>
@@ -153,6 +157,10 @@
                       </div>
                       <div class="form-group">
                         <input type="text" class="form-control" ng-model="wifi.ssid_pass" placeholder="WiFi Password"/>
+                      </div>
+                      <div class="form-group">
+                        <input type="text" class="form-control" ng-model="wifi.hostname" placeholder="Desired Hostname"/>
+                        Defaults to: bbesp
                       </div>
                       <p>WiFi info is not stored</p>
                       <div class="form-group">

@@ -112,6 +112,7 @@ Open the serial monitor on `115200` baud to get the IP address after uploading t
 
 This board only supports sensors
 
+- Thermistor 10k (147000k resistor or 150000k resistor)
 - PT100
 - DHT11 and DHT22
 - DS18B20

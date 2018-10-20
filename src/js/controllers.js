@@ -22,7 +22,8 @@ $scope.site = {https: !!(document.location.protocol=='https:')
 };
 $scope.wifi = {
   ssid: '',
-  ssid_pass: ''
+  ssid_pass: '',
+  hostname: ''
 };
 $scope.hops;
 $scope.grains;
@@ -909,6 +910,7 @@ $scope.updateABV();
     if(kettle.temp.volts){
       if(kettle.temp.type == 'Thermistor' &&
         kettle.temp.pin.indexOf('A') === 0 &&
+        !BrewService.isESP(kettle.arduino) &&
         kettle.temp.volts < 2){
           $scope.setErrorMessage('Sensor is not connected', kettle);
           return;
@@ -1299,7 +1301,6 @@ $scope.updateABV();
           .replace('// [actions]', actions.length ? actions.join('\n') : '')
           .replace('// [headers]', headers.length ? headers.join('\n') : '')
           .replace(/\[VERSION\]/g, $scope.pkg.sketch_version)
-          .replace(/\[HOSTNAME\]/g, name)
           .replace(/\[TPLINK_CONNECTION\]/g, tplink_connection_string)
           .replace(/\[SLACK_CONNECTION\]/g, $scope.settings.notifications.slack);
 
@@ -1308,6 +1309,13 @@ $scope.updateABV();
         }
         if($scope.wifi.ssid_pass){
           response.data = response.data.replace(/\[SSID_PASS\]/g, $scope.wifi.ssid_pass);
+        }
+        if(sketch.indexOf('ESP') !== -1 && $scope.wifi.hostname){
+          response.data = response.data.replace(/\[HOSTNAME\]/g, $scope.wifi.hostname);
+        } else if(sketch.indexOf('ESP') !== -1){
+          response.data = response.data.replace(/\[HOSTNAME\]/g, 'bbesp');
+        } else {
+          response.data = response.data.replace(/\[HOSTNAME\]/g, name);
         }
         if( sketch.indexOf('Streams') !== -1){
           // streams connection
