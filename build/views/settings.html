@@ -6,11 +6,13 @@
         <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
       </div>
       <div class="modal-body settings">
-        <div class="btn-group float-right">
+        <div class="btn-group float-left">
           <span class="btn btn-light btn-file">
             Import <input type="file" on-read-file="importSettings($fileContent,$ext)" accept=".json"/>
           </span>
           <a class="btn btn-light" href="{{exportSettings()}}" download="brewbench-profile.json">Export</a>
+        </div>
+        <div class="btn-group float-right">
           <a class="btn btn-danger" href="" ng-click="clearSettings($event)">Delete Settings</a>
         </div>
         <div class="row-new"></div>
@@ -159,9 +161,12 @@
               </div>
             </div>
 
-            <button type="button" class="btn btn-primary float-right" ng-click="arduinos.add()">Add Arduino</button>
-              <table class="table table-striped table-responsive">
-              <thead class="thead-inverse">
+            <div class="float-right pb-2">
+              <button type="button" class="btn btn-primary" ng-click="arduinos.add()">Add Arduino</button>
+            </div>
+            <div class="table-responsive">
+            <table class="table table-striped">
+              <thead class="thead-dark">
                 <tr>
                   <th>Online</th>
                   <th>URL</th>
@@ -190,10 +195,12 @@
                     <small class="text-muted" ng-show="(arduino.status.message)">&nbsp;{{arduino.status.message}}<br/></small>
                   </td>
                   <td>
-                    <span ng-show="arduino.version" class="badge badge-pill" ng-class="{'badge-success':pkg.sketch_version==arduino.version, 'badge-warning':pkg.sketch_version!=arduino.version}">
+                    <span ng-show="arduino.version" class="badge badge-pill badge-lg" ng-class="{'badge-success':pkg.sketch_version==arduino.version, 'badge-warning':pkg.sketch_version!=arduino.version}">
                     {{arduino.version}}</span>
                     <span ng-show="!arduino.version" style="cursor: pointer;" class="badge badge-pill" ng-class="{'badge-danger':!!arduino.status.error, 'badge-secondary': !arduino.status.error}" ng-click="arduinos.connect(arduino)">
                     Connect</span>
+                    <span ng-show="arduino.version" style="cursor: pointer;" class="badge badge-pill badge-secondary" ng-click="arduinos.connect(arduino)">
+                    <i class="fa fa-refresh"></i></span>
                     <small ng-show="arduino.version && pkg.sketch_version!=arduino.version"><a href="" data-dismiss="modal" data-toggle="modal" data-target="#sketchesModal">{{pkg.sketch_version}} is Available</a></small>
                   </td>
                   <!-- <td class="text-left">
@@ -206,6 +213,7 @@
                 </tr>
               </tbody>
             </table>
+          </div>
           </div>
         </div>
 
@@ -227,18 +235,19 @@
                 <input class="form-control" type="password" ng-model="settings.tplink.pass" placeholder="Password">
               </div>
             </div>
-            <div class="btn-group float-right">
+            <div class="btn-group float-right pb-2">
               <button type="button" ng-if="settings.tplink.token" class="btn btn-light" style="margin-top: 5px;" ng-click="tplink.scan()">Scan</button>
               <button type="button" class="btn btn-primary" style="margin-top: 5px;" ng-click="tplink.login()">Connect</button>
             </div>
-            <table class="table table-striped table-responsive tplinks">
-              <thead class="thead-inverse">
+            <div class="table-responsive">
+            <table class="table table-striped tplinks">
+              <thead class="thead-dark">
                 <tr>
                   <th>Online</th>
                   <th>Name</th>
                   <th>Type</th>
                   <th>Power</th>
-                  <th></th>
+                  <th>On/Off</th>
                 </tr>
               </thead>
               <tbody>
@@ -268,6 +277,7 @@
                 </tr>
               </tbody>
             </table>
+          </div>
           </div>
         </div>
       </div>

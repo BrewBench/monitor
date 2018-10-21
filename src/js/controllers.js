@@ -1251,7 +1251,7 @@ $scope.updateABV();
       var adjust = ($scope.settings.general.unit=='F' && !!kettle.temp.adjust) ? $filter('round')(kettle.temp.adjust*0.555,3) : kettle.temp.adjust;
       if(BrewService.isESP(kettle.arduino) && $scope.esp.autoconnect){
         currentSketch.headers.push('#include <AutoConnect.h>');
-      }      
+      }
       if(!BrewService.isESP(kettle.arduino) &&
         ($scope.settings.sensors.DHT || kettle.temp.type.indexOf('DHT') !== -1) &&
         currentSketch.headers.indexOf('#include <dht.h>') === -1){

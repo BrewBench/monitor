@@ -732,6 +732,7 @@ li.ssr {
 .btn-file {
   position: relative;
   overflow: hidden;
+  cursor: pointer;
 }
 .btn-file input[type=file] {
   position: absolute;
@@ -745,7 +746,7 @@ li.ssr {
   opacity: 0;
   outline: none;
   background: white;
-  cursor: inherit;
+  cursor: pointer;
   display: block;
 }
 #importModal .alert {
@@ -1126,10 +1127,6 @@ input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
-}
-
-.table-responsive {
-  display: inline-table;
 }
 
 .type.hubspot {

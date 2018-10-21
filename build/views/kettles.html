@@ -23,7 +23,7 @@
                 ng-class="{'active': kettle.arduino && kettle.arduino.id == arduino.id}"
                 ng-click="kettle.arduino=arduino;updateStreams(kettle);"
                 class="dropdown-item" type="button">
-                {{ arduino.url }}
+                <i class="fa fa-circle" ng-class="{'orange':(!site.https && arduino.secure),'on':(!arduino.status.error && arduino.status.dt),'off':!!arduino.status.error}" aria-hidden="true"></i> {{ arduino.url }}
               </button>
             </div>
           </div>
