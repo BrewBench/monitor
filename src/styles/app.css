@@ -1132,3 +1132,7 @@ input[type=number]::-webkit-outer-spin-button {
 .type.hubspot {
   color: #5c4033;
 }
+
+#settingsModal table .badge {
+  font-size: 100%;
+}
