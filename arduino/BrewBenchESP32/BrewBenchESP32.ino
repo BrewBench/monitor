@@ -16,7 +16,7 @@ WebServer server(80);
 DHTesp dht;
 
 #ifndef ARDUINO_BOARD
-#define ARDUINO_BOARD "generic"
+#define ARDUINO_BOARD "ESP32"
 #endif
 
 // how many samples to take and average, more takes longer

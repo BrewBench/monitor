@@ -8,6 +8,10 @@ const PROGMEM uint8_t FREQUENCY_SECONDS = 60;
 uint8_t secondCounter = 0;
 BridgeServer server;
 
+#ifndef ARDUINO_BOARD
+#define ARDUINO_BOARD "YUN"
+#endif
+
 // DHT dht DHT;
 // ADC Adafruit_ADS1115 ads(0x48);
 
@@ -65,7 +69,7 @@ void processRest(BridgeClient client) {
     sensorCommand(client, command);
   }
   else {
-    client.print("{\"BrewBench\": {\"board\": \"YUN\", \"version\": \"[VERSION]\"}}");
+    client.print("{\"BrewBench\": {\"board\": \""+String(ARDUINO_BOARD)+"\", \"version\": \"[VERSION]\"}}");
   }
 }
 
