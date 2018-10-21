@@ -28,23 +28,30 @@
         </div>
         <div class="pb-3">
           <h4>
-            Sensors
+            Settings
           </h4>
           <div class="block-border">
             <div class="row new pb-3">
               <div class="col-10 pb-3">
                 Some sensors require additional libraries.  Check sensors you want included in the sketch.
                 <ul class="tg-list">
-                  <li class="tg-list-item">
+                  <li class="tg-list-item" style="margin-right: 20px;">
                     <label><b>DHT</b></label>
                     <input class="tgl tgl-ios" id="DHT" type="checkbox" ng-model="settings.sensors.DHT" ng-checked="settings.sensors.DHT"/>
                     <label class="tgl-btn" for="DHT"></label>
                   </li>
-                  <li class="tg-list-item">
+                  <li class="tg-list-item" style="margin-right: 20px;">
                     <label><b>DS18B20</b></label>
                     <input class="tgl tgl-ios" id="DS18B20" type="checkbox" ng-model="settings.sensors.DS18B20" ng-checked="settings.sensors.DS18B20"/>
                     <label class="tgl-btn" for="DS18B20"></label>
                   </li>
+                  <!-- TODO look at adding AutoConnect
+                  <li class="tg-list-item" style="margin-right: 20px;">
+                    <label><b>ESP AutoConnect</b></label>
+                    <input class="tgl tgl-ios" id="autoconnect" type="checkbox" ng-model="esp.autoconnect" ng-checked="esp.autoconnect"/>
+                    <label class="tgl-btn" for="autoconnect"></label>
+                  </li>
+                  -->
                 </ul>
               </div>
             </div>
@@ -66,18 +73,22 @@
                     Download ESP Sketch
                   </button>
                   <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="text-align: center; padding: 10px;">
-                    <p>Enter your WiFi info to automatically connect to your network.</p>
+                    <h6 class="dropdown-header">ESP Sketch Options</h6>
+                    <div class="dropdown-divider"></div>
                     <div class="form-group">
-                      <input type="text" class="form-control" ng-model="wifi.ssid" placeholder="WiFi Network"/>
+                      <label>ESP8266 <input type="radio" ng-model="esp.type" value="8266"/></label>
+                      <label>ESP32 <input type="radio" ng-model="esp.type" value="32"/></label>
+                    </div>
+                    <div class="form-group" ng-show="!esp.autoconnect">
+                      <input type="text" class="form-control" ng-model="esp.ssid" placeholder="WiFi Network"/>
+                    </div>
+                    <div class="form-group" ng-show="!esp.autoconnect">
+                      <input type="text" class="form-control" ng-model="esp.ssid_pass" placeholder="WiFi Password"/>
                     </div>
                     <div class="form-group">
-                      <input type="text" class="form-control" ng-model="wifi.ssid_pass" placeholder="WiFi Password"/>
-                    </div>
-                    <div class="form-group">
-                      <input type="text" class="form-control" ng-model="wifi.hostname" placeholder="Desired Hostname"/>
+                      <input type="text" class="form-control" ng-model="esp.hostname" placeholder="Hostname"/>
                       Defaults to: bbesp
                     </div>
-                    <p>WiFi info is not stored</p>
                     <div class="form-group">
                       <a href="" ng-click="compileSketch('ESP')" class="btn btn-primary" ng-class="{'disabled':settings.influxdb.status != 'Connected'}">Download ESP Sketch</a>
                     </div>
@@ -151,18 +162,22 @@
                       Download ESP Sketch
                     </button>
                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="text-align: center; padding: 10px;">
-                      <p>Enter your WiFi info to automatically connect to your network.</p>
+                      <h6 class="dropdown-header">ESP Sketch Options</h6>
+                      <div class="dropdown-divider"></div>
                       <div class="form-group">
-                        <input type="text" class="form-control" ng-model="wifi.ssid" placeholder="WiFi Network"/>
+                        <label>ESP8266 <input type="radio" ng-model="esp.type" value="8266"/></label>
+                        <label>ESP32 <input type="radio" ng-model="esp.type" value="32"/></label>
+                      </div>
+                      <div class="form-group" ng-show="!esp.autoconnect">
+                        <input type="text" class="form-control" ng-model="esp.ssid" placeholder="WiFi Network"/>
+                      </div>
+                      <div class="form-group" ng-show="!esp.autoconnect">
+                        <input type="text" class="form-control" ng-model="esp.ssid_pass" placeholder="WiFi Password"/>
                       </div>
                       <div class="form-group">
-                        <input type="text" class="form-control" ng-model="wifi.ssid_pass" placeholder="WiFi Password"/>
-                      </div>
-                      <div class="form-group">
-                        <input type="text" class="form-control" ng-model="wifi.hostname" placeholder="Desired Hostname"/>
+                        <input type="text" class="form-control" ng-model="esp.hostname" placeholder="Hostname"/>
                         Defaults to: bbesp
                       </div>
-                      <p>WiFi info is not stored</p>
                       <div class="form-group">
                         <a href="" ng-click="compileSketch('InfluxDBESP')" class="btn btn-primary" ng-class="{'disabled':settings.influxdb.status != 'Connected'}">Download ESP Sketch</a>
                       </div>

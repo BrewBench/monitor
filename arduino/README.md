@@ -92,9 +92,8 @@ Download the [Arduino IDE](https://www.arduino.cc/en/Main/Software) >= 1.8.5
   * Using the [Arduino IDE](https://www.arduino.cc/en/Main/Software) upload the [BrewBenchYun sketch](BrewBenchYun/BrewBenchYun.ino)
 
 ### Arduino Leonardo, Arduino Uno, Arduino Mega 2560 with a Dragino Yun Shield
-  * Add the boards following these instructions
-
-    * http://wiki.dragino.com/index.php?title=Getting_Start_with_Arduino_Yun#Automatically_Add_Board_Profile_in_Arduino_IDE
+  - Libraries: Add http://www.dragino.com/downloads/downloads/YunShield/package_dragino_yun_test_index.json to Boards Manager URLs
+  - http://wiki.dragino.com/index.php?title=Getting_Start_with_Arduino_Yun#Automatically_Add_Board_Profile_in_Arduino_IDE
 
 ### ESP8266, ESP32
 
@@ -106,13 +105,17 @@ Open the serial monitor on `115200` baud to get the IP address after uploading t
 
 - ESP8266
   - [ESP8266 on Amazon](https://smile.amazon.com/HiLetgo-Internet-Development-Wireless-Micropython/dp/B010N1SPRK/ref=sr_1_3?s=electronics&ie=UTF8&qid=1538931027&sr=1-3&keywords=esp8266)
+  - Libraries: Add http://arduino.esp8266.com/stable/package_esp8266com_index.json to Boards Manager URLs
   - Board: Node_MCU 1.0 (ESP-12E Module)
 - ESP32
+  - Need to hold the button to the right of the micro usb input while uploading the sketch
+  - Libraries: Add https://dl.espressif.com/dl/package_esp32_index.json to Boards Manager URLs
+  - Board Manager install esp32
   - [ESP32 on Amazon](https://smile.amazon.com/gp/product/B0718T232Z/ref=ox_sc_act_title_1?smid=A30QSGOJR8LMXA&psc=1)
 
 This board only supports sensors
 
-- Thermistor 10k (147000k resistor or 150000k resistor)
+- Thermistor 3.3V 10k (147000k resistor or 150000k resistor)
 - PT100
 - DHT11 and DHT22
 - DS18B20

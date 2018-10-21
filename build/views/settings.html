@@ -174,7 +174,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr ng-repeat="arduino in settings.arduinos">
+                <tr ng-repeat="arduino in settings.arduinos track by $index">
                   <td><i class="fa fa-circle fa-lg" ng-class="{'orange':(!site.https && arduino.secure),'on':(!arduino.status.error && arduino.status.dt),'off':!!arduino.status.error}" aria-hidden="true"></i></td>
                   <td class="text-left">
                     <div class="input-group">

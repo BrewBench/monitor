@@ -20,10 +20,12 @@ $scope.BrewService = BrewService;
 $scope.site = {https: !!(document.location.protocol=='https:')
   , https_url: `https://${document.location.host}`
 };
-$scope.wifi = {
+$scope.esp = {
+  type: '8266',
   ssid: '',
   ssid_pass: '',
-  hostname: ''
+  hostname: '',
+  autoconnect: false
 };
 $scope.hops;
 $scope.grains;
@@ -211,6 +213,13 @@ $scope.updateABV();
             arduino.status.dt = new Date();
             arduino.status.error = '';
             arduino.status.message = '';
+            if(arduino.board.indexOf('ESP32') == 0){
+              arduino.analog = 0;
+              arduino.digital = 33;
+            } else if(arduino.board.indexOf('ESP8266') == 0){
+              arduino.analog = 0;
+              arduino.digital = 10;
+            }
           }
         })
         .catch(err => {
@@ -1220,6 +1229,9 @@ $scope.updateABV();
   };
 
   $scope.compileSketch = function(sketchName){
+    // append esp type
+    if(sketchName.indexOf('ESP') !== -1)
+      sketchName += $scope.esp.type;
     var sketches = [];
     var arduinoName = '';
     _.each($scope.kettles, (kettle, i) => {
@@ -1237,6 +1249,9 @@ $scope.updateABV();
       var target = ($scope.settings.general.unit=='F') ? $filter('toCelsius')(kettle.temp.target) : kettle.temp.target;
       kettle.temp.adjust = parseFloat(kettle.temp.adjust);
       var adjust = ($scope.settings.general.unit=='F' && !!kettle.temp.adjust) ? $filter('round')(kettle.temp.adjust*0.555,3) : kettle.temp.adjust;
+      if(BrewService.isESP(kettle.arduino) && $scope.esp.autoconnect){
+        currentSketch.headers.push('#include <AutoConnect.h>');
+      }      
       if(!BrewService.isESP(kettle.arduino) &&
         ($scope.settings.sensors.DHT || kettle.temp.type.indexOf('DHT') !== -1) &&
         currentSketch.headers.indexOf('#include <dht.h>') === -1){
@@ -1298,20 +1313,20 @@ $scope.updateABV();
       .then(response => {
         // replace variables
         response.data = autogen+response.data
-          .replace('// [actions]', actions.length ? actions.join('\n') : '')
-          .replace('// [headers]', headers.length ? headers.join('\n') : '')
+          .replace('// [ACTIONS]', actions.length ? actions.join('\n') : '')
+          .replace('// [HEADERS]', headers.length ? headers.join('\n') : '')
           .replace(/\[VERSION\]/g, $scope.pkg.sketch_version)
           .replace(/\[TPLINK_CONNECTION\]/g, tplink_connection_string)
           .replace(/\[SLACK_CONNECTION\]/g, $scope.settings.notifications.slack);
 
-        if($scope.wifi.ssid){
-          response.data = response.data.replace(/\[SSID\]/g, $scope.wifi.ssid);
+        if($scope.esp.ssid){
+          response.data = response.data.replace(/\[SSID\]/g, $scope.esp.ssid);
         }
-        if($scope.wifi.ssid_pass){
-          response.data = response.data.replace(/\[SSID_PASS\]/g, $scope.wifi.ssid_pass);
+        if($scope.esp.ssid_pass){
+          response.data = response.data.replace(/\[SSID_PASS\]/g, $scope.esp.ssid_pass);
         }
-        if(sketch.indexOf('ESP') !== -1 && $scope.wifi.hostname){
-          response.data = response.data.replace(/\[HOSTNAME\]/g, $scope.wifi.hostname);
+        if(sketch.indexOf('ESP') !== -1 && $scope.esp.hostname){
+          response.data = response.data.replace(/\[HOSTNAME\]/g, $scope.esp.hostname);
         } else if(sketch.indexOf('ESP') !== -1){
           response.data = response.data.replace(/\[HOSTNAME\]/g, 'bbesp');
         } else {

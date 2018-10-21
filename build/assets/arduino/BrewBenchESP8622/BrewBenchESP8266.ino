@@ -5,12 +5,14 @@
 #include "DHTesp.h"
 #include <OneWire.h>
 #include <DallasTemperature.h>
+// [HEADERS]
 
 String HOSTNAME = "[HOSTNAME]";
 const char* ssid     = "[SSID]";
 const char* password = "[SSID_PASS]";
 
 ESP8266WebServer server(80);
+// AC AutoConnect Portal(server);
 
 DHTesp dht;
 

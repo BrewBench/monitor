@@ -1,7 +1,7 @@
 #include <Process.h>
 #include <BridgeServer.h>
 #include <BridgeClient.h>
-// [headers]
+// [HEADERS]
 
 String HOSTNAME = "[HOSTNAME]";
 const PROGMEM uint8_t FREQUENCY_SECONDS = 60;
@@ -423,7 +423,7 @@ float actionsCommand(const String source, const String spin, const String type, 
 // triggers }
 
 void runActions(){
-  // [actions]
+  // [ACTIONS]
 }
 
 void getHostname(){

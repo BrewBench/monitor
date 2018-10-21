@@ -5,6 +5,7 @@
 #include "DHTesp.h"
 #include <OneWire.h>
 #include <DallasTemperature.h>
+// [HEADERS]
 
 String HOSTNAME = "[HOSTNAME]";
 const char* ssid     = "[SSID]";

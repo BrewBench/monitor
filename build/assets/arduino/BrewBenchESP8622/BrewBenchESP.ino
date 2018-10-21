@@ -14,6 +14,10 @@ ESP8266WebServer server(80);
 
 DHTesp dht;
 
+#ifndef ARDUINO_BOARD
+#define ARDUINO_BOARD "generic"
+#endif
+
 // how many samples to take and average, more takes longer
 // but is more 'smooth'
 #define NUMSAMPLES 5

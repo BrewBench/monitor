@@ -2,7 +2,7 @@
 #include <BridgeServer.h>
 #include <BridgeClient.h>
 #include <ArduinoJson.h>
-// [headers]
+// [HEADERS]
 
 String HOSTNAME = "[HOSTNAME]";
 String brewbenchSettings = "[]";

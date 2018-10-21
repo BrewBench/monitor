@@ -1,16 +1,17 @@
-#include <ESP8266WiFi.h>
-#include <ESP8266WebServer.h>
-#include <ESP8266mDNS.h>
+#include <WiFi.h>
+#include <WebServer.h>
+#include <ESPmDNS.h>
 // https://github.com/beegee-tokyo/DHTesp
 #include "DHTesp.h"
 #include <OneWire.h>
 #include <DallasTemperature.h>
+// [HEADERS]
 
 String HOSTNAME = "[HOSTNAME]";
 const char* ssid     = "[SSID]";
 const char* password = "[SSID_PASS]";
 
-ESP8266WebServer server(80);
+WebServer server(80);
 
 DHTesp dht;
 
@@ -134,7 +135,7 @@ String adCommand(const String dpin, const String apin, int16_t value, const Stri
   if ( value >= 0 ) {
     pinMode(pin, OUTPUT);
     if( type == "analog" ){
-      analogWrite(pin, value);//0 - 255
+      ledcWrite(pin, value);//0 - 255
     }
     else if( type == "digital" ){
       if(value == 1)
@@ -292,7 +293,7 @@ void connect(){
   if (MDNS.begin("[HOSTNAME]"))
     HOSTNAME = "[HOSTNAME]";
   else
-    HOSTNAME = WiFi.hostname();
+    HOSTNAME = WiFi.setHostname("[HOSTNAME]");
 
   Serial.print("Host: ");
   Serial.println(HOSTNAME+".local");
