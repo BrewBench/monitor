@@ -189,6 +189,8 @@
                       </span>
                       <input class="form-control" type="text" ng-model="arduino.url" ng-change="arduinos.update(arduino)" placeholder="URL" style="min-width: 200px;">
                     </div>
+                    <small class="text-muted" ng-show="(arduino.board)">&nbsp;Board: {{arduino.board}} <span ng-show="BrewService.isESP(arduino)" class="badge badge-pill badge-info">
+                    ESP</span><br/></small>
                     <small class="text-muted" ng-show="(!site.https && arduino.secure)">&nbsp;You should use https <a ng-href="{{site.https_url}}">{{site.https_url}}</a><br/></small>
                     <small class="text-muted" ng-show="(!arduino.status.error && arduino.status.dt)">&nbsp;Last reported: {{arduino.status.dt | moment}}<br/></small>
                     <small class="text-danger" ng-show="(!!arduino.status.error)">&nbsp;Error reported: {{arduino.status.dt | moment}} {{arduino.status.error}}<br/></small>

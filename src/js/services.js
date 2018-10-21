@@ -173,7 +173,7 @@ angular.module('brewbench-monitor')
     },
 
     isESP: function(arduino){
-      return !!(arduino.board && arduino.board.indexOf('ESP') !== -1);
+      return !!(arduino.board && (arduino.board.toLowerCase().indexOf('esp') !== -1 || arduino.board.toLowerCase().indexOf('nodemcu') !== -1));
     },
 
     slack: function(webhook_url, msg, color, icon, kettle){
