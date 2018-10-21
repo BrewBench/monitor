@@ -129,7 +129,7 @@ void handleNotFound() {
 String adCommand(const String dpin, const String apin, int16_t value, const String type) {
   uint8_t pin;
   if( dpin != "" )
-    pin = gpio(dpin);
+    pin = dpin.substring(1).toInt();
   else
     pin = apin.substring(1).toInt();
 
@@ -167,7 +167,7 @@ String adCommand(const String dpin, const String apin, int16_t value, const Stri
 String sensorCommand(const String dpin, const String apin, const int16_t index, const String type) {
   uint8_t pin;
   if( dpin != "" )
-    pin = gpio(dpin);
+    pin = dpin.substring(1).toInt();
   else
     pin = apin.substring(1).toInt();
   float temp = 0.00;
@@ -254,11 +254,7 @@ float actionsCommand(const String source, const String spin, const String type, 
   float temp = 0.00;
   float raw = 0.00;
   float volts = 0.00;
-  uint8_t pin;
-  if( spin.substring(0,1) == "A" )
-    pin = spin.substring(1).toInt();
-  else
-    pin = gpio(spin);
+  uint8_t pin = spin.substring(1).toInt();
 
   float percent = 0.00;
   // ADC int16_t adc0 = 0;
@@ -368,34 +364,6 @@ void postData(const String data){
     http.end();
   }
 
-}
-
-uint8_t gpio(String spin){
-  switch( spin.substring(1).toInt() ){
-    case 0:
-      return 16;
-    case 1:
-      return 5;
-    case 2:
-      return 4;
-    case 3:
-      return 0;
-    case 4:
-      return 2;
-    case 5:
-      return 14;
-    case 6:
-      return 12;
-    case 7:
-      return 13;
-    case 8:
-      return 15;
-    case 9:
-      return 3;
-    case 10:
-      return 1;
-  }
-  return -1;
 }
 
 void connect(){
