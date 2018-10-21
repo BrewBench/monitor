@@ -91,7 +91,7 @@
                       Defaults to: bbesp
                     </div>
                     <div class="form-group">
-                      <a href="" ng-click="compileSketch('ESP')" class="btn btn-primary" ng-class="{'disabled':settings.influxdb.status != 'Connected'}">Download ESP Sketch</a>
+                      <a href="" ng-click="compileSketch('ESP')" class="btn btn-primary">Download ESP Sketch</a>
                     </div>
                   </div>
                 </div>
@@ -159,7 +159,7 @@
                 <div class="col-2">
                   <a href="" ng-click="compileSketch('InfluxDBYun')" class="btn btn-light float-right" ng-class="{'disabled':settings.influxdb.status != 'Connected'}">Download Yun Sketch</a><br><br>
                   <div class="dropdown float-right">
-                    <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" ng-class="{'disabled':settings.influxdb.status != 'Connected'}">
                       Download ESP Sketch
                     </button>
                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="text-align: center; padding: 10px;">

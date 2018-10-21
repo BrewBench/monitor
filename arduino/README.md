@@ -107,6 +107,11 @@ Open the serial monitor on `115200` baud to get the IP address after uploading t
   - [ESP8266 on Amazon](https://smile.amazon.com/HiLetgo-Internet-Development-Wireless-Micropython/dp/B010N1SPRK/ref=sr_1_3?s=electronics&ie=UTF8&qid=1538931027&sr=1-3&keywords=esp8266)
   - Libraries: Add http://arduino.esp8266.com/stable/package_esp8266com_index.json to Boards Manager URLs
   - Board: Node_MCU 1.0 (ESP-12E Module)
+  - ![alt text](https://images-na.ssl-images-amazon.com/images/I/51%2BUHdAa1eL.jpg "ESP8266")
+
+- ESP8285
+  - Coming Soon
+
 - ESP32
   - Need to hold the button to the right of the micro usb input while uploading the sketch
   - Libraries: Add https://dl.espressif.com/dl/package_esp32_index.json to Boards Manager URLs
