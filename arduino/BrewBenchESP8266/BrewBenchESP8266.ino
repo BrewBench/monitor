@@ -100,7 +100,7 @@ void processRest(const String command) {
   if (command == "digital" || command == "analog" || command == "adc") {
     data = adCommand(dpin, apin, value, command);
   }
-  else if (command == "DS18B20" || command == "PT100" ||
+  else if (command == "Thermistor" || command == "DS18B20" || command == "PT100" ||
       command == "DHT11" || command == "DHT22" || command == "SoilMoisture") {
     data = sensorCommand(dpin, apin, index, command);
   }
