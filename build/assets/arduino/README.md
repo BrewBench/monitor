@@ -112,8 +112,9 @@ Open the serial monitor on `115200` baud to get the IP address after uploading t
   - Libraries: Add https://dl.espressif.com/dl/package_esp32_index.json to Boards Manager URLs
   - Board Manager install esp32
   - [ESP32 on Amazon](https://smile.amazon.com/gp/product/B0718T232Z/ref=ox_sc_act_title_1?smid=A30QSGOJR8LMXA&psc=1)
+  - ![alt text](https://github.com/espressif/arduino-esp32/raw/master/docs/esp32_pinmap.png "ESP32")
 
-This board only supports sensors
+These board only supports sensors
 
 - Thermistor 3.3V 10k (147000k resistor or 150000k resistor)
 - PT100

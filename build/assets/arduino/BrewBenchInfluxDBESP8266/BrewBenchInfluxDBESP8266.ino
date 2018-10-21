@@ -16,7 +16,7 @@ ESP8266WebServer server(80);
 HTTPClient http;
 
 #ifndef ARDUINO_BOARD
-#define ARDUINO_BOARD "generic"
+#define ARDUINO_BOARD "ESP8266"
 #endif
 
 // DHT DHTesp dht;

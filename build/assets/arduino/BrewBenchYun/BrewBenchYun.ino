@@ -11,6 +11,10 @@ String HOSTNAME = "[HOSTNAME]";
 BridgeServer server;
 // ADC Adafruit_ADS1115 ads(0x48);
 
+#ifndef ARDUINO_BOARD
+#define ARDUINO_BOARD "YUN"
+#endif
+
 dht DHT;
 
 // https://learn.adafruit.com/thermistor/using-a-thermistor
@@ -77,7 +81,7 @@ void processRest(BridgeClient client) {
     sensorCommand(client, command);
   }
   else {
-    client.print("{\"BrewBench\": {\"board\": \"YUN\", \"version\": \"[VERSION]\"}}");
+    client.print("{\"BrewBench\": {\"board\": \""+String(ARDUINO_BOARD)+"\", \"version\": \"[VERSION]\"}}");
   }
 }
 

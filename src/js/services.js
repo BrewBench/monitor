@@ -124,16 +124,16 @@ angular.module('brewbench-monitor')
 
     sensorTypes: function(name){
       var sensors = [
-        {name: 'Thermistor', analog: true, digital: false}
-        ,{name: 'DS18B20', analog: false, digital: true}
-        ,{name: 'PT100', analog: true, digital: true}
-        ,{name: 'DHT11', analog: false, digital: true}
-        ,{name: 'DHT12', analog: false, digital: true}
-        ,{name: 'DHT21', analog: false, digital: true}
-        ,{name: 'DHT22', analog: false, digital: true}
-        ,{name: 'DHT33', analog: false, digital: true}
-        ,{name: 'DHT44', analog: false, digital: true}
-        ,{name: 'SoilMoisture', analog: true, digital: false, vcc: true, percent: true}
+        {name: 'Thermistor', analog: true, digital: false, esp: true}
+        ,{name: 'DS18B20', analog: false, digital: true, esp: true}
+        ,{name: 'PT100', analog: true, digital: true, esp: true}
+        ,{name: 'DHT11', analog: false, digital: true, esp: true}
+        ,{name: 'DHT12', analog: false, digital: true, esp: true}
+        ,{name: 'DHT21', analog: false, digital: true, esp: false}
+        ,{name: 'DHT22', analog: false, digital: true, esp: false}
+        ,{name: 'DHT33', analog: false, digital: true, esp: false}
+        ,{name: 'DHT44', analog: false, digital: true, esp: false}
+        ,{name: 'SoilMoisture', analog: true, digital: false, vcc: true, percent: true, esp: true}
       ];
       if(name)
         return _.filter(sensors, {'name': name})[0];
@@ -146,7 +146,7 @@ angular.module('brewbench-monitor')
         ,{'name':'Mash','type':'grain','target':152,'diff':2}
         ,{'name':'Hot Liquor','type':'water','target':170,'diff':2}
         ,{'name':'Fermenter','type':'fermenter','target':74,'diff':2}
-        ,{'name':'Air','type':'air','target':74,'diff':2}
+        ,{'name':'Temp','type':'air','target':74,'diff':2}
         ,{'name':'Soil','type':'leaf','target':60,'diff':2}
       ];
       if(type)

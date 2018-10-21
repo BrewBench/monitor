@@ -56,6 +56,20 @@
             <div class="btn-group">
               <div class="btn-group" ng-if="kettle.arduino">
                 <button type="button" class="btn btn-light dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  {{kettle.temp.type}} <span class="caret"></span>
+                </button>
+                <div class="dropdown-menu scrollable-menu" ng-init="sensors = BrewService.sensorTypes()">
+                  <button ng-repeat="s in sensors track by $index"
+                      ng-if="!BrewService.isESP(kettle.arduino) || (BrewService.isESP(kettle.arduino) && s.esp)"
+                      ng-class="{'active': kettle.temp.type==s.name}"
+                      ng-click="kettle.temp.type=s.name;changeSensor(kettle);updateStreams(kettle);"
+                      class="dropdown-item" type="button">
+                    {{s.name}}
+                  </button>
+                </div>
+              </div>
+              <div class="btn-group" ng-if="kettle.arduino">
+                <button type="button" class="btn btn-light dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   {{ kettle.temp.pin }} <span class="caret"></span>
                 </button>
                 <div class="dropdown-menu scrollable-menu">
@@ -87,19 +101,6 @@
                       ng-click="kettle.temp.pin='C'+p;updateStreams(kettle);"
                       class="dropdown-item" type="button">
                     C{{p}} <span class="pininuse" ng-show="pinInUse('C'+p,kettle.arduino.id)">(In Use)</span>
-                  </button>
-                </div>
-              </div>
-              <div class="btn-group" ng-if="kettle.arduino">
-                <button type="button" class="btn btn-light dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  {{kettle.temp.type}} <span class="caret"></span>
-                </button>
-                <div class="dropdown-menu scrollable-menu" ng-init="sensors = BrewService.sensorTypes()">
-                  <button ng-repeat="s in sensors track by $index"
-                      ng-class="{'active': kettle.temp.type==s.name}"
-                      ng-click="kettle.temp.type=s.name;changeSensor(kettle);updateStreams(kettle);"
-                      class="dropdown-item" type="button">
-                    {{s.name}}
                   </button>
                 </div>
               </div>

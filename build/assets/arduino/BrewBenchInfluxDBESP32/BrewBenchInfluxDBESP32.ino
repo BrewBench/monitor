@@ -16,7 +16,7 @@ WebServer server(80);
 HTTPClient http;
 
 #ifndef ARDUINO_BOARD
-#define ARDUINO_BOARD "generic"
+#define ARDUINO_BOARD "ESP32"
 #endif
 
 // DHT DHTesp dht;
