@@ -1229,6 +1229,8 @@ $scope.updateABV();
   };
 
   $scope.compileSketch = function(sketchName){
+    if(!$scope.settings.sensors)
+      $scope.settings.sensors = {};
     // append esp type
     if(sketchName.indexOf('ESP') !== -1)
       sketchName += $scope.esp.type;
