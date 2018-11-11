@@ -12,12 +12,14 @@ angular.module('brewbench-monitor')
         window.localStorage.removeItem('accessToken');
       }
     },
+
     accessToken: function(token){
       if(token)
         return window.localStorage.setItem('accessToken',token);
       else
         return window.localStorage.getItem('accessToken');
     },
+
     reset: function(){
       const defaultSettings = {
         general: {debug: false, pollSeconds: 10, unit: 'F', shared: false}
@@ -766,18 +768,22 @@ angular.module('brewbench-monitor')
       var q = $q.defer();
       var settings = this.settings('settings');
       var influxConnection = `${settings.influxdb.url}`;
-      if( !!settings.influxdb.port && influxConnection.indexOf('streams.brewbench.co') === -1)
+      if(!!settings.influxdb.port && !this.hosted(influxConnection))
         influxConnection += `:${settings.influxdb.port}`;
 
       return {
+        hosted: (url) => {
+          return (url.indexOf('streams.brewbench.co') !== -1 ||
+            url.indexOf('hosted.brewbench.co') !== -1);
+        },
         ping: (influxdb) => {
           if(influxdb && influxdb.url){
             influxConnection = `${influxdb.url}`;
-            if( !!influxdb.port && influxConnection.indexOf('streams.brewbench.co') === -1)
+            if( !!influxdb.port && !this.influxdb().hosted(influxConnection))
               influxConnection += `:${influxdb.port}`
           }
           var request = {url: `${influxConnection}`, method: 'GET'};
-          if(influxConnection.indexOf('streams.brewbench.co') !== -1){
+          if(this.influxdb().hosted(influxConnection)){
             request.url = `${influxConnection}/ping`;
             if(influxdb && influxdb.user && influxdb.pass){
               request.headers = {'Content-Type': 'application/json',
@@ -798,7 +804,7 @@ angular.module('brewbench-monitor')
             return q.promise;
         },
         dbs: () => {
-          if(influxConnection.indexOf('streams.brewbench.co') !== -1){
+          if(this.influxdb().hosted(influxConnection)){
             q.resolve([settings.influxdb.user]);
           } else {
           $http({url: `${influxConnection}/query?u=${settings.influxdb.user.trim()}&p=${settings.influxdb.pass.trim()}&q=${encodeURIComponent('show databases')}`, method: 'GET'})
@@ -821,7 +827,7 @@ angular.module('brewbench-monitor')
           return q.promise;
         },
         createDB: (name) => {
-          if(influxConnection.indexOf('streams.brewbench.co') !== -1){
+          if(this.influxdb().hosted(influxConnection)){
             q.reject('Database already exists');
           } else {
           $http({url: `${influxConnection}/query?u=${settings.influxdb.user.trim()}&p=${settings.influxdb.pass.trim()}&q=${encodeURIComponent(`CREATE DATABASE "${name}"`)}`, method: 'POST'})

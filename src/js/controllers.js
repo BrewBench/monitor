@@ -410,7 +410,7 @@ $scope.updateABV();
 
   $scope.influxdb = {
     brewbenchHosted: () => {
-      return ($scope.settings.influxdb.url.indexOf('streams.brewbench.co') !== -1);
+      return BrewService.influxdb().hosted($scope.settings.influxdb.url);      
     },
     remove: () => {
       var defaultSettings = BrewService.reset();
@@ -743,14 +743,16 @@ $scope.updateABV();
   $scope.loadConfig = function(){
     var config = [];
     if(!$scope.pkg){
-      config.push(BrewService.pkg().then(function(response){
+      config.push(
+        BrewService.pkg().then(function(response){
           $scope.pkg = response;
         })
       );
     }
 
     if(!$scope.grains){
-      config.push(BrewService.grains().then(function(response){
+      config.push(
+        BrewService.grains().then(function(response){
           return $scope.grains = _.sortBy(_.uniqBy(response,'name'),'name');
         })
       );
@@ -924,13 +926,14 @@ $scope.updateABV();
           $scope.setErrorMessage('Sensor is not connected', kettle);
           return;
       }
-    } else if(kettle.temp.type != 'BMP180' && 
+    } else if(kettle.temp.type != 'BMP180' &&
       !kettle.temp.volts &&
       !kettle.temp.raw){
         $scope.setErrorMessage('Sensor is not connected', kettle);
       return;
-    } else if(kettle.temp.type == 'DS18B20' && response.temp == -127){
-      $scope.setErrorMessage('Sensor is not connected', kettle);
+    } else if(kettle.temp.type == 'DS18B20' &&
+      response.temp == -127){
+        $scope.setErrorMessage('Sensor is not connected', kettle);
       return;
     }
 
@@ -1351,7 +1354,7 @@ $scope.updateABV();
         }
         if( sketch.indexOf('Streams') !== -1){
           // streams connection
-          var connection_string = `https://${$scope.settings.streams.username}.streams.brewbench.co`;
+          var connection_string = `https://${$scope.settings.streams.username}.hosted.brewbench.co`;
           response.data = response.data.replace(/\[STREAMS_CONNECTION\]/g, connection_string);
           response.data = response.data.replace(/\[STREAMS_AUTH\]/g, 'Authorization: Basic '+btoa($scope.settings.streams.username.trim()+':'+$scope.settings.streams.api_key.trim()));
         } if( sketch.indexOf('InfluxDB') !== -1){
@@ -1728,7 +1731,7 @@ $scope.updateABV();
         allSensors.push(BrewService.temp($scope.kettles[i])
           .then(response => $scope.updateTemp(response, $scope.kettles[i]))
           .catch(err => {
-            // udpate chart with current
+            // update chart with current
             kettle.values.push([date.getTime(),kettle.temp.current]);
             if($scope.kettles[i].error.count)
               $scope.kettles[i].error.count++;

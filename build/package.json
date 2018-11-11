@@ -32,6 +32,7 @@
     "DHT22",
     "DHT33",
     "DHT44",
+    "BMP180",
     "TP-Link"
   ],
   "author": {
