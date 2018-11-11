@@ -9,7 +9,7 @@ const char* password = "[SSID_PASS]";
 
 WebServer server(80);
 
-// DHT dht DHT;
+// DHTesp dht;
 // BMP180 Adafruit_BMP085 bmp;
 
 #ifndef ARDUINO_BOARD

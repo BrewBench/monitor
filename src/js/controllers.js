@@ -1262,17 +1262,16 @@ $scope.updateABV();
       if(BrewService.isESP(kettle.arduino) && $scope.esp.autoconnect){
         currentSketch.headers.push('#include <AutoConnect.h>');
       }
-      if(!BrewService.isESP(kettle.arduino) &&
-        ($scope.settings.sensors.DHT || kettle.temp.type.indexOf('DHT') !== -1) &&
-        currentSketch.headers.indexOf('#include <dht.h>') === -1){
-          currentSketch.headers.push('// https://www.brewbench.co/libs/DHTlib-1.2.9.zip');
-          currentSketch.headers.push('#include <dht.h>');
-      }
-      else if(BrewService.isESP(kettle.arduino) &&
+      if((sketchName.indexOf('ESP') !== -1 || BrewService.isESP(kettle.arduino)) &&
         ($scope.settings.sensors.DHT || kettle.temp.type.indexOf('DHT') !== -1) &&
         currentSketch.headers.indexOf('#include "DHTesp.h"') === -1){
           currentSketch.headers.push('// https://github.com/beegee-tokyo/DHTesp');
           currentSketch.headers.push('#include "DHTesp.h"');
+      } else if(!BrewService.isESP(kettle.arduino) &&
+        ($scope.settings.sensors.DHT || kettle.temp.type.indexOf('DHT') !== -1) &&
+        currentSketch.headers.indexOf('#include <dht.h>') === -1){
+          currentSketch.headers.push('// https://www.brewbench.co/libs/DHTlib-1.2.9.zip');
+          currentSketch.headers.push('#include <dht.h>');
       }
       if($scope.settings.sensors.DS18B20 || kettle.temp.type.indexOf('DS18B20') !== -1){
         if(currentSketch.headers.indexOf('#include <OneWire.h>') === -1)

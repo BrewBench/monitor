@@ -128,9 +128,9 @@ angular.module('brewbench-monitor')
         ,{name: 'DS18B20', analog: false, digital: true, esp: true}
         ,{name: 'PT100', analog: true, digital: true, esp: true}
         ,{name: 'DHT11', analog: false, digital: true, esp: true}
-        ,{name: 'DHT12', analog: false, digital: true, esp: true}
+        ,{name: 'DHT12', analog: false, digital: true, esp: false}
         ,{name: 'DHT21', analog: false, digital: true, esp: false}
-        ,{name: 'DHT22', analog: false, digital: true, esp: false}
+        ,{name: 'DHT22', analog: false, digital: true, esp: true}
         ,{name: 'DHT33', analog: false, digital: true, esp: false}
         ,{name: 'DHT44', analog: false, digital: true, esp: false}
         ,{name: 'SoilMoisture', analog: true, digital: false, vcc: true, percent: true, esp: true}
