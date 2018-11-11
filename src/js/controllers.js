@@ -944,6 +944,14 @@ $scope.updateABV();
     if( typeof response.percent != 'undefined'){
       kettle.percent = response.percent;
     }
+    // BMP sensors have altitude and pressure
+    if( typeof response.altitude != 'undefined'){
+      kettle.altitude = response.altitude;
+    }
+    if( typeof response.pressure != 'undefined'){
+      // pascal to inches of mercury
+      kettle.pressure = response.pressure / 3386.389;
+    }
 
     $scope.updateKnobCopy(kettle);
     $scope.updateArduinoStatus({kettle:kettle, sketch_version:response.sketch_version});
@@ -1272,6 +1280,12 @@ $scope.updateABV();
         if(currentSketch.headers.indexOf('#include <DallasTemperature.h>') === -1)
           currentSketch.headers.push('#include <DallasTemperature.h>');
       }
+      if($scope.settings.sensors.BMP || kettle.temp.type.indexOf('BMP180') !== -1){
+        if(currentSketch.headers.indexOf('#include <Wire.h>') === -1)
+          currentSketch.headers.push('#include <Wire.h>');
+        if(currentSketch.headers.indexOf('#include <Adafruit_BMP085.h>') === -1)
+          currentSketch.headers.push('#include <Adafruit_BMP085.h>');
+      }
       // Are we using ADC?
       if(kettle.temp.pin.indexOf('C') === 0 && currentSketch.headers.indexOf('#include <Adafruit_ADS1015.h>') === -1){
         currentSketch.headers.push('// https://github.com/adafruit/Adafruit_ADS1X15');
@@ -1377,6 +1391,9 @@ $scope.updateABV();
         }
         if(headers.indexOf('#include <Adafruit_ADS1015.h>') !== -1){
           response.data = response.data.replace(/\/\/ ADC /g, '');
+        }
+        if(headers.indexOf('#include <Adafruit_BMP085.h>') !== -1){
+          response.data = response.data.replace(/\/\/ BMP180 /g, '');
         }
         if(hasTriggers){
           response.data = response.data.replace(/\/\/ triggers /g, '');

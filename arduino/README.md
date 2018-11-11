@@ -15,7 +15,9 @@ crontab -e
 0 0  * * * /etc/init.d/network restart
 ```
 
-### Choose a Temperature Sensor
+### Choose a Sensor
+
+#### Temperature
 
   * [Thermistors](https://learn.adafruit.com/thermistor/using-a-thermistor) (Analog) 10K or 100K resistor
 
@@ -30,6 +32,19 @@ crontab -e
 
     <img src="../src/assets/img/PT100.png?raw=true" alt="BrewBench PT100" align="center" width="400" />
 
+  * [Ranco temperature controller](https://forum.brewbench.co/d/5-ranco) (Uses a thermistor)
+
+      Modify an existing temperature controller
+      - White wire (Analog input)
+      - Black wire (Ground)
+
+  * [InkBird ITC-1000](https://forum.brewbench.co/d/4-inkbird) (Uses a thermistor)
+
+    - 3 Ground
+    - 4 Analog input
+
+#### Temperature & Humidity
+
   * DHT11, DHT12, DHT21, DHT22, DHT33, DHT44 Temperature and Humidity great addition for brew house monitoring.
 
     They are also available under other names,
@@ -40,13 +55,12 @@ crontab -e
     - DHT33 = RHT04 = AM2303
     - DHT44 = RHT05
 
-  <img src="../src/assets/img/DHT11.png?raw=true" alt="BrewBench DHT" align="center" width="400" />
+  <img src="../src/assets/img/DHT11.png?raw=true" alt="BrewBench DHT" align="center" width="400" />  
 
-  * Ranco temperature controller (Uses a thermistor)
+#### Temperature, Barometer & Altitude
 
-      Modify an existing temperature controller
-      - White wire (data)
-      - Black wire (ground)
+ * BMP180 Digital Barometric Pressure (use 3.3V not 5V)
+   * Adafruit BMP085 library required
 
 ### Choose a Relay
 
@@ -95,7 +109,7 @@ Download the [Arduino IDE](https://www.arduino.cc/en/Main/Software) >= 1.8.5
   - Libraries: Add http://www.dragino.com/downloads/downloads/YunShield/package_dragino_yun_test_index.json to Boards Manager URLs
   - http://wiki.dragino.com/index.php?title=Getting_Start_with_Arduino_Yun#Automatically_Add_Board_Profile_in_Arduino_IDE
 
-### ESP8266, ESP32
+### ESP8266 & ESP32
 
 Install this driver for the board to show up on the USB port
 

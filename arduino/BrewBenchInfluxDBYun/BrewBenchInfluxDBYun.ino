@@ -14,6 +14,7 @@ BridgeServer server;
 
 // DHT dht DHT;
 // ADC Adafruit_ADS1115 ads(0x48);
+// BMP180 Adafruit_BMP085 bmp;
 
 // https://learn.adafruit.com/thermistor/using-a-thermistor
 // resistance at 25 degrees C
@@ -64,6 +65,7 @@ void processRest(BridgeClient client) {
   else if (command == "Thermistor" || command == "PT100" ||
       command == "DHT11" || command == "DHT12" || command == "DHT21" ||
       command == "DHT22" || command == "DHT33" || command == "DHT44" ||
+      command == "BMP180" ||
       command.substring(0,13) == "SoilMoistureD" ||
       command.substring(0,7) == "DS18B20") {
     sensorCommand(client, command);
@@ -106,7 +108,7 @@ void adCommand(BridgeClient client, const String type) {
   }
 
   // Send JSON response to client
-  client.print("{\"hostname\":\""+String(HOSTNAME)+"\",\"pin\":\""+String(spin)+"\",\"value\":"+String(value)+"}");
+  client.print("{\"hostname\":\""+String(HOSTNAME)+"\",\"pin\":\""+String(spin)+"\",\"value\":"+String(value)+"\",\"sensor\":\""+String(type)+"\"}");
 }
 
 void sensorCommand(BridgeClient client, String type) {
@@ -119,6 +121,8 @@ void sensorCommand(BridgeClient client, String type) {
   float percent = 0.00;
   // ADC int16_t adc0 = 0;
   float resistance = 0.0;
+
+  String data = "{\"hostname\":\""+String(HOSTNAME)+"\",\"pin\":\""+String(spin)+"\",\"sensor\":\""+String(type)+"\"";
 
   if( spin.substring(0,1) == "A" ){
     raw = analogRead(pin);
@@ -173,6 +177,7 @@ void sensorCommand(BridgeClient client, String type) {
     raw = analogRead(pin);
     digitalWrite(dpin, LOW);
     percent = map(raw, 0, 880, 0, 100);
+    data += ",\"percent\":"+String(percent);
   }
   // DS18B20 else if(type.substring(0,7) == "DS18B20"){
   // DS18B20   // format DS18B20-index
@@ -205,14 +210,20 @@ void sensorCommand(BridgeClient client, String type) {
   // DHT if( chk == DHTLIB_OK ){
   // DHT     temp = DHT.temperature;
   // DHT     percent = DHT.humidity;
+  // DHT     data += ",\"percent\":"+String(percent);
   // DHT   }
   // DHT }
-  String data = "{\"hostname\":\""+String(HOSTNAME)+"\",\"pin\":\""+String(spin)+"\",\"temp\":"+String(temp);
+  // BMP180 else if(type == "BMP180"){
+  // BMP180   if (bmp.begin()) {
+  // BMP180     temp = bmp.readTemperature();
+  // BMP180     data += ",\"altitude\":"+String(bmp.readAltitude());
+  // BMP180     data += ",\"pressure\":"+String(bmp.readPressure());
+  // BMP180   }
+  // BMP180 }
+
+  data += ",\"temp\":"+String(temp);
   data += ",\"raw\":"+String(raw);
   data += ",\"volts\":"+String(volts);
-  if(percent || type.substring(0,13) == "SoilMoistureD" || type.substring(0,3) == "DHT") {
-    data += ",\"percent\":"+String(percent);
-  }
   data += "}";
   // Send JSON response to client
   client.print(data);
@@ -279,6 +290,7 @@ float actionsCommand(const String source, const String spin, const String type, 
   uint8_t pin = spin.substring(1).toInt();
 
   float percent = 0.00;
+  // BMP180 float pressure = 0.00;
   // ADC int16_t adc0 = 0;
   float resistance = 0.0;
 
@@ -371,6 +383,13 @@ float actionsCommand(const String source, const String spin, const String type, 
   // DHT     percent = DHT.humidity;
   // DHT   }
   // DHT }
+  // BMP180 else if(type == "BMP180"){
+  // BMP180   if (bmp.begin()) {
+  // BMP180     temp = bmp.readTemperature();
+  // BMP180     pressure = bmp.readPressure();
+  // BMP180   }
+  // BMP180 }
+
   // adjust temp if we have it
   if(temp) temp = temp+adjustTemp;
   // Send JSON response to client
@@ -381,8 +400,8 @@ float actionsCommand(const String source, const String spin, const String type, 
     data += "\nbits,sensor="+type+",pin="+spin+",source="+source+",host="+String(HOSTNAME)+" value="+String(raw);
   } else if(type.substring(0,3) == "DHT"){
     data += "\npercent,sensor="+type+",pin="+spin+",source="+source+",host="+String(HOSTNAME)+" value="+String(percent);
-  } else if(percent){
-    data += "\npercent,sensor="+type+",pin="+spin+",source="+source+",host="+String(HOSTNAME)+" value="+String(percent);
+  } else if(type.substring(0,3) == "BMP"){
+    data += "\npressure,sensor="+type+",pin="+spin+",source="+source+",host="+String(HOSTNAME)+" value="+String(pressure);
   } else {
     data += "\nbits,sensor="+type+",pin="+spin+",source="+source+",host="+String(HOSTNAME)+" value="+String(raw);
   }

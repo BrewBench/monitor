@@ -1,10 +1,6 @@
 #include <WiFi.h>
 #include <WebServer.h>
 #include <ESPmDNS.h>
-// https://github.com/beegee-tokyo/DHTesp
-#include "DHTesp.h"
-#include <OneWire.h>
-#include <DallasTemperature.h>
 // [HEADERS]
 
 String HOSTNAME = "[HOSTNAME]";
@@ -13,7 +9,8 @@ const char* password = "[SSID_PASS]";
 
 WebServer server(80);
 
-DHTesp dht;
+// DHT dht DHT;
+// BMP180 Adafruit_BMP085 bmp;
 
 #ifndef ARDUINO_BOARD
 #define ARDUINO_BOARD "ESP32"
@@ -58,18 +55,22 @@ void setupRest() {
     sendHeaders();
     processRest("PT100");
   });
-  server.on("/arduino/DS18B20", [](){
-    sendHeaders();
-    processRest("DS18B20");
-  });
-  server.on("/arduino/DHT11", [](){
-    sendHeaders();
-    processRest("DHT11");
-  });
-  server.on("/arduino/DHT22", [](){
-    sendHeaders();
-    processRest("DHT22");
-  });
+  // DS18B20 server.on("/arduino/DS18B20", [](){
+  // DS18B20   sendHeaders();
+  // DS18B20   processRest("DS18B20");
+  // DS18B20 });
+  // DHT server.on("/arduino/DHT11", [](){
+  // DHT   sendHeaders();
+  // DHT   processRest("DHT11");
+  // DHT });
+  // DHT server.on("/arduino/DHT22", [](){
+  // DHT   sendHeaders();
+  // DHT   processRest("DHT22");
+  // DHT });
+  // BMP180 server.on("/arduino/BMP180", [](){
+  // BMP180   sendHeaders();
+  // BMP180   processRest("BMP180");
+  // BMP180 });
 }
 
 void sendHeaders(){
@@ -101,7 +102,8 @@ void processRest(const String command) {
     data = adCommand(dpin, apin, value, command);
   }
   else if (command == "Thermistor" || command == "DS18B20" || command == "PT100" ||
-      command == "DHT11" || command == "DHT22" || command == "SoilMoisture") {
+      command == "DHT11" || command == "DHT22" || command == "SoilMoisture" ||
+      command == "BMP180") {
     data = sensorCommand(dpin, apin, index, command);
   }
   server.send(200, "application/json", data);
@@ -175,6 +177,12 @@ String sensorCommand(const String dpin, const String apin, const int16_t index, 
   // ADC int16_t adc0 = 0;
   float resistance = 0.0;
 
+  String data = "{\"hostname\":\""+String(HOSTNAME)+"\",\"sensor\":\""+String(type)+"\"";
+  if( dpin != "" )
+    data += ",\"pin\":\""+String(dpin)+"\"";
+  else
+    data += ",\"pin\":\""+String(apin)+"\"";
+
   if( apin != "" ){
     raw = analogRead(pin);
     volts = raw * 0.0049;
@@ -205,16 +213,16 @@ String sensorCommand(const String dpin, const String apin, const int16_t index, 
       temp = (150*map(raw,410,1023,0,614))/614;
     }
   }
-  else if(type == "DS18B20"){
-    OneWire oneWire(pin);
-    DallasTemperature sensors(&oneWire);
-    sensors.begin();
-    sensors.requestTemperatures();
-    if( index > 0 )
-      temp = sensors.getTempCByIndex(index);
-    else
-      temp = sensors.getTempCByIndex(0);
-  }
+  // DS18B20 else if(type == "DS18B20"){
+  // DS18B20   OneWire oneWire(pin);
+  // DS18B20   DallasTemperature sensors(&oneWire);
+  // DS18B20   sensors.begin();
+  // DS18B20   sensors.requestTemperatures();
+  // DS18B20   if( index > 0 )
+  // DS18B20     temp = sensors.getTempCByIndex(index);
+  // DS18B20   else
+  // DS18B20     temp = sensors.getTempCByIndex(0);
+  // DS18B20 }
   else if(type == "SoilMoisture"){
     pinMode(pin, OUTPUT);
     digitalWrite(pin, HIGH);
@@ -222,30 +230,35 @@ String sensorCommand(const String dpin, const String apin, const int16_t index, 
     raw = analogRead(apin.substring(1).toInt());
     digitalWrite(pin, LOW);
     percent = map(raw, 0, 880, 0, 100);
-  }
-  else if(type == "DHT11" || type == "DHT12"){
-    if(type == "DHT11"){
-      dht.setup(pin, DHTesp::DHT11);
-      delay(dht.getMinimumSamplingPeriod());
-      temp = dht.getTemperature();
-      percent = dht.getHumidity();
-    } else if(type == "DHT22"){
-      dht.setup(pin, DHTesp::DHT22);
-      delay(dht.getMinimumSamplingPeriod());
-      temp = dht.getTemperature();
-      percent = dht.getHumidity();
-    }
-    if(isnan(temp)) temp = 0;
-    if(isnan(percent)) percent = 0;
-  }
-
-  String data = "{\"hostname\":\""+String(HOSTNAME)+"\",\"pin\":\""+String(dpin)+"\",\"temp\":"+String(temp)+",\"sensor\":\""+String(type)+"\"";
-  if( apin != "" )
-    data = "{\"hostname\":\""+String(HOSTNAME)+"\",\"pin\":\""+String(apin)+"\",\"temp\":"+String(temp)+",\"sensor\":\""+String(type)+"\"";
-  data += ",\"raw\":"+String(raw)+",\"volts\":"+String(volts);
-  if(percent || type == "SoilMoisture" || type.substring(0,3) == "DHT") {
     data += ",\"percent\":"+String(percent);
   }
+  // DHT else if(type == "DHT11" || type == "DHT12"){
+  // DHT   if(type == "DHT11"){
+  // DHT     dht.setup(pin, DHTesp::DHT11);
+  // DHT     delay(dht.getMinimumSamplingPeriod());
+  // DHT     temp = dht.getTemperature();
+  // DHT     percent = dht.getHumidity();
+  // DHT   } else if(type == "DHT22"){
+  // DHT     dht.setup(pin, DHTesp::DHT22);
+  // DHT     delay(dht.getMinimumSamplingPeriod());
+  // DHT     temp = dht.getTemperature();
+  // DHT     percent = dht.getHumidity();
+  // DHT   }
+  // DHT   if(isnan(temp)) temp = 0;
+  // DHT   if(isnan(percent)) percent = 0;
+  // DHT   data += ",\"percent\":"+String(percent);
+  // DHT }
+  // BMP180 else if(type == "BMP180"){
+  // BMP180   if (bmp.begin()) {
+  // BMP180     temp = bmp.readTemperature();
+  // BMP180     data += ",\"altitude\":"+String(bmp.readAltitude());
+  // BMP180     data += ",\"pressure\":"+String(bmp.readPressure());
+  // BMP180   }
+  // BMP180 }
+
+  data += ",\"temp\":"+String(temp);
+  data += ",\"raw\":"+String(raw);
+  data += ",\"volts\":"+String(volts);
   data += "}";
 
   return data;

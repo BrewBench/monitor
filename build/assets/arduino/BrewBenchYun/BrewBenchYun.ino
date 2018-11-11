@@ -6,6 +6,8 @@
 #include <dht.h>
 #include <OneWire.h>
 #include <DallasTemperature.h>
+#include <Wire.h>
+#include <Adafruit_BMP085.h>
 
 String HOSTNAME = "[HOSTNAME]";
 BridgeServer server;
@@ -16,6 +18,8 @@ BridgeServer server;
 #endif
 
 dht DHT;
+
+Adafruit_BMP085 bmp;
 
 // https://learn.adafruit.com/thermistor/using-a-thermistor
 // resistance at 25 degrees C
@@ -76,6 +80,7 @@ void processRest(BridgeClient client) {
   else if (command == "Thermistor" || command == "PT100" ||
       command == "DHT11" || command == "DHT12" || command == "DHT21" ||
       command == "DHT22" || command == "DHT33" || command == "DHT44" ||
+      command == "BMP180" ||
       command.substring(0,13) == "SoilMoistureD" ||
       command.substring(0,7) == "DS18B20") {
     sensorCommand(client, command);
@@ -132,6 +137,8 @@ void sensorCommand(BridgeClient client, String type) {
   // ADC int16_t adc0 = 0;
   float resistance = 0.0;
 
+  String data = "{\"hostname\":\""+String(HOSTNAME)+"\",\"pin\":\""+String(spin)+"\",\"sensor\":\""+String(type)+"\"";
+
   if( spin.substring(0,1) == "A" ){
     raw = analogRead(pin);
     volts = raw * 0.0049;
@@ -185,6 +192,7 @@ void sensorCommand(BridgeClient client, String type) {
     raw = analogRead(pin);
     digitalWrite(dpin, LOW);
     percent = map(raw, 0, 880, 0, 100);
+    data += ",\"percent\":"+String(percent);
   }
   else if(type.substring(0,7) == "DS18B20"){
     // format DS18B20-index
@@ -217,14 +225,20 @@ void sensorCommand(BridgeClient client, String type) {
     if( chk == DHTLIB_OK ){
       temp = DHT.temperature;
       percent = DHT.humidity;
+      data += ",\"percent\":"+String(percent);
     }
   }
-  String data = "{\"hostname\":\""+String(HOSTNAME)+"\",\"pin\":\""+String(spin)+"\",\"temp\":"+String(temp)+",\"sensor\":\""+String(type)+"\"";
+  else if(type == "BMP180"){
+    if (bmp.begin()) {
+      temp = bmp.readTemperature();
+      data += ",\"altitude\":"+String(bmp.readAltitude());
+      data += ",\"pressure\":"+String(bmp.readPressure());
+    }
+  }
+
+  data += ",\"temp\":"+String(temp);
   data += ",\"raw\":"+String(raw);
   data += ",\"volts\":"+String(volts);
-  if(percent || type.substring(0,13) == "SoilMoistureD" || type.substring(0,3) == "DHT") {
-    data += ",\"percent\":"+String(percent);
-  }
   data += "}";
   // Send JSON response to client
   client.print(data);
