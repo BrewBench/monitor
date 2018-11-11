@@ -9,7 +9,7 @@ const char* password = "[SSID_PASS]";
 
 WebServer server(80);
 
-// DHTesp dht;
+// DHT DHTesp dht;
 // BMP180 Adafruit_BMP085 bmp;
 
 #ifndef ARDUINO_BOARD
@@ -54,6 +54,10 @@ void setupRest() {
   server.on("/arduino/PT100", [](){
     sendHeaders();
     processRest("PT100");
+  });
+  server.on("/arduino/SoilMoisture", [](){
+    sendHeaders();
+    processRest("SoilMoisture");
   });
   // DS18B20 server.on("/arduino/DS18B20", [](){
   // DS18B20   sendHeaders();
@@ -131,7 +135,7 @@ String adCommand(const String dpin, const String apin, int16_t value, const Stri
   if( dpin != "" )
     pin = dpin.substring(1).toInt();
   else
-    pin = apin.substring(1).toInt();
+    pin = gpio(apin);
 
   // write
   if ( value >= 0 ) {
@@ -169,12 +173,11 @@ String sensorCommand(const String dpin, const String apin, const int16_t index, 
   if( dpin != "" )
     pin = dpin.substring(1).toInt();
   else
-    pin = apin.substring(1).toInt();
+    pin = gpio(apin);
   float temp = 0.00;
   float raw = 0.00;
   float percent = 0.00;
   float volts = 0.00;
-  // ADC int16_t adc0 = 0;
   float resistance = 0.0;
 
   String data = "{\"hostname\":\""+String(HOSTNAME)+"\",\"sensor\":\""+String(type)+"\"";
@@ -227,7 +230,7 @@ String sensorCommand(const String dpin, const String apin, const int16_t index, 
     pinMode(pin, OUTPUT);
     digitalWrite(pin, HIGH);
     delay(10);
-    raw = analogRead(apin.substring(1).toInt());
+    raw = gpio(apin);
     digitalWrite(pin, LOW);
     percent = map(raw, 0, 880, 0, 100);
     data += ",\"percent\":"+String(percent);
@@ -262,6 +265,45 @@ String sensorCommand(const String dpin, const String apin, const int16_t index, 
   data += "}";
 
   return data;
+}
+
+uint8_t gpio(String spin){
+  switch( spin.substring(1).toInt() ){
+    case 0:
+      return 36;
+    case 3:
+      return 39;
+    case 4:
+      return 32;
+    case 5:
+      return 33;
+    case 6:
+      return 34;
+    case 7:
+      return 35;
+    case 10:
+      return 4;
+    case 11:
+      return 0;
+    case 12:
+      return 12;
+    case 13:
+      return 15;
+    case 14:
+      return 13;
+    case 15:
+      return 12;
+    case 16:
+      return 14;
+    case 17:
+      return 27;
+    case 18:
+      return 25;
+    case 19:
+      return 26;
+    default:
+      return -1;
+  }
 }
 
 void connect(){

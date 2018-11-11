@@ -60,6 +60,10 @@ void setupRest() {
     sendHeaders();
     processRest("PT100");
   });
+  server.on("/arduino/SoilMoisture", [](){
+    sendHeaders();
+    processRest("SoilMoisture");
+  });
   // DS18B20 server.on("/arduino/DS18B20", [](){
   // DS18B20   sendHeaders();
   // DS18B20   processRest("DS18B20");
@@ -394,8 +398,9 @@ uint8_t gpio(String spin){
       return 3;
     case 10:
       return 1;
+    default:
+      return -1;
   }
-  return -1;
 }
 
 void connect(){

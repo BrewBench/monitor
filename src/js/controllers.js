@@ -924,8 +924,10 @@ $scope.updateABV();
           $scope.setErrorMessage('Sensor is not connected', kettle);
           return;
       }
-    } else if(!kettle.temp.volts && !kettle.temp.raw){
-      $scope.setErrorMessage('Sensor is not connected', kettle);
+    } else if(kettle.temp.type != 'BMP180' && 
+      !kettle.temp.volts &&
+      !kettle.temp.raw){
+        $scope.setErrorMessage('Sensor is not connected', kettle);
       return;
     } else if(kettle.temp.type == 'DS18B20' && response.temp == -127){
       $scope.setErrorMessage('Sensor is not connected', kettle);
