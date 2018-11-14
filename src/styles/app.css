@@ -983,7 +983,7 @@ button {
   color: #49a37f;
 }
 
-.tplinks .fa-power-off.on, .chart-toggle .fa-area-chart.on {
+.tplinks .fa-power-off.on, .chart-toggle .fa-chart-line.on {
   color: #FFF;
   background: #1FA66C;
   padding: 9px 7px 9px 7px;
@@ -1001,7 +1001,7 @@ button {
   padding: 2px;
 }
 
-.tplinks .fa-power-off.off, .chart-toggle .fa-area-chart.off {
+.tplinks .fa-power-off.off, .chart-toggle .fa-chart-line.off {
   color: #777;
   background: #ccc;
   padding: 9px 7px 9px 7px;
