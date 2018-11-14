@@ -272,8 +272,8 @@
                   <tr ng-repeat="kettle in kettles track by $index">
                     <td>
                       <img ng-if="['air','leaf'].indexOf(kettle.type) === -1" class="type" ng-src="/assets/img/{{kettle.type}}.svg" width="30" height="30"/>
-                      <i ng-if="kettle.type == 'air'" class="fa fa-thermometer-quarter fa-2x type" height="30"></i>
-                      <i ng-if="kettle.type == 'leaf'" class="fa fa-leaf fa-lg type" height="30"></i>
+                      <i ng-if="kettle.type == 'air'" class="fas fa-thermometer-quarter fa-2x type" height="30"></i>
+                      <i ng-if="kettle.type == 'leaf'" class="fas fa-leaf fa-lg type" height="30"></i>
                       &nbsp;
                       <strong>{{kettle.name}}</strong><br/>
                       {{kettle.temp.pin}} {{kettle.temp.type}}<br/>

@@ -2,7 +2,7 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h1 class="modal-title"><i class="fa fa-gear fa-lg" aria-hidden="true"></i> Settings</h1>
+        <h1 class="modal-title"><i class="fas fa-gear fa-lg" aria-hidden="true"></i> Settings</h1>
         <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
       </div>
       <div class="modal-body settings">
@@ -66,7 +66,7 @@
 
         <div class="pb-3">
           <h4>Notifications
-            <i class="fa fa-bell fa-lg float-right" aria-hidden="true"></i>
+            <i class="fas fa-bell fa-lg float-right" aria-hidden="true"></i>
           </h4>
           <div class="block-border">
             <button type="button" class="btn btn-primary float-right" ng-click="notify()" ng-disabled="!settings.notifications.on">Test</button>
@@ -124,15 +124,15 @@
 
         <div class="pb-3">
           <h4>Kettles
-            <i class="fa fa-cubes fa-lg float-right" aria-hidden="true"></i>
+            <i class="fas fa-cauldron fa-lg float-right" aria-hidden="true"></i>
           </h4>
           <div class="block-border">
             <label class="adjust">Add a kettle</label>
             <div class="btn-group item" ng-repeat="kettle in kettleTypes">
               <button type="button" class="btn btn-light {{kettle.type}}" ng-click="addKettle(kettle.type)">
                 <img ng-if="['air','leaf'].indexOf(kettle.type) === -1" class="type" ng-src="/assets/img/{{kettle.type}}.svg" height="30"/>
-                <i ng-if="kettle.type == 'air'" class="fa fa-thermometer-quarter fa-2x type"></i>
-                <i ng-if="kettle.type == 'leaf'" class="fa fa-leaf fa-lg type"></i>
+                <i ng-if="kettle.type == 'air'" class="fas fa-thermometer-quarter fa-2x type"></i>
+                <i ng-if="kettle.type == 'leaf'" class="fas fa-leaf fa-lg type"></i>
               </button>
               <div class="floating ui blue circular label">{{kettleCount(kettle.type)}}</div>
             </div>
@@ -143,6 +143,7 @@
         <div class="pb-3">
           <h4>Arduinos
             <img src="/assets/img/arduino.svg" width="32" class="float-right">
+            <a href="" ng-click="openSketches()" class="float-right" style="font-size: 18px;padding-right: 10px; margin-top: 8px;">Sketches</a>
           </h4>
           <div class="block-border">
             <div class="row new">
@@ -151,8 +152,8 @@
                 <div class="input-group">
                   <input class="form-control" type="number" ng-model="settings.general.pollSeconds" step="1" min="5">
                   <span class="input-group-append">
-                    <button type="button" class="btn btn-light"><i class="fa fa-minus fa-lg" ng-click="(settings.general.pollSeconds > 5) ? settings.general.pollSeconds=settings.general.pollSeconds-1 : 5"></i></button>
-                    <button type="button" class="btn btn-light"><i class="fa fa-plus fa-lg" ng-click="settings.general.pollSeconds=settings.general.pollSeconds+1"></i></button>
+                    <button type="button" class="btn btn-light"><i class="fas fa-minus fa-lg" ng-click="(settings.general.pollSeconds > 5) ? settings.general.pollSeconds=settings.general.pollSeconds-1 : 5"></i></button>
+                    <button type="button" class="btn btn-light"><i class="fas fa-plus fa-lg" ng-click="settings.general.pollSeconds=settings.general.pollSeconds+1"></i></button>
                   </span>
                 </div>
                 <small class="form-text text-muted">Every {{settings.general.pollSeconds}} seconds</small>
@@ -178,7 +179,7 @@
               </thead>
               <tbody>
                 <tr ng-repeat="arduino in settings.arduinos track by $index">
-                  <td><i class="fa fa-circle fa-lg" ng-class="{'orange':(!site.https && arduino.secure),'on':(!arduino.status.error && arduino.status.dt),'off':!!arduino.status.error}" aria-hidden="true"></i></td>
+                  <td><i class="fas fa-circle fa-lg" ng-class="{'orange':(!site.https && arduino.secure),'on':(!arduino.status.error && arduino.status.dt),'off':!!arduino.status.error}" aria-hidden="true"></i></td>
                   <td class="text-left">
                     <div class="input-group">
                       <span class="input-group-prepend">
@@ -187,8 +188,18 @@
                       </span>
                       <input class="form-control" type="text" ng-model="arduino.url" ng-change="arduinos.update(arduino)" placeholder="URL" style="min-width: 200px;">
                     </div>
-                    <small class="text-muted" ng-show="(arduino.board)">&nbsp;Board: {{arduino.board}} <span ng-show="BrewService.isESP(arduino)" class="badge badge-pill badge-info">
-                    ESP</span><br/></small>
+                    <small class="text-muted" ng-show="(arduino.board)">&nbsp;Board: {{arduino.board}}
+                      <span ng-show="BrewService.isESP(arduino)" class="badge badge-pill badge-info">ESP</span>
+                    </small>
+                    <small class="text-muted" ng-if="arduino.RSSI">
+                      <br/>&nbsp;Wifi:
+                      <i class="fas fa-signal-1 fa-2x" ng-if="(arduino.RSSI | dbmPercent) < 25"></i>
+                      <i class="fas fa-signal-2 fa-2x" ng-if="(arduino.RSSI | dbmPercent) >= 25 && (arduino.RSSI | dbmPercent) < 50"></i>
+                      <i class="fas fa-signal-3 fa-2x" ng-if="(arduino.RSSI | dbmPercent) >= 50 && (arduino.RSSI | dbmPercent) <= 75"></i>
+                      <i class="fas fa-signal-4 fa-2x" ng-if="(arduino.RSSI | dbmPercent) > 75"></i>
+                      {{ arduino.RSSI }} dBm {{ arduino.RSSI | dbmPercent }}%
+                    </small>
+                    <br/>
                     <small class="text-muted" ng-show="(!site.https && arduino.secure)">&nbsp;You should use https <a ng-href="{{site.https_url}}">{{site.https_url}}</a><br/></small>
                     <small class="text-muted" ng-show="(!arduino.status.error && arduino.status.dt)">&nbsp;Last reported: {{arduino.status.dt | moment}}<br/></small>
                     <small class="text-danger" ng-show="(!!arduino.status.error)">&nbsp;Error reported: {{arduino.status.dt | moment}} {{arduino.status.error}}<br/></small>
@@ -200,8 +211,10 @@
                     <span ng-show="!arduino.version" style="cursor: pointer;" class="badge badge-pill" ng-class="{'badge-danger':!!arduino.status.error, 'badge-secondary': !arduino.status.error}" ng-click="arduinos.connect(arduino)">
                     Connect</span>
                     <span ng-show="arduino.version" style="cursor: pointer;" class="badge badge-pill badge-secondary" ng-click="arduinos.connect(arduino)">
-                    <i class="fa fa-refresh"></i></span>
-                    <small ng-show="arduino.version && pkg.sketch_version!=arduino.version"><a href="" data-dismiss="modal" data-toggle="modal" data-target="#sketchesModal">{{pkg.sketch_version}} is Available</a></small>
+                    <i class="fas fa-sync-alt"></i></span>
+                    <small ng-show="arduino.version && pkg.sketch_version!=arduino.version">
+                      <a href="" ng-click="openSketches()">{{ pkg.sketch_version }} is Available</a>
+                    </small>
                   </td>
                   <!-- <td class="text-left">
                     <input class="form-control" type="password" ng-model="arduino.password" ng-change="arduinos.update(arduino)"></input>
@@ -209,7 +222,7 @@
                   <td class="text-left"><input class="form-control" type="number" step="1" min="0" ng-model="arduino.analog" ng-change="arduinos.update(arduino)"></td>
                   <td class="text-left"><input class="form-control" type="number" step="1" min="0" ng-model="arduino.digital" ng-change="arduinos.update(arduino)"></td>
                   <td class="text-left"><input class="form-control" type="number" step="1" min="0" ng-model="arduino.adc" ng-change="arduinos.update(arduino)"></td>
-                  <td><a href="" ng-click="arduinos.delete($index, arduino)"><i class="fa fa-trash fa-2x text-danger"></i></a></td>
+                  <td><a href="" ng-click="arduinos.delete($index, arduino)"><i class="fas fa-trash-alt fa-2x text-danger"></i></a></td>
                 </tr>
               </tbody>
             </table>
@@ -222,7 +235,7 @@
             <sup class="badge badge-{{ getStatusClass(settings.tplink.status) }} badge-pill">
               {{ settings.tplink.status || 'Not Connected'}}
             </sup>
-            <i class="fa fa-plug fa-lg float-right" aria-hidden="true"></i>
+            <i class="fas fa-plug fa-lg float-right" aria-hidden="true"></i>
           </h4>
           <div class="block-border">
             <div class="row">
@@ -252,7 +265,7 @@
               </thead>
               <tbody>
                 <tr ng-repeat="tp in settings.tplink.plugs | orderBy:'alias'">
-                  <td><i class="fa fa-circle fa-lg" ng-class="{'on':!!tp.status, 'off':!tp.status}" aria-hidden="true"></i></td>
+                  <td><i class="fas fa-circle fa-lg" ng-class="{'on':!!tp.status, 'off':!tp.status}" aria-hidden="true"></i></td>
                   <td>{{ tp.alias }}</td>
                   <td>
                     {{ tp.deviceModel }}
@@ -271,7 +284,7 @@
                       ng-if="!!tp.status"
                       ng-click="tplink.toggle(tp)"
                       ng-class="{'on':!!tp.info.relay_state,'off':!tp.info.relay_state}">
-                    <i class="fa fa-power-off fa-lg" ng-class="{'on':!!tp.info.relay_state,'off':!tp.info.relay_state}"></i>
+                    <i class="fas fa-power-off fa-lg" ng-class="{'on':!!tp.info.relay_state,'off':!tp.info.relay_state}"></i>
                     </a>
                   </td>
                 </tr>

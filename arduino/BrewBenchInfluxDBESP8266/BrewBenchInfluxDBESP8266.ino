@@ -41,13 +41,19 @@ float Thermistor(float average) {
 void setupRest() {
 
   server.on("/", [](){
-    String data = "{\"BrewBench\": {\"board\": \""+String(ARDUINO_BOARD)+"\", \"version\": \"[VERSION]\"}}";
+    String data = "{\"BrewBench\": {\"board\": \""+String(ARDUINO_BOARD)+"\", \"version\": \"[VERSION]\"";
+    data += ",\"RSSI\":"+String(WiFi.RSSI());
+    data += ",\"IP\":\""+WiFi.localIP().toString()+"\"";
+    data += "}}";
     sendHeaders();
     server.send(200, "application/json", data);
   });
 
   server.on("/arduino/info", [](){
-    String data = "{\"BrewBench\": {\"board\": \""+String(ARDUINO_BOARD)+"\", \"version\": \"[VERSION]\"}}";
+    String data = "{\"BrewBench\": {\"board\": \""+String(ARDUINO_BOARD)+"\", \"version\": \"[VERSION]\"";
+    data += ",\"RSSI\":"+String(WiFi.RSSI());
+    data += ",\"IP\":\""+WiFi.localIP().toString()+"\"";
+    data += "}}";
     sendHeaders();
     server.send(200, "application/json", data);
   });
@@ -411,8 +417,6 @@ void connect(){
   while (WiFi.status() != WL_CONNECTED) {
     delay(50);
   }
-  Serial.print("IP: ");
-  Serial.println(WiFi.localIP());
 
   // Start the mDNS responder to set hostname bbesp.local
   if (MDNS.begin("[HOSTNAME]"))
@@ -420,8 +424,9 @@ void connect(){
   else
     HOSTNAME = WiFi.hostname();
 
-  Serial.print("Host: ");
-  Serial.println(HOSTNAME+".local");
+  Serial.printf("IP: %s\n", WiFi.localIP().toString().c_str());
+  Serial.printf("Host %s.local\n", HOSTNAME.c_str());
+  Serial.printf("RSSI: %d dBm\n", WiFi.RSSI());
 }
 
 void runActions(){

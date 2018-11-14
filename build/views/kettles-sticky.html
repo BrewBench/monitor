@@ -2,7 +2,7 @@
   <div class="card" ng-repeat="kettle in kettles" id="kettle-sticky-{{$index}}" ng-if="kettle.sticky">
     <div class="content">
       <div class="header">{{kettle.name}}</div>
-      <a href="" class="sticky text-danger" ng-click="kettle.sticky = !!(kettle.sticky) ?  false : true"><i class="fa fa-thumb-tack"></i></a>
+      <a href="" class="sticky text-danger" ng-click="kettle.sticky = !!(kettle.sticky) ?  false : true"><i class="fas fa-thumbtack"></i></a>
       <div class="description temp" ng-class="{'high':kettle.high, 'low':kettle.low}">
         {{kettle.temp.current|number:0}}&deg;
       </div>

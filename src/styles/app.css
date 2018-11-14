@@ -402,7 +402,7 @@ sup.ref {
   top: 5px;
   right: 5px;
   border-radius: 0 0 0 10px;
-  padding: 2px 5px 2px 8px;
+  padding: 2px 5px 0px 8px;
   border-left: 1px solid #ccc;
   border-bottom: 1px solid #ccc;
   margin: -5px -5px 0 0;
@@ -416,6 +416,7 @@ sup.ref {
   -o-transition: All 250ms ease;
   -ms-transition: All 250ms ease;
   transition: All 250ms ease;
+  background-color: #fff;
 }
 .sticky-layout .sticky:hover {
   background-color: #e5e5e5;
@@ -674,15 +675,16 @@ input[type=radio].degree {
   width: 1px;
 }
 input[type=radio].degree + label:before {
-  font-family: FontAwesome;
+  font-family: "Font Awesome 5 Free";
   display: inline-block;
-  content: "\f1db";
+  content: "\f111";
   letter-spacing: 10px;
   font-size: 1.8em;
   color: #535353;
 }
 input[type=radio].degree:checked + label:before {
-  content: "\f00c";
+  font-family: "Font Awesome 5 Free";
+  content: "\f058";
   font-size: 1.8em;
   color: rgba(73, 163, 127, 1);
   letter-spacing: 5px;
@@ -692,9 +694,9 @@ li.ssr {
   border-bottom: 1px solid #ccc;
 }
 .notifications .on:after, li.ssr .on:after {
-  font-family: FontAwesome;
+  font-family: "Font Awesome 5 Free";
   display: inline-block;
-  content: "\f00c";
+  content: "\f058";
   letter-spacing: 5px;
   font-size: 1.6em;
   color: rgba(73, 163, 127, 1);
@@ -990,7 +992,7 @@ button {
 .tplinks a.on {
   border: 1px solid #1FA66C;
   border-radius: 20px;
-  padding: 10px 2px 10px 2px;
+  padding: 11px 2px 8px 2px;
 }
 
 .chart-toggle.on {
@@ -1009,7 +1011,7 @@ button {
 .tplinks a.off {
   border: 1px solid #ccc;
   border-radius: 20px;
-  padding: 10px 2px 10px 2px;
+  padding: 11px 2px 8px 2px;
 }
 
 .chart-toggle.off {
@@ -1091,7 +1093,7 @@ button {
 .kettles a.sticky, .kettles a.streams {
   border: 1px solid #ccc;
   border-radius: 20px;
-  padding: 8px 12px 8px 12px;
+  padding: 10px 10px 2px 10px;
   margin-right: 5px;
   -webkit-box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(0,0,0,0.2);
   -moz-box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(0,0,0,0.2);
@@ -1135,4 +1137,8 @@ input[type=number]::-webkit-outer-spin-button {
 
 #settingsModal table .badge {
   font-size: 100%;
+}
+
+.modal {
+  overflow: scroll;
 }

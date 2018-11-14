@@ -4,7 +4,7 @@
   <div class="flex-row share" ng-if="settings.shared && !shareAccess('embed')">
     <div class="col">
       <div class="alert alert-info alert-dismissible share">
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close" ng-click="clearSettings()"><i class="fa fa-trash"></i></button>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close" ng-click="clearSettings()"><i class="fas fa-trash-alt"></i></button>
         <h3>Shared Session <sup>from</sup> <a href="mailto: {{settings.recipe.brewer.email}}">{{settings.recipe.brewer.name}}</a></h3>
         <form ng-if="share.needPassword">
           A password is required to load this session <br>
@@ -29,7 +29,7 @@
       </div>
       <div class="pb-5">
         <a href="" class="chart-toggle float-right" ng-click="settings.chart=!settings.chart" ng-class="{'on':settings.chart.show,'off':!settings.chart.show}">
-        <i class="fa fa-area-chart"
+        <i class="fas fa-area-chart"
           ng-class="{'on':settings.chart.show,'off':!settings.chart.show}"
           aria-hidden="true"></i>
         </a>

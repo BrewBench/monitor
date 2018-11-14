@@ -47,5 +47,10 @@ angular.module('brewbench-monitor')
 .filter('titlecase', function($filter){
   return function(text){
     return (text.charAt(0).toUpperCase() + text.slice(1));
-  }
+  };
+})
+.filter('dbmPercent', function($filter){
+  return function(dbm){
+    return 2 * (dbm + 100);
+  };
 });

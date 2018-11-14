@@ -1,9 +1,18 @@
 # Change Log
 
+## 4.1.0 - 2018-11-14
+
+### Added
+- Support for BMP180 temp altitude and barometric pressure
+- ESP32 and ESP8266 board support and sketches
+- ESP WiFi signal 
+
+### Updated
+- Icons to Font Awesome 5
+
 ## 4.0.0 - 2018-04-27
 
 ### Added
-- [BrewBench Streams](https://app.brewbench.co) Sketch
 - raw analogRead/digitalRead value in response
 - Debug settings option to view raw and unformatted temps
 - Arduino online status
@@ -66,7 +75,7 @@
 ## 3.1.2 - 2018-01-06
 
 ### Fixed
-- TP Links fixes
+- TP-Link issues
 
 ## 3.1.1 - 2018-01-05
 
@@ -74,6 +83,7 @@
 - InfluxDB database list
 - Kettle adjustment % to Auto and InfluxDB sketches
 - Button styles
+- TP-Link support
 
 ### Updated
 - CSS styles

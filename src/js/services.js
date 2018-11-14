@@ -28,7 +28,7 @@ angular.module('brewbench-monitor')
         ,recipe: {'name':'','brewer':{name:'','email':''},'yeast':[],'hops':[],'grains':[],scale:'gravity',method:'papazian','og':1.050,'fg':1.010,'abv':0,'abw':0,'calories':0,'attenuation':0}
         ,notifications: {on:true,timers:true,high:true,low:true,target:true,slack:'',last:''}
         ,sounds: {on:true,alert:'/assets/audio/bike.mp3',timer:'/assets/audio/school.mp3'}
-        ,arduinos: [{id:'local-'+btoa('brewbench'),board:'',url:'arduino.local',analog:5,digital:13,adc:0,secure:false,version:'',status:{error:'',dt:'',message:''}}]
+        ,arduinos: [{id:'local-'+btoa('brewbench'),board:'',RSSI:false,url:'arduino.local',analog:5,digital:13,adc:0,secure:false,version:'',status:{error:'',dt:'',message:''}}]
         ,tplink: {user: '', pass: '', token:'', status: '', plugs: []}
         ,influxdb: {url: '', port: '', user: '', pass: '', db: '', dbs:[], status: ''}
         ,streams: {username: '', api_key: '', status: '', session: {id: '', name: '', type: 'fermentation'}}

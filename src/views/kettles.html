@@ -12,7 +12,7 @@
               <span class="dropdown-toggle"><img src="assets/img/arduino.svg" width="15"> {{kettle.arduino ? kettle.arduino.url : 'Select an Arduino'}}</span>
             </a>
             <div class="kettle-options">
-              <a href="" class="text-success sticky" ng-click="kettle.sticky = !!(kettle.sticky) ?  false : true"><i class="fa fa-thumb-tack fa-lg"></i></a>
+              <a href="" class="text-success sticky" ng-click="kettle.sticky = !!(kettle.sticky) ?  false : true"><i class="fas fa-thumbtack fa-lg"></i></a>
             </div>
             <div class="dropdown-menu scrollable-menu">
               <button class="text-center modal-link dropdown-item" type="button" data-toggle="modal" data-target="#settingsModal">
@@ -23,13 +23,13 @@
                 ng-class="{'active': kettle.arduino && kettle.arduino.id == arduino.id}"
                 ng-click="kettle.arduino=arduino;updateStreams(kettle);"
                 class="dropdown-item" type="button">
-                <i class="fa fa-circle" ng-class="{'orange':(!site.https && arduino.secure),'on':(!arduino.status.error && arduino.status.dt),'off':!!arduino.status.error}" aria-hidden="true"></i> {{ arduino.url }}
+                <i class="fas fa-circle" ng-class="{'orange':(!site.https && arduino.secure),'on':(!arduino.status.error && arduino.status.dt),'off':!!arduino.status.error}" aria-hidden="true"></i> {{ arduino.url }}
               </button>
             </div>
           </div>
         </div>
         <div ng-if="shareAccess('fullAccess')" class="col-auto">
-          <i class="fa fa-4x float-right" ng-click="startStopKettle(kettle)" ng-class="{'fa-stop-circle':kettle.active,'fa-play-circle':!kettle.active}"></i>
+          <i class="fas fa-4x float-right" ng-click="startStopKettle(kettle)" ng-class="{'fa-stop-circle':kettle.active,'fa-play-circle':!kettle.active}"></i>
         </div>
       </div>
 
@@ -42,8 +42,8 @@
         <div class="col">
           <a href="" ng-click="changeKettleType(kettle)" class="kettle-type {{ kettle.type }}" ng-class="{'svg': ['air','leaf'].indexOf(kettle.type) === -1}">
             <img ng-if="['air','leaf'].indexOf(kettle.type) === -1" class="type {{ kettle.type }}" ng-src="/assets/img/{{kettle.type}}.svg" width="30" height="30"/>
-            <i ng-if="kettle.type == 'air'" class="fa fa-thermometer-quarter fa-2x type" height="30"></i>
-            <i ng-if="kettle.type == 'leaf'" class="fa fa-leaf fa-lg type" height="30"></i>
+            <i ng-if="kettle.type == 'air'" class="fas fa-thermometer-quarter fa-2x type" height="30"></i>
+            <i ng-if="kettle.type == 'leaf'" class="fas fa-leaf fa-lg type" height="30"></i>
           </a>&nbsp;
           <h3><editable type="text" model="kettle.name"></editable></h3>
         </div>
@@ -166,7 +166,7 @@
                 <button ng-click="kettle.heater.ssr = !kettle.heater.ssr"
                   class="ssr dropdown-item" type="button">
                   Solid State Relay
-                  <i class="fa fa-lg" ng-class="{'fa-check text-success':kettle.heater.ssr,'fa-circle-o':!kettle.heater.ssr}"></i> <span ng-show="kettle.heater.ssr" class="text-muted">{{kettle.heater.dutyCycle}}%</span>
+                  <i class="fas fa-lg" ng-class="{'fa-check text-success':kettle.heater.ssr,'fa-circle-o':!kettle.heater.ssr}"></i> <span ng-show="kettle.heater.ssr" class="text-muted">{{kettle.heater.dutyCycle}}%</span>
                 </button>
                 <div class="dropdown-divider"></div>
                 <h6 class="dropdown-header" ng-if="settings.tplink.token">TP-Link</h6>
@@ -176,7 +176,7 @@
                      ng-class="{'active': kettle.heater.pin=='TP-'+tp.deviceId}"
                      ng-click="kettle.heater.pin='TP-'+tp.deviceId; kettle.heater.pwm=false;updateStreams(kettle);"
                      class="dropdown-item" type="button">
-                   {{ tp.alias }} <i class="fa fa-circle" ng-class="{'on':!!tp.status, 'off':!tp.status}" aria-hidden="true"></i> <span class="pininuse" ng-show="pinInUse('TP-'+tp.deviceId,kettle.arduino.id)">(In Use)</span>
+                   {{ tp.alias }} <i class="fas fa-circle" ng-class="{'on':!!tp.status, 'off':!tp.status}" aria-hidden="true"></i> <span class="pininuse" ng-show="pinInUse('TP-'+tp.deviceId,kettle.arduino.id)">(In Use)</span>
                 </button>
                 <div class="dropdown-divider" ng-if="settings.tplink.token"></div>
                 <h6 class="dropdown-header">Analog</h6>
@@ -201,7 +201,7 @@
             <div class="btn-group relay">
               <button type="button" class="btn" ng-class="{'btn-light':!kettle.heater.auto,'btn-success':kettle.heater.auto}" ng-click="kettle.heater.auto=!kettle.heater.auto">Auto</button>
               <button type="button" class="btn" ng-class="{'btn-light':!kettle.heater.running && !kettle.heater.auto,'btn-success':kettle.heater.running,'btn-warning':!kettle.heater.running && kettle.heater.auto}" ng-click="toggleKettle('heat',kettle)">
-                <i class="fa fa-power-off fa-lg"></i>
+                <i class="fas fa-power-off fa-lg"></i>
               </button>
             </div>
             </div>
@@ -225,7 +225,7 @@
                 <button ng-click="kettle.pump.ssr = !kettle.pump.ssr"
                   class="ssr dropdown-item" type="button">
                   Solid State Relay
-                  <i class="fa fa-lg" ng-class="{'fa-check text-success':kettle.pump.ssr,'fa-circle-o':!kettle.pump.ssr}"></i> <span ng-show="kettle.pump.ssr" class="text-muted">{{kettle.pump.dutyCycle}}%</span>
+                  <i class="fas fa-lg" ng-class="{'fa-check text-success':kettle.pump.ssr,'fa-circle-o':!kettle.pump.ssr}"></i> <span ng-show="kettle.pump.ssr" class="text-muted">{{kettle.pump.dutyCycle}}%</span>
                 </button>
                 <div class="dropdown-divider"></div>
                 <h6 class="dropdown-header" ng-if="settings.tplink.token">TP-Link</h6>
@@ -235,7 +235,7 @@
                      ng-class="{'active': kettle.pump.pin=='TP-'+tp.deviceId}"
                      ng-click="kettle.pump.pin='TP-'+tp.deviceId; kettle.pump.pwm=false;"
                      class="dropdown-item" type="button">
-                   {{ tp.alias }} <i class="fa fa-circle" ng-class="{'on':!!tp.status, 'off':!tp.status}" aria-hidden="true"></i> <span class="pininuse" ng-show="pinInUse('TP-'+tp.deviceId,kettle.arduino.id)">(In Use)</span>
+                   {{ tp.alias }} <i class="fas fa-circle" ng-class="{'on':!!tp.status, 'off':!tp.status}" aria-hidden="true"></i> <span class="pininuse" ng-show="pinInUse('TP-'+tp.deviceId,kettle.arduino.id)">(In Use)</span>
                 </button>
                 <div class="dropdown-divider" ng-if="settings.tplink.token"></div>
                 <h6 class="dropdown-header">Analog</h6>
@@ -260,7 +260,7 @@
             <div class="btn-group relay">
               <button type="button" class="btn" ng-class="{'btn-light':!kettle.pump.auto,'btn-success':kettle.pump.auto}" ng-click="kettle.pump.auto=!kettle.pump.auto">Auto</button>
               <button type="button" class="btn" ng-class="{'btn-light':!kettle.pump.running && !kettle.pump.auto,'btn-success':kettle.pump.running,'btn-warning':!kettle.pump.running && kettle.pump.auto}" ng-click="toggleKettle('pump',kettle)">
-                <i class="fa fa-power-off fa-lg"></i>
+                <i class="fas fa-power-off fa-lg"></i>
               </button>
             </div>
           </div>
@@ -284,7 +284,7 @@
                 <button ng-click="kettle.cooler.ssr = !kettle.cooler.ssr"
                   class="ssr dropdown-item" type="button">
                   Solid State Relay
-                  <i class="fa fa-lg" ng-class="{'fa-check text-success':kettle.cooler.ssr,'fa-circle-o':!kettle.cooler.ssr}"></i> <span ng-show="kettle.cooler.ssr" class="text-muted">{{kettle.cooler.dutyCycle}}%</span>
+                  <i class="fas fa-lg" ng-class="{'fa-check text-success':kettle.cooler.ssr,'fa-circle-o':!kettle.cooler.ssr}"></i> <span ng-show="kettle.cooler.ssr" class="text-muted">{{kettle.cooler.dutyCycle}}%</span>
                 </button>
                 <div class="dropdown-divider"></div>
                 <h6 class="dropdown-header" ng-if="settings.tplink.token">TP-Link</h6>
@@ -294,7 +294,7 @@
                      ng-class="{'active': kettle.cooler.pin=='TP-'+tp.deviceId}"
                      ng-click="kettle.cooler.pin='TP-'+tp.deviceId; kettle.cooler.pwm=false;"
                      class="dropdown-item" type="button">
-                   {{ tp.alias }} <i class="fa fa-circle" ng-class="{'on':!!tp.status, 'off':!tp.status}" aria-hidden="true"></i> <span class="pininuse" ng-show="pinInUse('TP-'+tp.deviceId,kettle.arduino.id)">(In Use)</span>
+                   {{ tp.alias }} <i class="fas fa-circle" ng-class="{'on':!!tp.status, 'off':!tp.status}" aria-hidden="true"></i> <span class="pininuse" ng-show="pinInUse('TP-'+tp.deviceId,kettle.arduino.id)">(In Use)</span>
                 </button>
                 <div class="dropdown-divider" ng-if="settings.tplink.token"></div>
                 <h6 class="dropdown-header">Analog</h6>
@@ -319,7 +319,7 @@
             <div class="btn-group relay">
               <button type="button" class="btn" ng-class="{'btn-light':!kettle.cooler.auto,'btn-success':kettle.cooler.auto}" ng-click="kettle.cooler.auto=!kettle.cooler.auto">Auto</button>
               <button type="button" class="btn" ng-class="{'btn-light':!kettle.cooler.running && !kettle.cooler.auto,'btn-success':kettle.cooler.running,'btn-warning':!kettle.cooler.running&&kettle.cooler.auto}" ng-click="toggleKettle('cool',kettle)">
-                <i class="fa fa-power-off fa-lg"></i>
+                <i class="fas fa-power-off fa-lg"></i>
               </button>
             </div>
           </div>
@@ -375,8 +375,8 @@
                 <a class="btn btn-light"><editable type="number" model="kettle.temp.target">{{kettle.temp.target}}</editable>
                   {{ !!BrewService.sensorTypes(kettle.temp.type).percent ? '%' : '&deg;'+settings.general.unit }}
                 </a>
-                <a class="btn btn-light" ng-click="changeValue(kettle,'target',false)"><i class="fa fa-minus fa-lg"></i></a>
-                <a class="btn btn-light" ng-click="changeValue(kettle,'target',true)"><i class="fa fa-plus fa-lg"></i></a>
+                <a class="btn btn-light" ng-click="changeValue(kettle,'target',false)"><i class="fas fa-minus fa-lg"></i></a>
+                <a class="btn btn-light" ng-click="changeValue(kettle,'target',true)"><i class="fas fa-plus fa-lg"></i></a>
               </div>
             </div>
           </div>
@@ -387,8 +387,8 @@
                 <a class="btn btn-light"><editable type="number" model="kettle.temp.diff">{{kettle.temp.diff}}</editable>
                   {{ !!BrewService.sensorTypes(kettle.temp.type).percent ? '%' : '&deg;'+settings.general.unit }}
                 </a>
-                <a class="btn btn-light" ng-click="changeValue(kettle,'diff',false)"><i class="fa fa-minus fa-lg"></i></a>
-                <a class="btn btn-light" ng-click="changeValue(kettle,'diff',true)"><i class="fa fa-plus fa-lg"></i></a>
+                <a class="btn btn-light" ng-click="changeValue(kettle,'diff',false)"><i class="fas fa-minus fa-lg"></i></a>
+                <a class="btn btn-light" ng-click="changeValue(kettle,'diff',true)"><i class="fas fa-plus fa-lg"></i></a>
               </div>
             </div>
           </div>
@@ -399,8 +399,8 @@
                 <a class="btn btn-light"><editable type="number" model="kettle.temp.adjust" placeholder="0">{{kettle.temp.adjust}}</editable>
                   {{ !!BrewService.sensorTypes(kettle.temp.type).percent ? '%' : '&deg;'+settings.general.unit }}
                 </a>
-                <a class="btn btn-light" ng-click="changeValue(kettle,'adjust',false)"><i class="fa fa-minus fa-lg"></i></a>
-                <a class="btn btn-light" ng-click="changeValue(kettle,'adjust',true)"><i class="fa fa-plus fa-lg"></i></a>
+                <a class="btn btn-light" ng-click="changeValue(kettle,'adjust',false)"><i class="fas fa-minus fa-lg"></i></a>
+                <a class="btn btn-light" ng-click="changeValue(kettle,'adjust',true)"><i class="fas fa-plus fa-lg"></i></a>
               </div>
             </div>
           </div>
@@ -454,7 +454,7 @@
                 </div>
               </div>
 
-              <button type="button" class="btn btn-light" ng-click="removeTimers($event,kettle)" ng-if="kettle.timers.length"><i class="fa fa-trash fa-lg"></i></button>
+              <button type="button" class="btn btn-light" ng-click="removeTimers($event,kettle)" ng-if="kettle.timers.length"><i class="fas fa-trash fa-lg"></i></button>
 
             </div>
           </div>
@@ -472,11 +472,11 @@
             </div>
             <div class="col-auto">
               <div class="btn-group" role="group">
-                  <button type="button" class="btn btn-light" ng-if="timer.min!==null" ng-click="timerStart(timer,kettle)" ng-disabled="timer.queue"><i class="fa fa-lg" ng-class="{'fa-stop-circle':timer.running||timer.up.running,'fa-play-circle':!timer.running && !timer.queue && !timer.up.running,'fa-clock-o':timer.queue}"></i></button>
-                  <button type="button" class="btn btn-light" ng-if="timer.min!==null" ng-click="timer.min=timer.min-1" ng-disabled="timer.up"><i class="fa fa-minus fa-lg"></i></button>
-                  <button type="button" class="btn btn-light" ng-if="timer.min!==null" ng-click="timer.min=timer.min+1" ng-disabled="timer.up"><i class="fa fa-plus fa-lg"></i></button>
+                  <button type="button" class="btn btn-light" ng-if="timer.min!==null" ng-click="timerStart(timer,kettle)" ng-disabled="timer.queue"><i class="fas fa-lg" ng-class="{'fa-stop-circle':timer.running||timer.up.running,'fa-play-circle':!timer.running && !timer.queue && !timer.up.running,'fa-clock-o':timer.queue}"></i></button>
+                  <button type="button" class="btn btn-light" ng-if="timer.min!==null" ng-click="timer.min=timer.min-1" ng-disabled="timer.up"><i class="fas fa-minus fa-lg"></i></button>
+                  <button type="button" class="btn btn-light" ng-if="timer.min!==null" ng-click="timer.min=timer.min+1" ng-disabled="timer.up"><i class="fas fa-plus fa-lg"></i></button>
               </div>
-              <button type="button" class="btn btn-light" ng-click="kettle.timers.splice($index, 1);"><i class="fa fa-trash fa-lg"></i></button>
+              <button type="button" class="btn btn-light" ng-click="kettle.timers.splice($index, 1);"><i class="fas fa-trash fa-lg"></i></button>
             </div>
           </div>
         </div>
@@ -508,7 +508,7 @@
         <span ng-if="kettle.notify.streams" class="badge badge-pill badge-dark badge-streams float-left status-{{ kettle.message.status }}">
           <img src="/assets/img/brewbench-colors.png" width="25" style="border-radius:10px;"/> Streaming
         </span>
-        <i class="fa fa-1x float-right" ng-class="{'fa-chevron-left':!showRemoveKettle,'fa-chevron-right':showRemoveKettle}" aria-hidden="true" ng-click="showRemoveKettle=!showRemoveKettle"></i>
+        <i class="fas fa-1x float-right" ng-class="{'fa-chevron-left':!showRemoveKettle,'fa-chevron-right':showRemoveKettle}" aria-hidden="true" ng-click="showRemoveKettle=!showRemoveKettle"></i>
         <button type="button" ng-show="showRemoveKettle" class="btn btn-danger btn-sm float-right" ng-click="removeKettle(kettle, $index); showRemoveKettle=!showRemoveKettle">Remove Kettle</button>
     </div>
   </div>

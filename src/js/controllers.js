@@ -12,9 +12,9 @@ $scope.clearSettings = function(e){
 if( $state.current.name == 'reset')
   $scope.clearSettings();
 
-var notification = null,
-  resetChart = 100,
-  timeout = null;//reset chart after 100 polls
+var notification = null;
+var resetChart = 100;
+var timeout = null; //reset chart after 100 polls
 
 $scope.BrewService = BrewService;
 $scope.site = {https: !!(document.location.protocol=='https:')
@@ -106,6 +106,11 @@ $scope.share = (!$state.params.file && BrewService.settings('share')) ? BrewServ
       , deleteAfter: 14
   };
 
+$scope.openSketches = function(){
+  $('#settingsModal').modal('hide');
+  $('#sketchesModal').modal('show');
+};
+
 $scope.sumValues = function(obj){
   return _.sumBy(obj,'amount');
 }
@@ -175,6 +180,7 @@ $scope.updateABV();
         id: btoa(now+''+$scope.settings.arduinos.length+1),
         url: 'arduino.local',
         board: '',
+        RSSI: false,
         analog: 5,
         digital: 13,
         adc: 0,
@@ -209,6 +215,8 @@ $scope.updateABV();
           if(info && info.BrewBench){
             event.srcElement.innerHTML = 'Connect';
             arduino.board = info.BrewBench.board;
+            if(info.BrewBench.RSSI)
+              arduino.RSSI = info.BrewBench.RSSI;
             arduino.version = info.BrewBench.version;
             arduino.status.dt = new Date();
             arduino.status.error = '';
@@ -410,7 +418,7 @@ $scope.updateABV();
 
   $scope.influxdb = {
     brewbenchHosted: () => {
-      return BrewService.influxdb().hosted($scope.settings.influxdb.url);      
+      return BrewService.influxdb().hosted($scope.settings.influxdb.url);
     },
     remove: () => {
       var defaultSettings = BrewService.reset();
