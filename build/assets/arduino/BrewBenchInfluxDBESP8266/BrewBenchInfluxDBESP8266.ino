@@ -194,6 +194,12 @@ String sensorCommand(const String dpin, const String apin, const int16_t index, 
   // ADC int16_t adc0 = 0;
   float resistance = 0.0;
 
+  String data = "{\"hostname\":\""+String(HOSTNAME)+"\",\"sensor\":\""+String(type)+"\"";
+  if( dpin != "" )
+    data += ",\"pin\":\""+String(dpin)+"\"";
+  else
+    data += ",\"pin\":\""+String(apin)+"\"";
+
   if( apin != "" ){
     raw = analogRead(pin);
     volts = raw * 0.0049;
@@ -284,6 +290,7 @@ float actionsCommand(const String source, const String spin, const String type, 
     pin = gpio(spin);
 
   float percent = 0.00;
+  // BMP180 float pressure = 0.00;
   // ADC int16_t adc0 = 0;
   float resistance = 0.0;
 
