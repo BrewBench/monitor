@@ -1337,7 +1337,7 @@ $scope.updateABV();
   function downloadSketch(name, actions, hasTriggers, headers, sketch){
     // tp link connection
     var tplink_connection_string = BrewService.tplink().connection();
-    var autogen = '/* Sketch Auto Generated from http://monitor.brewbench.co on '+moment().format('YYYY-MM-DD HH:MM:SS')+' for '+name+' */\n';
+    var autogen = '/*\nSketch Auto Generated from http://monitor.brewbench.co\nVersion '+$scope.pkg.sketch_version+' '+moment().format('YYYY-MM-DD HH:MM:SS')+' for '+name+'\n*/\n';
     $http.get('assets/arduino/'+sketch+'/'+sketch+'.ino')
       .then(response => {
         // replace variables
@@ -1420,7 +1420,7 @@ $scope.updateABV();
           response.data = response.data.replace(/\/\/ triggers /g, '');
         }
         var streamSketch = document.createElement('a');
-        streamSketch.setAttribute('download', sketch+'-'+name+'.ino');
+        streamSketch.setAttribute('download', sketch+'-'+name+'-'+$scope.pkg.sketch_version+'.ino');
         streamSketch.setAttribute('href', "data:text/ino;charset=utf-8," + encodeURIComponent(response.data));
         streamSketch.style.display = 'none';
         document.body.appendChild(streamSketch);
