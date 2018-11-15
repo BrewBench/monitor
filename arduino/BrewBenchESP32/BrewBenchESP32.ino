@@ -223,6 +223,15 @@ String sensorCommand(const String dpin, const String apin, const int16_t index, 
       temp = (150*map(raw,410,1023,0,614))/614;
     }
   }
+  else if(type == "SoilMoisture"){
+    pinMode(pin, OUTPUT);
+    digitalWrite(pin, HIGH);
+    delay(10);
+    raw = gpio(apin);
+    digitalWrite(pin, LOW);
+    percent = map(raw, 0, 880, 0, 100);
+    data += ",\"percent\":"+String(percent);
+  }
   // DS18B20 else if(type == "DS18B20"){
   // DS18B20   OneWire oneWire(pin);
   // DS18B20   DallasTemperature sensors(&oneWire);
@@ -233,15 +242,6 @@ String sensorCommand(const String dpin, const String apin, const int16_t index, 
   // DS18B20   else
   // DS18B20     temp = sensors.getTempCByIndex(0);
   // DS18B20 }
-  else if(type == "SoilMoisture"){
-    pinMode(pin, OUTPUT);
-    digitalWrite(pin, HIGH);
-    delay(10);
-    raw = gpio(apin);
-    digitalWrite(pin, LOW);
-    percent = map(raw, 0, 880, 0, 100);
-    data += ",\"percent\":"+String(percent);
-  }
   // DHT else if(type == "DHT11" || type == "DHT12"){
   // DHT   if(type == "DHT11"){
   // DHT     dht.setup(pin, DHTesp::DHT11);

@@ -1,5 +1,10 @@
 # Change Log
 
+## 4.1.2 - 2018-11-14
+
+### Added
+- BMP180 support for ESP8266
+
 ## 4.1.1 - 2018-11-14
 
 ### Added

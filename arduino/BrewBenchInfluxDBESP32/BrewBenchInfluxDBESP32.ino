@@ -229,6 +229,15 @@ String sensorCommand(const String dpin, const String apin, const int16_t index, 
       temp = (150*map(raw,410,1023,0,614))/614;
     }
   }
+  else if(type == "SoilMoisture"){
+    pinMode(pin, OUTPUT);
+    digitalWrite(pin, HIGH);
+    delay(10);
+    raw = analogRead(gpio(apin));
+    digitalWrite(pin, LOW);
+    percent = map(raw, 0, 880, 0, 100);
+    data += ",\"percent\":"+String(percent);
+  }
   // DS18B20 else if(type.substring(0,7) == "DS18B20"){
   // DS18B20   OneWire oneWire(pin);
   // DS18B20   DallasTemperature sensors(&oneWire);
@@ -239,15 +248,6 @@ String sensorCommand(const String dpin, const String apin, const int16_t index, 
   // DS18B20   else
   // DS18B20     temp = sensors.getTempCByIndex(0);
   // DS18B20 }
-  else if(type == "SoilMoisture"){
-    pinMode(pin, OUTPUT);
-    digitalWrite(pin, HIGH);
-    delay(10);
-    raw = analogRead(gpio(apin));
-    digitalWrite(pin, LOW);
-    percent = map(raw, 0, 880, 0, 100);
-    data += ",\"percent\":"+String(percent);
-  }
   // DHT else if(type == "DHT11" || type == "DHT12"){
   // DHT   if(type == "DHT11"){
   // DHT     dht.setup(pin, DHTesp::DHT11);
@@ -319,6 +319,15 @@ float actionsCommand(const String source, const String spin, const String type, 
       temp = (150*map(raw,410,1023,0,614))/614;
     }
   }
+  else if(type.substring(0,13) == "SoilMoistureD"){
+    uint8_t dpin = type.substring(13).toInt();
+    pinMode(dpin, OUTPUT);
+    digitalWrite(dpin, HIGH);
+    delay(10);
+    raw = analogRead(pin);
+    digitalWrite(dpin, LOW);
+    percent = map(raw, 0, 880, 0, 100);
+  }
   // DS18B20 else if(type.substring(0,7) == "DS18B20"){
   // DS18B20   // format DS18B20-index
   // DS18B20   int16_t index = -1;
@@ -333,15 +342,6 @@ float actionsCommand(const String source, const String spin, const String type, 
   // DS18B20   else
   // DS18B20     temp = sensors.getTempCByIndex(0);
   // DS18B20 }
-  else if(type.substring(0,13) == "SoilMoistureD"){
-    uint8_t dpin = type.substring(13).toInt();
-    pinMode(dpin, OUTPUT);
-    digitalWrite(dpin, HIGH);
-    delay(10);
-    raw = analogRead(pin);
-    digitalWrite(dpin, LOW);
-    percent = map(raw, 0, 880, 0, 100);
-  }
   // DHT else if(type == "DHT11" || type == "DHT12"){
   // DHT   if(type == "DHT11"){
   // DHT     dht.setup(pin, DHTesp::DHT11);

@@ -122,6 +122,8 @@ Open the serial monitor on `115200` baud to get the IP address after uploading t
   - Libraries: Add http://arduino.esp8266.com/stable/package_esp8266com_index.json to Boards Manager URLs
   - Board: Node_MCU 1.0 (ESP-12E Module)
   - ![alt text](https://images-na.ssl-images-amazon.com/images/I/51%2BUHdAa1eL.jpg "ESP8266")
+  - SLC is D1 (GPIO5)
+  - SLA is D2 (GPIO4)
 
 - ESP8285
   - Coming Soon
@@ -131,6 +133,8 @@ Open the serial monitor on `115200` baud to get the IP address after uploading t
   - Libraries: Add https://dl.espressif.com/dl/package_esp32_index.json to Boards Manager URLs
   - Board: NodeMCU-32S
   - Board Manager install esp32
+  - SLC is D22 (GPI22)
+  - SLA is D21 (GPI21)
   - [ESP32 on Amazon](https://smile.amazon.com/gp/product/B0718T232Z/ref=ox_sc_act_title_1?smid=A30QSGOJR8LMXA&psc=1)
   - ![alt text](https://github.com/espressif/arduino-esp32/raw/master/docs/esp32_pinmap.png "ESP32")
 

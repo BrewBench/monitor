@@ -18,7 +18,6 @@ BridgeServer server;
 #endif
 
 dht DHT;
-
 Adafruit_BMP085 bmp;
 
 // https://learn.adafruit.com/thermistor/using-a-thermistor
