@@ -1,11 +1,16 @@
 # Change Log
 
+## 4.1.1 - 2018-11-14
+
+### Added
+- ESP32 and ESP8266 OTA support for sketch updates
+
 ## 4.1.0 - 2018-11-14
 
 ### Added
 - Support for BMP180 temp altitude and barometric pressure
 - ESP32 and ESP8266 board support and sketches
-- ESP WiFi signal 
+- ESP WiFi signal
 
 ### Updated
 - Icons to Font Awesome 5

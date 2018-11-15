@@ -24,7 +24,8 @@ $scope.esp = {
   type: '8266',
   ssid: '',
   ssid_pass: '',
-  hostname: '',
+  hostname: 'bbesp',
+  arduino_pass: 'bbadmin',
   autoconnect: false
 };
 $scope.hops;
@@ -113,7 +114,7 @@ $scope.openSketches = function(){
 
 $scope.sumValues = function(obj){
   return _.sumBy(obj,'amount');
-}
+};
 
 // init calc values
 $scope.updateABV = function(){
@@ -1347,16 +1348,24 @@ $scope.updateABV();
           .replace(/\[TPLINK_CONNECTION\]/g, tplink_connection_string)
           .replace(/\[SLACK_CONNECTION\]/g, $scope.settings.notifications.slack);
 
-        if($scope.esp.ssid){
-          response.data = response.data.replace(/\[SSID\]/g, $scope.esp.ssid);
-        }
-        if($scope.esp.ssid_pass){
-          response.data = response.data.replace(/\[SSID_PASS\]/g, $scope.esp.ssid_pass);
-        }
-        if(sketch.indexOf('ESP') !== -1 && $scope.esp.hostname){
-          response.data = response.data.replace(/\[HOSTNAME\]/g, $scope.esp.hostname);
-        } else if(sketch.indexOf('ESP') !== -1){
-          response.data = response.data.replace(/\[HOSTNAME\]/g, 'bbesp');
+        // ESP variables
+        if(sketch.indexOf('ESP') !== -1){
+          if($scope.esp.ssid){
+            response.data = response.data.replace(/\[SSID\]/g, $scope.esp.ssid);
+          }
+          if($scope.esp.ssid_pass){
+            response.data = response.data.replace(/\[SSID_PASS\]/g, $scope.esp.ssid_pass);
+          }
+          if($scope.esp.arduino_pass){
+            response.data = response.data.replace(/\[ARDUINO_PASS\]/g, md5($scope.esp.arduino_pass));
+          } else {
+            response.data = response.data.replace(/\[ARDUINO_PASS\]/g, md5('bbadmin'));
+          }
+          if($scope.esp.hostname){
+            response.data = response.data.replace(/\[HOSTNAME\]/g, $scope.esp.hostname);
+          } else {
+            response.data = response.data.replace(/\[HOSTNAME\]/g, 'bbesp');
+          }
         } else {
           response.data = response.data.replace(/\[HOSTNAME\]/g, name);
         }

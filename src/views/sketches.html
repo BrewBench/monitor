@@ -92,8 +92,12 @@
                       <input type="text" class="form-control" ng-model="esp.ssid_pass" placeholder="WiFi Password"/>
                     </div>
                     <div class="form-group">
+                      <label>Arduino Password</label>
+                      <input type="text" class="form-control" ng-model="esp.arduino_pass" placeholder="Arduino Password"/>
+                    </div>
+                    <div class="form-group">
+                      <label>Arduino Hostname</label>
                       <input type="text" class="form-control" ng-model="esp.hostname" placeholder="Hostname"/>
-                      Defaults to: bbesp
                     </div>
                     <div class="form-group">
                       <a href="" ng-click="compileSketch('ESP')" class="btn btn-primary">Download ESP Sketch</a>
@@ -181,8 +185,12 @@
                         <input type="text" class="form-control" ng-model="esp.ssid_pass" placeholder="WiFi Password"/>
                       </div>
                       <div class="form-group">
+                        <label>Arduino Password</label>
+                        <input type="text" class="form-control" ng-model="esp.arduino_pass" placeholder="Arduino Password"/>
+                      </div>
+                      <div class="form-group">
+                        <label>Arduino Hostname</label>
                         <input type="text" class="form-control" ng-model="esp.hostname" placeholder="Hostname"/>
-                        Defaults to: bbesp
                       </div>
                       <div class="form-group">
                         <a href="" ng-click="compileSketch('InfluxDBESP')" class="btn btn-primary" ng-class="{'disabled':settings.influxdb.status != 'Connected'}">Download ESP Sketch</a>

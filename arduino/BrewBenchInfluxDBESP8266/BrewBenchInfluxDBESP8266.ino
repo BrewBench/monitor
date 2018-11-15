@@ -3,6 +3,7 @@
 #include <ESP8266HTTPClient.h>
 #include <ESP8266mDNS.h>
 #include <WiFiClient.h>
+#include <ArduinoOTA.h>
 // [HEADERS]
 
 String HOSTNAME = "[HOSTNAME]";
@@ -414,9 +415,11 @@ void connect(){
   if (String(WiFi.SSID()) != String(ssid)) {
     WiFi.begin(ssid, password);
   }
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(50);
-  }
+  while (WiFi.waitForConnectResult() != WL_CONNECTED) {
+   Serial.println("Connection Failed! Rebooting...");
+   delay(5000);
+   ESP.restart();
+ }
 
   // Start the mDNS responder to set hostname bbesp.local
   if (MDNS.begin("[HOSTNAME]"))
@@ -447,11 +450,46 @@ void setup() {
 
   http.setReuse(true);
 
+  ArduinoOTA.setPort(3232);
+
+  ArduinoOTA.setHostname(HOSTNAME.c_str());
+
+  ArduinoOTA.setPasswordHash("[ARDUINO_PASS]");
+
+  ArduinoOTA.onStart([]() {
+    String type;
+
+    if (ArduinoOTA.getCommand() == U_FLASH)
+      type = "sketch";
+    else // U_SPIFFS
+      type = "filesystem";
+
+    // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using SPIFFS.end()
+    Serial.println("Start updating " + type);
+  });
+  ArduinoOTA.onEnd([]() {
+    Serial.println("\nEnd");
+  });
+  ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
+    Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
+  });
+  ArduinoOTA.onError([](ota_error_t error) {
+    Serial.printf("Error[%u]: ", error);
+    if (error == OTA_AUTH_ERROR) Serial.println("Auth Failed");
+    else if (error == OTA_BEGIN_ERROR) Serial.println("Begin Failed");
+    else if (error == OTA_CONNECT_ERROR) Serial.println("Connect Failed");
+    else if (error == OTA_RECEIVE_ERROR) Serial.println("Receive Failed");
+    else if (error == OTA_END_ERROR) Serial.println("End Failed");
+  });
+
+  ArduinoOTA.begin();
+
   runActions();
 }
 
 void loop() {
   server.handleClient();
+  ArduinoOTA.handle();
 
   secondCounter+=1;
   if( secondCounter == FREQUENCY_SECONDS ){
