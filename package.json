@@ -13,7 +13,7 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/brewbench/monitor.git"
-  }, 
+  },
   "keywords": [
     "Arduino",
     "brewing",
@@ -83,6 +83,6 @@
     "jquery": "^3.2.1",
     "lodash": "^4.17.11",
     "moment": "^2.22.2",
-    "popper.js": "^1.14.4"
+    "popper.js": "^1.14.5"
   }
 }

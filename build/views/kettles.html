@@ -40,13 +40,13 @@
 
       <div class="row">
         <div class="col">
-          <a href="" ng-click="changeKettleType(kettle)" class="kettle-type {{ kettle.type }}" ng-class="{'svg': ['air','seedling','cannabis'].indexOf(kettle.type) === -1}">
+          <a href="" ng-click="changeKettleType(kettle)" data-toggle="tooltip" title="Change type" class="kettle-type {{ kettle.type }}" ng-class="{'svg': ['air','seedling','cannabis'].indexOf(kettle.type) === -1}">
             <img ng-if="['air','seedling','cannabis'].indexOf(kettle.type) === -1" class="type {{ kettle.type }}" ng-src="/assets/img/{{kettle.type}}.svg" width="30" height="30"/>
             <i ng-if="kettle.type == 'air'" class="fas fa-thermometer-quarter fa-2x type"></i>
             <i ng-if="kettle.type == 'seedling'" class="fas fa-seedling fa-lg type"></i>
             <i ng-if="kettle.type == 'cannabis'" class="fas fa-cannabis fa-2x type"></i>
           </a>&nbsp;
-          <h3><editable type="text" model="kettle.name"></editable></h3>
+          <h3><editable type="text" model="kettle.name" data-toggle="tooltip" title="Click to edit name<br>Enter return to save"></editable></h3>
         </div>
       </div>
 
@@ -151,6 +151,11 @@
                     {{$index}} <span class="pininuse" ng-show="$index == 0">Default</span>
                   </button>
                 </div>
+              </div>
+              <div class="btn-group" ng-if="BrewService.isESP(kettle.arduino)">
+                <button type="button" class="btn btn-light" data-toggle="modal" data-target="#dataModal-esp{{ BrewService.isESP(kettle.arduino, true) }}">
+                  <i class="fa fa-microchip fa-lg"></i>
+                </button>
               </div>
             </div>
           </div>
@@ -413,7 +418,7 @@
               <label class="adjust">Timers</label>
               <!--  grain timers -->
               <div class="btn-group" role="group" ng-if="kettle.type=='grain'">
-                  <button type="button" class="btn btn-light add-timer" ng-click="addTimer(kettle)"><img src="/assets/img/grain.svg" width="32"></button>
+                  <button type="button" class="btn btn-light add-timer" ng-click="addTimer(kettle)" data-toggle="tooltip" title="Add timer"><img src="/assets/img/grain.svg" width="32"></button>
                     <div class="btn-group" role="group">
                       <button type="button" class="btn btn-light dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></button>
                       <div class="dropdown-menu scrollable-menu dropdown-menu-right">
@@ -427,7 +432,7 @@
               </div>
               <!--  hot timers -->
               <div class="btn-group" role="group" ng-if="kettle.type=='hop'">
-                  <button type="button" class="btn btn-light add-timer" ng-click="addTimer(kettle)"><img src="/assets/img/hop.svg" width="32"></button>
+                  <button type="button" class="btn btn-light add-timer" ng-click="addTimer(kettle)" data-toggle="tooltip" title="Add timer"><img src="/assets/img/hop.svg" width="32"></button>
                   <div class="btn-group" role="group">
                       <button type="button" class="btn btn-light dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></button>
                       <div class="dropdown-menu scrollable-menu dropdown-menu-right">
@@ -445,7 +450,7 @@
               </div>
               <!--  water timers -->
               <div class="btn-group" role="group" ng-if="kettle.type=='water'">
-                  <button type="button" class="btn btn-light add-timer" ng-click="addTimer(kettle)"><img src="/assets/img/water.svg" width="32"></button>
+                  <button type="button" class="btn btn-light add-timer" ng-click="addTimer(kettle)" data-toggle="tooltip" title="Add timer"><img src="/assets/img/water.svg" width="32"></button>
                   <div class="btn-group" role="group">
                     <button type="button" class="btn btn-light dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></button>
                     <div class="dropdown-menu scrollable-menu dropdown-menu-right">
@@ -459,7 +464,7 @@
               </div>
               <!--  generic timers -->
               <div class="btn-group" role="group" ng-if="['grain','hop','water'].indexOf(kettle.type) === -1">
-                  <button type="button" class="btn btn-light add-timer" ng-click="addTimer(kettle)">
+                  <button type="button" class="btn btn-light add-timer" ng-click="addTimer(kettle)" data-toggle="tooltip" title="Add timer">
                     <img ng-if="['air','seedling','cannabis'].indexOf(kettle.type) === -1" class="type {{ kettle.type }}" ng-src="/assets/img/{{kettle.type}}.svg" width="32"/>
                     <i ng-if="kettle.type == 'air'" class="fas fa-thermometer-quarter fa-2x type"></i>
                     <i ng-if="kettle.type == 'seedling'" class="fas fa-seedling fa-lg type"></i>
@@ -467,7 +472,9 @@
                   </button>
               </div>
 
-              <button type="button" class="btn btn-light" ng-click="removeTimers($event,kettle)" ng-if="kettle.timers.length"><i class="fas fa-trash-alt fa-lg"></i></button>
+              <button type="button" class="btn btn-light" ng-click="removeTimers($event,kettle)" ng-if="kettle.timers.length" data-toggle="tooltip" title="Delete all timers">
+                <i class="fas fa-trash-alt fa-lg"></i>
+              </button>
 
             </div>
           </div>

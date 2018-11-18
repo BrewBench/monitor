@@ -176,7 +176,15 @@ angular.module('brewbench-monitor')
       return domain;
     },
 
-    isESP: function(arduino){
+    isESP: function(arduino, return_version){
+      if(return_version){
+        if(arduino.board.toLowerCase().indexOf('32') !== -1)
+          return '32';
+        else if(arduino.board.toLowerCase().indexOf('8266') !== -1)
+          return '8266';
+        else
+          return false;
+      }
       return !!(arduino.board && (arduino.board.toLowerCase().indexOf('esp') !== -1 || arduino.board.toLowerCase().indexOf('nodemcu') !== -1));
     },
 

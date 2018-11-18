@@ -371,7 +371,10 @@ $scope.updateABV();
         var device = _.filter($scope.settings.tplink.plugs,{deviceId: pin.substr(3)})[0];
         return device ? device.alias : '';
       } else if(BrewService.isESP(arduino)){
-        return pin.replace('A','GPIO').replace('D','GPIO');
+        if(BrewService.isESP(arduino, true) == '8266')
+          return pin.replace('D','GPIO');
+        else
+          return pin.replace('A','GPIO').replace('D','GPIO');
       } else {
         return pin;
       }
@@ -1348,7 +1351,7 @@ $scope.updateABV();
     });
     _.each(sketches, (sketch, i) => {
       if(sketch.triggers){
-        sketch.actions.unshift('float temp = 0.00;')
+        sketch.actions.unshift('float temp = 0.00;');
         // update autoCommand
         for(var a = 0; a < sketch.actions.length; a++){
           if(sketches[i].actions[a].indexOf('actionsCommand(') !== -1)
@@ -1853,4 +1856,12 @@ $scope.updateABV();
     },5000);
   }
   $scope.updateLocal();
+
+  $(document).ready(function(){
+    $('[data-toggle="tooltip"]').tooltip({
+      animated: 'fade',
+      placement: 'right',
+      html: true
+    });
+  });
 });

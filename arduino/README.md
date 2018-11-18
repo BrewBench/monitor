@@ -121,7 +121,7 @@ Open the serial monitor on `115200` baud to get the IP address after uploading t
   - [ESP8266 on Amazon](https://smile.amazon.com/HiLetgo-Internet-Development-Wireless-Micropython/dp/B010N1SPRK/ref=sr_1_3?s=electronics&ie=UTF8&qid=1538931027&sr=1-3&keywords=esp8266)
   - Libraries: Add http://arduino.esp8266.com/stable/package_esp8266com_index.json to Boards Manager URLs
   - Board: Node_MCU 1.0 (ESP-12E Module)
-  - ![alt text](https://images-na.ssl-images-amazon.com/images/I/51%2BUHdAa1eL.jpg "ESP8266")
+  - ![alt text](../src/assets/img/esp-8266.png "ESP8266")
   - SLC is D1 (GPIO5)
   - SLA is D2 (GPIO4)
 
@@ -137,7 +137,7 @@ Open the serial monitor on `115200` baud to get the IP address after uploading t
   - SLA is D21 (GPIO21)
   - [ESP32 on Amazon](https://smile.amazon.com/gp/product/B0718T232Z/ref=ox_sc_act_title_1?smid=A30QSGOJR8LMXA&psc=1)  
 
-  - ![alt text](https://github.com/espressif/arduino-esp32/raw/master/docs/esp32_pinmap.png "ESP32")
+  - ![alt text](../src/assets/img/esp-32.png "ESP32")
 
 These board only supports sensors
 

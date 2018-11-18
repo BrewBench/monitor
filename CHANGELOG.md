@@ -7,9 +7,11 @@
 - Cannabis type
 - Reboot option in settings
 - Delay between actions
+- Tooltips
 
 ### Updated
 - ESP8266 and ESP32 to use GPIO input numbers instead of A/D mappings
+- ESP8266 and ESP32 quick reference diagrams
 
 ### Fixed
 - BMP180 on ESP8266
