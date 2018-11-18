@@ -46,12 +46,19 @@ void setupRest() {
   });
 
   server.on("/arduino/info", [](){
-    String data = "{\"BrewBench\": {\"board\": \""+String(ARDUINO_BOARD)+"\", \"version\": \"[VERSION]\"";
+    String data = "{\"BrewBench\": {\"board\": \""+String(ARDUINO_BOARD)+"\", \"version\": \"[VERSION]\", \"status\": \"restarting\"";
     data += ",\"RSSI\":"+String(WiFi.RSSI());
     data += ",\"IP\":\""+WiFi.localIP().toString()+"\"";
     data += "}}";
     sendHeaders();
     server.send(200, "application/json", data);
+  });
+
+  server.on("/arduino/reboot", [](){
+    sendHeaders();
+    server.send(200, "application/json", "{\"reboot\":true}");
+    delay(500);
+    ESP.restart();
   });
 
   server.on("/arduino/Thermistor", [](){
@@ -140,7 +147,7 @@ void handleNotFound() {
 String adCommand(const String dpin, const String apin, int16_t value, const String type) {
   uint8_t pin;
   if( dpin != "" )
-    pin = gpio(dpin);
+    pin = dpin.substring(1).toInt();
   else
     pin = apin.substring(1).toInt();
 
@@ -178,7 +185,7 @@ String adCommand(const String dpin, const String apin, int16_t value, const Stri
 String sensorCommand(const String dpin, const String apin, const int16_t index, const String type) {
   uint8_t pin;
   if( dpin != "" )
-    pin = gpio(dpin);
+    pin = dpin.substring(1).toInt();
   else
     pin = apin.substring(1).toInt();
   float temp = 0.00;
@@ -194,12 +201,11 @@ String sensorCommand(const String dpin, const String apin, const int16_t index, 
   else
     data += ",\"pin\":\""+String(apin)+"\"";
 
-  if( apin != "" ){
+  if( dpin != "" ){
+    raw = digitalRead(pin);
+  } else {
     raw = analogRead(pin);
     volts = raw * 0.0049;
-  }
-  else if( dpin != "" ){
-    raw = digitalRead(pin);
   }
 
   // Start sensors
@@ -225,11 +231,15 @@ String sensorCommand(const String dpin, const String apin, const int16_t index, 
     }
   }
   else if(type == "SoilMoisture"){
-    pinMode(pin, OUTPUT);
-    digitalWrite(pin, HIGH);
-    delay(10);
+    if( dpin != "" ){
+      pinMode(pin, OUTPUT);
+      digitalWrite(pin, HIGH);
+      delay(10);
+    }
     raw = analogRead(apin.substring(1).toInt());
-    digitalWrite(pin, LOW);
+    if( dpin != "" ){
+      digitalWrite(pin, LOW);
+    }
     percent = map(raw, 0, 880, 0, 100);
     data += ",\"percent\":"+String(percent);
   }
@@ -264,6 +274,9 @@ String sensorCommand(const String dpin, const String apin, const int16_t index, 
   // BMP180     temp = bmp.readTemperature();
   // BMP180     data += ",\"altitude\":"+String(bmp.readAltitude());
   // BMP180     data += ",\"pressure\":"+String(bmp.readPressure());
+  // BMP180   } else {
+  // BMP180     data += ",\"altitude\":0";
+  // BMP180     data += ",\"pressure\":0";
   // BMP180   }
   // BMP180 }
 
@@ -273,35 +286,6 @@ String sensorCommand(const String dpin, const String apin, const int16_t index, 
   data += "}";
 
   return data;
-}
-
-uint8_t gpio(String spin){
-  switch( spin.substring(1).toInt() ){
-    case 0:
-      return 16;
-    case 1:
-      return 5;
-    case 2:
-      return 4;
-    case 3:
-      return 0;
-    case 4:
-      return 2;
-    case 5:
-      return 14;
-    case 6:
-      return 12;
-    case 7:
-      return 13;
-    case 8:
-      return 15;
-    case 9:
-      return 3;
-    case 10:
-      return 1;
-    default:
-      return -1;
-  }
 }
 
 void connect(){

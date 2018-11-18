@@ -525,7 +525,7 @@ sup.ref {
 .settings .fa-thermometer-quarter {
   padding: 0 5px 0 5px;
 }
-.settings .fa-leaf {
+.settings .fa-seedling {
   padding: 10px 1px 10px 1px;
 }
 .settings ul {
@@ -983,6 +983,10 @@ button {
   color: #49a37f;
 }
 
+.fa-cannabis {
+  color: #059033;
+}
+
 .tplinks .fa-power-off.on, .chart-toggle .fa-chart-line.on {
   color: #FFF;
   background: #1FA66C;
@@ -1063,15 +1067,19 @@ button {
   transition: All 250ms ease;
 }
 
-.fa-thermometer-quarter, .fa-power-off {
+.fa-thermometer-quarter, .relay .fa-power-off {
   color: #777;
 }
 
-.kettles a.kettle-type.leaf {
+.kettles a.kettle-type.seedling {
   padding: 12px 6px 9px 10px;
 }
 
-.fa-leaf {
+.kettles a.kettle-type.cannabis {
+  padding: 18px 2px 7px 7px;
+}
+
+.fa-seedling {
   color: #65350f;
 }
 
@@ -1141,4 +1149,12 @@ input[type=number]::-webkit-outer-spin-button {
 
 .modal {
   overflow: scroll;
+}
+
+.btn-group button {
+  outline: none;
+}
+
+.btn {
+  min-height: 38px;
 }

@@ -150,7 +150,8 @@ angular.module('brewbench-monitor')
         ,{'name':'Hot Liquor','type':'water','target':170,'diff':2}
         ,{'name':'Fermenter','type':'fermenter','target':74,'diff':2}
         ,{'name':'Temp','type':'air','target':74,'diff':2}
-        ,{'name':'Soil','type':'leaf','target':60,'diff':2}
+        ,{'name':'Soil','type':'seedling','target':60,'diff':2}
+        ,{'name':'Plant','type':'cannabis','target':60,'diff':2}
       ];
       if(type)
         return _.filter(kettles, {'type': type})[0];
@@ -202,9 +203,9 @@ angular.module('brewbench-monitor')
       return q.promise;
     },
 
-    connect: function(arduino){
+    connect: function(arduino, endpoint){
       var q = $q.defer();
-      var url = this.domain(arduino)+'/arduino/info';
+      var url = this.domain(arduino)+'/arduino/'+endpoint;
       var settings = this.settings('settings');
       var request = {url: url, method: 'GET', timeout: settings.general.pollSeconds*10000};
       $http(request)
@@ -231,12 +232,12 @@ angular.module('brewbench-monitor')
           url += '?apin='+kettle.temp.pin;
         else
           url += '?dpin='+kettle.temp.pin;
-        if(!!kettle.temp.vcc) //SoilMoisture logic
+        if(!!kettle.temp.vcc && ['3V','5V'].indexOf(kettle.temp.vcc) === -1) //SoilMoisture logic
           url += '&dpin='+kettle.temp.vcc;
         else if(!!kettle.temp.index) //DS18B20 logic
           url += '&index='+kettle.temp.index;
       } else {
-        if(!!kettle.temp.vcc) //SoilMoisture logic
+        if(!!kettle.temp.vcc && ['3V','5V'].indexOf(kettle.temp.vcc) === -1) //SoilMoisture logic
           url += kettle.temp.vcc;
         else if(!!kettle.temp.index) //DS18B20 logic
           url += '&index='+kettle.temp.index;

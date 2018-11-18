@@ -10,7 +10,7 @@
           <span class="btn btn-light btn-file">
             Import <input type="file" on-read-file="importSettings($fileContent,$ext)" accept=".json"/>
           </span>
-          <a class="btn btn-light" href="{{exportSettings()}}" download="brewbench-profile.json">Export</a>
+          <a class="btn btn-light" href="{{exportSettings()}}" download="brewbench-profile-{{pkg.version}}.json">Export</a>
         </div>
         <div class="btn-group float-right">
           <a class="btn btn-danger" href="" ng-click="clearSettings($event)">Delete Settings</a>
@@ -130,9 +130,10 @@
             <label class="adjust">Add a kettle</label>
             <div class="btn-group item" ng-repeat="kettle in kettleTypes">
               <button type="button" class="btn btn-light {{kettle.type}}" ng-click="addKettle(kettle.type)">
-                <img ng-if="['air','leaf'].indexOf(kettle.type) === -1" class="type" ng-src="/assets/img/{{kettle.type}}.svg" height="30"/>
+                <img ng-if="['air','seedling','cannabis'].indexOf(kettle.type) === -1" class="type" ng-src="/assets/img/{{kettle.type}}.svg" height="30"/>
                 <i ng-if="kettle.type == 'air'" class="fas fa-thermometer-quarter fa-2x type"></i>
-                <i ng-if="kettle.type == 'leaf'" class="fas fa-leaf fa-lg type"></i>
+                <i ng-if="kettle.type == 'seedling'" class="fas fa-seedling fa-lg type"></i>
+                <i ng-if="kettle.type == 'cannabis'" class="fas fa-cannabis fa-2x type"></i>
               </button>
               <div class="floating ui blue circular label">{{kettleCount(kettle.type)}}</div>
             </div>
@@ -206,12 +207,12 @@
                     <small class="text-muted" ng-show="(arduino.status.message)">&nbsp;{{arduino.status.message}}<br/></small>
                   </td>
                   <td>
-                    <span ng-show="arduino.version" class="badge badge-pill badge-lg" ng-class="{'badge-success':pkg.sketch_version==arduino.version, 'badge-warning':pkg.sketch_version!=arduino.version}">
-                    {{arduino.version}}</span>
-                    <span ng-show="!arduino.version" style="cursor: pointer;" class="badge badge-pill" ng-class="{'badge-danger':!!arduino.status.error, 'badge-secondary': !arduino.status.error}" ng-click="arduinos.connect(arduino)">
-                    Connect</span>
-                    <span ng-show="arduino.version" style="cursor: pointer;" class="badge badge-pill badge-secondary" ng-click="arduinos.connect(arduino)">
-                    <i class="fas fa-sync-alt"></i></span>
+                    <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                      <button type="button" class="btn" ng-class="{'btn-success':pkg.sketch_version==arduino.version, 'btn-warning':pkg.sketch_version!=arduino.version}" ng-click="openSketches()"> {{arduino.version}}</button>
+                      <button type="button" ng-show="!arduino.version" class="btn" ng-class="{'btn-danger':!!arduino.status.error, 'btn-secondary': !arduino.status.error}" ng-click="arduinos.connect(arduino)"> Connect</button>
+                      <button type="button" ng-show="arduino.version" class="btn btn-secondary" ng-click="arduinos.connect(arduino)"> <i class="fas fa-sync-alt"></i></button>
+                      <button type="button" class="btn btn-danger" ng-click="arduinos.reboot(arduino)"> <i class="fas fa-power-off"></i></button>
+                    </div>
                     <small ng-show="arduino.version && pkg.sketch_version!=arduino.version">
                       <a href="" ng-click="openSketches()">{{ pkg.sketch_version }} is Available</a>
                     </small>

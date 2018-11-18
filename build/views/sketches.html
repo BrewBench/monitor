@@ -290,14 +290,14 @@
                     <td>
                       <span ng-if="kettle.heater && kettle.heater.pin.indexOf('TP-')===0">
                         <i>Not Supported</i> <br/>
-                        {{pinDisplay(kettle.heater.pin)}}
+                        {{pinDisplay(kettle.arduino, kettle.heater.pin)}}
                       </span>
                       <span ng-if="!kettle.heater">
                         <i>Not Available</i> <br/>
                       </span>
                       <ul class="tg-list" ng-if="kettle.heater && kettle.heater.pin.indexOf('TP-')===-1">
                         <li class="tg-list-item">
-                          <span>{{pinDisplay(kettle.heater.pin)}}</span>
+                          <span>{{pinDisplay(kettle.arduino, kettle.heater.pin)}}</span>
                           <input class="tgl tgl-ios" id="triggerHeater{{$index}}" type="checkbox"
                             ng-checked="kettle.heater.sketch"
                             ng-click="streams.kettles(kettle,'heater')"/>
@@ -308,14 +308,14 @@
                     <td>
                       <span ng-if="kettle.cooler && kettle.cooler.pin.indexOf('TP-')===0">
                         <i>Not Supported</i> <br/>
-                        {{pinDisplay(kettle.cooler.pin)}}
+                        {{pinDisplay(kettle.arduino, kettle.cooler.pin)}}
                       </span>
                       <span ng-if="!kettle.cooler">
                         <i>Not Available</i> <br/>
                       </span>
                       <ul class="tg-list" ng-if="kettle.cooler && kettle.cooler.pin.indexOf('TP-')===-1">
                         <li class="tg-list-item">
-                          <span>{{pinDisplay(kettle.cooler.pin)}}</span>
+                          <span>{{pinDisplay(kettle.arduino,  kettle.cooler.pin)}}</span>
                           <input class="tgl tgl-ios" id="triggerCooler{{$index}}" type="checkbox"
                             ng-checked="kettle.cooler.sketch"
                             ng-click="streams.kettles(kettle,'cooler')"/>

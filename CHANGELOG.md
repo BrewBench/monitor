@@ -1,5 +1,20 @@
 # Change Log
 
+## 4.2.0 - 2018-11-16
+
+### Added
+- Timers for all kettle types
+- Cannabis type
+- Reboot option in settings
+- Delay between actions
+
+### Updated
+- ESP8266 and ESP32 to use GPIO input numbers instead of A/D mappings
+
+### Fixed
+- BMP180 on ESP8266
+- SoilMoisture when operating on 3.3V or 5V and not D input
+
 ## 4.1.2 - 2018-11-14
 
 ### Added

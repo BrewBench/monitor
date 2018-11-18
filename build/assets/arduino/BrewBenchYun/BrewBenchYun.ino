@@ -80,7 +80,7 @@ void processRest(BridgeClient client) {
       command == "DHT11" || command == "DHT12" || command == "DHT21" ||
       command == "DHT22" || command == "DHT33" || command == "DHT44" ||
       command == "BMP180" ||
-      command.substring(0,13) == "SoilMoistureD" ||
+      command.substring(0,12) == "SoilMoisture" ||
       command.substring(0,7) == "DS18B20") {
     sensorCommand(client, command);
   }
@@ -183,13 +183,18 @@ void sensorCommand(BridgeClient client, String type) {
       temp = (150*map(raw,410,1023,0,614))/614;
     }
   }
-  else if(type.substring(0,13) == "SoilMoistureD"){
-    uint8_t dpin = type.substring(13).toInt();
-    pinMode(dpin, OUTPUT);
-    digitalWrite(dpin, HIGH);
-    delay(10);
+  else if(type.substring(0,12) == "SoilMoisture"){
+    uint8_t dpin;
+    if(type.substring(0,13) == "SoilMoistureD"){
+      dpin = type.substring(13).toInt();
+      pinMode(dpin, OUTPUT);
+      digitalWrite(dpin, HIGH);
+      delay(10);
+    }
     raw = analogRead(pin);
-    digitalWrite(dpin, LOW);
+    if(dpin){
+      digitalWrite(dpin, LOW);
+    }
     percent = map(raw, 0, 880, 0, 100);
     data += ",\"percent\":"+String(percent);
   }
@@ -232,7 +237,10 @@ void sensorCommand(BridgeClient client, String type) {
       temp = bmp.readTemperature();
       data += ",\"altitude\":"+String(bmp.readAltitude());
       data += ",\"pressure\":"+String(bmp.readPressure());
-    }
+    } else {
+      data += ",\"altitude\":0";
+      data += ",\"pressure\":0";
+    } 
   }
 
   data += ",\"temp\":"+String(temp);

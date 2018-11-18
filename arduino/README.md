@@ -133,9 +133,10 @@ Open the serial monitor on `115200` baud to get the IP address after uploading t
   - Libraries: Add https://dl.espressif.com/dl/package_esp32_index.json to Boards Manager URLs
   - Board: NodeMCU-32S
   - Board Manager install esp32
-  - SLC is D22 (GPI22)
-  - SLA is D21 (GPI21)
-  - [ESP32 on Amazon](https://smile.amazon.com/gp/product/B0718T232Z/ref=ox_sc_act_title_1?smid=A30QSGOJR8LMXA&psc=1)
+  - SLC is D22 (GPIO22)
+  - SLA is D21 (GPIO21)
+  - [ESP32 on Amazon](https://smile.amazon.com/gp/product/B0718T232Z/ref=ox_sc_act_title_1?smid=A30QSGOJR8LMXA&psc=1)  
+
   - ![alt text](https://github.com/espressif/arduino-esp32/raw/master/docs/esp32_pinmap.png "ESP32")
 
 These board only supports sensors
@@ -182,21 +183,34 @@ Sensors are:
 Then add this to your `/home/user/.homeassistant/configuration.yaml`
 
 ```yaml
-  sensor:
-    # https://home-assistant.io/components/sensor.rest/    
+  # https://home-assistant.io/components/sensor.rest/    
+
+  # Arduino Yun
+  sensor:    
     - platform: rest
       resource: http://arduino.local/arduino/Thermistor/A2
       method: GET
       name: BrewBench
       unit_of_measurement: "°F"
       value_template: "{{ ((float(value_json.temp) * 9 / 5 )  +  32) | round(1) }}"
+
+  # Arduino ESP
+  # query params: apin, dpin
+  sensor:
+    - platform: rest
+      resource: http://arduino.local/arduino/Thermistor?apin=A0
+      method: GET
+      name: BrewBench
+      unit_of_measurement: "°F"
+      value_template: "{{ ((float(value_json.temp) * 9 / 5 )  +  32) | round(1) }}"    
 ```
+
 
 ### InfluxDB & Grafana
 
 Use the [InfluxDB]() sketch, download from the app and it will create the kettles you have connected.  Then use docker and  [Grafana](https://grafana.com/grafana/download?platform=docker) for graphs.
 
-Download the [fermentation](https://grafana.com/dashboards/3957) or [session](https://grafana.com/dashboards/3960) dashboard from [Grafana](https://grafana.com/dashboards?search=BrewBench)
+Download the [fermentation](https://grafana.com/dashboards/3957) or [brew session](https://grafana.com/dashboards/3960) dashboard from [Grafana](https://grafana.com/dashboards?search=BrewBench)
 
 ```sh
 brew update

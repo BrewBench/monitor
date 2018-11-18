@@ -31,6 +31,12 @@ BridgeServer server;
 
 uint16_t samples[NUMSAMPLES];
 
+void reboot() {
+  wdt_disable();
+  wdt_enable(WDTO_15MS);
+  while (1) {}
+}
+
 float Thermistor(float average) {
    // convert the value to resistance
    average = 1023 / average - 1;
@@ -62,11 +68,15 @@ void processRest(BridgeClient client) {
   if (command == "digital" || command == "analog" || command == "adc") {
     adCommand(client, command);
   }
+  else if (command == "reboot") {
+    client.print("{\"reboot\":true}");
+    reboot();
+  }
   else if (command == "Thermistor" || command == "PT100" ||
       command == "DHT11" || command == "DHT12" || command == "DHT21" ||
       command == "DHT22" || command == "DHT33" || command == "DHT44" ||
       command == "BMP180" ||
-      command.substring(0,13) == "SoilMoistureD" ||
+      command.substring(0,12) == "SoilMoisture" ||
       command.substring(0,7) == "DS18B20") {
     sensorCommand(client, command);
   }
@@ -169,13 +179,18 @@ void sensorCommand(BridgeClient client, String type) {
       temp = (150*map(raw,410,1023,0,614))/614;
     }
   }
-  else if(type.substring(0,13) == "SoilMoistureD"){
-    uint8_t dpin = type.substring(13).toInt();
-    pinMode(dpin, OUTPUT);
-    digitalWrite(dpin, HIGH);
-    delay(10);
-    raw = analogRead(pin);
-    digitalWrite(dpin, LOW);
+  else if(type == "SoilMoisture"){
+    if( dpin != "" ){
+      pinMode(pin, OUTPUT);
+      digitalWrite(pin, HIGH);
+      delay(10);
+    }
+    raw = analogRead(apin.substring(1).toInt());
+    if( dpin != "" ){
+      digitalWrite(pin, LOW);
+    }
+    // ESP32 has 12bits of resolution instead of 10
+    raw = map(raw, 0, 4095, 0, 880);
     percent = map(raw, 0, 880, 0, 100);
     data += ",\"percent\":"+String(percent);
   }
@@ -218,6 +233,9 @@ void sensorCommand(BridgeClient client, String type) {
   // BMP180     temp = bmp.readTemperature();
   // BMP180     data += ",\"altitude\":"+String(bmp.readAltitude());
   // BMP180     data += ",\"pressure\":"+String(bmp.readPressure());
+  // BMP180   } else {
+  // BMP180     data += ",\"altitude\":0";
+  // BMP180     data += ",\"pressure\":0";
   // BMP180   }
   // BMP180 }
 
@@ -339,14 +357,20 @@ float actionsCommand(const String source, const String spin, const String type, 
       temp = (150*map(raw,410,1023,0,614))/614;
     }
   }
-  else if(type.substring(0,13) == "SoilMoistureD"){
-    uint8_t dpin = type.substring(13).toInt();
-    pinMode(dpin, OUTPUT);
-    digitalWrite(dpin, HIGH);
-    delay(10);
-    raw = analogRead(pin);
-    digitalWrite(dpin, LOW);
+  else if(type == "SoilMoisture"){
+    if( dpin != "" ){
+      pinMode(pin, OUTPUT);
+      digitalWrite(pin, HIGH);
+      delay(10);
+    }
+    raw = analogRead(apin.substring(1).toInt());
+    if( dpin != "" ){
+      digitalWrite(pin, LOW);
+    }
+    // ESP32 has 12bits of resolution instead of 10
+    raw = map(raw, 0, 4095, 0, 880);
     percent = map(raw, 0, 880, 0, 100);
+    data += ",\"percent\":"+String(percent);
   }
   // DS18B20 else if(type.substring(0,7) == "DS18B20"){
   // DS18B20   // format DS18B20-index

@@ -52,12 +52,19 @@ void setupRest() {
   });
 
   server.on("/arduino/info", [](){
-    String data = "{\"BrewBench\": {\"board\": \""+String(ARDUINO_BOARD)+"\", \"version\": \"[VERSION]\"";
+    String data = "{\"BrewBench\": {\"board\": \""+String(ARDUINO_BOARD)+"\", \"version\": \"[VERSION]\", \"status\": \"restarting\"";
     data += ",\"RSSI\":"+String(WiFi.RSSI());
     data += ",\"IP\":\""+WiFi.localIP().toString()+"\"";
     data += "}}";
     sendHeaders();
     server.send(200, "application/json", data);
+  });
+
+  server.on("/arduino/reboot", [](){
+    sendHeaders();
+    server.send(200, "application/json", "{\"reboot\":true}");
+    delay(500);
+    ESP.restart();
   });
 
   server.on("/arduino/Thermistor", [](){
@@ -148,7 +155,7 @@ String adCommand(const String dpin, const String apin, int16_t value, const Stri
   if( dpin != "" )
     pin = dpin.substring(1).toInt();
   else
-    pin = gpio(apin);
+    pin = apin.substring(1).toInt();
 
   // write
   if ( value >= 0 ) {
@@ -186,7 +193,7 @@ String sensorCommand(const String dpin, const String apin, const int16_t index, 
   if( dpin != "" )
     pin = dpin.substring(1).toInt();
   else
-    pin = gpio(apin);
+    pin = apin.substring(1).toInt();
   float temp = 0.00;
   float raw = 0.00;
   float percent = 0.00;
@@ -230,11 +237,17 @@ String sensorCommand(const String dpin, const String apin, const int16_t index, 
     }
   }
   else if(type == "SoilMoisture"){
-    pinMode(pin, OUTPUT);
-    digitalWrite(pin, HIGH);
-    delay(10);
-    raw = analogRead(gpio(apin));
-    digitalWrite(pin, LOW);
+    if( dpin != "" ){
+      pinMode(pin, OUTPUT);
+      digitalWrite(pin, HIGH);
+      delay(10);
+    }
+    raw = analogRead(apin.substring(1).toInt());
+    if( dpin != "" ){
+      digitalWrite(pin, LOW);
+    }
+    // ESP32 has 12bits of resolution instead of 10
+    raw = map(raw, 0, 4095, 0, 880);
     percent = map(raw, 0, 880, 0, 100);
     data += ",\"percent\":"+String(percent);
   }
@@ -319,13 +332,20 @@ float actionsCommand(const String source, const String spin, const String type, 
       temp = (150*map(raw,410,1023,0,614))/614;
     }
   }
-  else if(type.substring(0,13) == "SoilMoistureD"){
-    uint8_t dpin = type.substring(13).toInt();
-    pinMode(dpin, OUTPUT);
-    digitalWrite(dpin, HIGH);
-    delay(10);
+  else if(type.substring(0,12) == "SoilMoisture"){
+    uint8_t dpin;
+    if(type.substring(0,13) == "SoilMoistureD"){
+      dpin = type.substring(13).toInt();
+      pinMode(dpin, OUTPUT);
+      digitalWrite(dpin, HIGH);
+      delay(10);
+    }
     raw = analogRead(pin);
-    digitalWrite(dpin, LOW);
+    if(dpin){
+      digitalWrite(dpin, LOW);
+    }
+    // ESP32 has 12bits of resolution instead of 10
+    raw = map(raw, 0, 4095, 0, 880);
     percent = map(raw, 0, 880, 0, 100);
   }
   // DS18B20 else if(type.substring(0,7) == "DS18B20"){
@@ -361,6 +381,9 @@ float actionsCommand(const String source, const String spin, const String type, 
   // BMP180   if (bmp.begin()) {
   // BMP180     temp = bmp.readTemperature();
   // BMP180     pressure = bmp.readPressure();
+  // BMP180   } else {
+  // BMP180     data += ",\"altitude\":0";
+  // BMP180     data += ",\"pressure\":0";
   // BMP180   }
   // BMP180 }
 
@@ -369,7 +392,7 @@ float actionsCommand(const String source, const String spin, const String type, 
   // Send JSON response to client
   String data = "temperature,sensor="+type+",pin="+spin+",source="+source+",host="+String(HOSTNAME)+" value="+String(temp);
   // SoilMoistureD only has percent so replace data
-  if(type.substring(0,13) == "SoilMoistureD") {
+  if(type.substring(0,12) == "SoilMoisture") {
     data = "percent,sensor="+type+",pin="+spin+",source="+source+",host="+String(HOSTNAME)+" value="+String(percent);
     data += "\nbits,sensor="+type+",pin="+spin+",source="+source+",host="+String(HOSTNAME)+" value="+String(raw);
   } else if(type.substring(0,3) == "DHT"){
@@ -384,7 +407,7 @@ float actionsCommand(const String source, const String spin, const String type, 
 
   postData(data);
 
-  if(type.substring(0,13) == "SoilMoistureD"){
+  if(type.substring(0,12) == "SoilMoisture"){
     return percent;
   } else {
     return temp;
@@ -403,45 +426,6 @@ void postData(const String data){
     http.end();
   }
 
-}
-
-uint8_t gpio(String spin){
-  switch( spin.substring(1).toInt() ){
-    case 0:
-      return 36;
-    case 3:
-      return 39;
-    case 4:
-      return 32;
-    case 5:
-      return 33;
-    case 6:
-      return 34;
-    case 7:
-      return 35;
-    case 10:
-      return 4;
-    case 11:
-      return 0;
-    case 12:
-      return 12;
-    case 13:
-      return 15;
-    case 14:
-      return 13;
-    case 15:
-      return 12;
-    case 16:
-      return 14;
-    case 17:
-      return 27;
-    case 18:
-      return 25;
-    case 19:
-      return 26;
-    default:
-      return -1;
-  }
 }
 
 void connect(){

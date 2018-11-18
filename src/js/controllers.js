@@ -211,7 +211,7 @@ $scope.updateABV();
       arduino.status.dt = '';
       arduino.status.error = '';
       arduino.status.message = 'Connecting...';
-      BrewService.connect(arduino)
+      BrewService.connect(arduino, 'info')
         .then(info => {
           if(info && info.BrewBench){
             event.srcElement.innerHTML = 'Connect';
@@ -223,11 +223,12 @@ $scope.updateABV();
             arduino.status.error = '';
             arduino.status.message = '';
             if(arduino.board.indexOf('ESP32') == 0){
-              arduino.analog = 0;
-              arduino.digital = 33;
+              arduino.analog = 39;
+              arduino.digital = 39;
+              arduino.touch = [4,0,2,15,13,12,14,27,33,32];
             } else if(arduino.board.indexOf('ESP8266') == 0){
               arduino.analog = 0;
-              arduino.digital = 10;
+              arduino.digital = 16;
             }
           }
         })
@@ -236,6 +237,26 @@ $scope.updateABV();
             arduino.status.dt = '';
             arduino.status.message = '';
             arduino.status.error = 'Could not connect';
+          }
+        });
+    },
+    reboot: (arduino) => {
+      arduino.status.dt = '';
+      arduino.status.error = '';
+      arduino.status.message = 'Rebooting...';
+      BrewService.connect(arduino, 'reboot')
+        .then(info => {
+          arduino.version = '';
+          arduino.status.message = 'Reboot Success, try connecting in a few seconds.';
+        })
+        .catch(err => {
+          if(err && err.status == -1){
+            arduino.status.dt = '';
+            arduino.status.message = '';
+            if(pkg.version < 4.2)
+              arduino.status.error = 'Upgrade to support reboot';
+            else
+              arduino.status.error = 'Could not connect';
           }
         });
     }
@@ -345,12 +366,15 @@ $scope.updateABV();
     return _.filter($scope.kettles,{'active': true}).length;
   };
 
-  $scope.pinDisplay = function(pin){
+  $scope.pinDisplay = function(arduino, pin){
       if( pin.indexOf('TP-')===0 ){
         var device = _.filter($scope.settings.tplink.plugs,{deviceId: pin.substr(3)})[0];
         return device ? device.alias : '';
-      } else
+      } else if(BrewService.isESP(arduino)){
+        return pin.replace('A','GPIO').replace('D','GPIO');
+      } else {
         return pin;
+      }
   };
 
   $scope.pinInUse = function(pin,arduinoId){
@@ -1055,7 +1079,7 @@ $scope.updateABV();
 
   $scope.removeTimers = function(e,kettle){
     var btn = angular.element(e.target);
-    if(btn.hasClass('fa-trash')) btn = btn.parent();
+    if(btn.hasClass('fa-trash-alt')) btn = btn.parent();
 
     if(!btn.hasClass('btn-danger')){
       btn.removeClass('btn-light').addClass('btn-danger');
@@ -1310,15 +1334,16 @@ $scope.updateABV();
       var kettleType = kettle.temp.type;
       if(kettle.temp.vcc) kettleType += kettle.temp.vcc;
       if(kettle.temp.index) kettleType += '-'+kettle.temp.index;
-      currentSketch.actions.push('actionsCommand(F("'+kettle.name.replace(/[^a-zA-Z0-9-.]/g, "")+'"),F("'+kettle.temp.pin+'"),F("'+kettleType+'"),'+adjust+');');
+      currentSketch.actions.push('  actionsCommand(F("'+kettle.name.replace(/[^a-zA-Z0-9-.]/g, "")+'"),F("'+kettle.temp.pin+'"),F("'+kettleType+'"),'+adjust+');');
+      currentSketch.actions.push('  delay(500);');
       //look for triggers
       if(kettle.heater && kettle.heater.sketch){
         currentSketch.triggers = true;
-        currentSketch.actions.push('trigger(F("heat"),F("'+kettle.name.replace(/[^a-zA-Z0-9-.]/g, "")+'"),F("'+kettle.heater.pin+'"),temp,'+target+','+kettle.temp.diff+','+!!kettle.notify.slack+');');
+        currentSketch.actions.push('  trigger(F("heat"),F("'+kettle.name.replace(/[^a-zA-Z0-9-.]/g, "")+'"),F("'+kettle.heater.pin+'"),temp,'+target+','+kettle.temp.diff+','+!!kettle.notify.slack+');');
       }
       if(kettle.cooler && kettle.cooler.sketch){
         currentSketch.triggers = true;
-        currentSketch.actions.push('trigger(F("cool"),F("'+kettle.name.replace(/[^a-zA-Z0-9-.]/g, "")+'"),F("'+kettle.cooler.pin+'"),temp,'+target+','+kettle.temp.diff+','+!!kettle.notify.slack+');');
+        currentSketch.actions.push('  trigger(F("cool"),F("'+kettle.name.replace(/[^a-zA-Z0-9-.]/g, "")+'"),F("'+kettle.cooler.pin+'"),temp,'+target+','+kettle.temp.diff+','+!!kettle.notify.slack+');');
       }
     });
     _.each(sketches, (sketch, i) => {
@@ -1367,7 +1392,7 @@ $scope.updateABV();
             response.data = response.data.replace(/\[HOSTNAME\]/g, 'bbesp');
           }
         } else {
-          response.data = response.data.replace(/\[HOSTNAME\]/g, name);
+          response.data = response.data.replace(/\[HOSTNAME\]/g, name.replace('.local',''));
         }
         if( sketch.indexOf('Streams') !== -1){
           // streams connection
