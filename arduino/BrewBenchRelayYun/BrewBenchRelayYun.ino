@@ -1,6 +1,7 @@
 #include <Process.h>
 #include <BridgeServer.h>
 #include <BridgeClient.h>
+#include <avr/wdt.h>
 // [HEADERS]
 
 String HOSTNAME = "[HOSTNAME]";
