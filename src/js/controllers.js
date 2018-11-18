@@ -1397,12 +1397,13 @@ $scope.updateABV();
         } else {
           response.data = response.data.replace(/\[HOSTNAME\]/g, name.replace('.local',''));
         }
-        if( sketch.indexOf('Streams') !== -1){
+        if( sketch.indexOf('Streams' ) !== -1){
           // streams connection
           var connection_string = `https://${$scope.settings.streams.username}.hosted.brewbench.co`;
           response.data = response.data.replace(/\[STREAMS_CONNECTION\]/g, connection_string);
           response.data = response.data.replace(/\[STREAMS_AUTH\]/g, 'Authorization: Basic '+btoa($scope.settings.streams.username.trim()+':'+$scope.settings.streams.api_key.trim()));
-        } if( sketch.indexOf('InfluxDB') !== -1){
+        }
+        if( sketch.indexOf('InfluxDB') !== -1){
           // influx db connection
           var connection_string = `${$scope.settings.influxdb.url}`;
           if($scope.influxdb.brewbenchHosted()){
