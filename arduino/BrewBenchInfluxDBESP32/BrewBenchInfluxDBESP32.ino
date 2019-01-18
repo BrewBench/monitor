@@ -333,7 +333,7 @@ float actionsCommand(const String source, const String spin, const String type, 
     }
   }
   else if(type.substring(0,12) == "SoilMoisture"){
-    uint8_t dpin;
+    uint8_t dpin = -1;
     if(type.substring(0,13) == "SoilMoistureD"){
       dpin = type.substring(13).toInt();
       pinMode(dpin, OUTPUT);
@@ -341,7 +341,7 @@ float actionsCommand(const String source, const String spin, const String type, 
       delay(10);
     }
     raw = analogRead(pin);
-    if(dpin){
+    if(dpin >= 0){
       digitalWrite(dpin, LOW);
     }
     // ESP32 has 12bits of resolution instead of 10
@@ -381,9 +381,6 @@ float actionsCommand(const String source, const String spin, const String type, 
   // BMP180   if (bmp.begin()) {
   // BMP180     temp = bmp.readTemperature();
   // BMP180     pressure = bmp.readPressure();
-  // BMP180   } else {
-  // BMP180     data += ",\"altitude\":0";
-  // BMP180     data += ",\"pressure\":0";
   // BMP180   }
   // BMP180 }
 

@@ -184,7 +184,7 @@ void sensorCommand(BridgeClient client, String type) {
     }
   }
   else if(type.substring(0,12) == "SoilMoisture"){
-    uint8_t dpin;
+    uint8_t dpin = -1;
     if(type.substring(0,13) == "SoilMoistureD"){
       dpin = type.substring(13).toInt();
       pinMode(dpin, OUTPUT);
@@ -192,7 +192,7 @@ void sensorCommand(BridgeClient client, String type) {
       delay(10);
     }
     raw = analogRead(pin);
-    if(dpin){
+    if(dpin >= 0){
       digitalWrite(dpin, LOW);
     }
     percent = map(raw, 0, 880, 0, 100);
@@ -240,7 +240,7 @@ void sensorCommand(BridgeClient client, String type) {
     } else {
       data += ",\"altitude\":0";
       data += ",\"pressure\":0";
-    } 
+    }
   }
 
   data += ",\"temp\":"+String(temp);
