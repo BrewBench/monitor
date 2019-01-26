@@ -1858,7 +1858,7 @@ $scope.updateABV();
   }
   $scope.updateLocal();
 
-  $(document).ready(function(){
+  angular.element(document).ready(function () {
     $('[data-toggle="tooltip"]').tooltip({
       animated: 'fade',
       placement: 'right',
