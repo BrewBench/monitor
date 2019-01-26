@@ -823,6 +823,14 @@ $scope.updateABV();
 
   // check if pump or heater are running
   $scope.init = () => {
+    $('[data-toggle="tooltip"]').tooltip({
+      animated: 'fade',
+      placement: 'right',
+      html: true
+    });
+    if($('#gitcommit a').text() != 'git_commit'){
+      $('#gitcommit').show();
+    }
     $scope.showSettings = !$scope.settings.general.shared;
     if($scope.share.file)
       return $scope.loadShareFile();
@@ -1858,14 +1866,4 @@ $scope.updateABV();
   }
   $scope.updateLocal();
 
-  angular.element(document).ready(function () {
-    $('[data-toggle="tooltip"]').tooltip({
-      animated: 'fade',
-      placement: 'right',
-      html: true
-    });
-    if($('#gitcommit a').text != 'git_commit'){
-      $('#gitcommit').show();
-    }
-  });
 });
