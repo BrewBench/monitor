@@ -675,7 +675,7 @@ input[type=radio].degree {
   width: 1px;
 }
 input[type=radio].degree + label:before {
-  font-family: "Font Awesome 5 Pro";
+  font-family: "Font Awesome 5 Free";
   display: inline-block;
   content: "\f111";
   letter-spacing: 10px;
@@ -683,7 +683,7 @@ input[type=radio].degree + label:before {
   color: #535353;
 }
 input[type=radio].degree:checked + label:before {
-  font-family: "Font Awesome 5 Pro";
+  font-family: "Font Awesome 5 Free";
   content: "\f058";
   font-size: 1.8em;
   color: rgba(73, 163, 127, 1);
@@ -694,7 +694,7 @@ li.ssr {
   border-bottom: 1px solid #ccc;
 }
 .notifications .on:after, li.ssr .on:after {
-  font-family: "Font Awesome 5 Pro";
+  font-family: "Font Awesome 5 Free";
   display: inline-block;
   content: "\f058";
   letter-spacing: 5px;

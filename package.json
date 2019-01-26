@@ -46,6 +46,7 @@
   },
   "homepage": "https://brewbench.co",
   "devDependencies": {
+    "ajv": "^6.7.0",
     "angular-mocks": "1.6.6",
     "assets-webpack-plugin": "^3.9.7",
     "babel-core": "^6.26.3",
@@ -80,7 +81,7 @@
     "angular-touch": "^1.7.5",
     "angularjs-slider": "^6.6.1",
     "bootstrap": "^4.1.2",
-    "jquery": "^3.2.1",
+    "jquery": "^3.3.1",
     "lodash": "^4.17.11",
     "moment": "^2.22.2",
     "popper.js": "^1.14.5"
