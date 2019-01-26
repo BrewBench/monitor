@@ -1864,5 +1864,8 @@ $scope.updateABV();
       placement: 'right',
       html: true
     });
+    if($('#gitcommit a').html() != 'git_commit'){
+      $('#gitcommit').show();
+    }
   });
 });

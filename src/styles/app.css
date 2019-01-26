@@ -1158,3 +1158,7 @@ input[type=number]::-webkit-outer-spin-button {
 .btn {
   min-height: 38px;
 }
+
+#gitcommit {
+  display: none;
+}
