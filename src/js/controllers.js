@@ -962,15 +962,7 @@ $scope.updateABV();
     kettle.temp.volts = response.volts;
 
     // volt check
-    if(kettle.temp.volts){
-      if(kettle.temp.type == 'Thermistor' &&
-        kettle.temp.pin.indexOf('A') === 0 &&
-        !BrewService.isESP(kettle.arduino) &&
-        kettle.temp.volts < 2){
-          $scope.setErrorMessage('Sensor is not connected', kettle);
-          return;
-      }
-    } else if(kettle.temp.type != 'BMP180' &&
+    if(kettle.temp.type != 'BMP180' &&
       !kettle.temp.volts &&
       !kettle.temp.raw){
         $scope.setErrorMessage('Sensor is not connected', kettle);
