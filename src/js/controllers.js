@@ -1293,7 +1293,8 @@ $scope.updateABV();
           name: arduinoName,
           actions: [],
           headers: [],
-          triggers: false
+          triggers: false,
+          bf: (sketchName.indexOf('BFYun') !== -1) ? true : false
         });
         currentSketch = _.find(sketches,{name:arduinoName});
       }
@@ -1336,7 +1337,7 @@ $scope.updateABV();
       }
       var kettleType = kettle.temp.type;
       if(kettle.temp.vcc) kettleType += kettle.temp.vcc;
-      if(kettle.temp.index) kettleType += '-'+kettle.temp.index;
+      if (kettle.temp.index) kettleType += '-' + kettle.temp.index;      
       currentSketch.actions.push('  actionsCommand(F("'+kettle.name.replace(/[^a-zA-Z0-9-.]/g, "")+'"),F("'+kettle.temp.pin+'"),F("'+kettleType+'"),'+adjust+');');
       currentSketch.actions.push('  delay(500);');
       //look for triggers
@@ -1350,12 +1351,19 @@ $scope.updateABV();
       }
     });
     _.each(sketches, (sketch, i) => {
-      if(sketch.triggers){
+      if(sketch.triggers || sketch.bf){
         sketch.actions.unshift('float temp = 0.00;');
-        // update autoCommand
-        for(var a = 0; a < sketch.actions.length; a++){
-          if(sketches[i].actions[a].indexOf('actionsCommand(') !== -1)
-            sketches[i].actions[a] = sketches[i].actions[a].replace('actionsCommand(','temp = actionsCommand(')
+        if (sketch.bf) {
+          sketch.actions.unshift('float ambient = 0.00;');
+          sketch.actions.unshift('const String equipment_name = "'+$scope.settings.bf.name+'";');          
+        }
+        // update autoCommand 
+        for (var a = 0; a < sketch.actions.length; a++){
+          if (sketch.bf && sketches[i].actions[a].indexOf('actionsCommand(') !== -1 && sketches[i].actions[a].toLowerCase().indexOf('ambient') !== -1) { 
+            sketches[i].actions[a] = sketches[i].actions[a].replace('actionsCommand(', 'ambient = actionsCommand(');
+          } else if (sketches[i].actions[a].indexOf('actionsCommand(') !== -1) {
+            sketches[i].actions[a] = sketches[i].actions[a].replace('actionsCommand(', 'temp = actionsCommand(');
+          }
         }
       }
       downloadSketch(sketch.name, sketch.actions, sketch.triggers, sketch.headers, 'BrewBench'+sketchName);
@@ -1403,7 +1411,11 @@ $scope.updateABV();
           response.data = response.data.replace(/\[STREAMS_CONNECTION\]/g, connection_string);
           response.data = response.data.replace(/\[STREAMS_AUTH\]/g, 'Authorization: Basic '+btoa($scope.settings.streams.username.trim()+':'+$scope.settings.streams.api_key.trim()));
         }
-        if( sketch.indexOf('InfluxDB') !== -1){
+        else if( sketch.indexOf('BFYun' ) !== -1){
+          // bf api key header
+          response.data = response.data.replace(/\[BF_AUTH\]/g, 'X-API-KEY: '+$scope.settings.bf.api_key.trim());
+        }
+        else if( sketch.indexOf('InfluxDB') !== -1){
           // influx db connection
           var connection_string = `${$scope.settings.influxdb.url}`;
           if($scope.influxdb.brewbenchHosted()){

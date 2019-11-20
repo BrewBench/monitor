@@ -3,11 +3,11 @@
 #include <BridgeClient.h>
 #include <avr/wdt.h>
 // https://www.brewbench.co/libs/DHTlib-1.2.9.zip
-#include <dht.h>
-#include <OneWire.h>
-#include <DallasTemperature.h>
-#include <Wire.h>
-#include <Adafruit_BMP085.h>
+// DHT #include <dht.h>
+// DS18B20 #include <OneWire.h>
+// DS18B20 #include <DallasTemperature.h>
+// DS18B20 #include <Wire.h>
+// BMP180 #include <Adafruit_BMP085.h>
 
 String HOSTNAME = "[HOSTNAME]";
 BridgeServer server;
@@ -17,8 +17,8 @@ BridgeServer server;
 #define ARDUINO_BOARD "YUN"
 #endif
 
-dht DHT;
-Adafruit_BMP085 bmp;
+// DHT dht DHT;
+// BMP180 Adafruit_BMP085 bmp;
 
 // https://learn.adafruit.com/thermistor/using-a-thermistor
 // resistance at 25 degrees C
@@ -198,50 +198,50 @@ void sensorCommand(BridgeClient client, String type) {
     percent = map(raw, 0, 880, 0, 100);
     data += ",\"percent\":"+String(percent);
   }
-  else if(type.substring(0,7) == "DS18B20"){
-    // format DS18B20-index
-    int16_t index = -1;
-    if( type.length() > 7 )
-      index = type.substring(8).toInt();
-    OneWire oneWire(pin);
-    DallasTemperature sensors(&oneWire);
-    sensors.begin();
-    sensors.requestTemperatures();
-    if( index > 0 )
-      temp = sensors.getTempCByIndex(index);
-    else
-      temp = sensors.getTempCByIndex(0);
-  }
-  else if(type == "DHT11" || type == "DHT12" || type == "DHT21" || type == "DHT22" || type == "DHT33" || type == "DHT44"){
-    int chk = -1;
-    if(type == "DHT11")
-      chk = DHT.read11(pin);
-    else if(type == "DHT12")
-      chk = DHT.read12(pin);
-    else if(type == "DHT21")
-      chk = DHT.read21(pin);
-    else if(type == "DHT22")
-      chk = DHT.read22(pin);
-    else if(type == "DHT33")
-      chk = DHT.read33(pin);
-    else if(type == "DHT44")
-      chk = DHT.read44(pin);
-    if( chk == DHTLIB_OK ){
-      temp = DHT.temperature;
-      percent = DHT.humidity;
-      data += ",\"percent\":"+String(percent);
-    }
-  }
-  else if(type == "BMP180"){
-    if (bmp.begin()) {
-      temp = bmp.readTemperature();
-      data += ",\"altitude\":"+String(bmp.readAltitude());
-      data += ",\"pressure\":"+String(bmp.readPressure());
-    } else {
+  // DS18B20 else if(type.substring(0,7) == "DS18B20"){
+  // DS18B20   int16_t index = -1;
+  // DS18B20   if( type.length() > 7 )
+  // DS18B20     index = type.substring(8).toInt();
+  // DS18B20   OneWire oneWire(pin);
+  // DS18B20   DallasTemperature sensors(&oneWire);
+  // DS18B20   sensors.begin();
+  // DS18B20   sensors.requestTemperatures();
+  // DS18B20   if( index > 0 )
+  // DS18B20     temp = sensors.getTempCByIndex(index);
+  // DS18B20   else
+  // DS18B20     temp = sensors.getTempCByIndex(0);
+  // DS18B20 }
+  // DHT else if(type == "DHT11" || type == "DHT12" || type == "DHT21" || type == "DHT22" || type == "DHT33" || type == "DHT44"){
+  // DHT   int chk = -1;
+  // DHT   if(type == "DHT11")
+  // DHT     chk = DHT.read11(pin);
+  // DHT   else if(type == "DHT12")
+  // DHT     chk = DHT.read12(pin);
+  // DHT   else if(type == "DHT21")
+  // DHT     chk = DHT.read21(pin);
+  // DHT   else if(type == "DHT22")
+  // DHT     chk = DHT.read22(pin);
+  // DHT   else if(type == "DHT33")
+  // DHT     chk = DHT.read33(pin);
+  // DHT   else if(type == "DHT44")
+  // DHT     chk = DHT.read44(pin);
+  // DHT   if( chk == DHTLIB_OK ){
+  // DHT     temp = DHT.temperature;
+  // DHT     percent = DHT.humidity;
+  // DHT     data += ",\"percent\":"+String(percent);
+  // DHT   }
+  // DHT }
+  // BMP180 else if(type == "BMP180"){
+  // BMP180   if (bmp.begin()) {
+  // BMP180     temp = bmp.readTemperature();
+  // BMP180     data += ",\"altitude\":"+String(bmp.readAltitude());
+  // BMP180     data += ",\"pressure\":"+String(bmp.readPressure());
+  // BMP180   }
+  // BMP180 } 
+    else {
       data += ",\"altitude\":0";
       data += ",\"pressure\":0";
-    }
-  }
+  }  
 
   data += ",\"temp\":"+String(temp);
   data += ",\"raw\":"+String(raw);

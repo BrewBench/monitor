@@ -247,6 +247,35 @@
               </div>
           </div>
         </div>
+        
+        <div class="pb-3">
+          <h4>
+            <img src="/assets/img/brewersfriend.png" width="35" style="margin-top: -5px;border-radius: 10px;">
+            Brewer's Friend Equipment            
+          </h4>
+          <div class="block-border">
+            <div class="row">
+              <div class="col-10">
+                <p>
+                  <a href="https://pro.brewersfriend.com" target="_blank">Brewer's Friend Pro</a> offers equipment monitoring.
+                </p>
+              </div>
+              <div class="col-2">
+                <a href="" class="btn btn-light float-right" ng-click="compileSketch('BFYun')">Download Sketch</a>
+              </div>
+            </div>
+            <div class="row pb-2">      
+              <div class="col-6">
+                <label class="adjust">Equipment Name</label>
+                <input class="form-control" type="text" ng-model="settings.bf.name" placeholder="Equipment Name">
+              </div>        
+              <div class="col-6">
+                <label class="adjust">API Key</label>
+                <input class="form-control" type="text" ng-model="settings.bf.api_key" placeholder="API Key">
+              </div>
+            </div>            
+        </div>
+        
         <div class="pb-3">
           <h4>
             BrewBench Relay

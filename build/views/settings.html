@@ -10,7 +10,7 @@
           <span class="btn btn-light btn-file">
             Import <input type="file" on-read-file="importSettings($fileContent,$ext)" accept=".json"/>
           </span>
-          <a class="btn btn-light" href="{{exportSettings()}}" download="brewbench-profile-{{pkg.version}}.json">Export</a>
+          <a class="btn btn-light" ng-href="{{exportSettings()}}" download="brewbench-profile-{{pkg.version}}.json">Export</a>
         </div>
         <div class="btn-group float-right">
           <a class="btn btn-danger" href="" ng-click="clearSettings($event)">Delete Settings</a>
