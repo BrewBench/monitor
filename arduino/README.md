@@ -50,8 +50,8 @@ crontab -e
     They are also available under other names,
 
     - DHT11 = RHT01 = ...
-    - DHT21 = RHT02= AM2301 = HM2301
-    - DHT22 = RHT03= AM2302
+    - DHT21 = RHT02 = AM2301 = HM2301
+    - DHT22 = RHT03 = AM2302
     - DHT33 = RHT04 = AM2303
     - DHT44 = RHT05
 

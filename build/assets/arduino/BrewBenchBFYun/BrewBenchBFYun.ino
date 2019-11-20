@@ -12,6 +12,8 @@ BridgeServer server;
 #define ARDUINO_BOARD "YUN"
 #endif
 
+// DHT dht DHT;
+
 // https://learn.adafruit.com/thermistor/using-a-thermistor
 // resistance at 25 degrees C
 #define THERMISTORNOMINAL 10000
@@ -58,7 +60,9 @@ void processRest(BridgeClient client) {
   if (command == "digital" || command == "analog") {
     adCommand(client, command);
   }
-  else if (command == "Thermistor") {
+  else if (command == "Thermistor" ||
+      command == "DHT11" || command == "DHT12" || command == "DHT21" ||
+      command == "DHT22" || command == "DHT33" || command == "DHT44") {
     sensorCommand(client, command);
   }
   else {
@@ -135,10 +139,32 @@ void sensorCommand(BridgeClient client, String type) {
       temp = Thermistor(resistance);
     }    
   }
+  // DHT else if(type == "DHT11" || type == "DHT12" || type == "DHT21" || type == "DHT22" || type == "DHT33" || type == "DHT44"){
+  // DHT   int chk = -1;
+  // DHT if(type == "DHT11")
+  // DHT   chk = DHT.read11(pin);
+  // DHT else if(type == "DHT12")
+  // DHT   chk = DHT.read12(pin);
+  // DHT else if(type == "DHT21")
+  // DHT   chk = DHT.read21(pin);
+  // DHT else if(type == "DHT22")
+  // DHT   chk = DHT.read22(pin);
+  // DHT else if(type == "DHT33")
+  // DHT   chk = DHT.read33(pin);
+  // DHT else if(type == "DHT44")
+  // DHT   chk = DHT.read44(pin);
+  // DHT if( chk == DHTLIB_OK ){
+  // DHT     temp = DHT.temperature;
+  // DHT     percent = DHT.humidity;
+  // DHT   }
+  // DHT }
   
   String data = "{\"hostname\":\""+String(HOSTNAME)+"\",\"pin\":\""+String(spin)+"\",\"temp\":"+String(temp);
   data += ",\"raw\":"+String(raw);
   data += ",\"volts\":"+String(volts);  
+  if(percent){
+    data += ",\"percent\":"+String(percent);    
+  }
   data += "}";
   // Send JSON response to client
   client.print(data);
@@ -148,8 +174,7 @@ float actionsCommand(const String source, const String spin, const String type, 
   float temp = 0.00;
   float raw = 0.00;
   float volts = 0.00;
-  uint8_t pin = spin.substring(1).toInt();
-  
+  uint8_t pin = spin.substring(1).toInt();  
   float resistance = 0.0;
 
   if( spin.substring(0,1) == "A" ){
@@ -181,10 +206,56 @@ float actionsCommand(const String source, const String spin, const String type, 
       temp = Thermistor(resistance);
     }    
   }
+  // DHT else if(type == "DHT11" || type == "DHT12" || type == "DHT21" || type == "DHT22" || type == "DHT33" || type == "DHT44"){
+  // DHT   int chk = -1;
+  // DHT if(type == "DHT11")
+  // DHT   chk = DHT.read11(pin);
+  // DHT else if(type == "DHT12")
+  // DHT   chk = DHT.read12(pin);
+  // DHT else if(type == "DHT21")
+  // DHT   chk = DHT.read21(pin);
+  // DHT else if(type == "DHT22")
+  // DHT   chk = DHT.read22(pin);
+  // DHT else if(type == "DHT33")
+  // DHT   chk = DHT.read33(pin);
+  // DHT else if(type == "DHT44")
+  // DHT   chk = DHT.read44(pin);
+  // DHT if( chk == DHTLIB_OK ){
+  // DHT     temp = DHT.temperature;
+  // DHT   }
+  // DHT }
+  
   // adjust temp if we have it
   if(temp) temp = temp+adjustTemp;
   
   return temp;
+}
+
+float actionsPercentCommand(const String source, const String spin, const String type, const float adjustTemp) {
+  uint8_t pin = spin.substring(1).toInt();
+  
+  float percent = 0.00;
+
+  // DHT if(type == "DHT11" || type == "DHT12" || type == "DHT21" || type == "DHT22" || type == "DHT33" || type == "DHT44"){
+  // DHT   int chk = -1;
+  // DHT if(type == "DHT11")
+  // DHT   chk = DHT.read11(pin);
+  // DHT else if(type == "DHT12")
+  // DHT   chk = DHT.read12(pin);
+  // DHT else if(type == "DHT21")
+  // DHT   chk = DHT.read21(pin);
+  // DHT else if(type == "DHT22")
+  // DHT   chk = DHT.read22(pin);
+  // DHT else if(type == "DHT33")
+  // DHT   chk = DHT.read33(pin);
+  // DHT else if(type == "DHT44")
+  // DHT   chk = DHT.read44(pin);
+  // DHT if( chk == DHTLIB_OK ){
+  // DHT     percent = DHT.humidity;
+  // DHT   }
+  // DHT }
+  
+  return percent;
 }
 
 void postStreams(const String data){
@@ -212,6 +283,9 @@ void runActions(){
     String data = "{\"name\":\""+String(equipment_name)+"\",\"temp\":"+String(temp)+",\"temp_unit\":\"C\"";
     if(ambient){
       data += ",\"ambient\":\""+String(ambient)+"\"";  
+    }
+    if(humidity){
+      data += ",\"humidity\":\""+String(humidity)+"\"";  
     }
     data += "}";
     postStreams(data);    

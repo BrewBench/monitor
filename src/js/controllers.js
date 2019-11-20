@@ -1335,11 +1335,20 @@ $scope.updateABV();
         if(currentSketch.headers.indexOf('#include <Adafruit_ADS1015.h>') === -1)
           currentSketch.headers.push('#include <Adafruit_ADS1015.h>');
       }
+      // add the actions command
       var kettleType = kettle.temp.type;
-      if(kettle.temp.vcc) kettleType += kettle.temp.vcc;
+      if (kettle.temp.vcc)
+        kettleType += kettle.temp.vcc;
+      
       if (kettle.temp.index) kettleType += '-' + kettle.temp.index;      
       currentSketch.actions.push('  actionsCommand(F("'+kettle.name.replace(/[^a-zA-Z0-9-.]/g, "")+'"),F("'+kettle.temp.pin+'"),F("'+kettleType+'"),'+adjust+');');
       currentSketch.actions.push('  delay(500);');
+      
+      if ($scope.settings.sensors.DHT || kettle.temp.type.indexOf('DHT') !== -1 && kettle.percent) {
+        currentSketch.actions.push('  actionsPercentCommand(F("'+kettle.name.replace(/[^a-zA-Z0-9-.]/g, "")+'-Humidity"),F("'+kettle.temp.pin+'"),F("'+kettleType+'"),'+adjust+');');
+        currentSketch.actions.push('  delay(500);');        
+      }
+      
       //look for triggers
       if(kettle.heater && kettle.heater.sketch){
         currentSketch.triggers = true;
@@ -1355,13 +1364,21 @@ $scope.updateABV();
         sketch.actions.unshift('float temp = 0.00;');
         if (sketch.bf) {
           sketch.actions.unshift('float ambient = 0.00;');
+          sketch.actions.unshift('float humidity = 0.00;');
           sketch.actions.unshift('const String equipment_name = "'+$scope.settings.bf.name+'";');          
         }
         // update autoCommand 
         for (var a = 0; a < sketch.actions.length; a++){
-          if (sketch.bf && sketches[i].actions[a].indexOf('actionsCommand(') !== -1 && sketches[i].actions[a].toLowerCase().indexOf('ambient') !== -1) { 
-            sketches[i].actions[a] = sketches[i].actions[a].replace('actionsCommand(', 'ambient = actionsCommand(');
+          if (sketch.bf && sketches[i].actions[a].indexOf('actionsPercentCommand(') !== -1 &&
+            sketches[i].actions[a].toLowerCase().indexOf('humidity') !== -1) { 
+              // BF logic
+              sketches[i].actions[a] = sketches[i].actions[a].replace('actionsPercentCommand(', 'humidity = actionsPercentCommand(');
+          } else if (sketch.bf && sketches[i].actions[a].indexOf('actionsCommand(') !== -1 &&
+            sketches[i].actions[a].toLowerCase().indexOf('ambient') !== -1) { 
+              // BF logic
+              sketches[i].actions[a] = sketches[i].actions[a].replace('actionsCommand(', 'ambient = actionsCommand(');
           } else if (sketches[i].actions[a].indexOf('actionsCommand(') !== -1) {
+            // All other logic
             sketches[i].actions[a] = sketches[i].actions[a].replace('actionsCommand(', 'temp = actionsCommand(');
           }
         }
