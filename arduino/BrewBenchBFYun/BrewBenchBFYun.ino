@@ -280,12 +280,15 @@ void runActions(){
   // [ACTIONS]
   
   if(equipment_name && temp){
-    String data = "{\"name\":\""+String(equipment_name)+"\",\"temp\":"+String(temp)+",\"temp_unit\":\"C\"";
+    String data = "{\"name\":\""+String(equipment_name)+"\"";
+    data += ",\"report_source\":\"BrewBench\"";
+    data += ",\"temp\":"+String(temp);
+    data += ",\"temp_unit\":\"C\"";    
     if(ambient){
-      data += ",\"ambient\":\""+String(ambient)+"\"";  
+      data += ",\"ambient\":"+String(ambient);  
     }
     if(humidity){
-      data += ",\"humidity\":\""+String(humidity)+"\"";  
+      data += ",\"humidity\":"+String(humidity);  
     }
     data += "}";
     postStreams(data);    
