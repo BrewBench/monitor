@@ -185,7 +185,7 @@ angular.module('brewbench-monitor')
         else
           return false;
       }
-      return !!(arduino.board && (arduino.board.toLowerCase().indexOf('esp') !== -1 || arduino.board.toLowerCase().indexOf('nodemcu') !== -1));
+      return !!(arduino && arduino.board && (arduino.board.toLowerCase().indexOf('esp') !== -1 || arduino.board.toLowerCase().indexOf('nodemcu') !== -1));
     },
 
     slack: function(webhook_url, msg, color, icon, kettle){
@@ -1053,7 +1053,7 @@ angular.module('brewbench-monitor')
           response.grains.push({
             label: grain.F_G_NAME,
             min: parseInt(grain.F_G_BOIL_TIME,10),
-            notes: $filter('number')(grain.F_G_AMOUNT/16,2)+' lbs.',
+            notes: $filter('number')(grain.F_G_AMOUNT/16,2)+' kg',
             amount: $filter('number')(grain.F_G_AMOUNT/16,2)
           });
         });
@@ -1152,7 +1152,7 @@ angular.module('brewbench-monitor')
           response.grains.push({
             label: grain.NAME,
             min: parseInt(mash_time,10),
-            notes: $filter('number')(grain.AMOUNT,2)+' lbs.',
+            notes: $filter('number')(grain.AMOUNT,2)+' kg',
             amount: $filter('number')(grain.AMOUNT,2),
           });
         });
