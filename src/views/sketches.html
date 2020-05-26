@@ -37,6 +37,11 @@
                 Some sensors require additional libraries.  Check sensors you want included in the sketch.
                 <ul class="tg-list">
                   <li class="tg-list-item" style="margin-right: 20px;">
+                    <label><b>NTC / Thermistor</b></label>
+                    <input class="tgl tgl-ios" id="NTC" type="checkbox" ng-model="settings.sensors.NTC" ng-checked="settings.sensors.NTC"/>
+                    <label class="tgl-btn" for="NTC"></label>
+                  </li>
+                  <li class="tg-list-item" style="margin-right: 20px;">
                     <label><b>DHT</b></label>
                     <input class="tgl tgl-ios" id="DHT" type="checkbox" ng-model="settings.sensors.DHT" ng-checked="settings.sensors.DHT"/>
                     <label class="tgl-btn" for="DHT"></label>
@@ -261,7 +266,8 @@
                 </p>
               </div>
               <div class="col-2">
-                <a href="" class="btn btn-light float-right" ng-click="compileSketch('BFYun')">Download Sketch</a>
+                <a href="" class="btn btn-light float-right" ng-click="compileSketch('BFYun')">Download Yun Sketch</a><br><br>
+                <a href="" class="btn btn-light float-right" ng-click="compileSketch('BFESPM5')">Download M5 Sketch</a>
               </div>
             </div>
             <div class="row pb-2">      

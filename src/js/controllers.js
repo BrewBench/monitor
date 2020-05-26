@@ -21,7 +21,7 @@ $scope.site = {https: !!(document.location.protocol=='https:')
   , https_url: `https://${document.location.host}`
 };
 $scope.esp = {
-  type: '8266',
+  type: '',
   ssid: '',
   ssid_pass: '',
   hostname: 'bbesp',
@@ -1286,15 +1286,16 @@ $scope.updateABV();
     var sketches = [];
     var arduinoName = '';
     _.each($scope.kettles, (kettle, i) => {
-      arduinoName = kettle.arduino.url.replace(/[^a-zA-Z0-9-.]/g, "");
-      var currentSketch = _.find(sketches,{name:arduinoName});
+      arduinoName = kettle.arduino ? kettle.arduino.url.replace(/[^a-zA-Z0-9-.]/g, "") : 'Default';
+      var currentSketch = _.find(sketches,{name: arduinoName});
       if(!currentSketch){
         sketches.push({
           name: arduinoName,
+          type: sketchName,
           actions: [],
           headers: [],
           triggers: false,
-          bf: (sketchName.indexOf('BFYun') !== -1) ? true : false
+          bf: (sketchName.indexOf('BF') !== -1) ? true : false
         });
         currentSketch = _.find(sketches,{name:arduinoName});
       }
@@ -1360,12 +1361,14 @@ $scope.updateABV();
       }
     });
     _.each(sketches, (sketch, i) => {
-      if(sketch.triggers || sketch.bf){
-        sketch.actions.unshift('float temp = 0.00;');
-        if (sketch.bf) {
-          sketch.actions.unshift('float ambient = 0.00;');
-          sketch.actions.unshift('float humidity = 0.00;');
-          sketch.actions.unshift('const String equipment_name = "'+$scope.settings.bf.name+'";');          
+      if (sketch.triggers || sketch.bf) {
+        if (sketch.type.indexOf('M5') === -1) {
+          sketch.actions.unshift('float temp = 0.00;');
+          if (sketch.bf) {
+            sketch.actions.unshift('float ambient = 0.00;');
+            sketch.actions.unshift('float humidity = 0.00;');
+            sketch.actions.unshift('const String equipment_name = "'+$scope.settings.bf.name+'";');          
+          }
         }
         // update autoCommand 
         for (var a = 0; a < sketch.actions.length; a++){
@@ -1461,6 +1464,9 @@ $scope.updateABV();
             response.data = response.data.replace(/\[INFLUXDB_AUTH\]/g, '');
           }
           response.data = response.data.replace(/\[INFLUXDB_CONNECTION\]/g, connection_string);
+        }
+        if ($scope.settings.sensors.THC) {
+          response.data = response.data.replace(/\/\/ THC /g, '');
         }
         if(headers.indexOf('#include <dht.h>') !== -1 || headers.indexOf('#include "DHTesp.h"') !== -1){
           response.data = response.data.replace(/\/\/ DHT /g, '');
