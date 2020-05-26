@@ -53,4 +53,16 @@ angular.module('brewbench-monitor')
   return function(dbm){
     return 2 * (dbm + 100);
   };
+})
+.filter('kilogramsToOunces', function($filter){
+  return function (kg) {
+    if (typeof kg === 'undefined' || isNaN(kg)) return '';
+    return $filter('number')(kg * 35.274, 2);
+  };
+})
+.filter('kilogramsToPounds', function($filter){
+  return function (kg) {
+    if (typeof kg === 'undefined' || isNaN(kg)) return '';
+    return $filter('number')(kg * 2.20462, 2);
+  };
 });

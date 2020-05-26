@@ -1053,8 +1053,8 @@ angular.module('brewbench-monitor')
           response.grains.push({
             label: grain.F_G_NAME,
             min: parseInt(grain.F_G_BOIL_TIME,10),
-            notes: $filter('number')(grain.F_G_AMOUNT/16,2)+' kg',
-            amount: $filter('number')(grain.F_G_AMOUNT/16,2)
+            notes: $filter('kilogramsToPounds')(grain.F_G_AMOUNT)+' lb',
+            amount: $filter('kilogramsToPounds')(grain.F_G_AMOUNT)
           });
         });
       }
@@ -1065,9 +1065,9 @@ angular.module('brewbench-monitor')
               label: hop.F_H_NAME,
               min: parseInt(hop.F_H_DRY_HOP_TIME,10) > 0 ? null : parseInt(hop.F_H_BOIL_TIME,10),
               notes: parseInt(hop.F_H_DRY_HOP_TIME,10) > 0
-                ? 'Dry Hop '+$filter('number')(hop.F_H_AMOUNT,2)+' oz.'+' for '+parseInt(hop.F_H_DRY_HOP_TIME,10)+' Days'
-                : $filter('number')(hop.F_H_AMOUNT,2)+' oz.',
-              amount: $filter('number')(hop.F_H_AMOUNT,2)
+                ? 'Dry Hop '+$filter('kilogramsToOunces')(hop.F_H_AMOUNT)+' oz.'+' for '+parseInt(hop.F_H_DRY_HOP_TIME,10)+' Days'
+                : $filter('kilogramsToOunces')(hop.F_H_AMOUNT)+' oz.',
+              amount: $filter('kilogramsToOunces')(hop.F_H_AMOUNT)
             });
             // hop.F_H_ALPHA
             // hop.F_H_DRY_HOP_TIME
@@ -1152,8 +1152,8 @@ angular.module('brewbench-monitor')
           response.grains.push({
             label: grain.NAME,
             min: parseInt(mash_time,10),
-            notes: $filter('number')(grain.AMOUNT,2)+' kg',
-            amount: $filter('number')(grain.AMOUNT,2),
+            notes: $filter('kilogramsToPounds')(grain.AMOUNT)+' lb',
+            amount: $filter('kilogramsToPounds')(grain.AMOUNT),
           });
         });
       }
@@ -1165,9 +1165,9 @@ angular.module('brewbench-monitor')
             label: hop.NAME+' ('+hop.FORM+')',
             min: hop.USE == 'Dry Hop' ? 0 : parseInt(hop.TIME,10),
             notes: hop.USE == 'Dry Hop'
-              ? hop.USE+' '+$filter('number')(hop.AMOUNT*1000/28.3495,2)+' oz.'+' for '+parseInt(hop.TIME/60/24,10)+' Days'
-              : hop.USE+' '+$filter('number')(hop.AMOUNT*1000/28.3495,2)+' oz.',
-            amount: $filter('number')(hop.AMOUNT*1000/28.3495,2)
+              ? hop.USE+' '+$filter('kilogramsToOunces')(hop.AMOUNT)+' oz.'+' for '+parseInt(hop.TIME/60/24,10)+' Days'
+              : hop.USE+' '+$filter('kilogramsToOunces')(hop.AMOUNT)+' oz.',
+            amount: $filter('kilogramsToOunces')(hop.AMOUNT)
           });
         });
       }
