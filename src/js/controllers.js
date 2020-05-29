@@ -41,7 +41,7 @@ $scope.slider = {
   options: {
     floor: 0,
     ceil: 100,
-    step: 5,
+    step: 1,
     translate: function(value) {
         return `${value}%`;
     },

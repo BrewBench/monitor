@@ -1003,8 +1003,8 @@ angular.module('brewbench-monitor')
     },
     // http://www.brewersfriend.com/plato-to-sg-conversion-chart/
     sg: function(plato){
-      var sg = ( 1 + (plato / (258.6 - ( (plato/258.2) * 227.1) ) ) ).toFixed(3);
-      return parseFloat(sg);
+      var sg = (1 + (plato / (258.6 - ((plato / 258.2) * 227.1))));
+      return parseFloat(sg).toFixed(3);
     },
     plato: function(sg){
       var plato = ((-1 * 616.868) + (1111.14 * sg) - (630.272 * Math.pow(sg,2)) + (135.997 * Math.pow(sg,3))).toString();
@@ -1016,7 +1016,7 @@ angular.module('brewbench-monitor')
         plato = plato.substring(0,plato.indexOf('.'));
         plato = parseFloat(plato) + 1;
       }
-      return parseFloat(plato);
+      return parseFloat(plato).toFixed(2);;
     },
     recipeBeerSmith: function(recipe){
       var response = {name:'', date:'', brewer: {name:''}, category:'', abv:'', og:0.000, fg:0.000, ibu:0, hops:[], grains:[], yeast:[], misc:[]};
