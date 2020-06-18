@@ -75,7 +75,7 @@
   },
   "dependencies": {
     "@uirouter/angularjs": "^1.0.20",
-    "angular": "1.6.9",
+    "angular": "1.8.0",
     "angular-nvd3": "^1.0.9",
     "angular-scroll": "^1.0.2",
     "angular-touch": "^1.7.5",
