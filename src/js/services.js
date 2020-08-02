@@ -22,7 +22,7 @@ angular.module('brewbench-monitor')
 
     reset: function(){
       const defaultSettings = {
-        general: {debug: false, pollSeconds: 10, unit: 'F', shared: false}
+        general: {debug: false, pollSeconds: 10, unit: 'F', shared: false, heatSafty: false}
         ,chart: {show: true, military: false, area: false}
         ,sensors: {DHT: false, DS18B20: false, BMP: false}
         ,recipe: {'name':'','brewer':{name:'','email':''},'yeast':[],'hops':[],'grains':[],scale:'gravity',method:'papazian','og':1.050,'fg':1.010,'abv':0,'abw':0,'calories':0,'attenuation':0}

@@ -365,6 +365,10 @@ $scope.updateABV();
   $scope.activeKettles = function(){
     return _.filter($scope.kettles,{'active': true}).length;
   };
+  
+  $scope.heatIsOn = function () {
+    return Boolean(_.filter($scope.kettles,{'heater': {'running': true}}).length);
+  };
 
   $scope.pinDisplay = function(arduino, pin){
       if( pin.indexOf('TP-')===0 ){
@@ -1103,8 +1107,10 @@ $scope.updateABV();
 
   $scope.toggleKettle = function(item, kettle){
 
+    $scope.resetError(kettle);
     var k;
-
+    var heatIsOn = $scope.heatIsOn();
+    
     switch (item) {
       case 'heat':
         k = kettle.heater;
@@ -1120,13 +1126,17 @@ $scope.updateABV();
     if(!k)
       return;
 
-    k.running = !k.running;
-
-    if(kettle.active && k.running){
+    if(!k.running){
       //start the relay
-      $scope.toggleRelay(kettle, k, true);
-    } else if(!k.running){
+      if (item == 'heat' && $scope.settings.general.heatSafty && heatIsOn) {
+        $scope.setErrorMessage('A heater is already running.', kettle);
+      } else {
+        k.running = !k.running;
+        $scope.toggleRelay(kettle, k, true);
+      }
+    } else if(k.running){
       //stop the relay
+      k.running = !k.running;
       $scope.toggleRelay(kettle, k, false);
     }
   };
