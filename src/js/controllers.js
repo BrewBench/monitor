@@ -1128,7 +1128,7 @@ $scope.updateABV();
 
     if(!k.running){
       //start the relay
-      if (item == 'heat' && $scope.settings.general.heatSafty && heatIsOn) {
+      if (item == 'heat' && $scope.settings.general.heatSafety && heatIsOn) {
         $scope.setErrorMessage('A heater is already running.', kettle);
       } else {
         k.running = !k.running;
