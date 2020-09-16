@@ -31,7 +31,7 @@ angular.module('brewbench-monitor')
         ,arduinos: [{id:'local-'+btoa('brewbench'),board:'',RSSI:false,url:'arduino.local',analog:5,digital:13,adc:0,secure:false,version:'',status:{error:'',dt:'',message:''}}]
         ,tplink: {user: '', pass: '', token:'', status: '', plugs: []}
         ,influxdb: {url: '', port: '', user: '', pass: '', db: '', dbs:[], status: ''}
-        ,streams: {username: '', api_key: '', status: '', session: {id: '', name: '', type: 'fermentation'}}
+        ,app: {email: '', api_key: '', status: ''}
       };
       return defaultSettings;
     },
@@ -72,7 +72,7 @@ angular.module('brewbench-monitor')
           ,knob: angular.copy(this.defaultKnobOptions(),{value:0,min:0,max:220})
           ,arduino: {id: 'local-'+btoa('brewbench'),url:'arduino.local',analog:5,digital:13,adc:0,secure:false}
           ,message: {type:'error',message:'',version:'',count:0,location:''}
-          ,notify: {slack: false, dweet: false, streams: false}
+          ,notify: {slack: false, dweet: false}
         },{
           name: 'Mash'
           ,id: null
@@ -87,7 +87,7 @@ angular.module('brewbench-monitor')
           ,knob: angular.copy(this.defaultKnobOptions(),{value:0,min:0,max:220})
           ,arduino: {id: 'local-'+btoa('brewbench'),url:'arduino.local',analog:5,digital:13,adc:0,secure:false}
           ,message: {type:'error',message:'',version:'',count:0,location:''}
-          ,notify: {slack: false, dweet: false, streams: false}
+          ,notify: {slack: false, dweet: false}
         },{
           name: 'Boil'
           ,id: null
@@ -102,7 +102,7 @@ angular.module('brewbench-monitor')
           ,knob: angular.copy(this.defaultKnobOptions(),{value:0,min:0,max:220})
           ,arduino: {id: 'local-'+btoa('brewbench'),url:'arduino.local',analog:5,digital:13,adc:0,secure:false}
           ,message: {type:'error',message:'',version:'',count:0,location:''}
-          ,notify: {slack: false, dweet: false, streams: false}
+          ,notify: {slack: false, dweet: false}
         }];
     },
 
@@ -394,7 +394,7 @@ angular.module('brewbench-monitor')
         delete kettles[i].knob;
         delete kettles[i].values;
       });
-      delete settings.streams;
+      delete settings.app;
       delete settings.influxdb;
       delete settings.tplink;
       delete settings.notifications;
@@ -585,19 +585,18 @@ angular.module('brewbench-monitor')
       };
     },
 
-    streams: function(){
+    app: function(){
       var settings = this.settings('settings');
-      var request = {url: 'http://localhost:3001/api', headers: {}, timeout: settings.general.pollSeconds*10000};
+      var request = {url: 'https://sensor.brewbench.co', headers: {}, timeout: settings.general.pollSeconds*10000};
 
       return {
         auth: async (ping) => {
           var q = $q.defer();
-          if(settings.streams.api_key && settings.streams.username){
+          if(settings.app.api_key && settings.app.email){
             request.url += (ping) ? '/users/ping' : '/users/auth';
             request.method = 'POST';
             request.headers['Content-Type'] ='application/json';
-            request.headers['X-API-Key'] = `${settings.streams.api_key}`;
-            request.headers['X-BB-User'] = `${settings.streams.username}`;
+            request.headers['X-API-KEY'] = `${settings.app.api_key}`;
             $http(request)
               .then(response => {
                 if(response && response.data && response.data.access && response.data.access.id)
@@ -616,7 +615,7 @@ angular.module('brewbench-monitor')
           get: async () => {
             var q = $q.defer();
             if(!this.accessToken()){
-              var auth = await this.streams().auth();
+              var auth = await this.app().auth();
               if(!this.accessToken()){
                 q.reject('Sorry Bad Authentication');
                 return q.promise;
@@ -638,7 +637,7 @@ angular.module('brewbench-monitor')
           save: async (kettle) => {
             var q = $q.defer();
             if(!this.accessToken()){
-              var auth = await this.streams().auth();
+              var auth = await this.app().auth();
               if(!this.accessToken()){
                 q.reject('Sorry Bad Authentication');
                 return q.promise;
@@ -654,7 +653,7 @@ angular.module('brewbench-monitor')
             request.url += '/kettles/arm';
             request.method = 'POST';
             request.data = {
-              session: settings.streams.session,
+              session: settings.app.session,
               kettle: updatedKettle,
               notifications: settings.notifications
             };
@@ -674,7 +673,7 @@ angular.module('brewbench-monitor')
           get: async () => {
             var q = $q.defer();
             if(!this.accessToken()){
-              var auth = await this.streams().auth();
+              var auth = await this.app().auth();
               if(!this.accessToken()){
                 q.reject('Sorry Bad Authentication');
                 return q.promise;
@@ -700,7 +699,7 @@ angular.module('brewbench-monitor')
           save: async (session) => {
             var q = $q.defer();
             if(!this.accessToken()){
-              var auth = await this.streams().auth();
+              var auth = await this.app().auth();
               if(!this.accessToken()){
                 q.reject('Sorry Bad Authentication');
                 return q.promise;
@@ -777,31 +776,17 @@ angular.module('brewbench-monitor')
       var q = $q.defer();
       var settings = this.settings('settings');
       var influxConnection = `${settings.influxdb.url}`;
-      if(!!settings.influxdb.port && !this.hosted(influxConnection))
+      if(!!settings.influxdb.port)
         influxConnection += `:${settings.influxdb.port}`;
 
       return {
-        hosted: (url) => {
-          return (url.indexOf('streams.brewbench.co') !== -1 ||
-            url.indexOf('hosted.brewbench.co') !== -1);
-        },
         ping: (influxdb) => {
           if(influxdb && influxdb.url){
             influxConnection = `${influxdb.url}`;
-            if( !!influxdb.port && !this.influxdb().hosted(influxConnection))
+            if(Boolean(influxdb.port))
               influxConnection += `:${influxdb.port}`
           }
           var request = {url: `${influxConnection}`, method: 'GET'};
-          if(this.influxdb().hosted(influxConnection)){
-            request.url = `${influxConnection}/ping`;
-            if(influxdb && influxdb.user && influxdb.pass){
-              request.headers = {'Content-Type': 'application/json',
-                'Authorization': 'Basic '+btoa(influxdb.user.trim()+':'+influxdb.pass.trim())};
-            } else {
-              request.headers = {'Content-Type': 'application/json',
-                'Authorization': 'Basic '+btoa(settings.influxdb.user.trim()+':'+settings.influxdb.pass.trim())};
-            }
-          }
           $http(request)
             .then(response => {
               console.log(response)
@@ -813,9 +798,6 @@ angular.module('brewbench-monitor')
             return q.promise;
         },
         dbs: () => {
-          if(this.influxdb().hosted(influxConnection)){
-            q.resolve([settings.influxdb.user]);
-          } else {
           $http({url: `${influxConnection}/query?u=${settings.influxdb.user.trim()}&p=${settings.influxdb.pass.trim()}&q=${encodeURIComponent('show databases')}`, method: 'GET'})
             .then(response => {
               if(response.data &&
@@ -832,13 +814,9 @@ angular.module('brewbench-monitor')
             .catch(err => {
               q.reject(err);
             });
-          }
-          return q.promise;
+            return q.promise;
         },
         createDB: (name) => {
-          if(this.influxdb().hosted(influxConnection)){
-            q.reject('Database already exists');
-          } else {
           $http({url: `${influxConnection}/query?u=${settings.influxdb.user.trim()}&p=${settings.influxdb.pass.trim()}&q=${encodeURIComponent(`CREATE DATABASE "${name}"`)}`, method: 'POST'})
             .then(response => {
               q.resolve(response);
@@ -846,7 +824,6 @@ angular.module('brewbench-monitor')
             .catch(err => {
               q.reject(err);
             });
-          }
           return q.promise;
         }
       };

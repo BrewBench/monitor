@@ -381,11 +381,11 @@
             <div class="col">
               <label class="adjust">Target</label>
               <div class="btn-group" role="group">
-                <a class="btn btn-light"><editable type="number" model="kettle.temp.target">{{kettle.temp.target}}</editable>
+                <a class="btn btn-light" style="padding-top: 9px; width: 100px;"><editable type="number" model="kettle.temp.target">{{kettle.temp.target}}</editable>
                   {{ !!BrewService.sensorTypes(kettle.temp.type).percent ? '%' : '&deg;'+settings.general.unit }}
                 </a>
-                <a class="btn btn-light" ng-click="changeValue(kettle,'target',false)"><i class="fas fa-minus fa-lg"></i></a>
-                <a class="btn btn-light" ng-click="changeValue(kettle,'target',true)"><i class="fas fa-plus fa-lg"></i></a>
+                <a class="btn btn-light" ng-click="changeValue(kettle,'target',false)" style="padding-top: 12px;"><i class="fas fa-minus fa-lg"></i></a>
+                <a class="btn btn-light" ng-click="changeValue(kettle,'target',true)" style="padding-top: 12px;"><i class="fas fa-plus fa-lg"></i></a>
               </div>
             </div>
           </div>
@@ -393,11 +393,11 @@
             <div class="col">
               <label class="adjust">Diff</label>
               <div class="btn-group" role="group">
-                <a class="btn btn-light"><editable type="number" model="kettle.temp.diff">{{kettle.temp.diff}}</editable>
+                <a class="btn btn-light" style="padding-top: 9px; width: 100px;"><editable type="number" model="kettle.temp.diff">{{kettle.temp.diff}}</editable>
                   {{ !!BrewService.sensorTypes(kettle.temp.type).percent ? '%' : '&deg;'+settings.general.unit }}
                 </a>
-                <a class="btn btn-light" ng-click="changeValue(kettle,'diff',false)"><i class="fas fa-minus fa-lg"></i></a>
-                <a class="btn btn-light" ng-click="changeValue(kettle,'diff',true)"><i class="fas fa-plus fa-lg"></i></a>
+                <a class="btn btn-light" ng-click="changeValue(kettle,'diff',false)" style="padding-top: 12px;"><i class="fas fa-minus fa-lg"></i></a>
+                <a class="btn btn-light" ng-click="changeValue(kettle,'diff',true)" style="padding-top: 12px;"><i class="fas fa-plus fa-lg"></i></a>
               </div>
             </div>
           </div>
@@ -405,11 +405,11 @@
             <div class="col">
               <label class="adjust">Adjust</label>
               <div class="btn-group" role="group">
-                <a class="btn btn-light"><editable type="number" model="kettle.temp.adjust" placeholder="0">{{kettle.temp.adjust}}</editable>
+                <a class="btn btn-light" style="padding-top: 9px; width: 100px;"><editable type="number" model="kettle.temp.adjust" placeholder="0">{{kettle.temp.adjust}}</editable>
                   {{ !!BrewService.sensorTypes(kettle.temp.type).percent ? '%' : '&deg;'+settings.general.unit }}
                 </a>
-                <a class="btn btn-light" ng-click="changeValue(kettle,'adjust',false)"><i class="fas fa-minus fa-lg"></i></a>
-                <a class="btn btn-light" ng-click="changeValue(kettle,'adjust',true)"><i class="fas fa-plus fa-lg"></i></a>
+                <a class="btn btn-light" ng-click="changeValue(kettle,'adjust',false)" style="padding-top: 12px;"><i class="fas fa-minus fa-lg"></i></a>
+                <a class="btn btn-light" ng-click="changeValue(kettle,'adjust',true)" style="padding-top: 12px;"><i class="fas fa-plus fa-lg"></i></a>
               </div>
             </div>
           </div>

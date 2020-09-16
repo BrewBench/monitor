@@ -116,39 +116,44 @@
 
           <div class="pb-3">
             <h4>
-              <img src="/assets/img/brewbench-colors.png" width="35" style="margin-top: -5px;border-radius: 10px;">
-              BrewBench Streams
-              <sup class="badge badge-{{ getStatusClass(settings.streams.status) }} badge-pill">
-                {{ settings.streams.status || 'Not Connected'}}
+              <img src="/assets/img/brewbench-app.png" width="35" style="margin-top: -5px;border-radius: 10px;">
+              BrewBench Monitor App
+              <sup class="badge badge-{{ getStatusClass(settings.app.status) }} badge-pill">
+                {{ settings.app.status || 'Not Connected'}}
               </sup>
             </h4>
             <div class="block-border">
               <div class="row">
                 <div class="col-10">
                   <p>
-                    As part of <a href="https://brewbench.co/hosted" target="_blank">BrewBench Hosted</a>, the Streams sketch will be dynamically created depending on what sensors are in use with your current configuration.  It will run in the background sending temperature data from your fermentation for secure remote monitoring.
-                    <br/>Works with <strong>BrewBench Relay</strong> to trigger the heat / cool relays you have toggled on.
+                    Monitor your temps with the BrewBench Monitor app.  Integration Coming Soon...
                   </p>
                 </div>
                 <div class="col-2">
-                  <a href="" class="btn btn-light float-right" ng-click="compileSketch('StreamsYun')" ng-disabled="!streams.connected()">Download Sketch</a>
-                </div>
-              </div>
-              <div class="row pb-2">
-                <div class="col-6">
-                  <label class="adjust">Username</label>
-                  <input class="form-control" type="text" ng-model="settings.streams.username" placeholder="Username">
-                </div>
-                <div class="col-6">
-                  <label class="adjust">API Key</label>
-                  <input class="form-control" type="text" ng-model="settings.streams.api_key" placeholder="API Key">
+                  <a href="" class="btn btn-light float-right" ng-click="compileSketch('AppYun')" ng-class="{'disabled':!app.connected()}">Download Yun Sketch</a>
                 </div>
               </div>
               <div class="row">
+                <div class="col-12" style="padding-left: 10px;">
+                  <a href="https://apps.apple.com/us/app/id1527603859" target="_blank"><img alt='Download on the App Store' src='/assets/img/ios/Download_on_the_App_Store_Badge_US-UK_RGB_blk_092917.svg' width="120"/></a>
+                  <a href="https://play.google.com/store/apps/details?id=co.brewbench.monitor&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1" target="_blank"><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png' width="150"/></a>
+                </div>
+              </div>
+              <div class="row pb-2 disabled">
+                <div class="col-6">
+                  <label class="adjust">Email</label>
+                  <input class="form-control" type="text" ng-model="settings.app.email" placeholder="Email">
+                </div>
+                <div class="col-6">
+                  <label class="adjust">API Key</label>
+                  <input class="form-control" type="text" ng-model="settings.app.api_key" placeholder="API Key">
+                </div>
+              </div>
+              <div class="row disabled">
                 <div class="col-12">
                   <div class="btn-group float-right">
-                    <button type="button" class="btn btn-secondary" ng-click="streams.remove()" ng-disabled="!streams.connected()">Remove</button>
-                    <button type="button" class="btn btn-primary" ng-click="streams.connect()" ng-disabled="!settings.streams.username || !settings.streams.api_key">Connect</button>
+                    <button type="button" class="btn btn-secondary" ng-click="app.remove()" ng-disabled="!app.connected()">Remove</button>
+                    <button type="button" class="btn btn-primary" ng-click="app.connect()" ng-disabled="!settings.app.email || !settings.app.api_key">Connect</button>
                   </div>
               </div>
             </div>
@@ -166,7 +171,7 @@
               <div class="row">
                 <div class="col-10">
                   <p>
-                    As part of <a href="https://brewbench.co/hosted" target="_blank">BrewBench Hosted</a>, the InfluxDB sketch will be dynamically created depending on what sensors are in use with your current configuration.  It will run in the background sending temperature data to your InfluxDB time-series database.
+                    The InfluxDB sketch will be dynamically created depending on what sensors are in use with your current configuration.  It will run in the background sending temperature data to your InfluxDB time-series database.
                     <br/>Works with <strong>BrewBench Relay</strong> to trigger the heat / cool relays you have toggled on.
                   </p>
                 </div>
@@ -360,11 +365,6 @@
                     </td>
                     <td>
                       <ul class="tg-list">
-                        <li class="tg-list-item">
-                          <span>Streams</span>
-                          <input class="tgl tgl-ios" id="streams{{$index}}" type="checkbox" ng-disabled="!settings.streams.api_key || settings.streams.status != 'Connected'" ng-checked="kettle.notify.streams" ng-click="kettle.notify.streams = !kettle.notify.streams; streams.kettles(kettle)"/>
-                          <label class="tgl-btn" ng-class="{'disabled':!settings.streams.api_key || settings.streams.status != 'Connected'}" for="streams{{$index}}"></label>
-                        </li>
                         <li class="tg-list-item">
                           <span>Slack</span>
                           <input class="tgl tgl-ios" id="slack{{$index}}" type="checkbox" ng-disabled="!settings.notifications.slack" ng-checked="kettle.notify.slack" ng-click="kettle.notify.slack = !kettle.notify.slack"/>

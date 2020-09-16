@@ -94,10 +94,12 @@ $scope.getLovibondColor = function(range){
 
 //default settings values
 $scope.settings = BrewService.settings('settings') || BrewService.reset();
+if (!$scope.settings.app)
+  $scope.settings.app = { email: '', api_key: '', status: '' };
 // general check and update
 if(!$scope.settings.general)
   return $scope.clearSettings();
-$scope.chartOptions = BrewService.chartOptions({unit: $scope.settings.general.unit, chart: $scope.settings.chart, session: $scope.settings.streams.session});
+$scope.chartOptions = BrewService.chartOptions({unit: $scope.settings.general.unit, chart: $scope.settings.chart});
 $scope.kettles = BrewService.settings('kettles') || BrewService.defaultKettles();
 $scope.share = (!$state.params.file && BrewService.settings('share')) ? BrewService.settings('share') : {
       file: $state.params.file || null
@@ -449,9 +451,6 @@ $scope.updateABV();
   };
 
   $scope.influxdb = {
-    brewbenchHosted: () => {
-      return BrewService.influxdb().hosted($scope.settings.influxdb.url);
-    },
     remove: () => {
       var defaultSettings = BrewService.reset();
       $scope.settings.influxdb = defaultSettings.influxdb;
@@ -463,18 +462,14 @@ $scope.updateABV();
           if(response.status == 204 || response.status == 200){
             $('#influxdbUrl').removeClass('is-invalid');
             $scope.settings.influxdb.status = 'Connected';
-            if($scope.influxdb.brewbenchHosted()){
-              $scope.settings.influxdb.db = $scope.settings.influxdb.user;
-            } else {
-              //get list of databases
-              BrewService.influxdb().dbs()
-              .then(response => {
-                if(response.length){
-                  var dbs = [].concat.apply([], response);
-                  $scope.settings.influxdb.dbs = _.remove(dbs, (db) => db != "_internal");
-                }
-              });
-            }
+            //get list of databases
+            BrewService.influxdb().dbs()
+            .then(response => {
+              if(response.length){
+                var dbs = [].concat.apply([], response);
+                $scope.settings.influxdb.dbs = _.remove(dbs, (db) => db != "_internal");
+              }
+            });
           } else {
             $('#influxdbUrl').addClass('is-invalid');
             $scope.settings.influxdb.status = 'Failed to Connect';
@@ -515,74 +510,28 @@ $scope.updateABV();
      }
   };
 
-  $scope.streams = {
+  $scope.app = {
     connected: () => {
-      return (!!$scope.settings.streams.username &&
-        !!$scope.settings.streams.api_key &&
-        $scope.settings.streams.status == 'Connected'
+      return (Boolean($scope.settings.app.email) &&
+        Boolean($scope.settings.app.api_key) &&
+        $scope.settings.app.status == 'Connected'
       );
     },
     remove: () => {
       var defaultSettings = BrewService.reset();
-      $scope.settings.streams = defaultSettings.streams;
-      _.each($scope.kettles, kettle => {
-        kettle.notify.streams = false;
-      });
+      $scope.settings.app = defaultSettings.app;
     },
     connect: () => {
-      if(!$scope.settings.streams.username || !$scope.settings.streams.api_key)
+      if(!Boolean($scope.settings.app.email) || !Boolean($scope.settings.app.api_key))
         return;
-      $scope.settings.streams.status = 'Connecting';
-      return BrewService.streams().auth(true)
+      $scope.settings.app.status = 'Connecting';
+      return BrewService.app().auth(true)
         .then(response => {
-          $scope.settings.streams.status = 'Connected';
+          $scope.settings.app.status = 'Connected';
         })
         .catch(err => {
-          $scope.settings.streams.status = 'Failed to Connect';
+          $scope.settings.app.status = 'Failed to Connect';
         });
-    },
-    kettles: (kettle, relay) => {
-      if(relay){
-        kettle[relay].sketch = !kettle[relay].sketch;
-        if(!kettle.notify.streams)
-          return;
-      }
-      kettle.message.location = 'sketches';
-      kettle.message.type = 'info';
-      kettle.message.status = 0;
-      return BrewService.streams().kettles.save(kettle)
-        .then(response => {
-          var kettleResponse = response.kettle;
-          // update kettle vars
-          kettle.id = kettleResponse.id;
-          // update arduino id
-          _.each($scope.settings.arduinos, arduino => {
-            if(arduino.id == kettle.arduino.id)
-              arduino.id = kettleResponse.deviceId;
-          });
-          kettle.arduino.id = kettleResponse.deviceId;
-          // update session vars
-          _.merge($scope.settings.streams.session, kettleResponse.session);
-
-          kettle.message.type = 'success';
-          kettle.message.status = 2;
-        })
-        .catch(err => {
-          kettle.notify.streams = !kettle.notify.streams;
-          kettle.message.status = 1;
-          if(err && err.data && err.data.error && err.data.error.message){
-            $scope.setErrorMessage(err.data.error.message, kettle);
-            console.error('BrewBench Streams Error', err);
-          }
-        });
-    },
-    sessions: {
-      save: () => {
-        return BrewService.streams().sessions.save($scope.settings.streams.session)
-          .then(response => {
-
-          });
-      }
     }
   };
 
@@ -1013,8 +962,9 @@ $scope.updateABV();
 
     //is temp too high?
     if(currentValue > kettle.temp.target+kettle.temp.diff){
+      $scope.notify(kettle);
       //stop the heating element
-      if(kettle.heater.auto && kettle.heater.running){
+      if(kettle.heater && kettle.heater.auto && kettle.heater.running){
         temps.push($scope.toggleRelay(kettle, kettle.heater, false));
       }
       //stop the pump
@@ -1032,7 +982,7 @@ $scope.updateABV();
     else if(currentValue < kettle.temp.target-kettle.temp.diff){
       $scope.notify(kettle);
       //start the heating element
-      if(kettle.heater.auto && !kettle.heater.running){
+      if(kettle.heater && kettle.heater.auto && !kettle.heater.running){
         temps.push($scope.toggleRelay(kettle, kettle.heater, true).then(heating => {
           kettle.knob.subText.text = 'heating';
           kettle.knob.subText.color = 'rgba(200,47,47,1)';
@@ -1051,7 +1001,7 @@ $scope.updateABV();
       kettle.temp.hit=new Date();//set the time the target was hit so we can now start alerts
       $scope.notify(kettle);
       //stop the heater
-      if(kettle.heater.auto && kettle.heater.running){
+      if(kettle.heater && kettle.heater.auto && kettle.heater.running){
         temps.push($scope.toggleRelay(kettle, kettle.heater, false));
       }
       //stop the pump
@@ -1146,7 +1096,6 @@ $scope.updateABV();
     _.each($scope.kettles, kettle => {
       if((kettle.heater && kettle.heater.sketch) ||
         (kettle.cooler && kettle.cooler.sketch) ||
-        kettle.notify.streams ||
         kettle.notify.slack ||
         kettle.notify.dweet
       ) {
@@ -1435,11 +1384,9 @@ $scope.updateABV();
         } else {
           response.data = response.data.replace(/\[HOSTNAME\]/g, name.replace('.local',''));
         }
-        if( sketch.indexOf('Streams' ) !== -1){
-          // streams connection
-          var connection_string = `https://${$scope.settings.streams.username}.hosted.brewbench.co`;
-          response.data = response.data.replace(/\[STREAMS_CONNECTION\]/g, connection_string);
-          response.data = response.data.replace(/\[STREAMS_AUTH\]/g, 'Authorization: Basic '+btoa($scope.settings.streams.username.trim()+':'+$scope.settings.streams.api_key.trim()));
+        if( sketch.indexOf('App' ) !== -1){
+          // app connection
+          response.data = response.data.replace(/\[APP_AUTH\]/g, 'X-API-KEY: '+$scope.settings.app.api_key.trim());
         }
         else if( sketch.indexOf('BFYun' ) !== -1){
           // bf api key header
@@ -1448,31 +1395,15 @@ $scope.updateABV();
         else if( sketch.indexOf('InfluxDB') !== -1){
           // influx db connection
           var connection_string = `${$scope.settings.influxdb.url}`;
-          if($scope.influxdb.brewbenchHosted()){
-            connection_string += '/bbp';
-            if(sketch.indexOf('ESP') !== -1){
-              // does not support https
-              if(connection_string.indexOf('https:') === 0)
-                connection_string = connection_string.replace('https:','http:');
-              response.data = response.data.replace(/\[INFLUXDB_AUTH\]/g, btoa($scope.settings.influxdb.user.trim()+':'+$scope.settings.influxdb.pass.trim()));
-              response.data = response.data.replace(/\[API_KEY\]/g, $scope.settings.influxdb.pass);
-            } else {
-              response.data = response.data.replace(/\[INFLUXDB_AUTH\]/g, 'Authorization: Basic '+btoa($scope.settings.influxdb.user.trim()+':'+$scope.settings.influxdb.pass.trim()));
-              var additional_post_params = '  p.addParameter(F("-H"));\n';
-              additional_post_params += '  p.addParameter(F("X-API-KEY: '+$scope.settings.influxdb.pass+'"));';
-              response.data = response.data.replace('// additional_post_params', additional_post_params);
-            }
-          } else {
-            if( !!$scope.settings.influxdb.port )
-              connection_string += `:${$scope.settings.influxdb.port}`;
-            connection_string += '/write?';
-            // add user/pass
-            if(!!$scope.settings.influxdb.user && !!$scope.settings.influxdb.pass)
-            connection_string += `u=${$scope.settings.influxdb.user}&p=${$scope.settings.influxdb.pass}&`
-            // add db
-            connection_string += 'db='+($scope.settings.influxdb.db || 'session-'+moment().format('YYYY-MM-DD'));
-            response.data = response.data.replace(/\[INFLUXDB_AUTH\]/g, '');
-          }
+          if( !!$scope.settings.influxdb.port )
+            connection_string += `:${$scope.settings.influxdb.port}`;
+          connection_string += '/write?';
+          // add user/pass
+          if(!!$scope.settings.influxdb.user && !!$scope.settings.influxdb.pass)
+          connection_string += `u=${$scope.settings.influxdb.user}&p=${$scope.settings.influxdb.pass}&`
+          // add db
+          connection_string += 'db='+($scope.settings.influxdb.db || 'session-'+moment().format('YYYY-MM-DD'));
+          response.data = response.data.replace(/\[INFLUXDB_AUTH\]/g, '');
           response.data = response.data.replace(/\[INFLUXDB_CONNECTION\]/g, connection_string);
         }
         if ($scope.settings.sensors.THC) {
@@ -1753,7 +1684,7 @@ $scope.updateABV();
         kettle.knob.max = kettle.temp.target+kettle.temp.diff+10;
         $scope.updateKnobCopy(kettle);
       });
-      $scope.chartOptions = BrewService.chartOptions({unit: $scope.settings.general.unit, chart: $scope.settings.chart, session: $scope.settings.streams.session});
+      $scope.chartOptions = BrewService.chartOptions({unit: $scope.settings.general.unit, chart: $scope.settings.chart, session: $scope.settings.app.session});
     }
   };
 
@@ -1879,13 +1810,6 @@ $scope.updateABV();
     },1000);
   };
 
-  $scope.updateStreams = function(kettle){
-    //update streams
-    if($scope.streams.connected() && kettle.notify.streams){
-      $scope.streams.kettles(kettle);
-    }
-  };
-
   $scope.loadConfig() // load config
     .then($scope.init) // init
     .then(loaded => {
@@ -1894,13 +1818,14 @@ $scope.updateABV();
     });
 
   // update local cache
-  $scope.updateLocal = function(){
-    $timeout(function(){
+  $scope.updateLocal = function () {
+    $timeout(function () {
       BrewService.settings('settings', $scope.settings);
-      BrewService.settings('kettles',$scope.kettles);
+      BrewService.settings('kettles', $scope.kettles);
       $scope.updateLocal();
-    },5000);
-  }
+    }, 5000);
+  };
+  
   $scope.updateLocal();
 
 });
