@@ -1652,7 +1652,6 @@ $scope.updateABV();
       kettle.pump = {pin:'D2',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false};
       delete kettle.cooler;
     }
-    $scope.updateStreams(kettle);
   };
 
   $scope.changeUnits = function(unit){
@@ -1783,7 +1782,6 @@ $scope.updateABV();
   };
 
   $scope.removeKettle = function(kettle,$index){
-    $scope.updateStreams(kettle);
     $scope.kettles.splice($index,1);
   };
 
@@ -1806,7 +1804,6 @@ $scope.updateABV();
       //update max
       kettle.knob.max = kettle.temp['target']+kettle.temp['diff']+10;
       $scope.updateKnobCopy(kettle);
-      $scope.updateStreams(kettle);
     },1000);
   };
 
