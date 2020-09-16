@@ -12,7 +12,7 @@ angular.module('brewbench-monitor')
 '</span>',
         link: function(scope, element, attrs) {
             scope.edit = false;
-            scope.type = !!scope.type ? scope.type : 'text';
+            scope.type = Boolean(scope.type) ? scope.type : 'text';
             element.bind('click', function() {
                 scope.$apply(scope.edit = true);
             });
@@ -37,17 +37,15 @@ angular.module('brewbench-monitor')
 		scope: false,
 		link: function(scope, element, attrs) {
       var fn = $parse(attrs.onReadFile);
-
 			element.on('change', function(onChangeEvent) {
 				var reader = new FileReader();
-        var file = (onChangeEvent.srcElement || onChangeEvent.target).files[0];
-        var extension = (file) ? file.name.split('.').pop().toLowerCase() : '';
-
+                var file = (onChangeEvent.srcElement || onChangeEvent.target).files[0];
+                var extension = (file) ? file.name.split('.').pop().toLowerCase() : '';
 				reader.onload = function(onLoadEvent) {
 					scope.$apply(function() {
-            fn(scope, {$fileContent: onLoadEvent.target.result, $ext: extension});
-            element.val(null);
-					});
+                    fn(scope, {$fileContent: onLoadEvent.target.result, $ext: extension});
+                    element.val(null);
+				    });
 				};
 				reader.readAsText(file);
 			});

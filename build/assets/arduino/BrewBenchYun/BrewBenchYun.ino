@@ -122,7 +122,7 @@ void adCommand(BridgeClient client, const String type) {
   }
 
   // Send JSON response to client
-  client.print("{\"hostname\":\""+String(HOSTNAME)+"\",\"pin\":\""+String(spin)+"\",\"value\":"+String(value)+"\",\"sensor\":\""+String(type)+"\"}");
+  client.print("{\"hostname\":\""+String(HOSTNAME)+"\",\"pin\":\""+String(spin)+"\",\"value\":\""+String(value)+"\",\"sensor\":\""+String(type)+"\"}");
 }
 
 void sensorCommand(BridgeClient client, String type) {

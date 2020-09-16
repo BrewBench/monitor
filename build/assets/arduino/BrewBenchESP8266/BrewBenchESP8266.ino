@@ -175,9 +175,9 @@ String adCommand(const String dpin, const String apin, int16_t value, const Stri
   }
 
   // Send JSON response to client
-  String data = "{\"hostname\":\""+String(HOSTNAME)+"\",\"pin\":\""+String(dpin)+"\",\"value\":"+String(value)+"\",\"sensor\":\""+String(type)+"\"}";
+  String data = "{\"hostname\":\""+String(HOSTNAME)+"\",\"pin\":\""+String(dpin)+"\",\"value\":\""+String(value)+"\",\"sensor\":\""+String(type)+"\"}";
   if( apin != "" )
-    data = "{\"hostname\":\""+String(HOSTNAME)+"\",\"pin\":\""+String(apin)+"\",\"value\":"+String(value)+"\",\"sensor\":\""+String(type)+"\"}";
+    data = "{\"hostname\":\""+String(HOSTNAME)+"\",\"pin\":\""+String(apin)+"\",\"value\":\""+String(value)+"\",\"sensor\":\""+String(type)+"\"}";
 
   return data;
 }

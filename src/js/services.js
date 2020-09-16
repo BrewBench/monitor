@@ -167,7 +167,7 @@ angular.module('brewbench-monitor')
           arduino.url.substr(arduino.url.indexOf('//')+2) :
           arduino.url;
 
-        if(!!arduino.secure)
+        if(Boolean(arduino.secure))
           domain = `https://${domain}`;
         else
           domain = `http://${domain}`;
@@ -185,9 +185,9 @@ angular.module('brewbench-monitor')
         else
           return false;
       }
-      return !!(arduino && arduino.board && (arduino.board.toLowerCase().indexOf('esp') !== -1 || arduino.board.toLowerCase().indexOf('nodemcu') !== -1));
+      return Boolean(arduino && arduino.board && (arduino.board.toLowerCase().indexOf('esp') !== -1 || arduino.board.toLowerCase().indexOf('nodemcu') !== -1));
     },
-
+  
     slack: function(webhook_url, msg, color, icon, kettle){
       var q = $q.defer();
 
@@ -240,14 +240,14 @@ angular.module('brewbench-monitor')
           url += '?apin='+kettle.temp.pin;
         else
           url += '?dpin='+kettle.temp.pin;
-        if(!!kettle.temp.vcc && ['3V','5V'].indexOf(kettle.temp.vcc) === -1) //SoilMoisture logic
+        if(Boolean(kettle.temp.vcc) && ['3V','5V'].indexOf(kettle.temp.vcc) === -1) //SoilMoisture logic
           url += '&dpin='+kettle.temp.vcc;
-        else if(!!kettle.temp.index) //DS18B20 logic
+        else if(Boolean(kettle.temp.index)) //DS18B20 logic
           url += '&index='+kettle.temp.index;
       } else {
-        if(!!kettle.temp.vcc && ['3V','5V'].indexOf(kettle.temp.vcc) === -1) //SoilMoisture logic
+        if(Boolean(kettle.temp.vcc) && ['3V','5V'].indexOf(kettle.temp.vcc) === -1) //SoilMoisture logic
           url += kettle.temp.vcc;
-        else if(!!kettle.temp.index) //DS18B20 logic
+        else if(Boolean(kettle.temp.index)) //DS18B20 logic
           url += '&index='+kettle.temp.index;
         url += '/'+kettle.temp.pin;
       }
@@ -283,10 +283,10 @@ angular.module('brewbench-monitor')
       }
       var settings = this.settings('settings');
       var request = {url: url, method: 'GET', timeout: settings.general.pollSeconds*10000};
-
+      request.headers = { 'Content-Type': 'application/json' };
       if(kettle.arduino.password){
         request.withCredentials = true;
-        request.headers = {'Authorization': 'Basic '+btoa('root:'+kettle.arduino.password.trim())};
+        request.headers.Authorization = 'Basic '+btoa('root:'+kettle.arduino.password.trim());
       }
 
       $http(request)
@@ -649,7 +649,7 @@ angular.module('brewbench-monitor')
             delete updatedKettle.message;
             delete updatedKettle.timers;
             delete updatedKettle.knob;
-            updatedKettle.temp.adjust = (settings.general.unit=='F' && !!updatedKettle.temp.adjust) ? $filter('round')(updatedKettle.temp.adjust*0.555,3) : updatedKettle.temp.adjust;
+            updatedKettle.temp.adjust = (settings.general.unit=='F' && Boolean(updatedKettle.temp.adjust)) ? $filter('round')(updatedKettle.temp.adjust*0.555,3) : updatedKettle.temp.adjust;
             request.url += '/kettles/arm';
             request.method = 'POST';
             request.data = {
@@ -776,7 +776,7 @@ angular.module('brewbench-monitor')
       var q = $q.defer();
       var settings = this.settings('settings');
       var influxConnection = `${settings.influxdb.url}`;
-      if(!!settings.influxdb.port)
+      if(Boolean(settings.influxdb.port))
         influxConnection += `:${settings.influxdb.port}`;
 
       return {
@@ -906,8 +906,8 @@ angular.module('brewbench-monitor')
         chart: {
               type: 'lineChart',
               title: {
-                enable: !!options.session,
-                text: !!options.session ? options.session : ''
+                enable: Boolean(options.session),
+                text: Boolean(options.session) ? options.session : ''
               },
               noData: 'BrewBench Monitor',
               height: 350,
@@ -929,11 +929,11 @@ angular.module('brewbench-monitor')
               legend: {
                 key: function (d) { return d.name }
               },
-              isArea: function (d) { return !!options.chart.area },
+              isArea: function (d) { return Boolean(options.chart.area) },
               xAxis: {
                   axisLabel: 'Time',
                   tickFormat: function(d) {
-                      if(!!options.chart.military)
+                      if(Boolean(options.chart.military))
                         return d3.time.format('%H:%M:%S')(new Date(d)).toLowerCase();
                       else
                         return d3.time.format('%I:%M:%S%p')(new Date(d)).toLowerCase();
@@ -997,35 +997,35 @@ angular.module('brewbench-monitor')
     },
     recipeBeerSmith: function(recipe){
       var response = {name:'', date:'', brewer: {name:''}, category:'', abv:'', og:0.000, fg:0.000, ibu:0, hops:[], grains:[], yeast:[], misc:[]};
-      if(!!recipe.F_R_NAME)
+      if(Boolean(recipe.F_R_NAME))
         response.name = recipe.F_R_NAME;
-      if(!!recipe.F_R_STYLE.F_S_CATEGORY)
+      if(Boolean(recipe.F_R_STYLE.F_S_CATEGORY))
         response.category = recipe.F_R_STYLE.F_S_CATEGORY;
-      if(!!recipe.F_R_DATE)
+      if(Boolean(recipe.F_R_DATE))
         response.date = recipe.F_R_DATE;
-      if(!!recipe.F_R_BREWER)
+      if(Boolean(recipe.F_R_BREWER))
         response.brewer.name = recipe.F_R_BREWER;
 
-      if(!!recipe.F_R_STYLE.F_S_MAX_OG)
+      if(Boolean(recipe.F_R_STYLE.F_S_MAX_OG))
         response.og = parseFloat(recipe.F_R_STYLE.F_S_MAX_OG).toFixed(3);
-      else if(!!recipe.F_R_STYLE.F_S_MIN_OG)
+      else if(Boolean(recipe.F_R_STYLE.F_S_MIN_OG))
         response.og = parseFloat(recipe.F_R_STYLE.F_S_MIN_OG).toFixed(3);
-      if(!!recipe.F_R_STYLE.F_S_MAX_FG)
+      if(Boolean(recipe.F_R_STYLE.F_S_MAX_FG))
         response.fg = parseFloat(recipe.F_R_STYLE.F_S_MAX_FG).toFixed(3);
-      else if(!!recipe.F_R_STYLE.F_S_MIN_FG)
+      else if(Boolean(recipe.F_R_STYLE.F_S_MIN_FG))
         response.fg = parseFloat(recipe.F_R_STYLE.F_S_MIN_FG).toFixed(3);
 
-      if(!!recipe.F_R_STYLE.F_S_MAX_ABV)
+      if(Boolean(recipe.F_R_STYLE.F_S_MAX_ABV))
         response.abv = $filter('number')(recipe.F_R_STYLE.F_S_MAX_ABV,2);
-      else if(!!recipe.F_R_STYLE.F_S_MIN_ABV)
+      else if(Boolean(recipe.F_R_STYLE.F_S_MIN_ABV))
         response.abv = $filter('number')(recipe.F_R_STYLE.F_S_MIN_ABV,2);
 
-      if(!!recipe.F_R_STYLE.F_S_MAX_IBU)
+      if(Boolean(recipe.F_R_STYLE.F_S_MAX_IBU))
         response.ibu = parseInt(recipe.F_R_STYLE.F_S_MAX_IBU,10);
-      else if(!!recipe.F_R_STYLE.F_S_MIN_IBU)
+      else if(Boolean(recipe.F_R_STYLE.F_S_MIN_IBU))
         response.ibu = parseInt(recipe.F_R_STYLE.F_S_MIN_IBU,10);
 
-      if(!!recipe.Ingredients.Data.Grain){
+      if(Boolean(recipe.Ingredients.Data.Grain)){
         _.each(recipe.Ingredients.Data.Grain,function(grain){
           response.grains.push({
             label: grain.F_G_NAME,
@@ -1036,7 +1036,7 @@ angular.module('brewbench-monitor')
         });
       }
 
-      if(!!recipe.Ingredients.Data.Hops){
+      if(Boolean(recipe.Ingredients.Data.Hops)){
           _.each(recipe.Ingredients.Data.Hops,function(hop){
             response.hops.push({
               label: hop.F_H_NAME,
@@ -1052,7 +1052,7 @@ angular.module('brewbench-monitor')
           });
       }
 
-      if(!!recipe.Ingredients.Data.Misc){
+      if(Boolean(recipe.Ingredients.Data.Misc)){
         if(recipe.Ingredients.Data.Misc.length){
           _.each(recipe.Ingredients.Data.Misc,function(misc){
             response.misc.push({
@@ -1072,7 +1072,7 @@ angular.module('brewbench-monitor')
         }
       }
 
-      if(!!recipe.Ingredients.Data.Yeast){
+      if(Boolean(recipe.Ingredients.Data.Yeast)){
         if(recipe.Ingredients.Data.Yeast.length){
           _.each(recipe.Ingredients.Data.Yeast,function(yeast){
             response.yeast.push({
@@ -1096,34 +1096,34 @@ angular.module('brewbench-monitor')
       var response = {name:'', date:'', brewer: {name:''}, category:'', abv:'', og:0.000, fg:0.000, ibu:0, hops:[], grains:[], yeast:[], misc:[]};
       var mash_time = 60;
 
-      if(!!recipe.NAME)
+      if(Boolean(recipe.NAME))
         response.name = recipe.NAME;
-      if(!!recipe.STYLE.CATEGORY)
+      if(Boolean(recipe.STYLE.CATEGORY))
         response.category = recipe.STYLE.CATEGORY;
 
-      // if(!!recipe.F_R_DATE)
+      // if(Boolean(recipe.F_R_DATE))
       //   response.date = recipe.F_R_DATE;
-      if(!!recipe.BREWER)
+      if(Boolean(recipe.BREWER))
         response.brewer.name = recipe.BREWER;
 
-      if(!!recipe.OG)
+      if(Boolean(recipe.OG))
         response.og = parseFloat(recipe.OG).toFixed(3);
-      if(!!recipe.FG)
+      if(Boolean(recipe.FG))
         response.fg = parseFloat(recipe.FG).toFixed(3);
 
-      if(!!recipe.IBU)
+      if(Boolean(recipe.IBU))
         response.ibu = parseInt(recipe.IBU,10);
 
-      if(!!recipe.STYLE.ABV_MAX)
+      if(Boolean(recipe.STYLE.ABV_MAX))
         response.abv = $filter('number')(recipe.STYLE.ABV_MAX,2);
-      else if(!!recipe.STYLE.ABV_MIN)
+      else if(Boolean(recipe.STYLE.ABV_MIN))
         response.abv = $filter('number')(recipe.STYLE.ABV_MIN,2);
 
-      if(!!recipe.MASH.MASH_STEPS.MASH_STEP && recipe.MASH.MASH_STEPS.MASH_STEP.length && recipe.MASH.MASH_STEPS.MASH_STEP[0].STEP_TIME){
+      if(Boolean(recipe.MASH.MASH_STEPS.MASH_STEP && recipe.MASH.MASH_STEPS.MASH_STEP.length && recipe.MASH.MASH_STEPS.MASH_STEP[0].STEP_TIME)){
         mash_time = recipe.MASH.MASH_STEPS.MASH_STEP[0].STEP_TIME;
       }
 
-      if(!!recipe.FERMENTABLES){
+      if(Boolean(recipe.FERMENTABLES)){
         var grains = (recipe.FERMENTABLES.FERMENTABLE && recipe.FERMENTABLES.FERMENTABLE.length) ? recipe.FERMENTABLES.FERMENTABLE : recipe.FERMENTABLES;
         _.each(grains,function(grain){
           response.grains.push({
@@ -1135,7 +1135,7 @@ angular.module('brewbench-monitor')
         });
       }
 
-      if(!!recipe.HOPS){
+      if(Boolean(recipe.HOPS)){
         var hops = (recipe.HOPS.HOP && recipe.HOPS.HOP.length) ? recipe.HOPS.HOP : recipe.HOPS;
         _.each(hops,function(hop){
           response.hops.push({
@@ -1149,7 +1149,7 @@ angular.module('brewbench-monitor')
         });
       }
 
-      if(!!recipe.MISCS){
+      if(Boolean(recipe.MISCS)){
         var misc = (recipe.MISCS.MISC && recipe.MISCS.MISC.length) ? recipe.MISCS.MISC : recipe.MISCS;
         _.each(misc,function(misc){
           response.misc.push({
@@ -1161,7 +1161,7 @@ angular.module('brewbench-monitor')
         });
       }
 
-      if(!!recipe.YEASTS){
+      if(Boolean(recipe.YEASTS)){
         var yeast = (recipe.YEASTS.YEAST && recipe.YEASTS.YEAST.length) ? recipe.YEASTS.YEAST : recipe.YEASTS;
           _.each(yeast,function(yeast){
             response.yeast.push({

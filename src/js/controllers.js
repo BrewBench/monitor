@@ -17,7 +17,7 @@ var resetChart = 100;
 var timeout = null; //reset chart after 100 polls
 
 $scope.BrewService = BrewService;
-$scope.site = {https: !!(document.location.protocol=='https:')
+$scope.site = {https: Boolean(document.location.protocol=='https:')
   , https_url: `https://${document.location.host}`
 };
 $scope.esp = {
@@ -87,7 +87,7 @@ $scope.getLovibondColor = function(range){
   var l = _.filter($scope.lovibond, function(item){
     return (item.srm <= range) ? item.hex : '';
   });
-  if(!!l.length)
+  if(l.length)
     return l[l.length-1].hex;
   return '';
 };
@@ -289,7 +289,7 @@ $scope.updateABV();
           $scope.settings.tplink.plugs = response.deviceList;
           // get device info if online (ie. status==1)
           _.each($scope.settings.tplink.plugs, plug => {
-            if(!!plug.status){
+            if(Boolean(plug.status)){
               BrewService.tplink().info(plug).then(info => {
                 if(info && info.responseData){
                   plug.info = JSON.parse(info.responseData).system.get_sysinfo;
@@ -403,7 +403,7 @@ $scope.updateABV();
   };
 
   $scope.changeSensor = function(kettle){
-    if(!!BrewService.sensorTypes(kettle.temp.type).percent){
+    if(Boolean(BrewService.sensorTypes(kettle.temp.type).percent)){
       kettle.knob.unit = '\u0025';
     } else {
       kettle.knob.unit = '\u00B0';
@@ -539,14 +539,14 @@ $scope.updateABV();
       if($scope.settings.general.shared){
         if(access){
           if(access == 'embed'){
-            return !!(window.frameElement);
+            return Boolean(window.frameElement);
           } else {
-            return !!($scope.share.access && $scope.share.access === access);
+            return Boolean($scope.share.access && $scope.share.access === access);
           }
         }
         return true;
       } else if(access && access == 'embed'){
-        return !!(window.frameElement);
+        return Boolean(window.frameElement);
       }
       return true;
   };
@@ -597,7 +597,7 @@ $scope.updateABV();
       var formatted_content = BrewService.formatXML($fileContent);
       var jsonObj, recipe = null;
 
-      if(!!formatted_content){
+      if(Boolean(formatted_content)){
         var x2js = new X2JS();
         jsonObj = x2js.xml_str2json( formatted_content );
       }
@@ -606,16 +606,16 @@ $scope.updateABV();
         return $scope.recipe_success = false;
 
       if($ext=='bsmx'){
-        if(!!jsonObj.Recipes && !!jsonObj.Recipes.Data.Recipe)
+        if(Boolean(jsonObj.Recipes) && Boolean(jsonObj.Recipes.Data.Recipe))
           recipe = jsonObj.Recipes.Data.Recipe;
-        else if(!!jsonObj.Selections && !!jsonObj.Selections.Data.Recipe)
+        else if(Boolean(jsonObj.Selections) && Boolean(jsonObj.Selections.Data.Recipe))
           recipe = jsonObj.Selections.Data.Recipe;
         if(recipe)
           recipe = BrewService.recipeBeerSmith(recipe);
         else
           return $scope.recipe_success = false;
       } else if($ext=='xml'){
-        if(!!jsonObj.RECIPES && !!jsonObj.RECIPES.RECIPE)
+        if(Boolean(jsonObj.RECIPES) && Boolean(jsonObj.RECIPES.RECIPE))
           recipe = jsonObj.RECIPES.RECIPE;
         if(recipe)
           recipe = BrewService.recipeBeerXML(recipe);
@@ -626,9 +626,9 @@ $scope.updateABV();
       if(!recipe)
         return $scope.recipe_success = false;
 
-      if(!!recipe.og)
+      if(Boolean(recipe.og))
         $scope.settings.recipe.og = recipe.og;
-      if(!!recipe.fg)
+      if(Boolean(recipe.fg))
         $scope.settings.recipe.fg = recipe.fg;
 
       $scope.settings.recipe.name = recipe.name;
@@ -792,7 +792,7 @@ $scope.updateABV();
         //update max
         kettle.knob.max = kettle.temp['target']+kettle.temp['diff']+10;
         // check timers for running
-        if(!!kettle.timers && kettle.timers.length){
+        if(Boolean(kettle.timers) && kettle.timers.length){
           _.each(kettle.timers, timer => {
             if(timer.running){
               timer.running = false;
@@ -814,7 +814,7 @@ $scope.updateABV();
   };
 
   $scope.setErrorMessage = function(err, kettle, location){
-    if(!!$scope.settings.general.shared){
+    if(Boolean($scope.settings.general.shared)){
       $scope.error.type = 'warning';
       $scope.error.message = $sce.trustAsHtml('The monitor seems to be off-line, re-connecting...');
     } else {
@@ -828,7 +828,7 @@ $scope.updateABV();
 
       if(typeof err == 'string')
         message = err;
-      else if(!!err.statusText)
+      else if(Boolean(err.statusText))
         message = err.statusText;
       else if(err.config && err.config.url)
         message = err.config.url;
@@ -840,7 +840,7 @@ $scope.updateABV();
         if(message == '{}') message = '';
       }
 
-      if(!!message){
+      if(Boolean(message)){
         if(kettle){
           kettle.message.type = 'danger';
           kettle.message.count=0;
@@ -902,7 +902,7 @@ $scope.updateABV();
     if(response.volts)
       response.volts = parseFloat(response.volts);
 
-    if(!!kettle.temp.current)
+    if(Boolean(kettle.temp.current))
       kettle.temp.previous = kettle.temp.current;
     // temp response is in C
     kettle.temp.measured = ($scope.settings.general.unit == 'F') ?
@@ -953,7 +953,7 @@ $scope.updateABV();
     var currentValue = kettle.temp.current;
     var unitType = '\u00B0';
     //percent?
-    if(!!BrewService.sensorTypes(kettle.temp.type).percent && typeof kettle.percent != 'undefined'){
+    if(Boolean(BrewService.sensorTypes(kettle.temp.type).percent) && typeof kettle.percent != 'undefined'){
       currentValue = kettle.percent;
       unitType = '\u0025';
     } else {
@@ -1260,7 +1260,7 @@ $scope.updateABV();
       }
       var target = ($scope.settings.general.unit=='F') ? $filter('toCelsius')(kettle.temp.target) : kettle.temp.target;
       kettle.temp.adjust = parseFloat(kettle.temp.adjust);
-      var adjust = ($scope.settings.general.unit=='F' && !!kettle.temp.adjust) ? $filter('round')(kettle.temp.adjust*0.555,3) : kettle.temp.adjust;
+      var adjust = ($scope.settings.general.unit=='F' && Boolean(kettle.temp.adjust)) ? $filter('round')(kettle.temp.adjust*0.555,3) : kettle.temp.adjust;
       if(BrewService.isESP(kettle.arduino) && $scope.esp.autoconnect){
         currentSketch.headers.push('#include <AutoConnect.h>');
       }
@@ -1312,11 +1312,11 @@ $scope.updateABV();
       //look for triggers
       if(kettle.heater && kettle.heater.sketch){
         currentSketch.triggers = true;
-        currentSketch.actions.push('  trigger(F("heat"),F("'+kettle.name.replace(/[^a-zA-Z0-9-.]/g, "")+'"),F("'+kettle.heater.pin+'"),temp,'+target+','+kettle.temp.diff+','+!!kettle.notify.slack+');');
+        currentSketch.actions.push('  trigger(F("heat"),F("'+kettle.name.replace(/[^a-zA-Z0-9-.]/g, "")+'"),F("'+kettle.heater.pin+'"),temp,'+target+','+kettle.temp.diff+','+Boolean(kettle.notify.slack)+');');
       }
       if(kettle.cooler && kettle.cooler.sketch){
         currentSketch.triggers = true;
-        currentSketch.actions.push('  trigger(F("cool"),F("'+kettle.name.replace(/[^a-zA-Z0-9-.]/g, "")+'"),F("'+kettle.cooler.pin+'"),temp,'+target+','+kettle.temp.diff+','+!!kettle.notify.slack+');');
+        currentSketch.actions.push('  trigger(F("cool"),F("'+kettle.name.replace(/[^a-zA-Z0-9-.]/g, "")+'"),F("'+kettle.cooler.pin+'"),temp,'+target+','+kettle.temp.diff+','+Boolean(kettle.notify.slack)+');');
       }
     });
     _.each(sketches, (sketch, i) => {
@@ -1395,12 +1395,12 @@ $scope.updateABV();
         else if( sketch.indexOf('InfluxDB') !== -1){
           // influx db connection
           var connection_string = `${$scope.settings.influxdb.url}`;
-          if( !!$scope.settings.influxdb.port )
+          if( Boolean($scope.settings.influxdb.port))
             connection_string += `:${$scope.settings.influxdb.port}`;
           connection_string += '/write?';
           // add user/pass
-          if(!!$scope.settings.influxdb.user && !!$scope.settings.influxdb.pass)
-          connection_string += `u=${$scope.settings.influxdb.user}&p=${$scope.settings.influxdb.pass}&`
+          if (Boolean($scope.settings.influxdb.user) && Boolean($scope.settings.influxdb.pass))
+            connection_string += `u=${$scope.settings.influxdb.user}&p=${$scope.settings.influxdb.pass}&`;
           // add db
           connection_string += 'db='+($scope.settings.influxdb.db || 'session-'+moment().format('YYYY-MM-DD'));
           response.data = response.data.replace(/\[INFLUXDB_AUTH\]/g, '');
@@ -1471,19 +1471,19 @@ $scope.updateABV();
     var currentValue = (kettle && kettle.temp) ? kettle.temp.current : 0;
     var unitType = '\u00B0';
     //percent?
-    if(kettle && !!BrewService.sensorTypes(kettle.temp.type).percent && typeof kettle.percent != 'undefined'){
+    if(kettle && Boolean(BrewService.sensorTypes(kettle.temp.type).percent) && typeof kettle.percent != 'undefined'){
       currentValue = kettle.percent;
       unitType = '\u0025';
     } else if(kettle){
       kettle.values.push([date.getTime(),currentValue]);
     }
 
-    if(!!timer){ //kettle is a timer object
+    if(Boolean(timer)){ //kettle is a timer object
       if(!$scope.settings.notifications.timers)
         return;
       if(timer.up)
         message = 'Your timers are done';
-      else if(!!timer.notes)
+      else if(Boolean(timer.notes))
         message = 'Time to add '+timer.notes+' of '+timer.label;
       else
         message = 'Time to add '+timer.label;
@@ -1521,9 +1521,9 @@ $scope.updateABV();
     // Sound Notification
     if($scope.settings.sounds.on===true){
       //don't alert if the heater is running and temp is too low
-      if(!!timer && kettle && kettle.low && kettle.heater.running)
+      if(Boolean(timer) && kettle && kettle.low && kettle.heater.running)
         return;
-      var snd = new Audio((!!timer) ? $scope.settings.sounds.timer : $scope.settings.sounds.alert); // buffers automatically when created
+      var snd = new Audio((Boolean(timer)) ? $scope.settings.sounds.timer : $scope.settings.sounds.alert); // buffers automatically when created
       snd.play();
     }
 
@@ -1588,7 +1588,7 @@ $scope.updateABV();
     var currentValue = kettle.temp.current;
     var unitType = '\u00B0';
     //percent?
-    if(!!BrewService.sensorTypes(kettle.temp.type).percent && typeof kettle.percent != 'undefined'){
+    if(Boolean(BrewService.sensorTypes(kettle.temp.type).percent) && typeof kettle.percent != 'undefined'){
       currentValue = kettle.percent;
       unitType = '\u0025';
     }
@@ -1665,7 +1665,7 @@ $scope.updateABV();
         kettle.temp.previous = $filter('formatDegrees')(kettle.temp.previous,unit);
         kettle.temp.target = $filter('formatDegrees')(kettle.temp.target,unit);
         kettle.temp.target = $filter('round')(kettle.temp.target,0);
-        if(!!kettle.temp.adjust){
+        if(Boolean(kettle.temp.adjust)){
           kettle.temp.adjust = parseFloat(kettle.temp.adjust);
           if(unit === 'C')
             kettle.temp.adjust = $filter('round')(kettle.temp.adjust*0.555,3);
@@ -1696,7 +1696,7 @@ $scope.updateABV();
         //start up counter
         timer.up = {min:0,sec:0,running:true};
         //if all timers are done send an alert
-        if( !!kettle && _.filter(kettle.timers, {up: {running:true}}).length == kettle.timers.length )
+        if( Boolean(kettle) && _.filter(kettle.timers, {up: {running:true}}).length == kettle.timers.length )
           $scope.notify(kettle,timer);
       } else if(!timer.up && timer.sec > 0){
         //count down seconds
@@ -1706,7 +1706,7 @@ $scope.updateABV();
         timer.up.sec++;
       } else if(!timer.up){
         //should we start the next timer?
-        if(!!kettle){
+        if(Boolean(kettle)){
           _.each(_.filter(kettle.timers, {running:false,min:timer.min,queue:false}),function(nextTimer){
             $scope.notify(kettle,nextTimer);
             nextTimer.queue=true;
@@ -1772,12 +1772,12 @@ $scope.updateABV();
         //re process on timeout
         $timeout(function(){
             return $scope.processTemps();
-        },(!!$scope.settings.pollSeconds) ? $scope.settings.pollSeconds*1000 : 10000);
+        },Boolean($scope.settings.pollSeconds) ? $scope.settings.pollSeconds*1000 : 10000);
       })
       .catch(err => {
         $timeout(function(){
             return $scope.processTemps();
-        },(!!$scope.settings.pollSeconds) ? $scope.settings.pollSeconds*1000 : 10000);
+        },Boolean($scope.settings.pollSeconds) ? $scope.settings.pollSeconds*1000 : 10000);
     });
   };
 
@@ -1810,7 +1810,7 @@ $scope.updateABV();
   $scope.loadConfig() // load config
     .then($scope.init) // init
     .then(loaded => {
-      if(!!loaded)
+      if(Boolean(loaded))
         $scope.processTemps(); // start polling
     });
 
