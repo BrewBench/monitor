@@ -789,7 +789,6 @@ angular.module('brewbench-monitor')
           var request = {url: `${influxConnection}`, method: 'GET'};
           $http(request)
             .then(response => {
-              console.log(response)
               q.resolve(response);
             })
             .catch(err => {
