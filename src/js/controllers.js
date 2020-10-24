@@ -118,6 +118,32 @@ $scope.sumValues = function(obj){
   return _.sumBy(obj,'amount');
 };
 
+$scope.changeArduino = function (kettle) {
+  if(!kettle.arduino)
+    kettle.arduino = $scope.settings.arduinos[0];
+  if (BrewService.isESP(kettle.arduino, true) == '32') {
+    kettle.arduino.analog = 39;
+    kettle.arduino.digital = 39;
+    kettle.arduino.touch = [4,0,2,15,13,12,14,27,33,32];
+  } else if (BrewService.isESP(kettle.arduino, true) == '8266') {
+    kettle.arduino.analog = 0;
+    kettle.arduino.digital = 16;
+  }
+};
+// check kettle type ports
+_.each($scope.kettles, kettle => {
+  if(!kettle.arduino)
+    kettle.arduino = $scope.settings.arduinos[0];
+  if (BrewService.isESP(kettle.arduino, true) == '32') {
+    kettle.arduino.analog = 39;
+    kettle.arduino.digital = 39;
+    kettle.arduino.touch = [4,0,2,15,13,12,14,27,33,32];
+  } else if (BrewService.isESP(kettle.arduino, true) == '8266') {
+    kettle.arduino.analog = 0;
+    kettle.arduino.digital = 16;
+  }
+});
+  
 // init calc values
 $scope.updateABV = function(){
   if($scope.settings.recipe.scale=='gravity'){
@@ -194,6 +220,14 @@ $scope.updateABV();
       _.each($scope.kettles, kettle => {
         if(!kettle.arduino)
           kettle.arduino = $scope.settings.arduinos[0];
+        if (BrewService.isESP(kettle.arduino, true) == '32') {
+          kettle.arduino.analog = 39;
+          kettle.arduino.digital = 39;
+          kettle.arduino.touch = [4,0,2,15,13,12,14,27,33,32];
+        } else if (BrewService.isESP(kettle.arduino, true) == '8266') {
+          kettle.arduino.analog = 0;
+          kettle.arduino.digital = 16;
+        }
       });
     },
     update: (arduino) => {
@@ -216,7 +250,6 @@ $scope.updateABV();
       BrewService.connect(arduino, 'info')
         .then(info => {
           if(info && info.BrewBench){
-            event.srcElement.innerHTML = 'Connect';
             arduino.board = info.BrewBench.board;
             if(info.BrewBench.RSSI)
               arduino.RSSI = info.BrewBench.RSSI;
@@ -525,11 +558,12 @@ $scope.updateABV();
       if(!Boolean($scope.settings.app.email) || !Boolean($scope.settings.app.api_key))
         return;
       $scope.settings.app.status = 'Connecting';
-      return BrewService.app().auth(true)
+      return BrewService.app().auth()
         .then(response => {
           $scope.settings.app.status = 'Connected';
         })
         .catch(err => {
+          console.error(err);
           $scope.settings.app.status = 'Failed to Connect';
         });
     }
@@ -907,15 +941,17 @@ $scope.updateABV();
     // temp response is in C
     kettle.temp.measured = ($scope.settings.general.unit == 'F') ?
       $filter('toFahrenheit')(response.temp) :
-      $filter('round')(response.temp,2);
+      $filter('round')(response.temp, 2);
+    
     // add adjustment
-    kettle.temp.current = (parseFloat(kettle.temp.measured) + parseFloat(kettle.temp.adjust));
+    kettle.temp.current = $filter('round')(parseFloat(kettle.temp.measured) + parseFloat(kettle.temp.adjust), 0);    
     // set raw
     kettle.temp.raw = response.raw;
     kettle.temp.volts = response.volts;
 
     // volt check
-    if(kettle.temp.type != 'BMP180' &&
+    if (kettle.temp.type != 'BMP180' &&
+      kettle.temp.type != 'BMP280' &&
       !kettle.temp.volts &&
       !kettle.temp.raw){
         $scope.setErrorMessage('Sensor is not connected', kettle);
@@ -936,7 +972,7 @@ $scope.updateABV();
     //DHT sensors have humidity as a percent
     //SoilMoistureD has moisture as a percent
     if( typeof response.percent != 'undefined'){
-      kettle.percent = response.percent;
+      kettle.percent = $filter('round')(response.percent,0);
     }
     // BMP sensors have altitude and pressure
     if( typeof response.altitude != 'undefined'){
@@ -1287,6 +1323,12 @@ $scope.updateABV();
         if(currentSketch.headers.indexOf('#include <Adafruit_BMP085.h>') === -1)
           currentSketch.headers.push('#include <Adafruit_BMP085.h>');
       }
+      if($scope.settings.sensors.BMP || kettle.temp.type.indexOf('BMP280') !== -1){
+        if(currentSketch.headers.indexOf('#include <Wire.h>') === -1)
+          currentSketch.headers.push('#include <Wire.h>');
+        if(currentSketch.headers.indexOf('#include <Adafruit_BMP280.h>') === -1)
+          currentSketch.headers.push('#include <Adafruit_BMP280.h>');
+      }
       // Are we using ADC?
       if(kettle.temp.pin.indexOf('C') === 0 && currentSketch.headers.indexOf('#include <Adafruit_ADS1015.h>') === -1){
         currentSketch.headers.push('// https://github.com/adafruit/Adafruit_ADS1X15');
@@ -1420,6 +1462,9 @@ $scope.updateABV();
         }
         if(headers.indexOf('#include <Adafruit_BMP085.h>') !== -1){
           response.data = response.data.replace(/\/\/ BMP180 /g, '');
+        }
+        if(headers.indexOf('#include <Adafruit_BMP280.h>') !== -1){
+          response.data = response.data.replace(/\/\/ BMP280 /g, '');
         }
         if(hasTriggers){
           response.data = response.data.replace(/\/\/ triggers /g, '');
@@ -1683,7 +1728,7 @@ $scope.updateABV();
         kettle.knob.max = kettle.temp.target+kettle.temp.diff+10;
         $scope.updateKnobCopy(kettle);
       });
-      $scope.chartOptions = BrewService.chartOptions({unit: $scope.settings.general.unit, chart: $scope.settings.chart, session: $scope.settings.app.session});
+      $scope.chartOptions = BrewService.chartOptions({unit: $scope.settings.general.unit, chart: $scope.settings.chart});
     }
   };
 
@@ -1781,8 +1826,13 @@ $scope.updateABV();
     });
   };
 
-  $scope.removeKettle = function(kettle,$index){
-    $scope.kettles.splice($index,1);
+  $scope.removeKettle = function (kettle, $index) {    
+    if(confirm('Are you sure you want to remove this kettle?'))
+      $scope.kettles.splice($index,1);
+  };
+  
+  $scope.clearKettle = function (kettle, $index) {
+    $scope.kettles[$index].values = [];
   };
 
   $scope.changeValue = function(kettle,field,up){

@@ -268,9 +268,19 @@ sup.ref {
   color: #777;
   width: 150px;
 }
+.kettles .kettle_name input[type=text] {
+  font-size: 20px;
+  color: #777;
+  width: 200px;
+}
 .kettles .editable {
   height: 34px;
   max-width: 60px;
+  padding: 11px;
+}
+.kettles .kettle_name .editable {
+  height: 34px;
+  max-width: 200px;
   padding: 11px;
 }
 .kettles .editable:hover {

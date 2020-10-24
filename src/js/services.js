@@ -137,6 +137,7 @@ angular.module('brewbench-monitor')
         ,{name: 'DHT44', analog: false, digital: true, esp: false}
         ,{name: 'SoilMoisture', analog: true, digital: false, vcc: true, percent: true, esp: true}
         ,{name: 'BMP180', analog: true, digital: false, esp: true}
+        ,{name: 'BMP280', analog: true, digital: false, esp: true}
       ];
       if(name)
         return _.filter(sensors, {'name': name})[0];
@@ -587,21 +588,22 @@ angular.module('brewbench-monitor')
 
     app: function(){
       var settings = this.settings('settings');
-      var request = {url: 'https://sensor.brewbench.co', headers: {}, timeout: settings.general.pollSeconds*10000};
+      var request = {url: 'https://sensor.brewbench.co/', headers: {}, timeout: 10000};
 
       return {
-        auth: async (ping) => {
+        auth: async () => {
           var q = $q.defer();
           if(settings.app.api_key && settings.app.email){
-            request.url += (ping) ? '/users/ping' : '/users/auth';
-            request.method = 'POST';
-            request.headers['Content-Type'] ='application/json';
+            request.url += `users/${settings.app.api_key}`;
+            request.method = 'GET';
             request.headers['X-API-KEY'] = `${settings.app.api_key}`;
+            request.headers['X-API-EMAIL'] = `${settings.app.email}`;
             $http(request)
               .then(response => {
-                if(response && response.data && response.data.access && response.data.access.id)
-                  this.accessToken(response.data.access.id);
-                q.resolve(response);
+                if(response && response.data && response.data.success)
+                  q.resolve(response);
+                else
+                  q.reject("User not found");
               })
               .catch(err => {
                 q.reject(err);
@@ -610,118 +612,6 @@ angular.module('brewbench-monitor')
             q.reject(false);
           }
           return q.promise;
-        },
-        kettles: {
-          get: async () => {
-            var q = $q.defer();
-            if(!this.accessToken()){
-              var auth = await this.app().auth();
-              if(!this.accessToken()){
-                q.reject('Sorry Bad Authentication');
-                return q.promise;
-              }
-            }
-            request.url += '/kettles';
-            request.method = 'GET';
-            request.headers['Content-Type'] = 'application/json';
-            request.headers['Authorization'] = this.accessToken();
-            $http(request)
-              .then(response => {
-                q.resolve(response.data);
-              })
-              .catch(err => {
-                q.reject(err);
-              });
-              return q.promise;
-          },
-          save: async (kettle) => {
-            var q = $q.defer();
-            if(!this.accessToken()){
-              var auth = await this.app().auth();
-              if(!this.accessToken()){
-                q.reject('Sorry Bad Authentication');
-                return q.promise;
-              }
-            }
-            var updatedKettle = angular.copy(kettle);
-            // remove not needed data
-            delete updatedKettle.values;
-            delete updatedKettle.message;
-            delete updatedKettle.timers;
-            delete updatedKettle.knob;
-            updatedKettle.temp.adjust = (settings.general.unit=='F' && Boolean(updatedKettle.temp.adjust)) ? $filter('round')(updatedKettle.temp.adjust*0.555,3) : updatedKettle.temp.adjust;
-            request.url += '/kettles/arm';
-            request.method = 'POST';
-            request.data = {
-              session: settings.app.session,
-              kettle: updatedKettle,
-              notifications: settings.notifications
-            };
-            request.headers['Content-Type'] = 'application/json';
-            request.headers['Authorization'] = this.accessToken();
-            $http(request)
-              .then(response => {
-                q.resolve(response.data);
-              })
-              .catch(err => {
-                q.reject(err);
-              });
-              return q.promise;
-            }
-        },
-        sessions: {
-          get: async () => {
-            var q = $q.defer();
-            if(!this.accessToken()){
-              var auth = await this.app().auth();
-              if(!this.accessToken()){
-                q.reject('Sorry Bad Authentication');
-                return q.promise;
-              }
-            }
-            request.url += '/sessions';
-            request.method = 'GET';
-            request.data = {
-              sessionId: sessionId,
-              kettle: kettle
-            };
-            request.headers['Content-Type'] = 'application/json';
-            request.headers['Authorization'] = this.accessToken();
-            $http(request)
-              .then(response => {
-                q.resolve(response.data);
-              })
-              .catch(err => {
-                q.reject(err);
-              });
-              return q.promise;
-          },
-          save: async (session) => {
-            var q = $q.defer();
-            if(!this.accessToken()){
-              var auth = await this.app().auth();
-              if(!this.accessToken()){
-                q.reject('Sorry Bad Authentication');
-                return q.promise;
-              }
-            }
-            request.url += '/sessions/'+session.id;
-            request.method = 'PATCH';
-            request.data = {
-              name: session.name,
-              type: session.type
-            };
-            request.headers['Content-Type'] = 'application/json';
-            request.headers['Authorization'] = this.accessToken();
-            $http(request)
-              .then(response => {
-                q.resolve(response.data);
-              })
-              .catch(err => {
-                q.reject(err);
-              });
-              return q.promise;
-          }
         }
       };
     },

@@ -1,26 +1,19 @@
-// BrewBench App Yun
+// BrewBench App ESP32
 // copyright 2020 Andrew Van Tassel
+#include <WiFi.h>
 #include <WebServer.h>
 #include <HTTPClient.h>
+#include <ESPmDNS.h>
 #include <WiFiClient.h>
 #include <Preferences.h>
-#include <OneWire.h>
-#include <DallasTemperature.h>
-#include "DHT12.h"
-#include <Wire.h>
-#include "OTAUpdate.h"
-#include <avr/wdt.h>
-// https://www.brewbench.co/libs/DHTlib-1.2.9.zip
-// DHT #include <dht.h>
-// DS18B20 #include <OneWire.h>
-// DS18B20 #include <DallasTemperature.h>
-// DS18B20 #include <Wire.h>
-// BMP180 #include <Adafruit_BMP085.h>
+// [HEADERS]
 
-const PROGMEM String VERSION = "[VERSION]";
+const PROGMEM String VERSION = "1.0.0";
+const IPAddress apIP(192, 168, 4, 1);
+const char *apSSID = "BrewBench_SETUP";
 uint32_t FREQUENCY_SECONDS = 900;
 uint32_t secondCounter = 0;
-boolean settingMode = false;
+boolean settingMode = false;;
 boolean offlineMode = false;
 String ssidList;
 String wifi_ssid;
@@ -29,120 +22,163 @@ String api_key;
 String device_name;
 String device_id;
 String temp_unit = "F";
+String pressure_unit = "Pa";
 float temp = 0.00;
 float temp_adjust = 0.00;
 float ambient = NULL;
 float ambient_adjust = 0.00;
 float humidity = NULL;
+float moisture = NULL;
+float pressure = NULL;
 int LED = 10;
-DHT12 dht12;
-DHTesp dht22;
+// DHT DHT12 dht12;
+// DHT DHTesp dht22;
 
 WebServer webServer(80);
 
 HTTPClient http;
 
-// settings store
+// wifi/settings store
 Preferences preferences;
 
-// ADC Adafruit_ADS1115 ads(0x48);
-
-#ifndef ARDUINO_BOARD
-#define ARDUINO_BOARD "YUN"
-#endif
-
-// DHT dht DHT;
+// DHT DHTesp dht;
 // BMP180 Adafruit_BMP085 bmp;
+// BMP280 Adafruit_BMP280 bme;
 
-// https://learn.adafruit.com/thermistor/using-a-thermistor
-// resistance at 25 degrees C
-#define THERMISTORNOMINAL 10000
-// temp. for nominal resistance (almost always 25 C)
-#define TEMPERATURENOMINAL 25
-// how many samples to take and average, more takes longer
-// but is more 'smooth'
 #define NUMSAMPLES 5
-// The beta coefficient of the thermistor (usually 3000-4000)
-#define BCOEFFICIENT 3950
-// the value of the 'other' resistor
-#define SERIESRESISTOR 10000
+#define SERIESRESISTOR 147000
 
 uint16_t samples[NUMSAMPLES];
 
-void reboot() {
-  wdt_disable();
-  wdt_enable(WDTO_15MS);
-  while (1) {}
-}
-
 float Thermistor(float average) {
-   // convert the value to resistance
-   average = 1023 / average - 1;
-   average = SERIESRESISTOR / average;
-
-   float steinhart = average / THERMISTORNOMINAL;     // (R/Ro)
-   steinhart = log(steinhart);                  // ln(R/Ro)
-   steinhart /= BCOEFFICIENT;                   // 1/B * ln(R/Ro)
-   steinhart += 1.0 / (TEMPERATURENOMINAL + 273.15); // + (1/To)
-   steinhart = 1.0 / steinhart;                 // Invert
-   steinhart -= 273.15;
-
-   return steinhart;
+  float V_NTC = average / 1024;
+  float R_NTC = (SERIESRESISTOR * V_NTC) / (3.3 - V_NTC);
+  R_NTC = log(R_NTC);
+  float Temp = 1 / (0.001129148 + (0.000234125 + (0.0000000876741 * R_NTC * R_NTC ))* R_NTC );
+  Temp = Temp - 273.15;
+  return Temp;
 }
 
-void actionsCommand(const String spin, const String type)
+void actionsCommand(const String sensor_name, const String spin, const String type, const float temp_offset)
 {
   uint8_t pin = spin.substring(1).toInt();
-
-  if (type == "DS18B20")
-  {
-    OneWire oneWire(pin);
-    DallasTemperature sensors(&oneWire);
-    sensors.begin();
-    sensors.requestTemperatures();
-    temp = sensors.getTempCByIndex(0);
-    if (temp != DEVICE_DISCONNECTED_C && temp_adjust && !isnan(temp_adjust))
+  float raw = 0.00;
+  float volts = 0.00;
+  // ADC int16_t adc0 = 0;
+  float resistance = 0.0;
+  
+  if(type == "Thermistor"){    
+    samples[0] = raw;
+    uint8_t i;
+    // take N samples in a row, with a slight delay
+    for (i=1; i< NUMSAMPLES; i++) {
+      samples[i] = analogRead(pin);
+      delay(10);
+    }
+    // average all the samples out
+    for (i=0; i< NUMSAMPLES; i++) {
+       resistance += samples[i];
+    }
+    resistance /= NUMSAMPLES;
+    raw = resistance;
+    temp = Thermistor(resistance);
+    if (temp && temp_adjust && !isnan(temp_adjust))
       temp = temp + temp_adjust;
+    else if (temp && temp_offset && !isnan(temp_offset))
+      temp = temp + temp_offset;
   }
-  else if (type == "DHT12")
-  {
-    ambient = dht12.readTemperature();
-    humidity = dht12.readHumidity();
-    // not connected check
-    if (String(humidity) == "0.01")
-    {
-      ambient = NULL;
-      humidity = NULL;
-    }
-    else if (ambient_adjust && !isnan(ambient_adjust))
-    {
-      ambient = ambient + ambient_adjust;
+  else if(type == "PT100"){
+    if (raw>409){
+      temp = (150*map(raw,410,1023,0,614))/614;
+      if (temp && temp_adjust && !isnan(temp_adjust))
+        temp = temp + temp_adjust;
+      else if (temp && temp_offset && !isnan(temp_offset))
+        temp = temp + temp_offset;
     }
   }
-  else if (type == "DHT22")
-  {
-    dht22.setup(pin, DHTesp::DHT22);
-    delay(dht22.getMinimumSamplingPeriod());
-    ambient = dht22.getTemperature();
-    humidity = dht22.getHumidity();
-    // not connected check
-    if (String(humidity) == "0.01")
-    {
-      ambient = NULL;
-      humidity = NULL;
+  // DS18B20 else if (type == "DS18B20")
+  // DS18B20 {
+  // DS18B20   OneWire oneWire(pin);
+  // DS18B20   DallasTemperature sensors(&oneWire);
+  // DS18B20   sensors.begin();
+  // DS18B20   sensors.requestTemperatures();
+  // DS18B20   temp = sensors.getTempCByIndex(0);
+  // DS18B20   if (temp != DEVICE_DISCONNECTED_C && temp_adjust && !isnan(temp_adjust))
+  // DS18B20     temp = temp + temp_adjust;
+  // DS18B20   else if (temp != DEVICE_DISCONNECTED_C && temp_offset && !isnan(temp_offset))
+  // DS18B20     temp = temp + temp_offset;
+  // DS18B20 }
+  // DHT else if (type == "DHT12")
+  // DHT {
+  // DHT   ambient = dht12.readTemperature();
+  // DHT   humidity = dht12.readHumidity();
+  // DHT   // not connected check
+  // DHT   if (String(humidity) == "0.01")
+  // DHT   {
+  // DHT     ambient = NULL;
+  // DHT     humidity = NULL;
+  // DHT   }
+  // DHT   else if (ambient_adjust && !isnan(ambient_adjust))
+  // DHT   {
+  // DHT     ambient = ambient + ambient_adjust;
+  // DHT   }
+  // DHT   else if (temp_offset && !isnan(temp_offset))
+  // DHT   {
+  // DHT     ambient = ambient + temp_offset;
+  // DHT   }
+  // DHT }
+  // DHT else if (type == "DHT22")
+  // DHT {
+  // DHT   dht22.setup(pin, DHTesp::DHT22);
+  // DHT   delay(dht22.getMinimumSamplingPeriod());
+  // DHT   ambient = dht22.getTemperature();
+  // DHT   humidity = dht22.getHumidity();
+  // DHT   // not connected check
+  // DHT   if (String(humidity) == "0.01")
+  // DHT   {
+  // DHT     ambient = NULL;
+  // DHT     humidity = NULL;
+  // DHT   }
+  // DHT   else if (ambient_adjust && !isnan(ambient_adjust))
+  // DHT   {
+  // DHT     ambient = ambient + ambient_adjust;
+  // DHT   }
+  // DHT   else if (temp_offset && !isnan(temp_offset))
+  // DHT   {
+  // DHT     ambient = ambient + temp_offset;
+  // DHT   }
+  // DHT }  
+  // BMP180 else if(type == "BMP180"){
+  // BMP180   if (bmp.begin()) {
+  // BMP180     ambient = bmp.readTemperature();  
+  // BMP180     pressure = bmp.readPressure();
+  // BMP180   }
+  // BMP180 } 
+  // BMP280 else if(type == "BMP280"){
+  // BMP280   if (bme.begin()) {
+  // BMP280     ambient = bme.readTemperature();  
+  // BMP280     pressure = bme.readPressure();
+  // BMP280   }
+  // BMP280 } 
+  else if(type.substring(0,12) == "SoilMoisture"){
+    uint8_t dpin = -1;
+    if(type.substring(0,13) == "SoilMoistureD"){
+      dpin = type.substring(13).toInt();
+      pinMode(dpin, OUTPUT);
+      digitalWrite(dpin, HIGH);
+      delay(10);
     }
-    else if (ambient_adjust && !isnan(ambient_adjust))
-    {
-      ambient = ambient + ambient_adjust;
+    raw = analogRead(pin);
+    if(dpin >= 0){
+      digitalWrite(dpin, LOW);
     }
-  }  
+    moisture = map(raw, 0, 880, 0, 100);
+  }
 }
 
 void runActions()
 {
-  // ACTIONS
-  actionsCommand(F("D33"), F("DS18B20"));
-  actionsCommand(F("D26"), F("DHT12"));
+  // [ACTIONS]  
 }
 
 void createSensor(){
@@ -157,7 +193,7 @@ void createSensor(){
       String data = "{\"device_name\":\"" + String(device_name) + "\"";
       data += ",\"uid\":\"" + String(api_key) + "\"";            
       data += ",\"type\":\"temp\"";
-      data += ",\"model\":\"BrewBench Stick\"";
+      data += ",\"model\":\"BrewBench OpenSource\"";
       data += ",\"version\":\""+String(VERSION)+"\"";
       data += ",\"temp\":\""+String(temp)+"\"";
       data += ",\"temp_unit\":\"C\"";
@@ -165,6 +201,9 @@ void createSensor(){
       data += ",\"ambient\":\""+String(ambient)+"\"";
       data += ",\"ambient_unit\":\"C\"";
       data += ",\"ambient_adjust\":\""+String(ambient_adjust)+"\"";
+      data += ",\"moisture\": \""+String(moisture)+"\"";
+      data += ",\"pressure\":" + String(pressure);
+      data += ",\"pressure_unit\":\""+String(pressure_unit)+"\"";    
       data += ",\"frequency\":"+String(FREQUENCY_SECONDS);      
       data += ",\"device_ip\":\"" + WiFi.localIP().toString() + "\"";
       data += ",\"rssi\": "+String(WiFi.RSSI());
@@ -173,11 +212,15 @@ void createSensor(){
  
       int responseCode = http.POST(data);
       if(responseCode == 200){
+        
         String body = http.getString();
         if(body.length() > 0 && body.indexOf("{") == -1)
           device_id = urlDecode(body);        
       }      
 
+      Serial.println("Sensor Response");
+      Serial.println(device_id);
+    
       http.end();
       preferences.begin("brewbench", false);
       preferences.putString("DEVICE_ID", urlDecode(device_id));
@@ -195,11 +238,12 @@ void postData()
       delay(10);
     }
     
+    Serial.println("Posting Data");
     String data = "{\"device_name\":\"" + String(device_name) + "\"";
     data += ",\"uid\":\"" + String(api_key) + "\"";
     data += ",\"sensorsId\":\"" + String(device_id) + "\"";
     // always send temp
-    if (temp != DEVICE_DISCONNECTED_C && !isnan(temp))
+    if (temp && !isnan(temp))
       data += ",\"temp\":" + String(temp);
     else
       data += ",\"temp\": \"\"";
@@ -214,10 +258,23 @@ void postData()
     // humidity
     if (humidity && !isnan(humidity) && humidity != NULL)
       data += ",\"humidity\":" + String(humidity);
+      
+    // moisture
+    if (moisture && !isnan(moisture) && moisture != NULL)
+      data += ",\"moisture\":" + String(moisture);
+      
+    // pressure
+    if (pressure && !isnan(pressure) && pressure != NULL){
+      data += ",\"pressure\":" + String(pressure);
+      data += ",\"pressure_unit\":\""+String(pressure_unit)+"\"";
+    }
     
     data += ",\"device_ip\":\"" + WiFi.localIP().toString() + "\"";
     data += ",\"rssi\":" + String(WiFi.RSSI());
     data += "}";
+
+    Serial.println("Posting Data");
+    Serial.println(data);
 
     if (http.begin(F("https://sensor.brewbench.co/readings")))
     {
@@ -225,23 +282,14 @@ void postData()
       http.addHeader("User-Agent", "BrewBench-Stick/" + VERSION);
       http.addHeader("Content-Type", "application/json");
       int responseCode = http.POST(data);
+      Serial.print("POST Response: ");
+      Serial.println(responseCode);
       http.end();
 
-      if (responseCode == 200)
-      {
-      
-      }
-      else if (responseCode == 429)
-      {
-      
-      }
-      else if (responseCode == -1)
-      {
-        reboot();
-      }
-      else
-      {
-      
+      if (responseCode == -1)
+      {       
+        WiFi.disconnect(true, true);
+        ESP.restart();
       }
     }
   }
@@ -250,6 +298,82 @@ void postData()
 void getTemps()
 {
   runActions();
+
+  Serial.println("Temp: " + String(temp) + " C");
+  Serial.println("Ambient: " + String(ambient) + " C");
+  Serial.println("Humidity: " + String(humidity) + " %");
+  
+}
+
+boolean restoreConfig()
+{
+  preferences.begin("wifi-config", false);
+  wifi_ssid = preferences.getString("WIFI_SSID");
+  wifi_password = preferences.getString("WIFI_PASSWD");
+  preferences.end();    
+  
+  if(wifi_ssid.length() == 0){
+    preferences.begin("brewbench", false);
+    wifi_ssid = preferences.getString("WIFI_SSID");
+    wifi_password = preferences.getString("WIFI_PASSWD");
+    preferences.end();  
+  }
+  
+  Serial.print("WIFI-SSID: ");
+  Serial.println(wifi_ssid);
+
+  Serial.print("WIFI-PASSWD: ");
+  Serial.println(wifi_password);
+
+  if (wifi_ssid.length() > 0)
+  {
+    WiFi.begin(wifi_ssid.c_str(), wifi_password.c_str());
+    MDNS.begin("brewbench");
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
+boolean checkConnection()
+{
+  int count = 0;
+  Serial.println("Waiting for Wi-Fi connection");
+  while (count < 30)
+  {
+    if (WiFi.status() == WL_CONNECTED)
+    {
+      Serial.println("Connected!");
+      return (true);
+    }
+    delay(500);
+    count++;
+  }
+  return false;
+}
+
+void sendHeaders(){
+  webServer.sendHeader("Access-Control-Allow-Origin", "*");
+  webServer.sendHeader("Access-Control-Allow-Methods", "GET");
+  webServer.sendHeader("Access-Control-Expose-Headers", "X-Sketch-Version");
+  webServer.sendHeader("X-Sketch-Version", "[VERSION]");
+  webServer.sendHeader("Connection", "close");
+}
+
+void handleNotFound() {
+  String message = "{";
+  message += "\"uri\": \""+webServer.uri()+"\"";
+  message += ",\"method: \"";
+  message += (webServer.method() == HTTP_GET) ? "GET" : "POST";
+  message += "\",\"arguments\": {";
+  for (uint8_t i = 0; i < webServer.args(); i++) {
+    message += "\"" + webServer.argName(i) + "\": \"" + webServer.arg(i) + "\"";
+  }
+  message += "\"}}";
+
+  webServer.send(404, "text/plain", message);
 }
 
 void startWebServer()
@@ -269,11 +393,12 @@ void startWebServer()
   
   preferences.end();
   webServer.begin();
+  webServer.onNotFound(handleNotFound);
 
   webServer.on("/info", []() {
     String data = "{";
-    data += "\"model\": \"BrewBench Stick\"";
-    data += ",\"type\":\"temp\"";
+    data += "\"model\": \"BrewBench ESP32\"";
+    data += ",\"type\":\"opensource\"";
     data += ",\"version\": \""+String(VERSION)+"\"";
     data += ",\"temp\": \""+String(temp)+"\"";
     data += ",\"temp_unit\":\"C\"";
@@ -282,6 +407,9 @@ void startWebServer()
     data += ",\"ambient_unit\":\"C\"";
     data += ",\"ambient_adjust\": \""+String(ambient_adjust)+"\"";
     data += ",\"humidity\": \""+String(humidity)+"\"";
+    data += ",\"moisture\": \""+String(moisture)+"\"";
+    data += ",\"pressure\":" + String(pressure);
+    data += ",\"pressure_unit\":\""+String(pressure_unit)+"\"";    
     data += ",\"frequency\": "+String(FREQUENCY_SECONDS)+"";
     data += ",\"device_id\":\"" + String(device_id) + "\"";
     data += ",\"device_name\": \""+String(device_name)+"\"";
@@ -294,7 +422,11 @@ void startWebServer()
     
   if (settingMode)
   {
-      webServer.on("/settings", []() {
+
+    Serial.println("Starting Web Server at ");
+    Serial.println(WiFi.softAPIP());
+    
+    webServer.on("/settings", []() {
       String s = "<h1 class='ui header'>Wi-Fi Settings</h1>";
       s += "<p>Please select your Wi-Fi SSID and enter the Wi-Fi password.</p>";
       s += "<form method='get' action='setap' class='ui form' style='max-width: 400px;'>";
@@ -340,10 +472,24 @@ void startWebServer()
       webServer.send(200, "text/html", makePage("Wi-Fi Settings", s));
     });
 
+    webServer.on("/reset", []() {
+      String s = "<div class='ui positive message'><div class='header'>BrewBench Wi-Fi reset.</div>";
+      s += "<p>Device is rebooting...Wait 10 seconds then connect to the <label class='ui label'>" + String(apSSID) + "</label> access point and go to <a href='http://192.168.4.1'>http://192.168.4.1.</a></p></div>";
+      webServer.send(200, "text/html", makePage("Reset Wi-Fi Settings", s));
+      reset();
+    });
+    
     webServer.on("/setap", []() {
       String ssid = urlDecode(webServer.arg("ssid"));
-      String pass = urlDecode(webServer.arg("pass"));
+      Serial.print("SSID: ");
       
+      Serial.println(ssid);
+      
+      String pass = urlDecode(webServer.arg("pass"));
+      Serial.print("Password: ");
+      Serial.println(pass);
+      Serial.println("Writing SSID to EEPROM...");
+
       preferences.begin("brewbench", false);
 
       // Store wifi config
@@ -353,7 +499,7 @@ void startWebServer()
 
       // Store api key
       api_key = urlDecode(webServer.arg("api_key"));
-      
+      Serial.println("Writing API Key to nvr...");
       preferences.putString("API_KEY", urlDecode(webServer.arg("api_key")));
 
       // Store name
@@ -399,6 +545,26 @@ void startWebServer()
   }
   else
   {
+
+    Serial.print("Starting Web Server at ");
+    Serial.println(WiFi.localIP());
+
+    webServer.on("/arduino/info", [](){
+      String data = "{\"BrewBench\": {\"board\": \""+String(ARDUINO_BOARD)+"\", \"version\": \"[VERSION]\", \"status\": \"restarting\"";
+      data += ",\"RSSI\":"+String(WiFi.RSSI());
+      data += ",\"IP\":\""+WiFi.localIP().toString()+"\"";
+      data += "}}";
+      sendHeaders();
+      webServer.send(200, "application/json", data);
+    });
+
+    webServer.on("/arduino/reboot", [](){
+      sendHeaders();
+      webServer.send(200, "application/json", "{\"reboot\":true}");
+      delay(500);
+      ESP.restart();
+    });  
+  
     webServer.on("/post", []() {
       secondCounter = 0;
       postData();
@@ -407,25 +573,8 @@ void startWebServer()
       webServer.send(200, "text/html", makePage("Post Data", s));
     });
 
-    webServer.on("/firmware", []() {
-      if (hasUpdate(VERSION))
-      {
-        String s = "<div class='ui warning message'><div class='header'>BrewBench is being updated...</div>";
-        s += "<p>Wait for BrewBench Stick to reboot then <a href='/'>return to main settings page.</a></p></div>";
-        webServer.send(200, "text/html", makePage("Firmware Update", s));
-        settingMode = true;
-        execOTA();
-      }
-      else
-      {
-        String s = "<div class='ui info message'><div class='header'>You have the latest firmware...</div>";
-        s += "<p><a href='/'>Return to main settings page.</a></p></div>";
-        webServer.send(200, "text/html", makePage("Firmware Update", s));
-      }
-    });
-
     webServer.on("/", []() {
-      String s = "<h1 class='ui header'>BrewBench Stick</h1>";
+      String s = "<h1 class='ui header'>BrewBench OpenSource</h1>";
       if(device_id.length() == 0)
         s += "<div class='ui warning message'>Connect this device with the BrewBench Monitor App.</div>";      
       s += "<form method='get' action='edit' class='ui form' style='max-width: 400px;'>";
@@ -433,7 +582,6 @@ void startWebServer()
       s += "<p><a href='/reset' class='ui button' onclick=\"return confirm('Are you sure you want to reset WiFi and all settings?');\">Reset All Settings</a></p>";
       s += "<h4 class='ui dividing header'>Firmware Settings</h4>";
       s += "<div class='two fields'>";
-      s += "<div class='field'><label>Update</label> <a href='/firmware' class='ui button'>Firmware Update</a></div>";
       s += "<div class='field'><label>Version</label> " + VERSION + "</div>";
       s += "</div><h4 class='ui dividing header'>BrewBench Settings</h4>";
       s += "<div class='ui info message'>Set alerts in the app</div>";
@@ -480,9 +628,14 @@ void startWebServer()
       s += "</div></div></div>";
       s += "<div class='field center aligned'><a class='ui button' href='/post'>Post Data</a> <input type='submit' value='Edit Settings' class='ui primary button'></div>";
       s += "</form>";
-      webServer.send(200, "text/html", makePage("BrewBench Stick", s));
+      webServer.send(200, "text/html", makePage("BrewBench OpenSource", s));
     });
-    
+    webServer.on("/reset", []() {
+      String s = "<div class='ui positive message'><div class='header'>BrewBench Wi-Fi reset.</div>";
+      s += "<p>Device is rebooting...Wait 10 seconds then connect to the <label class='ui label'>" + String(apSSID) + "</label> access point and go to <a href='http://192.168.4.1'>http://192.168.4.1.</a></p></div>";
+      webServer.send(200, "text/html", makePage("Reset Wi-Fi Settings", s));
+      reset();
+    });
     webServer.on("/edit", []() {
       String s = "<h1 class='ui header'>BrewBnech Settings</h1>";
       s += "<div class='ui info message'>Connect this device with the BrewBench Monitor App. ";
@@ -544,7 +697,7 @@ void startWebServer()
       s += "<p>Device is rebooting...Wait 10 seconds then <a href='/'>return to main settings page.</a></p></div>";
       webServer.send(200, "text/html", makePage("Settings", s));
       delay(3000);
-      reboot();
+      ESP.restart();
     });
   }
   webServer.begin();
@@ -574,7 +727,29 @@ void reset(){
 
 void setupMode()
 {
+  WiFi.softAPdisconnect(true);
+  WiFi.mode(WIFI_MODE_STA);
+  delay(100);
+  int n = WiFi.scanNetworks();
+  delay(100);
+
+  for (int i = 0; i < n; ++i)
+  {
+    ssidList += "<option value=\"";
+    ssidList += WiFi.SSID(i);
+    ssidList += "\">";
+    ssidList += WiFi.SSID(i) + " " + WiFi.RSSI(i) + "dBm";
+    ssidList += "</option>";
+  }
+  delay(100);
+  WiFi.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0));
+  String macSSID = String(apSSID) + "-" + random(1000, 9999);
+  WiFi.softAP(macSSID.c_str());
+  WiFi.mode(WIFI_MODE_AP);
   startWebServer();
+  Serial.println("Starting Access Point at:");
+  Serial.print(macSSID);
+  
 }
 
 String makePage(String title, String contents)
@@ -582,7 +757,7 @@ String makePage(String title, String contents)
   String s = "<!DOCTYPE html><html><head>";
   s += "<link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/fomantic-ui/2.8.4/semantic.min.css\" crossorigin=\"anonymous\" />";
   s += "<meta name=\"viewport\" content=\"width=device-width,user-scalable=0\">";
-  if (title == "BrewBench Stick")
+  if (title == "BrewBench OpenSource")
     s += "<meta http-equiv='refresh' content='60'>";
   s += "<title>" + title;
   if (device_name.length() > 0)
@@ -632,38 +807,27 @@ String urlDecode(String input)
   return s;
 }
 
-void getHostname(){
-  Process p;
-  p.runShellCommand("uname -n");
-  while(p.running());
-  if(p.available() > 0) {
-   HOSTNAME = p.readString();
-  }
-  HOSTNAME.trim();
-  if(!HOSTNAME || HOSTNAME == "")
-    HOSTNAME = "missing";
-}
-
 void setup()
 {
 
   pinMode(LED, OUTPUT);
   digitalWrite(LED, HIGH);
 
-  Wire.begin(0, 26);
-  getHostname();
-  
-  startWebServer();
-  setupMode();
-}
+  Serial.begin(115200);
 
-void updateCheckPowerOff(){
-    // check for firmware update
-    if (hasUpdate(VERSION))
+  delay(10);
+
+  if (restoreConfig())
+  {
+    if (checkConnection())
     {
-      settingMode = true;
-      execOTA();
+      settingMode = false;
+      startWebServer();
+      return;
     }
+  }
+  settingMode = true;
+  setupMode();
 }
 
 void loop()
@@ -679,7 +843,6 @@ void loop()
       secondCounter = 0;
       getTemps();
       postData();
-      updateCheckPowerOff();
     }
   } else if(!offlineMode && settingMode){
     preferences.begin("brewbench", false);
@@ -688,14 +851,15 @@ void loop()
     preferences.end();
     // let's reboot incase we got offline
     if(secondCounter == FREQUENCY_SECONDS && api_key.length() > 0 && device_id.length() > 0){
-      reboot();
+      ESP.restart();
     }
   }
-
-  if (offlineMode && secondCounter % 10 == 0)
-  {
+  
+  // UPDATE TEMPS every 10 seconds for the web admin
+  if(secondCounter % 10 == 0){
     getTemps();
   }
 
   delay(1000);
+  
 }

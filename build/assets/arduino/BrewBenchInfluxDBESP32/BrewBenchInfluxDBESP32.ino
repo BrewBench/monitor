@@ -23,10 +23,7 @@ HTTPClient http;
 // DHT DHTesp dht;
 // BMP180 Adafruit_BMP085 bmp;
 
-// how many samples to take and average, more takes longer
-// but is more 'smooth'
 #define NUMSAMPLES 5
-// the value of the 'other' resistor
 #define SERIESRESISTOR 147000
 
 uint16_t samples[NUMSAMPLES];

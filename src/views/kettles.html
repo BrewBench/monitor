@@ -21,7 +21,7 @@
               <div class="dropdown-divider"></div>
               <button ng-repeat="arduino in settings.arduinos | orderBy:'url'"
                 ng-class="{'active': kettle.arduino && kettle.arduino.id == arduino.id}"
-                ng-click="kettle.arduino=arduino;updateStreams(kettle);"
+                ng-click="kettle.arduino=arduino;changeArduino(kettle);"
                 class="dropdown-item" type="button">
                 <i class="fas fa-circle" ng-class="{'orange':(!site.https && arduino.secure),'on':(!arduino.status.error && arduino.status.dt),'off':!!arduino.status.error}" aria-hidden="true"></i> {{ arduino.url }}
               </button>
@@ -46,7 +46,7 @@
             <i ng-if="kettle.type == 'seedling'" class="fas fa-seedling fa-lg type"></i>
             <i ng-if="kettle.type == 'cannabis'" class="fas fa-cannabis fa-2x type"></i>
           </a>&nbsp;
-          <h3><editable type="text" model="kettle.name" data-toggle="tooltip" title="Click to edit name<br>Enter return to save"></editable></h3>
+          <h3><editable type="text" model="kettle.name" class="kettle_name" data-toggle="tooltip" title="Click to edit name<br/>Enter return to save"></editable></h3>
         </div>
       </div>
 
@@ -63,7 +63,7 @@
                   <button ng-repeat="s in sensors track by $index"
                       ng-if="!BrewService.isESP(kettle.arduino) || (BrewService.isESP(kettle.arduino) && s.esp)"
                       ng-class="{'active': kettle.temp.type==s.name}"
-                      ng-click="kettle.temp.type=s.name;changeSensor(kettle);updateStreams(kettle);"
+                      ng-click="kettle.temp.type=s.name;changeSensor(kettle);"
                       class="dropdown-item" type="button">
                     {{s.name}}
                   </button>
@@ -79,7 +79,7 @@
                   <button ng-if="BrewService.sensorTypes(kettle.temp.type).analog"
                       ng-repeat="p in getPortRange(kettle.arduino.analog) track by $index"
                       ng-class="{'active': kettle.temp.pin=='A'+p}"
-                      ng-click="kettle.temp.pin='A'+p;updateStreams(kettle);"
+                      ng-click="kettle.temp.pin='A'+p;"
                       class="dropdown-item" type="button">
                     {{ pinDisplay(kettle.arduino, 'A'+p) }} <span class="pininuse" ng-show="pinInUse('A'+p,kettle.arduino.id)">(In Use)</span>
                   </button>
@@ -89,7 +89,7 @@
                   <button ng-if="BrewService.sensorTypes(kettle.temp.type).digital"
                       ng-repeat="p in getPortRange(kettle.arduino.digital) track by $index"
                       ng-class="{'active': kettle.temp.pin=='D'+p}"
-                      ng-click="kettle.temp.pin='D'+p;updateStreams(kettle);"
+                      ng-click="kettle.temp.pin='D'+p;"
                       class="dropdown-item" type="button">
                     {{ pinDisplay(kettle.arduino, 'D'+p) }}  <span class="pininuse" ng-show="pinInUse('D'+p,kettle.arduino.id)">(In Use)</span>
                   </button>
@@ -99,7 +99,7 @@
                   <button ng-if="kettle.arduino.adc"
                       ng-repeat="p in getPortRange(kettle.arduino.adc) track by $index"
                       ng-class="{'active': kettle.temp.pin=='C'+p}"
-                      ng-click="kettle.temp.pin='C'+p;updateStreams(kettle);"
+                      ng-click="kettle.temp.pin='C'+p;"
                       class="dropdown-item" type="button">
                     C{{p}} <span class="pininuse" ng-show="pinInUse('C'+p,kettle.arduino.id)">(In Use)</span>
                   </button>
@@ -113,17 +113,17 @@
                   <h6 class="dropdown-header">VCC</h6>
                   <div class="dropdown-divider"></div>
                   <button ng-class="{'active': kettle.temp.vcc==''}"
-                      ng-click="kettle.temp.vcc='';updateStreams(kettle);"
+                      ng-click="kettle.temp.vcc='';"
                       class="dropdown-item" type="button">
                     None
                   </button>
                   <button ng-class="{'active': kettle.temp.vcc=='5V'}"
-                      ng-click="kettle.temp.vcc='5V';updateStreams(kettle);"
+                      ng-click="kettle.temp.vcc='5V';"
                       class="dropdown-item" type="button">
                     5V <span class="pininuse" ng-show="pinInUse('5V',kettle.arduino.id)">(In Use)</span>
                   </button>
                   <button ng-class="{'active': kettle.temp.vcc=='3V'}"
-                      ng-click="kettle.temp.vcc='3V';updateStreams(kettle);"
+                      ng-click="kettle.temp.vcc='3V';"
                       class="dropdown-item" type="button">
                     3.3V <span class="pininuse" ng-show="pinInUse('3V',kettle.arduino.id)">(In Use)</span>
                   </button>
@@ -132,7 +132,7 @@
                   <div class="dropdown-divider"></div>
                   <button ng-repeat="p in getPortRange(kettle.arduino.digital) track by $index"
                       ng-class="{'active': kettle.temp.vcc=='D'+p}"
-                      ng-click="kettle.temp.vcc='D'+p;updateStreams(kettle);"
+                      ng-click="kettle.temp.vcc='D'+p;"
                       class="dropdown-item" type="button">
                     {{ pinDisplay(kettle.arduino, 'D'+p) }} <span class="pininuse" ng-show="pinInUse('D'+p,kettle.arduino.id)">(In Use)</span>
                   </button>
@@ -146,7 +146,7 @@
                   <h6 class="dropdown-header">Index</h6>
                   <div class="dropdown-divider"></div>
                   <button ng-repeat="n in [].constructor(20) track by $index" ng-class="{'active': kettle.temp.index==$index}"
-                      ng-click="kettle.temp.index=$index;updateStreams(kettle);"
+                      ng-click="kettle.temp.index=$index;"
                       class="dropdown-item" type="button">
                     {{$index}} <span class="pininuse" ng-show="$index == 0">Default</span>
                   </button>
@@ -183,7 +183,7 @@
                 <button ng-if="settings.tplink.plugs"
                      ng-repeat="tp in settings.tplink.plugs track by $index"
                      ng-class="{'active': kettle.heater.pin=='TP-'+tp.deviceId}"
-                     ng-click="kettle.heater.pin='TP-'+tp.deviceId; kettle.heater.pwm=false;updateStreams(kettle);"
+                     ng-click="kettle.heater.pin='TP-'+tp.deviceId; kettle.heater.pwm=false;"
                      class="dropdown-item" type="button">
                    {{ tp.alias }} <i class="fas fa-circle" ng-class="{'on':!!tp.status, 'off':!tp.status}" aria-hidden="true"></i> <span class="pininuse" ng-show="pinInUse('TP-'+tp.deviceId,kettle.arduino.id)">(In Use)</span>
                 </button>
@@ -192,7 +192,7 @@
                 <div class="dropdown-divider"></div>
                 <button ng-repeat="p in getPortRange(kettle.arduino.analog) track by $index"
                     ng-class="{'active': kettle.heater.pin=='A'+p}"
-                    ng-click="kettle.heater.pin='A'+p; kettle.heater.pwm=false;updateStreams(kettle);"
+                    ng-click="kettle.heater.pin='A'+p; kettle.heater.pwm=false;"
                     class="dropdown-item" type="button">
                   {{ pinDisplay(kettle.arduino, 'A'+p) }} <span class="pininuse" ng-show="pinInUse('A'+p,kettle.arduino.id)">(In Use)</span>
                 </button>
@@ -201,7 +201,7 @@
                 <div class="dropdown-divider"></div>
                 <button ng-repeat="p in getPortRange(kettle.arduino.digital) track by $index"
                     ng-class="{'active': kettle.heater.pin=='D'+p}"
-                    ng-click="kettle.heater.pin='D'+p;updateStreams(kettle);"
+                    ng-click="kettle.heater.pin='D'+p;"
                     class="dropdown-item" type="button">
                   {{ pinDisplay(kettle.arduino, 'D'+p) }} <span class="pininuse" ng-show="pinInUse('D'+p,kettle.arduino.id)">(In Use)</span>
                 </button>
@@ -349,12 +349,12 @@
         <div class="col mr-auto">
           <ui-knob ng-if="BrewService.sensorTypes(kettle.temp.type).percent"
             ng-click="knobClick(kettle)"
-            value="(kettle.percent | round:0)"
+            value="kettle.percent"
             options="kettle.knob">
           </ui-knob>
           <ui-knob ng-if="!BrewService.sensorTypes(kettle.temp.type).percent"
             ng-click="knobClick(kettle)"
-            value="(kettle.temp.current | round:0)"
+            value="kettle.temp.current"
             options="kettle.knob">
           </ui-knob><br/>
           <div ng-if="kettle.temp.type.indexOf('DHT') === 0">
@@ -528,8 +528,12 @@
         <span ng-if="kettle.notify.streams" class="badge badge-pill badge-dark badge-streams float-left status-{{ kettle.message.status }}">
           <img src="/assets/img/brewbench-colors.png" width="25" style="border-radius:10px;"/> Streaming
         </span>
-        <i class="fas fa-1x float-right" ng-class="{'fa-chevron-left':!showRemoveKettle,'fa-chevron-right':showRemoveKettle}" aria-hidden="true" ng-click="showRemoveKettle=!showRemoveKettle"></i>
-        <button type="button" ng-show="showRemoveKettle" class="btn btn-danger btn-sm float-right" ng-click="removeKettle(kettle, $index); showRemoveKettle=!showRemoveKettle">Remove Kettle</button>
+        <i class="fas fa-1x float-right" ng-class="{'fa-chevron-left':!showRemoveKettle,'fa-chevron-right':showRemoveKettle}" aria-hidden="true" ng-click="showRemoveKettle=!showRemoveKettle"></i>        
+        <div style="float:right;">
+          <button type="button" ng-show="showRemoveKettle" class="btn btn-danger btn-sm" ng-click="clearKettle(kettle, $index); showRemoveKettle=!showRemoveKettle">Clear History</button>
+          &nbsp;          
+          <button type="button" ng-show="showRemoveKettle" class="btn btn-danger btn-sm" ng-click="removeKettle(kettle, $index); showRemoveKettle=!showRemoveKettle">Remove Kettle</button>        
+        </div>
     </div>
   </div>
 </div>

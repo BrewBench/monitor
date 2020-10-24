@@ -157,16 +157,6 @@ These board only supports sensors
 * http://www.instructables.com/id/16-bit-I2C-Temperature-Monitor-Using-Arduino/
 
 
-## Monitoring
-
-### BrewBench Streams
-
-Monitor and control your temps remotely with history of all your fermentation sessions.
-
-Sign up at https://app.brewbench.co for an API Key
-
-Then enter your username and API key in the settings and download and install the Streams sketch.
-
 <img src="../src/assets/img/screenshot-streams.png?raw=true" alt="BrewBench Streams" align="center" width="100%" />
 
 ## Home Assistant

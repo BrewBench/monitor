@@ -1,5 +1,20 @@
 # Change Log
 
+## 4.6.0 - 2020-10-18
+
+- BrewBench App Support
+- BMP280 Support on ESP32
+
+## 4.5.4 - 2020-09-16
+
+### Added
+- Heater Safety that allows one heater to run at a time.
+
+## 4.5.4 - 2020-05-29
+
+### Added
+- Changed PWM range from 5% to 1% for more accurate.
+
 ## 4.2.0 - 2018-11-16
 
 ### Added

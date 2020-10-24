@@ -126,11 +126,11 @@
               <div class="row">
                 <div class="col-10">
                   <p>
-                    Monitor your temps with the BrewBench Monitor app.  Integration Coming Soon...
+                    Monitor your temps with the BrewBench Monitor app and an <a href="https://smile.amazon.com/s?k=Arduino+ESP32" target="_blank">Arduino ESP32</a> or <a href="https://www.etsy.com/shop/SensorOverlord" target="_blank">BrewBench Stick</a>.  Download the basic ESP32 sketch to setup your sensors then download and install this one.
                   </p>
                 </div>
                 <div class="col-2">
-                  <a href="" class="btn btn-light float-right" ng-click="compileSketch('AppYun')" ng-class="{'disabled':!app.connected()}">Download Yun Sketch</a>
+                  <a href="" class="btn btn-light float-right" ng-click="compileSketch('AppESP32')" ng-class="{'disabled':!app.connected()}">Download ESP32 Sketch</a>
                 </div>
               </div>
               <div class="row">
@@ -139,17 +139,17 @@
                   <a href="https://play.google.com/store/apps/details?id=co.brewbench.monitor&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1" target="_blank"><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png' width="150"/></a>
                 </div>
               </div>
-              <div class="row pb-2 disabled">
+              <div class="row pb-2">
                 <div class="col-6">
                   <label class="adjust">Email</label>
-                  <input class="form-control" type="text" ng-model="settings.app.email" placeholder="Email">
+                  <input class="form-control" type="email" ng-model="settings.app.email" placeholder="Email">
                 </div>
                 <div class="col-6">
                   <label class="adjust">API Key</label>
                   <input class="form-control" type="text" ng-model="settings.app.api_key" placeholder="API Key">
                 </div>
               </div>
-              <div class="row disabled">
+              <div class="row">
                 <div class="col-12">
                   <div class="btn-group float-right">
                     <button type="button" class="btn btn-secondary" ng-click="app.remove()" ng-disabled="!app.connected()">Remove</button>

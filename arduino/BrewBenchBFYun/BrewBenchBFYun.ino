@@ -1,6 +1,7 @@
 #include <Process.h>
 #include <BridgeServer.h>
 #include <BridgeClient.h>
+#include <avr/wdt.h>
 // [HEADERS]
 
 String HOSTNAME = "[HOSTNAME]";
@@ -28,6 +29,12 @@ BridgeServer server;
 #define SERIESRESISTOR 10000
 
 uint16_t samples[NUMSAMPLES];
+
+void reboot() {
+  wdt_disable();
+  wdt_enable(WDTO_15MS);
+  while (1) {}
+}
 
 float Thermistor(float average) {
    // convert the value to resistance
@@ -59,6 +66,10 @@ void processRest(BridgeClient client) {
 
   if (command == "digital" || command == "analog") {
     adCommand(client, command);
+  }
+  else if (command == "reboot") {
+    client.print("{\"reboot\":true}");
+    reboot();
   }
   else if (command == "Thermistor" ||
       command == "DHT11" || command == "DHT12" || command == "DHT21" ||
