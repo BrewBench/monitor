@@ -1,5 +1,9 @@
 # Change Log
 
+## 4.6.3 - 2020-10-25
+
+- Set knob rounding to zero
+
 ## 4.6.2 - 2020-10-25
 
 - Icon updates

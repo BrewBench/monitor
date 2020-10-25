@@ -349,12 +349,12 @@
         <div class="col mr-auto">
           <ui-knob ng-if="BrewService.sensorTypes(kettle.temp.type).percent"
             ng-click="knobClick(kettle)"
-            value="kettle.percent"
+            value="kettle.percent | number:0"
             options="kettle.knob">
           </ui-knob>
           <ui-knob ng-if="!BrewService.sensorTypes(kettle.temp.type).percent"
             ng-click="knobClick(kettle)"
-            value="kettle.temp.current"
+            value="kettle.temp.current | number:0"
             options="kettle.knob">
           </ui-knob><br/>
           <div ng-if="kettle.temp.type.indexOf('DHT') === 0">
