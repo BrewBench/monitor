@@ -7,10 +7,10 @@
   resolved "https://registry.yarnpkg.com/@types/color-name/-/color-name-1.1.1.tgz#1c1261bbeaa10a8055bbc5d8ab84b7b2afc846a0"
   integrity sha512-rr+OQyAjxze7GgWrSaJwydHStIhHq2lvY3BOC2Mj7KnzI7XK0Uw1TOOdI9lDoajEbSWLiYgoo4f1R51erQfhPQ==
 
-"@uirouter/angularjs@^1.0.20":
-  version "1.0.27"
-  resolved "https://registry.yarnpkg.com/@uirouter/angularjs/-/angularjs-1.0.27.tgz#7f5e0b2edb04cb0fcee4f5ee8329b52515e34fb7"
-  integrity sha512-klW+ysT8hdYFJ0aVtRBumGtTrN3KJxtNBhVr1tXW4f7er+WB9SVWcvurFI1+8bt8vLQgDXsglU44xoek1LxT7Q==
+"@uirouter/angularjs@^1.0.28":
+  version "1.0.28"
+  resolved "https://registry.yarnpkg.com/@uirouter/angularjs/-/angularjs-1.0.28.tgz#3f4a567c3f0199c254729050fd77cb0e15f97246"
+  integrity sha512-PI9kgUjQu5ItRVUMvdp9j613IT6nCmFRlahTP2MiD4k1RJjY/RwIGzHI9pjuz7PAfdHvxAqGOZEOl6EjVmchyw==
   dependencies:
     "@uirouter/core" "6.0.6"
 
@@ -129,20 +129,25 @@ angular-scroll@^1.0.2:
   resolved "https://registry.yarnpkg.com/angular-scroll/-/angular-scroll-1.0.2.tgz#2768ff35dbe1ce40e0c3fbedd4534888299c3e2d"
   integrity sha1-J2j/NdvhzkDgw/vt1FNIiCmcPi0=
 
-angular-touch@^1.7.5:
-  version "1.8.0"
-  resolved "https://registry.yarnpkg.com/angular-touch/-/angular-touch-1.8.0.tgz#dd2cff364db89c56a57ecd90d6d2956e1cb5ad52"
-  integrity sha512-bE0YSl4uBcCgTwa8S20LVsbY4mq9oX7YnienCOdqRewz6LXPZiWg1nwzar2X3UvyxVsREr06RhJ/4TFj2PNNEQ==
+angular-touch@^1.8.2:
+  version "1.8.2"
+  resolved "https://registry.yarnpkg.com/angular-touch/-/angular-touch-1.8.2.tgz#56c54df3f776246bb36f16bef2720a93ed5b8441"
+  integrity sha512-tGoFNsONm/VHFcBW8gySVZvpCIYAvsAlEuHpJDugGn+3ENLxSDhpZ4ikev4KXfWr8ZNsYGoVSfsvJegkiC+9Ig==
 
-angular@1.8.0, angular@^1.x:
+angular@1.8.2:
+  version "1.8.2"
+  resolved "https://registry.yarnpkg.com/angular/-/angular-1.8.2.tgz#5983bbb5a9fa63e213cb7749199e0d352de3a2f1"
+  integrity sha512-IauMOej2xEe7/7Ennahkbb5qd/HFADiNuLSESz9Q27inmi32zB0lnAsFeLEWcox3Gd1F6YhNd1CP7/9IukJ0Gw==
+
+angular@^1.x:
   version "1.8.0"
   resolved "https://registry.yarnpkg.com/angular/-/angular-1.8.0.tgz#b1ec179887869215cab6dfd0df2e42caa65b1b51"
   integrity sha512-VdaMx+Qk0Skla7B5gw77a8hzlcOakwF8mjlW13DpIWIDlfqwAbSSLfd8N/qZnzEmQF4jC4iofInd3gE7vL8ZZg==
 
-angularjs-slider@^6.6.1:
-  version "6.7.0"
-  resolved "https://registry.yarnpkg.com/angularjs-slider/-/angularjs-slider-6.7.0.tgz#eb2229311b81b79315a36e7b5eb700e128f50319"
-  integrity sha512-Cizsuax65wN2Y+htmA3safE5ALOSCyWcKyWkziaO8vCVymi26bQQs6kKDhkYc8GFix/KE7Oc9gH3QLlTUgD38w==
+angularjs-slider@^7.0.0:
+  version "7.0.0"
+  resolved "https://registry.yarnpkg.com/angularjs-slider/-/angularjs-slider-7.0.0.tgz#418f828e25daeb3a738f2cc2257072c5721f2e67"
+  integrity sha512-qNWPARWEktSthHj0/SAMVhy+3AIRnyVCXRK58gXT+3uRORXu/3QJ2L9MjCZvA9yeZxFceEYMOrtK8sSsTKobUw==
 
 ansi-html@0.0.7:
   version "0.0.7"
@@ -1024,10 +1029,10 @@ bonjour@^3.5.0:
     multicast-dns "^6.0.1"
     multicast-dns-service-types "^1.1.0"
 
-bootstrap@^4.5.0:
-  version "4.5.0"
-  resolved "https://registry.yarnpkg.com/bootstrap/-/bootstrap-4.5.0.tgz#97d9dbcb5a8972f8722c9962483543b907d9b9ec"
-  integrity sha512-Z93QoXvodoVslA+PWNdk23Hze4RBYIkpb5h8I2HY2Tu2h7A0LpAgLcyrhrSUyo2/Oxm2l1fRZPs1e5hnxnliXA==
+bootstrap@^4.5.3:
+  version "4.5.3"
+  resolved "https://registry.yarnpkg.com/bootstrap/-/bootstrap-4.5.3.tgz#c6a72b355aaf323920be800246a6e4ef30997fe6"
+  integrity sha512-o9ppKQioXGqhw8Z7mah6KdTYpNQY//tipnkxppWhPbiSWdD+1raYsnhwEZjkTHYbGee4cVQ0Rx65EhOY/HNLcQ==
 
 brace-expansion@^1.0.0:
   version "1.1.7"
@@ -4140,7 +4145,7 @@ lodash@4.17.15:
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.15.tgz#b447f6670a0455bbfeedd11392eff330ea097548"
   integrity sha512-8xOcRHvCjnocdS5cpwXQXVzmmh5e5+saE2QGoeQmbKmRS6J3VQppPOIt0MnmE+4xlZoumy0GPG0D0MVIQbNA1A==
 
-lodash@^4, lodash@^4.17.10, lodash@^4.17.11, lodash@^4.17.13, lodash@^4.17.14, lodash@^4.17.15, lodash@^4.17.19, lodash@^4.17.4:
+lodash@^4, lodash@^4.17.10, lodash@^4.17.11, lodash@^4.17.13, lodash@^4.17.14, lodash@^4.17.15, lodash@^4.17.4:
   version "4.17.19"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.19.tgz#e48ddedbe30b3321783c5b4301fbd353bc1e4a4b"
   integrity sha512-JNvd8XER9GQX0v2qJgsaN/mzFCNA5BRe/j8JN9d+tWyGLSodKQHKFicdwNYzWwI3wjRnaKPsGj1XkBjx/F96DQ==
@@ -4148,6 +4153,11 @@ lodash@^4, lodash@^4.17.10, lodash@^4.17.11, lodash@^4.17.13, lodash@^4.17.14, l
 lodash@^4.0.0, lodash@^4.2.0, lodash@~4.16.4:
   version "4.16.6"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.16.6.tgz#d22c9ac660288f3843e16ba7d2b5d06cca27d777"
+
+lodash@^4.17.20:
+  version "4.17.20"
+  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.20.tgz#b44a9b6297bcb698f1c51a3545a2b3b368d59c52"
+  integrity sha512-PlhdFcillOINfeV7Ni6oF1TAEayyZBoZ8bcshTHqOYJYlrqzRK5hagpagky5o4HfCzzd1TRkXPMFq6cKk9rGmA==
 
 log4js@^4.0.0:
   version "4.5.1"
@@ -4466,10 +4476,15 @@ mkdirp@^0.5.5, mkdirp@~0.5.0, mkdirp@~0.5.1:
   dependencies:
     minimist "^1.2.5"
 
-moment@^2.22.1, moment@^2.22.2:
+moment@^2.22.1:
   version "2.27.0"
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.27.0.tgz#8bff4e3e26a236220dfe3e36de756b6ebaa0105d"
   integrity sha512-al0MUK7cpIcglMv3YF13qSgdAIqxHTO7brRtaz3DlSULbqfazqkc5kEjNrLDOM7fsjshoFIihnU8snrP7zUvhQ==
+
+moment@^2.29.1:
+  version "2.29.1"
+  resolved "https://registry.yarnpkg.com/moment/-/moment-2.29.1.tgz#b2be769fa31940be9eeea6469c075e35006fa3d3"
+  integrity sha512-kHmoybcPV8Sqy59DwNDY3Jefr64lK/by/da0ViFcuA4DH0vQg5Q6Ze5VimxkfQNSC+Mls/Kx53s7TjP1RhFEDQ==
 
 move-concurrently@^1.0.1:
   version "1.0.1"
@@ -5110,7 +5125,7 @@ pkg-dir@^2.0.0:
   dependencies:
     find-up "^2.1.0"
 
-popper.js@^1.14.5:
+popper.js@^1.16.1:
   version "1.16.1"
   resolved "https://registry.yarnpkg.com/popper.js/-/popper.js-1.16.1.tgz#2a223cb3dc7b6213d740e40372be40de43e65b1b"
   integrity sha512-Wb4p1J4zyFTbM+u6WuO4XstYx4Ky9Cewe4DWrel7B0w6VVICvPwdOpotjzcf6eD8TsckVnIMNONQyPIUFOUbCQ==

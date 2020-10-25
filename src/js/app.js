@@ -8,7 +8,7 @@ angular.module('brewbench-monitor', [
   ,'ngTouch'
   ,'duScroll'
   ,'ui.knob'
-  ,'rzModule'
+  ,'rzSlider'
 ])
 .config(function($stateProvider, $urlRouterProvider, $httpProvider, $locationProvider, $compileProvider) {
 

@@ -868,11 +868,13 @@ angular.module('brewbench-monitor')
       return (((6.9 * abw) + 4.0 * (re - 0.1)) * fg * 3.55).toFixed(1);
     },
     // http://www.brewersfriend.com/plato-to-sg-conversion-chart/
-    sg: function(plato){
+    sg: function (plato) {
+      if (!plato) return '';
       var sg = (1 + (plato / (258.6 - ((plato / 258.2) * 227.1))));
       return parseFloat(sg).toFixed(3);
     },
-    plato: function(sg){
+    plato: function (sg) {
+      if (!sg) return '';
       var plato = ((-1 * 616.868) + (1111.14 * sg) - (630.272 * Math.pow(sg,2)) + (135.997 * Math.pow(sg,3))).toString();
       if(plato.substring(plato.indexOf('.')+1,plato.indexOf('.')+2) == 5)
         plato = plato.substring(0,plato.indexOf('.')+2);

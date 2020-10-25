@@ -27,6 +27,20 @@ describe('BrewBench Service', function() {
       expect(BrewService.reset).toBeDefined();
     });
   });
+  
+  describe('.app()', function() {
+    // A simple test to verify the method app exists
+    it('should exist', function() {
+      expect(BrewService.app).toBeDefined();
+    });
+  });
+  
+  describe('.app().auth()', function() {
+    // A simple test to verify the method app.auth exists
+    it('should exist', function() {
+      expect(BrewService.app().auth).toBeDefined();
+    });
+  });
 
   describe('.defaultKnobOptions()', function() {
     // A simple test to verify the method defaultKnobOptions exists

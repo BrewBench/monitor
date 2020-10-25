@@ -74,10 +74,10 @@
           </h4>
           <div class="block-border">
             <div class="row new pb-3">
-              <div class="col-10 pb-3">
+              <div class="col-9 pb-3">
                 <p>Control your brew session, setup a RIMS system or monitor your fermentation.  This is a basic sketch that lets you connect to all of the supported sensors.  We suggest using this to configure and test all kettles before uploading any of the other sketches.</p>
               </div>
-              <div class="col-2">
+              <div class="col-3">
                 <a class="btn btn-light float-right" href="" ng-click="compileSketch('Yun')" class="dropdown-item">Download Yun Sketch</a><br><br>
                 <div class="dropdown float-right">
                   <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -124,12 +124,12 @@
             </h4>
             <div class="block-border">
               <div class="row">
-                <div class="col-10">
+                <div class="col-9">
                   <p>
-                    Monitor your temps with the BrewBench Monitor app and an <a href="https://smile.amazon.com/s?k=Arduino+ESP32" target="_blank">Arduino ESP32</a> or <a href="https://www.etsy.com/shop/SensorOverlord" target="_blank">BrewBench Stick</a>.  Download the basic ESP32 sketch to setup your sensors then download and install this one.
+                    Monitor your temps with the BrewBench Monitor App and a <a href="https://smile.amazon.com/s?k=Arduino+ESP32" target="_blank">ESP32</a>.  Download the basic ESP32 sketch to setup your sensors then download and install this one.
                   </p>
                 </div>
-                <div class="col-2">
+                <div class="col-3">
                   <a href="" class="btn btn-light float-right" ng-click="compileSketch('AppESP32')" ng-class="{'disabled':!app.connected()}">Download ESP32 Sketch</a>
                 </div>
               </div>
@@ -169,13 +169,13 @@
             </h4>
             <div class="block-border">
               <div class="row">
-                <div class="col-10">
+                <div class="col-9">
                   <p>
                     The InfluxDB sketch will be dynamically created depending on what sensors are in use with your current configuration.  It will run in the background sending temperature data to your InfluxDB time-series database.
                     <br/>Works with <strong>BrewBench Relay</strong> to trigger the heat / cool relays you have toggled on.
                   </p>
                 </div>
-                <div class="col-2">
+                <div class="col-3">
                   <a href="" ng-click="compileSketch('InfluxDBYun')" class="btn btn-light float-right" ng-class="{'disabled':settings.influxdb.status != 'Connected'}">Download Yun Sketch</a><br><br>
                   <div class="dropdown float-right">
                     <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" ng-class="{'disabled':settings.influxdb.status != 'Connected'}">
@@ -265,12 +265,12 @@
           </h4>
           <div class="block-border">
             <div class="row">
-              <div class="col-10">
+              <div class="col-9">
                 <p>
                   <a href="https://pro.brewersfriend.com" target="_blank">Brewer's Friend Pro</a> offers equipment monitoring.  The sketch has support for Thermistors and DHT sensors.  For ambient air temp name must be Ambient.  DHT sensors can be used for ambient and humidity.  Thermistor name should be the same as the Equipment name below.
                 </p>
               </div>
-              <div class="col-2">
+              <div class="col-3">
                 <a href="" class="btn btn-light float-right" ng-click="compileSketch('BFYun')">Download Yun Sketch</a><br><br>
               </div>
             </div>
@@ -292,12 +292,12 @@
           </h4>
           <div class="block-border">
             <div class="row">
-              <div class="col-10">
+              <div class="col-9">
                 <p>
                   The Relay sketch will be dynamically created depending on what sensors are in use with your current configuration.  It will run in the background and trigger the heat / cool relays you have toggled on.
                 </p>
               </div>
-              <div class="col-2">
+              <div class="col-3">
                 <a href="" ng-click="compileSketch('RelayYun')" class="btn btn-light float-right"  ng-class="{'disabled': !hasSketches()}">Download Sketch</a>
               </div>
             </div>
