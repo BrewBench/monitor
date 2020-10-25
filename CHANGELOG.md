@@ -1,5 +1,14 @@
 # Change Log
 
+## 4.6.2 - 2020-10-25
+
+- Icon updates
+
+## 4.6.1 - 2020-10-25
+
+- NPM Package updates
+- Minor style updates to sketches
+
 ## 4.6.0 - 2020-10-18
 
 - BrewBench App Support
