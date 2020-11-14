@@ -312,8 +312,19 @@
               {{ settings.ifttt.status || 'Not Connected'}}
             </sup>
             <i class="fas fa-network-wired fa-lg float-right" aria-hidden="true"></i>
-          </h4>
+          </h4>          
           <div class="block-border">
+            <div class="row">
+              <div class="col-12">
+                There are 3 scenarious for sending data to this URL.<br/>
+                IFTTT uses the same logic as the above Notifications that send browser or slack alerts.
+                  <ol>
+                    <li>If the temp falls below the target</li>
+                    <li>If the temp raises above the target</li>
+                    <li>If the temp recovers from a low or high temp</li>
+                  </ol> 
+              </div>
+            </div>
             <div class="row">
               <div class="col-6">
                 <label class="adjust">URL</label>
