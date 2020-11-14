@@ -1,5 +1,9 @@
 # Change Log
 
+## 4.7.0 - 2020-11-14
+
+- Added IFTTT Support
+
 ## 4.6.3 - 2020-10-25
 
 - Set knob rounding to zero

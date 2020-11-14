@@ -1539,7 +1539,7 @@ $scope.updateABV();
       return;
 
     var currentValue = (kettle && kettle.temp) ? kettle.temp.current : 0;
-    var unitType = '\u00B0';
+    var unitType = '\u00B0'+$scope.settings.general.unit;
     //percent?
     if(kettle && Boolean(BrewService.sensorTypes(kettle.temp.type).percent) && typeof kettle.percent != 'undefined'){
       currentValue = kettle.percent;
@@ -1642,7 +1642,8 @@ $scope.updateABV();
     if(Boolean(kettle.temp.ifttt) && $scope.settings.ifttt.url && $scope.settings.ifttt.url.indexOf('http') === 0){
       BrewService.ifttt().send({
           message: message,
-          color: color,          
+          color: color,     
+          unit: $scope.settings.general.unit,
           name: kettle.name,
           type: kettle.type,
           temp: kettle.temp,
