@@ -22,16 +22,17 @@ angular.module('brewbench-monitor')
 
     reset: function(){
       const defaultSettings = {
-        general: {debug: false, pollSeconds: 10, unit: 'F', shared: false, heatSafety: false}
-        ,chart: {show: true, military: false, area: false}
-        ,sensors: {DHT: false, DS18B20: false, BMP: false}
-        ,recipe: {'name':'','brewer':{name:'','email':''},'yeast':[],'hops':[],'grains':[],scale:'gravity',method:'papazian','og':1.050,'fg':1.010,'abv':0,'abw':0,'calories':0,'attenuation':0}
-        ,notifications: {on:true,timers:true,high:true,low:true,target:true,slack:'',last:''}
-        ,sounds: {on:true,alert:'/assets/audio/bike.mp3',timer:'/assets/audio/school.mp3'}
-        ,arduinos: [{id:'local-'+btoa('brewbench'),board:'',RSSI:false,url:'arduino.local',analog:5,digital:13,adc:0,secure:false,version:'',status:{error:'',dt:'',message:''}}]
-        ,tplink: {user: '', pass: '', token:'', status: '', plugs: []}
-        ,influxdb: {url: '', port: '', user: '', pass: '', db: '', dbs:[], status: ''}
-        ,app: {email: '', api_key: '', status: ''}
+        general: { debug: false, pollSeconds: 10, unit: 'F', shared: false, heatSafety: false }
+        , chart: { show: true, military: false, area: false }
+        , sensors: { DHT: false, DS18B20: false, BMP: false }
+        , recipe: { 'name': '', 'brewer': { name: '', 'email': '' }, 'yeast': [], 'hops': [], 'grains': [], scale: 'gravity', method: 'papazian', 'og': 1.050, 'fg': 1.010, 'abv': 0, 'abw': 0, 'calories': 0, 'attenuation': 0 }
+        , notifications: { on: true, timers: true, high: true, low: true, target: true, slack: '', last: '' }
+        , sounds: { on: true, alert: '/assets/audio/bike.mp3', timer: '/assets/audio/school.mp3' }
+        , arduinos: [{ id: 'local-' + btoa('brewbench'), board: '', RSSI: false, url: 'arduino.local', analog: 5, digital: 13, adc: 0, secure: false, version: '', status: { error: '', dt: '', message: '' } }]
+        , tplink: { user: '', pass: '', token: '', status: '', plugs: [] }
+        , ifttt: { url: '', method: 'GET', auth: { key: '', value: '' }, status: '' }
+        , influxdb: { url: '', port: '', user: '', pass: '', db: '', dbs: [], status: '' }
+        , app: { email: '', api_key: '', status: '' }
       };
       return defaultSettings;
     },
@@ -66,7 +67,7 @@ angular.module('brewbench-monitor')
           ,sticky: false
           ,heater: {pin:'D2',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
           ,pump: {pin:'D3',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
-          ,temp: {pin:'A0',vcc:'',index:'',type:'Thermistor',adc:false,hit:false,current:0,measured:0,previous:0,adjust:0,target:170,diff:2,raw:0,volts:0}
+          ,temp: {pin:'A0',vcc:'',index:'',type:'Thermistor',adc:false,hit:false,ifttt:false,current:0,measured:0,previous:0,adjust:0,target:170,diff:2,raw:0,volts:0}
           ,values: []
           ,timers: []
           ,knob: angular.copy(this.defaultKnobOptions(),{value:0,min:0,max:220})
@@ -81,7 +82,7 @@ angular.module('brewbench-monitor')
           ,sticky: false
           ,heater: {pin:'D4',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
           ,pump: {pin:'D5',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
-          ,temp: {pin:'A1',vcc:'',index:'',type:'Thermistor',adc:false,hit:false,current:0,measured:0,previous:0,adjust:0,target:152,diff:2,raw:0,volts:0}
+          ,temp: {pin:'A1',vcc:'',index:'',type:'Thermistor',adc:false,hit:false,ifttt:false,current:0,measured:0,previous:0,adjust:0,target:152,diff:2,raw:0,volts:0}
           ,values: []
           ,timers: []
           ,knob: angular.copy(this.defaultKnobOptions(),{value:0,min:0,max:220})
@@ -96,7 +97,7 @@ angular.module('brewbench-monitor')
           ,sticky: false
           ,heater: {pin:'D6',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
           ,pump: {pin:'D7',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
-          ,temp: {pin:'A2',vcc:'',index:'',type:'Thermistor',adc:false,hit:false,current:0,measured:0,previous:0,adjust:0,target:200,diff:2,raw:0,volts:0}
+          ,temp: {pin:'A2',vcc:'',index:'',type:'Thermistor',adc:false,hit:false,ifttt:false,current:0,measured:0,previous:0,adjust:0,target:200,diff:2,raw:0,volts:0}
           ,values: []
           ,timers: []
           ,knob: angular.copy(this.defaultKnobOptions(),{value:0,min:0,max:220})
@@ -586,6 +587,73 @@ angular.module('brewbench-monitor')
       };
     },
 
+    ifttt: function () {
+      return {
+        config: (data) => {
+          var settings = this.settings('settings');
+          var headers = { 'Content-Type': 'application/json' };
+          if (settings.ifttt.auth.key && settings.ifttt.auth.value) {
+            headers[settings.ifttt.auth.key] = settings.ifttt.auth.value;
+          }
+          var http = {
+            url: settings.ifttt.url,
+            method: settings.ifttt.method,
+            headers: headers
+          };
+          if (settings.ifttt.method == 'GET')
+            http.params = data;
+          else
+            http.data = data;
+          return http;
+        },
+        
+        connect: () => {
+          var q = $q.defer();
+          var data = { 'brewbench': true };
+          var http_config = this.ifttt().config(data);
+          
+          if (!http_config.url) {
+            return q.reject('Missing URL');
+          }
+          
+          $http(http_config)
+            .then(response => {
+              if (response.status) {
+                q.resolve(`Connection status ${response.status}`);
+              } else {
+                q.reject(response.data);
+              }
+            })
+            .catch(err => {
+              q.reject(err);
+            });
+          return q.promise;
+        },
+        
+        send: (data) => {
+          var q = $q.defer();
+          var http_config = this.ifttt().config(data);
+          
+          if (!http_config.url) {
+            return q.reject('Missing URL');
+          }
+          
+          $http(http_config)
+            .then(response => {
+              if (response.status) {
+                q.resolve(`Connection status ${response.status}`);
+              } else {
+                q.reject(response.data);
+              }
+            })
+            .catch(err => {
+              q.reject(err);
+            });
+          return q.promise;
+        },
+      }
+    },
+    
     app: function(){
       var settings = this.settings('settings');
       var request = {url: 'https://sensor.brewbench.co/', headers: {}, timeout: 10000};

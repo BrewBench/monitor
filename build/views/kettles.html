@@ -159,6 +159,18 @@
               </div>
             </div>
           </div>
+          <div class="col" ng-if="kettle.arduino" ng-if="settings.ifttt.status == 'Connected'">
+            <label class="adjust">IFTTT              
+            </label>
+            <div class="btn-group pb-3">
+              <ul class="tg-list" data-toggle="tooltip" title="Toggle On to send data to your IFTTT URL when temp goes out of range">
+                <li class="tg-list-item">
+                  <input class="tgl tgl-ios" id="ifttt{{$index}}" type="checkbox" ng-checked="kettle.temp.ifttt" ng-click="kettle.temp.ifttt = !kettle.temp.ifttt"/>
+                  <label class="tgl-btn" for="ifttt{{$index}}"></label>
+                </li>
+              </ul>
+            </div>
+          </div>
         </div>
 
         <div class="row">

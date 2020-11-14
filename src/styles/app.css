@@ -1019,7 +1019,7 @@ button {
 .tplinks .fa-power-off.off, .chart-toggle .fa-chart-line.off {
   color: #777;
   background: #ccc;
-  padding: 9px;
+  padding: 9px 6px;
   border-radius: 20px;
 }
 

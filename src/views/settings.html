@@ -242,7 +242,7 @@
         </div>
 
         <div class="pb-3">
-          <h4>TP-Links
+          <h4><a href="https://www.kasasmart.com/us/products/smart-plugs" target="_blank"><img src="/assets/img/tp-link-logo.svg" width="100"/></a> Smart Plugs
             <sup class="badge badge-{{ getStatusClass(settings.tplink.status) }} badge-pill">
               {{ settings.tplink.status || 'Not Connected'}}
             </sup>
@@ -259,8 +259,9 @@
                 <input class="form-control" type="password" ng-model="settings.tplink.pass" placeholder="Password">
               </div>
             </div>
-            <div class="btn-group float-right pb-2">
-              <button type="button" ng-if="settings.tplink.token" class="btn btn-light" style="margin-top: 5px;" ng-click="tplink.scan()">Scan</button>
+            <div class="float-right pb-2">
+              <button type="button" ng-disabled="!settings.tplink.token" class="btn btn-light" style="margin-top: 5px;" ng-click="tplink.clear()">Clear</button>
+              <button type="button" ng-disabled="!settings.tplink.token" class="btn btn-light" style="margin-top: 5px;" ng-click="tplink.scan()">Scan</button>
               <button type="button" class="btn btn-primary" style="margin-top: 5px;" ng-click="tplink.login()">Connect</button>
             </div>
             <div class="table-responsive">
@@ -304,6 +305,46 @@
           </div>
           </div>
         </div>
+        
+        <div class="pb-3">
+          <h4><a href="https://ifttt.com" target="_blank"><img src="/assets/img/ifttt.png" width="100"/></a>
+            <sup class="badge badge-{{ getStatusClass(settings.ifttt.status) }} badge-pill">
+              {{ settings.ifttt.status || 'Not Connected'}}
+            </sup>
+            <i class="fas fa-network-wired fa-lg float-right" aria-hidden="true"></i>
+          </h4>
+          <div class="block-border">
+            <div class="row">
+              <div class="col-6">
+                <label class="adjust">URL</label>
+                <input class="form-control" type="text" ng-model="settings.ifttt.url" placeholder="URL">
+              </div>
+              <div class="col-6">
+                <label class="adjust">Method</label>
+                  <div class="input-group" role="group">
+                    <input id="get" class="degree" type="radio" ng-checked="settings.ifttt.method=='GET'" value="GET" ng-click="settings.ifttt.method='GET'"> 
+                    <label for="get">GET</label>&nbsp;&nbsp;
+                    <input id="post" class="degree" type="radio" ng-checked="settings.ifttt.method=='POST'" value="POST" ng-click="settings.ifttt.method='POST'"> <label for="post">POST</label>
+                  </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-6">
+                <label class="adjust">Auth Header Key</label>
+                <input class="form-control" type="text" ng-model="settings.ifttt.auth.key" placeholder="Auth Header Key">
+              </div>
+              <div class="col-6">
+                <label class="adjust">Auth Header Value</label>
+                <input class="form-control" type="text" ng-model="settings.ifttt.auth.value" placeholder="Auth Header Value">
+              </div>
+            </div>
+            <div class="float-right pb-2">
+              <button type="button" ng-disabled="!settings.ifttt.url" class="btn btn-light" style="margin-top: 5px;" ng-click="ifttt.clear()">Clear</button>
+              <button type="button" class="btn btn-primary" style="margin-top: 5px;" ng-click="ifttt.connect()">Connect</button>
+            </div>
+          </div>
+        </div>  
+        
       </div>
     </div>
   </div>

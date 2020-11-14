@@ -298,6 +298,9 @@ $scope.updateABV();
   };
 
   $scope.tplink = {
+    clear: () => { 
+      $scope.settings.tplink = { user: '', pass: '', token: '', status: '', plugs: [] };
+    },
     login: () => {
       $scope.settings.tplink.status = 'Connecting';
       BrewService.tplink().login($scope.settings.tplink.user,$scope.settings.tplink.pass)
@@ -306,6 +309,9 @@ $scope.updateABV();
             $scope.settings.tplink.status = 'Connected';
             $scope.settings.tplink.token = response.token;
             $scope.tplink.scan(response.token);
+          } else if(response.error_code && response.msg){
+            $scope.settings.tplink.status = 'Failed to Connect';
+            $scope.setErrorMessage(response.msg);  
           }
         })
         .catch(err => {
@@ -368,6 +374,25 @@ $scope.updateABV();
     }
   };
 
+  $scope.ifttt = {
+    clear: () => { 
+      $scope.settings.ifttt = { url: '', method: 'GET', auth: { key: '', value: '' }, status: '' };
+    },
+    connect: () => {
+      $scope.settings.ifttt.status = 'Connecting';
+      BrewService.ifttt().connect()
+        .then(response => {
+          if(response){
+            $scope.settings.ifttt.status = 'Connected';
+          }
+        })
+        .catch(err => {
+          $scope.settings.ifttt.status = 'Failed to Connect';
+          $scope.setErrorMessage(err.msg || err);
+        });
+    },
+  };
+  
   $scope.addKettle = function(type){
     if(!$scope.kettles) $scope.kettles = [];
     var arduino = $scope.settings.arduinos.length ? $scope.settings.arduinos[0] : {id: 'local-'+btoa('brewbench'),url:'arduino.local',analog:5,digital:13,adc:0,secure:false};
@@ -379,7 +404,7 @@ $scope.updateABV();
         ,sticky: false
         ,heater: {pin:'D6',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
         ,pump: {pin:'D7',running:false,auto:false,pwm:false,dutyCycle:100,sketch:false}
-        ,temp: {pin:'A0',vcc:'',index:'',type:'Thermistor',adc:false,hit:false,current:0,measured:0,previous:0,adjust:0,target:$scope.kettleTypes[0].target,diff:$scope.kettleTypes[0].diff,raw:0,volts:0}
+        ,temp: {pin:'A0',vcc:'',index:'',type:'Thermistor',adc:false,hit:false,ifttt:false,current:0,measured:0,previous:0,adjust:0,target:$scope.kettleTypes[0].target,diff:$scope.kettleTypes[0].diff,raw:0,volts:0}
         ,values: []
         ,timers: []
         ,knob: angular.copy(BrewService.defaultKnobOptions(),{value:0,min:0,max:$scope.kettleTypes[0].target+$scope.kettleTypes[0].diff})
@@ -1597,7 +1622,7 @@ $scope.updateABV();
       }
     }
     // Slack Notification
-    if($scope.settings.notifications.slack.indexOf('http') === 0){
+    if($scope.settings.notifications.slack && $scope.settings.notifications.slack.indexOf('http') === 0){
       BrewService.slack($scope.settings.notifications.slack,
           message,
           color,
@@ -1611,6 +1636,28 @@ $scope.updateABV();
             $scope.setErrorMessage(`Failed posting to Slack ${err.message}`);
           else
             $scope.setErrorMessage(`Failed posting to Slack ${JSON.stringify(err)}`);
+        });
+    }
+    // IFTTT Notification
+    if(Boolean(kettle.temp.ifttt) && $scope.settings.ifttt.url && $scope.settings.ifttt.url.indexOf('http') === 0){
+      BrewService.ifttt().send({
+          message: message,
+          color: color,          
+          name: kettle.name,
+          type: kettle.type,
+          temp: kettle.temp,
+          heater: kettle.heater,
+          pump: kettle.pump,
+          cooler: kettle.cooler || {},
+          arduino: kettle.arduino          
+        }).then(function(response){
+          $scope.resetError();
+        })
+        .catch(function(err){
+          if(err.message)
+            $scope.setErrorMessage(`Failed sending to IFTTT ${err.message}`);
+          else
+            $scope.setErrorMessage(`Failed sending to IFTTT ${JSON.stringify(err)}`);
         });
     }
   };
