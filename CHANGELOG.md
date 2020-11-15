@@ -1,5 +1,9 @@
 # Change Log
 
+## 4.7.3 - 2020-11-14
+
+- Added info to app sketch with replace kettle functionality
+
 ## 4.7.2 - 2020-11-14
 
 - Removed share code, this was not being used
