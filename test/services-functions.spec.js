@@ -133,34 +133,34 @@ describe('BrewBench Service', function() {
     });
   });
 
-  describe('.loadShareFile()', function() {
-    // A simple test to verify the method loadShareFile exists
+  describe('.ifttt()', function() {
+    // A simple test to verify the method ifttt exists
     it('should exist', function() {
-      expect(BrewService.loadShareFile).toBeDefined();
+      expect(BrewService.ifttt).toBeDefined();
     });
   });
 
-  describe('.createShare()', function() {
-    // A simple test to verify the method createShare exists
+  describe('.ifttt().config()', function() {
+    // A simple test to verify the method ifttt exists
     it('should exist', function() {
-      expect(BrewService.createShare).toBeDefined();
+      expect(BrewService.ifttt().config).toBeDefined();
     });
   });
-
-  describe('.shareTest()', function() {
-    // A simple test to verify the method shareTest exists
+  
+  describe('.ifttt().connect()', function() {
+    // A simple test to verify the method ifttt exists
     it('should exist', function() {
-      expect(BrewService.shareTest).toBeDefined();
+      expect(BrewService.ifttt().connect).toBeDefined();
     });
   });
-
-  describe('.ip()', function() {
-    // A simple test to verify the method ip exists
+  
+  describe('.ifttt().send()', function() {
+    // A simple test to verify the method ifttt exists
     it('should exist', function() {
-      expect(BrewService.ip).toBeDefined();
+      expect(BrewService.ifttt().send).toBeDefined();
     });
   });
-
+  
   describe('.tplink()', function() {
     // A simple test to verify the method tplink exists
     it('should exist', function() {
