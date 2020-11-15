@@ -179,6 +179,151 @@ void actionsCommand(const String sensor_name, const String spin, const String ty
   }
 }
 
+String adCommand(const String dpin, const String apin, int16_t value, const String type) {
+  uint8_t pin;
+  if( dpin != "" )
+    pin = dpin.substring(1).toInt();
+  else
+    pin = apin.substring(1).toInt();
+
+  // write
+  if ( value >= 0 ) {
+    pinMode(pin, OUTPUT);
+    if( type == "analog" ){
+      ledcWrite(pin, value);//0 - 255
+    }
+    else if( type == "digital" ){
+      if(value == 1)
+        digitalWrite(pin, LOW);//turn on relay
+      else
+        digitalWrite(pin, HIGH);//turn off relay
+    }
+  } else {
+    // read
+    pinMode(pin, INPUT);
+    if( type == "analog" ){
+      value = analogRead(pin);
+    }
+    else if( type == "digital" ){
+      value = digitalRead(pin);
+    }
+  }
+
+  // Send JSON response to client
+  String data = "{\"pin\":\""+String(dpin)+"\",\"value\":\""+String(value)+"\",\"sensor\":\""+String(type)+"\"}";
+  if( apin != "" )
+    data = "{\"pin\":\""+String(apin)+"\",\"value\":\""+String(value)+"\",\"sensor\":\""+String(type)+"\"}";
+
+  return data;
+}
+
+String sensorCommand(const String dpin, const String apin, const int16_t index, const String type) {
+  uint8_t pin;
+  if( dpin != "" )
+    pin = dpin.substring(1).toInt();
+  else
+    pin = apin.substring(1).toInt();
+  float temp = 0.00;
+  float raw = 0.00;
+  float percent = 0.00;
+  float volts = 0.00;
+  float resistance = 0.0;
+
+  String data = "{\"sensor\":\""+String(type)+"\"";
+  if( dpin != "" )
+    data += ",\"pin\":\""+String(dpin)+"\"";
+  else
+    data += ",\"pin\":\""+String(apin)+"\"";
+
+  if( dpin != "" ){
+    raw = digitalRead(pin);
+  } else {
+    raw = analogRead(pin);
+    volts = raw * 0.0049;
+  }
+
+  // Start sensors
+  if(type == "Thermistor"){
+    samples[0] = raw;
+    uint8_t i;
+    // take N samples in a row, with a slight delay
+    for (i=1; i< NUMSAMPLES; i++) {
+      samples[i] = analogRead(pin);
+      delay(10);
+    }
+    // average all the samples out
+    for (i=0; i< NUMSAMPLES; i++) {
+       resistance += samples[i];
+    }
+    resistance /= NUMSAMPLES;
+    raw = resistance;
+    temp = Thermistor(resistance);
+  }
+  else if(type == "PT100"){
+    if (raw>409){
+      temp = (150*map(raw,410,1023,0,614))/614;
+    }
+  }
+  else if(type == "SoilMoisture"){
+    if( dpin != "" ){
+      pinMode(pin, OUTPUT);
+      digitalWrite(pin, HIGH);
+      delay(10);
+    }
+    raw = analogRead(apin.substring(1).toInt());
+    if( dpin != "" ){
+      digitalWrite(pin, LOW);
+    }
+    // ESP32 has 12bits of resolution instead of 10
+    raw = map(raw, 0, 4095, 0, 880);
+    percent = map(raw, 0, 880, 0, 100);
+    data += ",\"percent\":"+String(percent);
+  }
+  // DS18B20 else if(type == "DS18B20"){
+  // DS18B20   OneWire oneWire(pin);
+  // DS18B20   DallasTemperature sensors(&oneWire);
+  // DS18B20   sensors.begin();
+  // DS18B20   sensors.requestTemperatures();
+  // DS18B20   if( index > 0 )
+  // DS18B20     temp = sensors.getTempCByIndex(index);
+  // DS18B20   else
+  // DS18B20     temp = sensors.getTempCByIndex(0);
+  // DS18B20 }
+  // DHT else if(type == "DHT11" || type == "DHT12"){
+  // DHT   if(type == "DHT11"){
+  // DHT     dht.setup(pin, DHTesp::DHT11);
+  // DHT     delay(dht.getMinimumSamplingPeriod());
+  // DHT     temp = dht.getTemperature();
+  // DHT     percent = dht.getHumidity();
+  // DHT   } else if(type == "DHT22"){
+  // DHT     dht.setup(pin, DHTesp::DHT22);
+  // DHT     delay(dht.getMinimumSamplingPeriod());
+  // DHT     temp = dht.getTemperature();
+  // DHT     percent = dht.getHumidity();
+  // DHT   }
+  // DHT   if(isnan(temp)) temp = 0;
+  // DHT   if(isnan(percent)) percent = 0;
+  // DHT   data += ",\"percent\":"+String(percent);
+  // DHT }
+  // BMP180 else if(type == "BMP180"){
+  // BMP180   if (bmp.begin()) {
+  // BMP180     temp = bmp.readTemperature();
+  // BMP180     data += ",\"altitude\":"+String(bmp.readAltitude());
+  // BMP180     data += ",\"pressure\":"+String(bmp.readPressure());
+  // BMP180   } else {
+  // BMP180     data += ",\"altitude\":0";
+  // BMP180     data += ",\"pressure\":0";
+  // BMP180   }
+  // BMP180 }
+
+  data += ",\"temp\":"+String(temp);
+  data += ",\"raw\":"+String(raw);
+  data += ",\"volts\":"+String(volts);
+  data += "}";
+
+  return data;
+}
+
 String getPins(){
   String pins = ",\"pins\": [";
   // [PINS]
@@ -315,15 +460,12 @@ void getTemps()
 }
 
 boolean restoreConfig()
-{
-  
+{  
   preferences.begin("brewbench", false);
   wifi_ssid = preferences.getString("WIFI_SSID");
   wifi_password = preferences.getString("WIFI_PASSWD");
   preferences.end();  
-    preferences.end();  
-  preferences.end();  
-  
+    
   Serial.print("WIFI-SSID: ");
   Serial.println(wifi_ssid);
 
@@ -367,6 +509,34 @@ void sendHeaders(){
   webServer.sendHeader("Connection", "close");
 }
 
+void processRest(const String command) {
+  String apin = "";
+  String dpin = "";
+  int16_t value = -1;
+  int16_t index = -1;
+  for (uint8_t i = 0; i < webServer.args(); i++) {
+    if( webServer.argName(i) == "dpin" )
+      dpin = webServer.arg(i);
+    else if( webServer.argName(i) == "apin" )
+      apin = webServer.arg(i);
+    else if( webServer.argName(i) == "value" )
+      value = webServer.arg(i).toInt();
+    else if( webServer.argName(i) == "index" )
+      index = webServer.arg(i).toInt();
+  }
+  String data = "";
+
+  if (command == "digital" || command == "analog" || command == "adc") {
+    data = adCommand(dpin, apin, value, command);
+  }
+  else if (command == "Thermistor" || command == "DS18B20" || command == "PT100" ||
+      command == "DHT11" || command == "DHT22" || command == "SoilMoisture" ||
+      command == "BMP180") {
+    data = sensorCommand(dpin, apin, index, command);
+  }
+  webServer.send(200, "application/json", data);
+}
+
 void handleNotFound() {
   String message = "{";
   message += "\"uri\": \""+webServer.uri()+"\"";
@@ -399,7 +569,7 @@ void startWebServer()
   preferences.end();
   webServer.begin();
   webServer.onNotFound(handleNotFound);
-
+  
   webServer.on("/info", []() {
     String data = "{";
     data += "\"model\": \"BrewBench ESP32\"";
@@ -423,8 +593,55 @@ void startWebServer()
     data += ",\"mac\":\"" + String(WiFi.macAddress())+"\"";
     data += getPins();
     data += "}";
+    sendHeaders();
     webServer.send(200, "application/json", data);
   });
+  
+  // endpoints for monitor.brewbench.co
+  webServer.on("/arduino/info", [](){
+    String data = "{\"BrewBench\": {\"board\": \""+String(ARDUINO_BOARD)+"\", \"version\": \"[VERSION]\"";
+    data += ",\"RSSI\":"+String(WiFi.RSSI());
+    data += ",\"IP\":\""+WiFi.localIP().toString()+"\"";
+    data += "}}";
+    sendHeaders();
+    webServer.send(200, "application/json", data);
+  });
+  
+  webServer.on("/arduino/reboot", [](){
+    sendHeaders();
+    webServer.send(200, "application/json", "{\"reboot\":true}");
+    delay(500);
+    ESP.restart();
+  });
+  
+  webServer.on("/arduino/Thermistor", [](){
+    sendHeaders();
+    processRest("Thermistor");
+  });
+  webServer.on("/arduino/PT100", [](){
+    sendHeaders();
+    processRest("PT100");
+  });
+  webServer.on("/arduino/SoilMoisture", [](){
+    sendHeaders();
+    processRest("SoilMoisture");
+  });
+  // DS18B20 webServer.on("/arduino/DS18B20", [](){
+  // DS18B20   sendHeaders();
+  // DS18B20   processRest("DS18B20");
+  // DS18B20 });
+  // DHT webServer.on("/arduino/DHT11", [](){
+  // DHT   sendHeaders();
+  // DHT   processRest("DHT11");
+  // DHT });
+  // DHT webServer.on("/arduino/DHT22", [](){
+  // DHT   sendHeaders();
+  // DHT   processRest("DHT22");
+  // DHT });
+  // BMP180 webServer.on("/arduino/BMP180", [](){
+  // BMP180   sendHeaders();
+  // BMP180   processRest("BMP180");
+  // BMP180 });
     
   if (settingMode)
   {
@@ -554,23 +771,7 @@ void startWebServer()
 
     Serial.print("Starting Web Server at ");
     Serial.println(WiFi.localIP());
-
-    webServer.on("/arduino/info", [](){
-      String data = "{\"BrewBench\": {\"board\": \""+String(ARDUINO_BOARD)+"\", \"version\": \"[VERSION]\"";
-      data += ",\"RSSI\":"+String(WiFi.RSSI());
-      data += ",\"IP\":\""+WiFi.localIP().toString()+"\"";
-      data += "}}";
-      sendHeaders();
-      webServer.send(200, "application/json", data);
-    });
-
-    webServer.on("/arduino/reboot", [](){
-      sendHeaders();
-      webServer.send(200, "application/json", "{\"reboot\":true}");
-      delay(500);
-      ESP.restart();
-    });  
-  
+    
     webServer.on("/post", []() {
       secondCounter = 0;
       postData();

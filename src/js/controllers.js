@@ -28,6 +28,7 @@ $scope.esp = {
   arduino_pass: 'bbadmin',
   autoconnect: false
 };
+$scope.modalInfo = {};
 $scope.hops;
 $scope.grains;
 $scope.water;
@@ -70,6 +71,35 @@ $scope.slider = {
   }
 };
 
+$scope.openInfoModal = function (arduino) {
+  $scope.modalInfo = arduino;
+  $('#arduino-info').modal('toggle');  
+};
+  
+$scope.replaceKettlesWithPins = function (arduino) {
+  if (arduino.info && arduino.info.pins && arduino.info.pins.length) {
+    $scope.kettles = [];
+    _.each(arduino.info.pins, pin => {
+      $scope.kettles.push({
+        name: pin.name
+        , id: null
+        , type: $scope.kettleTypes[4].type
+        , active: false
+        , sticky: false
+        , heater: { pin: 'D6', running: false, auto: false, pwm: false, dutyCycle: 100, sketch: false }
+        , pump: { pin: 'D7', running: false, auto: false, pwm: false, dutyCycle: 100, sketch: false }
+        , temp: { pin: pin.pin, vcc: '', index: '', type: pin.type, adc: false, hit: false, ifttt: false, current: 0, measured: 0, previous: 0, adjust: 0, target: $scope.kettleTypes[4].target, diff: $scope.kettleTypes[4].diff, raw: 0, volts: 0 }
+        , values: []
+        , timers: []
+        , knob: angular.copy(BrewService.defaultKnobOptions(), { value: 0, min: 0, max: $scope.kettleTypes[4].target + $scope.kettleTypes[4].diff })
+        , arduino: arduino
+        , message: { type: 'error', message: '', version: '', count: 0, location: '' }
+        , notify: { slack: false }
+      });
+    });
+  }
+};
+  
 $scope.getKettleSliderOptions = function(type, index){
   return Object.assign($scope.slider.options, {id: `${type}_${index}`});
 }
@@ -208,7 +238,8 @@ $scope.updateABV();
         adc: 0,
         secure: false,
         version: '',
-        status: {error: '',dt: '',message:''}
+        status: { error: '', dt: '', message: '' },
+        info: {}
       });
       _.each($scope.kettles, kettle => {
         if(!kettle.arduino)
@@ -265,6 +296,26 @@ $scope.updateABV();
             arduino.status.dt = '';
             arduino.status.message = '';
             arduino.status.error = 'Could not connect';
+          }
+        });
+    },
+    info: (arduino) => {
+      arduino.status.error = '';
+      arduino.status.message = 'Getting Info...';
+      BrewService.connect(arduino, 'info-ext')
+        .then(info => {
+          arduino.info = info;
+          arduino.status.error = '';
+          arduino.status.message = '';
+        })
+        .catch(err => {
+          arduino.info = {};
+          if(err && err.status == -1){
+            arduino.status.message = '';
+            if(pkg.version < 4.2)
+              arduino.status.error = 'Upgrade to support reboot';
+            else
+              arduino.status.error = 'Could not connect';
           }
         });
     },

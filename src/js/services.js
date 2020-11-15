@@ -19,7 +19,7 @@ angular.module('brewbench-monitor')
         , recipe: { 'name': '', 'brewer': { name: '', 'email': '' }, 'yeast': [], 'hops': [], 'grains': [], scale: 'gravity', method: 'papazian', 'og': 1.050, 'fg': 1.010, 'abv': 0, 'abw': 0, 'calories': 0, 'attenuation': 0 }
         , notifications: { on: true, timers: true, high: true, low: true, target: true, slack: '', last: '' }
         , sounds: { on: true, alert: '/assets/audio/bike.mp3', timer: '/assets/audio/school.mp3' }
-        , arduinos: [{ id: 'local-' + btoa('brewbench'), board: '', RSSI: false, url: 'arduino.local', analog: 5, digital: 13, adc: 0, secure: false, version: '', status: { error: '', dt: '', message: '' } }]
+        , arduinos: [{ id: 'local-' + btoa('brewbench'), board: '', RSSI: false, url: 'arduino.local', analog: 5, digital: 13, adc: 0, secure: false, version: '', status: { error: '', dt: '', message: '' }, info: {} }]
         , tplink: { user: '', pass: '', token: '', status: '', plugs: [] }
         , ifttt: { url: '', method: 'GET', auth: { key: '', value: '' }, status: '' }
         , influxdb: { url: '', port: '', user: '', pass: '', db: '', dbs: [], status: '' }
@@ -206,9 +206,12 @@ angular.module('brewbench-monitor')
 
     connect: function(arduino, endpoint){
       var q = $q.defer();
-      var url = this.domain(arduino)+'/arduino/'+endpoint;
+      var url = this.domain(arduino) + '/arduino/' + endpoint;
+      // extended info
+      if (endpoint == 'info-ext')
+        url = this.domain(arduino) + '/info';
       var settings = this.settings('settings');
-      var request = {url: url, method: 'GET', timeout: settings.general.pollSeconds*10000};
+      var request = {url: url, method: 'GET', timeout: 10000};
       $http(request)
         .then(response => {
           if(response.headers('X-Sketch-Version'))
