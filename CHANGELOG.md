@@ -1,5 +1,9 @@
 # Change Log
 
+## 4.7.1 - 2020-11-14
+
+- Updated open source ESP32 sketch
+
 ## 4.7.0 - 2020-11-14
 
 - Added IFTTT Support
