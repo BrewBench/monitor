@@ -101,13 +101,6 @@ if(!$scope.settings.general)
   return $scope.clearSettings();
 $scope.chartOptions = BrewService.chartOptions({unit: $scope.settings.general.unit, chart: $scope.settings.chart});
 $scope.kettles = BrewService.settings('kettles') || BrewService.defaultKettles();
-$scope.share = (!$state.params.file && BrewService.settings('share')) ? BrewService.settings('share') : {
-      file: $state.params.file || null
-      , password: null
-      , needPassword: false
-      , access: 'readOnly'
-      , deleteAfter: 14
-  };
 
 $scope.openSketches = function(){
   $('#settingsModal').modal('hide');
@@ -410,7 +403,7 @@ $scope.updateABV();
         ,knob: angular.copy(BrewService.defaultKnobOptions(),{value:0,min:0,max:$scope.kettleTypes[0].target+$scope.kettleTypes[0].diff})
         ,arduino: arduino
         ,message: {type:'error',message:'',version:'',count:0,location:''}
-        ,notify: {slack: false, dweet: false, streams: false}
+        ,notify: {slack: false}
     });
   };
 
@@ -468,44 +461,6 @@ $scope.updateABV();
     }
     kettle.temp.vcc = '';
     kettle.temp.index = '';
-  };
-
-  $scope.createShare = function(){
-    if(!$scope.settings.recipe.brewer.name || !$scope.settings.recipe.brewer.email)
-      return;
-    $scope.share_status = 'Creating share link...';
-    return BrewService.createShare($scope.share)
-      .then(function(response) {
-        if(response.share && response.share.url){
-          $scope.share_status = '';
-          $scope.share_success = true;
-          $scope.share_link = response.share.url;
-        } else {
-          $scope.share_success = false;
-        }
-        BrewService.settings('share',$scope.share);
-      })
-      .catch(err => {
-        $scope.share_status = err;
-        $scope.share_success = false;
-        BrewService.settings('share',$scope.share);
-      });
-  };
-
-  $scope.shareTest = function(arduino){
-    arduino.testing = true;
-    BrewService.shareTest(arduino)
-      .then(response => {
-        arduino.testing = false;
-        if(response.http_code == 200)
-          arduino.public = true;
-        else
-          arduino.public = false;
-      })
-      .catch(err => {
-        arduino.testing = false;
-        arduino.public = false;
-      });
   };
 
   $scope.influxdb = {
@@ -592,62 +547,6 @@ $scope.updateABV();
           $scope.settings.app.status = 'Failed to Connect';
         });
     }
-  };
-
-  $scope.shareAccess = function(access){
-      if($scope.settings.general.shared){
-        if(access){
-          if(access == 'embed'){
-            return Boolean(window.frameElement);
-          } else {
-            return Boolean($scope.share.access && $scope.share.access === access);
-          }
-        }
-        return true;
-      } else if(access && access == 'embed'){
-        return Boolean(window.frameElement);
-      }
-      return true;
-  };
-
-  $scope.loadShareFile = function(){
-    BrewService.clear();
-    $scope.settings = BrewService.reset();
-    $scope.settings.general.shared = true;
-    return BrewService.loadShareFile($scope.share.file, $scope.share.password || null)
-      .then(function(contents) {
-        if(contents){
-          if(contents.needPassword){
-            $scope.share.needPassword = true;
-            if(contents.settings.recipe){
-              $scope.settings.recipe = contents.settings.recipe;
-            }
-            return false;
-          } else {
-            $scope.share.needPassword = false;
-            if(contents.share && contents.share.access){
-              $scope.share.access = contents.share.access;
-            }
-            if(contents.settings){
-              $scope.settings = contents.settings;
-              $scope.settings.notifications = {on:false,timers:true,high:true,low:true,target:true,slack:'',last:''};
-            }
-            if(contents.kettles){
-              _.each(contents.kettles, kettle => {
-                kettle.knob = angular.copy(BrewService.defaultKnobOptions(),{value:0,min:0,max:200+5,subText:{enabled: true,text: 'starting...',color: 'gray',font: 'auto'}});
-                kettle.values = [];
-              });
-              $scope.kettles = contents.kettles;
-            }
-            return $scope.processTemps();
-          }
-        } else {
-          return false;
-        }
-      })
-      .catch(function(err) {
-        $scope.setErrorMessage("Opps, there was a problem loading the shared session.");
-      });
   };
 
   $scope.importRecipe = function($fileContent,$ext){
@@ -843,10 +742,7 @@ $scope.updateABV();
     if($('#gitcommit a').text() != 'git_commit'){
       $('#gitcommit').show();
     }
-    $scope.showSettings = !$scope.settings.general.shared;
-    if($scope.share.file)
-      return $scope.loadShareFile();
-
+    
     _.each($scope.kettles, kettle => {
         //update max
         kettle.knob.max = kettle.temp['target']+kettle.temp['diff']+10;
@@ -872,11 +768,7 @@ $scope.updateABV();
       return true;
   };
 
-  $scope.setErrorMessage = function(err, kettle, location){
-    if(Boolean($scope.settings.general.shared)){
-      $scope.error.type = 'warning';
-      $scope.error.message = $sce.trustAsHtml('The monitor seems to be off-line, re-connecting...');
-    } else {
+  $scope.setErrorMessage = function(err, kettle, location){    
       var message;
 
       if(typeof err == 'string' && err.indexOf('{') !== -1){
@@ -918,7 +810,7 @@ $scope.updateABV();
       } else {
         $scope.error.message = $sce.trustAsHtml('Connection error:');
       }
-    }
+    
   };
   $scope.updateArduinoStatus = function(response, error){
     var arduino = _.filter($scope.settings.arduinos, {id: response.kettle.arduino.id});
@@ -1157,8 +1049,7 @@ $scope.updateABV();
     _.each($scope.kettles, kettle => {
       if((kettle.heater && kettle.heater.sketch) ||
         (kettle.cooler && kettle.cooler.sketch) ||
-        kettle.notify.slack ||
-        kettle.notify.dweet
+        kettle.notify.slack
       ) {
         hasASketch = true;
       }
@@ -1727,10 +1618,6 @@ $scope.updateABV();
   };
 
   $scope.changeKettleType = function(kettle){
-    //don't allow changing kettles on shared sessions
-    //this could be dangerous if doing this remotely
-    if($scope.settings.general.shared)
-      return;
     // find current kettle
     var kettleIndex = _.findIndex($scope.kettleTypes, {type: kettle.type});
     // move to next or first kettle in array

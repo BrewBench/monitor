@@ -1,5 +1,9 @@
 # Change Log
 
+## 4.7.2 - 2020-11-14
+
+- Removed share code, this was not being used
+
 ## 4.7.1 - 2020-11-14
 
 - Updated open source ESP32 sketch

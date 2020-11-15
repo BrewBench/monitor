@@ -7,7 +7,7 @@
 
       <div class="row">
         <div class="col-auto mr-auto">
-          <div class="arduinos" ng-if="shareAccess('fullAccess')">
+          <div class="arduinos">
             <a class="ui ribbon label dropdown-toggle" ng-class="{'teal':kettle.arduino, 'orange':!kettle.arduino}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               <span class="dropdown-toggle"><img src="assets/img/arduino.svg" width="15"> {{kettle.arduino ? kettle.arduino.url : 'Select an Arduino'}}</span>
             </a>
@@ -28,7 +28,7 @@
             </div>
           </div>
         </div>
-        <div ng-if="shareAccess('fullAccess')" class="col-auto">
+        <div class="col-auto">
           <i class="fas fa-4x float-right" ng-click="startStopKettle(kettle)" ng-class="{'fa-stop-circle':kettle.active,'fa-play-circle':!kettle.active}"></i>
         </div>
       </div>
@@ -50,7 +50,6 @@
         </div>
       </div>
 
-      <div ng-if="shareAccess('fullAccess')">
         <div class="row">
           <div class="col">
             <label class="adjust">Sensor</label>
@@ -352,8 +351,6 @@
         </div>
       </div>
 
-      </div>
-
     </div>
 
     <div class="card-body">
@@ -388,7 +385,7 @@
             {{ !!BrewService.sensorTypes(kettle.temp.type).percent ? '%' : '&deg;'+settings.general.unit }} &uarr;
           </span>
         </div>
-        <div class="col" ng-if="shareAccess('fullAccess')">
+        <div class="col">
           <div class="row">
             <div class="col">
               <label class="adjust">Target</label>
@@ -493,7 +490,7 @@
         </div>
       </div>
       <br>
-      <div class="row timers" ng-if="shareAccess('fullAccess')">
+      <div class="row timers">
         <div class="col">
             <div class="row timer-block" ng-repeat="timer in kettle.timers track by $index" ng-class="{'running':(timer.running && !timer.up), 'queue': timer.queue, 'finished': timer.up}">
             <div class="col-auto mr-auto">
@@ -536,10 +533,7 @@
         </li>
       </ul>
     </div>
-    <div class="card-footer" ng-if="shareAccess('fullAccess')">
-        <span ng-if="kettle.notify.streams" class="badge badge-pill badge-dark badge-streams float-left status-{{ kettle.message.status }}">
-          <img src="/assets/img/brewbench-colors.png" width="25" style="border-radius:10px;"/> Streaming
-        </span>
+    <div class="card-footer">        
         <i class="fas fa-1x float-right" ng-class="{'fa-chevron-left':!showRemoveKettle,'fa-chevron-right':showRemoveKettle}" aria-hidden="true" ng-click="showRemoveKettle=!showRemoveKettle"></i>        
         <div style="float:right;">
           <button type="button" ng-show="showRemoveKettle" class="btn btn-danger btn-sm" ng-click="clearKettle(kettle, $index); showRemoveKettle=!showRemoveKettle">Clear History</button>

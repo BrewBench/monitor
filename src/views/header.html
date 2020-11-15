@@ -1,4 +1,4 @@
-<nav ng-if="!shareAccess('embed')" id="navbar" class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+<nav id="navbar" class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
   <a class="navbar-brand" href="#" data-toggle="modal" data-target="#aboutModal">
     <img src="/assets/img/icons/icon.png" width="45"/>
   </a>
@@ -12,11 +12,9 @@
       <a href="" data-toggle="modal" data-target="#dataModal-water" class="nav-item nav-link" title="Water"><img src="/assets/img/water.svg" width="32"></a>
       <a href="" data-toggle="modal" data-target="#dataModal-styles" class="nav-item nav-link" title="Style Guide" ng-click="loadStyles()"><i class="fas fa-book fa-2x" aria-hidden="true"></i>
       <a href="" data-toggle="modal" data-target="#dataModal-calc" class="nav-item nav-link" title="Calculator"><i class="fas fa-calculator fa-2x" aria-hidden="true"></i></a>
-      <a ng-if="shareAccess('fullAccess')" href="" data-toggle="modal" data-target="#importModal" class="nav-item nav-link" title="Import Recipe"><i class="fas fa-upload fa-2x" aria-hidden="true"></i></a>
-      <a ng-if="shareAccess('fullAccess')" href="" data-toggle="modal" data-target="#shareModal" class="nav-item nav-link" title="Share Session"><i class="fas fa-share fa-2x" aria-hidden="true"></i></a>
-      <a ng-if="showSettings && shareAccess('fullAccess')" href="" data-toggle="modal" data-target="#settingsModal" class="nav-item nav-link" title="Settings"><i class="fas fa-cogs fa-2x"></i></a>
-      <a ng-if="showSettings && shareAccess('fullAccess')" href="" data-toggle="modal" data-target="#sketchesModal" class="nav-item nav-link" title="Sketches"><img src="/assets/img/arduino.svg" width="32"></a>
-      <!-- <a ng-if="shareAccess('fullAccess')" href="" data-toggle="modal" data-target="#accountModal" class="nav-item nav-link" title="Account"><i class="fas fa-user-circle-o fa-2x" aria-hidden="true"></i></a> -->
+      <a href="" data-toggle="modal" data-target="#importModal" class="nav-item nav-link" title="Import Recipe"><i class="fas fa-upload fa-2x" aria-hidden="true"></i></a>
+      <a ng-if="showSettings" href="" data-toggle="modal" data-target="#settingsModal" class="nav-item nav-link" title="Settings"><i class="fas fa-cogs fa-2x"></i></a>
+      <a ng-if="showSettings" href="" data-toggle="modal" data-target="#sketchesModal" class="nav-item nav-link" title="Sketches"><img src="/assets/img/arduino.svg" width="32"></a>
       <a href="#kettle{{$index}}"
         du-smooth-scroll
         duration="1000"

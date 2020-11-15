@@ -8,21 +8,12 @@ angular.module('brewbench-monitor')
       if(window.localStorage){
         window.localStorage.removeItem('settings');
         window.localStorage.removeItem('kettles');
-        window.localStorage.removeItem('share');
-        window.localStorage.removeItem('accessToken');
       }
-    },
-
-    accessToken: function(token){
-      if(token)
-        return window.localStorage.setItem('accessToken',token);
-      else
-        return window.localStorage.getItem('accessToken');
     },
 
     reset: function(){
       const defaultSettings = {
-        general: { debug: false, pollSeconds: 10, unit: 'F', shared: false, heatSafety: false }
+        general: { debug: false, pollSeconds: 10, unit: 'F', heatSafety: false }
         , chart: { show: true, military: false, area: false }
         , sensors: { DHT: false, DS18B20: false, BMP: false }
         , recipe: { 'name': '', 'brewer': { name: '', 'email': '' }, 'yeast': [], 'hops': [], 'grains': [], scale: 'gravity', method: 'papazian', 'og': 1.050, 'fg': 1.010, 'abv': 0, 'abw': 0, 'calories': 0, 'attenuation': 0 }
@@ -73,7 +64,7 @@ angular.module('brewbench-monitor')
           ,knob: angular.copy(this.defaultKnobOptions(),{value:0,min:0,max:220})
           ,arduino: {id: 'local-'+btoa('brewbench'),url:'arduino.local',analog:5,digital:13,adc:0,secure:false}
           ,message: {type:'error',message:'',version:'',count:0,location:''}
-          ,notify: {slack: false, dweet: false}
+          ,notify: {slack: false}
         },{
           name: 'Mash'
           ,id: null
@@ -88,7 +79,7 @@ angular.module('brewbench-monitor')
           ,knob: angular.copy(this.defaultKnobOptions(),{value:0,min:0,max:220})
           ,arduino: {id: 'local-'+btoa('brewbench'),url:'arduino.local',analog:5,digital:13,adc:0,secure:false}
           ,message: {type:'error',message:'',version:'',count:0,location:''}
-          ,notify: {slack: false, dweet: false}
+          ,notify: {slack: false}
         },{
           name: 'Boil'
           ,id: null
@@ -103,7 +94,7 @@ angular.module('brewbench-monitor')
           ,knob: angular.copy(this.defaultKnobOptions(),{value:0,min:0,max:220})
           ,arduino: {id: 'local-'+btoa('brewbench'),url:'arduino.local',analog:5,digital:13,adc:0,secure:false}
           ,message: {type:'error',message:'',version:'',count:0,location:''}
-          ,notify: {slack: false, dweet: false}
+          ,notify: {slack: false}
         }];
     },
 
@@ -356,123 +347,6 @@ angular.module('brewbench-monitor')
           q.reject(err);
         });
       return q.promise;
-    },
-
-    loadShareFile: function(file, password){
-      var q = $q.defer();
-      var query = '';
-      if(password)
-        query = '?password='+md5(password);
-      $http({url: 'https://monitor.brewbench.co/share/get/'+file+query, method: 'GET'})
-        .then(response => {
-          q.resolve(response.data);
-        })
-        .catch(err => {
-          q.reject(err);
-        });
-      return q.promise;
-    },
-
-    // TODO finish this
-    // deleteShareFile: function(file, password){
-    //   var q = $q.defer();
-    //   $http({url: 'https://monitor.brewbench.co/share/delete/'+file, method: 'GET'})
-    //     .then(response => {
-    //       q.resolve(response.data);
-    //     })
-    //     .catch(err => {
-    //       q.reject(err);
-    //     });
-    //   return q.promise;
-    // },
-
-    createShare: function(share){
-      var q = $q.defer();
-      var settings = this.settings('settings');
-      var kettles = this.settings('kettles');
-      var sh = Object.assign({}, {password: share.password, access: share.access});
-      //remove some things we don't need to share
-      _.each(kettles, (kettle, i) => {
-        delete kettles[i].knob;
-        delete kettles[i].values;
-      });
-      delete settings.app;
-      delete settings.influxdb;
-      delete settings.tplink;
-      delete settings.notifications;
-      delete settings.sketches;
-      settings.shared = true;
-      if(sh.password)
-        sh.password = md5(sh.password);
-      $http({url: 'https://monitor.brewbench.co/share/create/',
-          method:'POST',
-          data: {'share': sh, 'settings': settings, 'kettles': kettles},
-          headers: {'Content-Type': 'application/json'}
-        })
-        .then(response => {
-          q.resolve(response.data);
-        })
-        .catch(err => {
-          q.reject(err);
-        });
-      return q.promise;
-    },
-
-    shareTest: function(arduino){
-      var q = $q.defer();
-      var query = `url=${arduino.url}`
-
-      if(arduino.password)
-        query += '&auth='+btoa('root:'+arduino.password.trim());
-
-      $http({url: 'https://monitor.brewbench.co/share/test/?'+query, method: 'GET'})
-        .then(response => {
-          q.resolve(response.data);
-        })
-        .catch(err => {
-          q.reject(err);
-        });
-      return q.promise;
-    },
-
-    ip: function(arduino){
-      var q = $q.defer();
-
-      $http({url: 'https://monitor.brewbench.co/share/ip', method: 'GET'})
-        .then(response => {
-          q.resolve(response.data);
-        })
-        .catch(err => {
-          q.reject(err);
-        });
-      return q.promise;
-    },
-
-    dweet: function(){
-        return {
-          latest: () => {
-            var q = $q.defer();
-            $http({url: 'https://dweet.io/get/latest/dweet/for/brewbench', method: 'GET'})
-              .then(response => {
-                q.resolve(response.data);
-              })
-              .catch(err => {
-                q.reject(err);
-              });
-            return q.promise;
-          },
-          all: () => {
-            var q = $q.defer();
-            $http({url: 'https://dweet.io/get/dweets/for/brewbench', method: 'GET'})
-              .then(response => {
-                q.resolve(response.data);
-              })
-              .catch(err => {
-                q.reject(err);
-              });
-            return q.promise;
-          }
-        };
     },
 
     tplink: function(){
