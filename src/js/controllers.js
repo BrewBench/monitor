@@ -226,6 +226,7 @@ $scope.updateABV();
 
   $scope.arduinos = {
     add: () => {
+      $('[data-toggle="tooltip"]').tooltip('hide');
       var now = new Date();
       if(!$scope.settings.arduinos) $scope.settings.arduinos = [];
       $scope.settings.arduinos.push({
@@ -255,12 +256,14 @@ $scope.updateABV();
       });
     },
     update: (arduino) => {
+      $('[data-toggle="tooltip"]').tooltip('hide');
       _.each($scope.kettles, kettle => {
         if(kettle.arduino && kettle.arduino.id == arduino.id)
           kettle.arduino = arduino;
       });
     },
     delete: (index, arduino) => {
+      $('[data-toggle="tooltip"]').tooltip('hide');
       $scope.settings.arduinos.splice(index, 1);
       _.each($scope.kettles, kettle => {
         if(kettle.arduino && kettle.arduino.id == arduino.id)
@@ -268,6 +271,7 @@ $scope.updateABV();
       });
     },
     connect: (arduino) => {
+      $('[data-toggle="tooltip"]').tooltip('hide');
       arduino.status.dt = '';
       arduino.status.error = '';
       arduino.status.message = 'Connecting...';
@@ -300,6 +304,7 @@ $scope.updateABV();
         });
     },
     info: (arduino) => {
+      $('[data-toggle="tooltip"]').tooltip('hide');
       arduino.status.error = '';
       arduino.status.message = 'Getting Info...';
       BrewService.connect(arduino, 'info-ext')
@@ -312,7 +317,7 @@ $scope.updateABV();
           arduino.info = {};
           if(err && err.status == -1){
             arduino.status.message = '';
-            if(pkg.version < 4.2)
+            if($scope.pkg.version < 4.2)
               arduino.status.error = 'Upgrade to support reboot';
             else
               arduino.status.error = 'Could not connect';
@@ -320,6 +325,7 @@ $scope.updateABV();
         });
     },
     reboot: (arduino) => {
+      $('[data-toggle="tooltip"]').tooltip('hide');
       arduino.status.dt = '';
       arduino.status.error = '';
       arduino.status.message = 'Rebooting...';
