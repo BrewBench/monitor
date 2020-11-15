@@ -257,7 +257,7 @@ $scope.updateABV();
             arduino.status.dt = new Date();
             arduino.status.error = '';
             arduino.status.message = '';
-            if(arduino.board.indexOf('ESP32') == 0){
+            if(arduino.board.indexOf('ESP32') == 0 || arduino.board.indexOf('NodeMCU_32S') == 0){
               arduino.analog = 39;
               arduino.digital = 39;
               arduino.touch = [4,0,2,15,13,12,14,27,33,32];
@@ -1301,7 +1301,7 @@ $scope.updateABV();
     if(!$scope.settings.sensors)
       $scope.settings.sensors = {};
     // append esp type
-    if(sketchName.indexOf('ESP') !== -1)
+    if(sketchName.indexOf('ESP') !== -1 && !sketchName.indexOf('ESP32') === -1)
       sketchName += $scope.esp.type;
     var sketches = [];
     var arduinoName = '';
@@ -1313,6 +1313,7 @@ $scope.updateABV();
           name: arduinoName,
           type: sketchName,
           actions: [],
+          pins: [],
           headers: [],
           triggers: false,
           bf: (sketchName.indexOf('BF') !== -1) ? true : false
@@ -1370,6 +1371,8 @@ $scope.updateABV();
       if (kettle.temp.index) kettleType += '-' + kettle.temp.index;      
       currentSketch.actions.push('  actionsCommand(F("'+kettle.name.replace(/[^a-zA-Z0-9-.]/g, "")+'"),F("'+kettle.temp.pin+'"),F("'+kettleType+'"),'+adjust+');');
       currentSketch.actions.push('  delay(500);');
+      // used for info endpoint
+      currentSketch.pins.push(' pins += "{\\"name\\":\\"" + String("'+kettle.name+'") + "\\",\\"pin\\":\\"" + String("'+kettle.temp.pin+'") + "\\",\\"type\\":\\"" + String("'+kettleType+'") + "\\",\\"adjust\\":\\"" + String("'+adjust+'") + "\\"}";');
       
       if ($scope.settings.sensors.DHT || kettle.temp.type.indexOf('DHT') !== -1 && kettle.percent) {
         currentSketch.actions.push('  actionsPercentCommand(F("'+kettle.name.replace(/[^a-zA-Z0-9-.]/g, "")+'-Humidity"),F("'+kettle.temp.pin+'"),F("'+kettleType+'"),'+adjust+');');
@@ -1412,11 +1415,11 @@ $scope.updateABV();
           }
         }
       }
-      downloadSketch(sketch.name, sketch.actions, sketch.triggers, sketch.headers, 'BrewBench'+sketchName);
+      downloadSketch(sketch.name, sketch.actions, sketch.pins, sketch.triggers, sketch.headers, 'BrewBench'+sketchName);
     });
   };
 
-  function downloadSketch(name, actions, hasTriggers, headers, sketch){
+  function downloadSketch(name, actions, pins, hasTriggers, headers, sketch){
     // tp link connection
     var tplink_connection_string = BrewService.tplink().connection();
     var autogen = '/*\nSketch Auto Generated from http://monitor.brewbench.co\nVersion '+$scope.pkg.sketch_version+' '+moment().format('YYYY-MM-DD HH:MM:SS')+' for '+name+'\n*/\n';
@@ -1425,6 +1428,7 @@ $scope.updateABV();
         // replace variables
         response.data = autogen+response.data
           .replace('// [ACTIONS]', actions.length ? actions.join('\n') : '')
+          .replace('// [PINS]', pins.length ? pins.join('\n') : '')
           .replace('// [HEADERS]', headers.length ? headers.join('\n') : '')
           .replace(/\[VERSION\]/g, $scope.pkg.sketch_version)
           .replace(/\[TPLINK_CONNECTION\]/g, tplink_connection_string)

@@ -8,7 +8,6 @@
 #include <Preferences.h>
 // [HEADERS]
 
-const PROGMEM String VERSION = "1.0.0";
 const IPAddress apIP(192, 168, 4, 1);
 const char *apSSID = "BrewBench_SETUP";
 uint32_t FREQUENCY_SECONDS = 900;
@@ -44,6 +43,10 @@ Preferences preferences;
 // DHT DHTesp dht;
 // BMP180 Adafruit_BMP085 bmp;
 // BMP280 Adafruit_BMP280 bme;
+
+#ifndef ARDUINO_BOARD
+#define ARDUINO_BOARD "ESP32"
+#endif
 
 #define NUMSAMPLES 5
 #define SERIESRESISTOR 147000
@@ -176,6 +179,13 @@ void actionsCommand(const String sensor_name, const String spin, const String ty
   }
 }
 
+String getPins(){
+  String pins = ",\"pins\": [";
+  // [PINS]
+  pins += "]";
+  return pins;
+}
+
 void runActions()
 {
   // [ACTIONS]  
@@ -187,14 +197,13 @@ void createSensor(){
     if (http.begin(F("https://sensor.brewbench.co/sensors_from_device")))
     {
       http.addHeader("X-API-KEY", String(api_key));
-      // http.addHeader("X-API-KEY", String(sha1(api_key+WiFi.macAddress())));
-      http.addHeader("User-Agent", "BrewBench-Stick/" + VERSION);
+      http.addHeader("User-Agent", "BrewBench-Stick/[VERSION]");
       http.addHeader("Content-Type", "application/json");
       String data = "{\"device_name\":\"" + String(device_name) + "\"";
       data += ",\"uid\":\"" + String(api_key) + "\"";            
       data += ",\"type\":\"temp\"";
       data += ",\"model\":\"BrewBench OpenSource\"";
-      data += ",\"version\":\""+String(VERSION)+"\"";
+      data += ",\"version\":\"[VERSION]\"";
       data += ",\"temp\":\""+String(temp)+"\"";
       data += ",\"temp_unit\":\"C\"";
       data += ",\"temp_adjust\":\""+String(temp_adjust)+"\"";
@@ -279,7 +288,7 @@ void postData()
     if (http.begin(F("https://sensor.brewbench.co/readings")))
     {
       http.addHeader("X-API-KEY", String(api_key));
-      http.addHeader("User-Agent", "BrewBench-Stick/" + VERSION);
+      http.addHeader("User-Agent", "BrewBench-Stick/[VERSION]");
       http.addHeader("Content-Type", "application/json");
       int responseCode = http.POST(data);
       Serial.print("POST Response: ");
@@ -307,17 +316,13 @@ void getTemps()
 
 boolean restoreConfig()
 {
-  preferences.begin("wifi-config", false);
+  
+  preferences.begin("brewbench", false);
   wifi_ssid = preferences.getString("WIFI_SSID");
   wifi_password = preferences.getString("WIFI_PASSWD");
-  preferences.end();    
-  
-  if(wifi_ssid.length() == 0){
-    preferences.begin("brewbench", false);
-    wifi_ssid = preferences.getString("WIFI_SSID");
-    wifi_password = preferences.getString("WIFI_PASSWD");
+  preferences.end();  
     preferences.end();  
-  }
+  preferences.end();  
   
   Serial.print("WIFI-SSID: ");
   Serial.println(wifi_ssid);
@@ -399,7 +404,7 @@ void startWebServer()
     String data = "{";
     data += "\"model\": \"BrewBench ESP32\"";
     data += ",\"type\":\"opensource\"";
-    data += ",\"version\": \""+String(VERSION)+"\"";
+    data += ",\"version\": \"[VERSION]\"";
     data += ",\"temp\": \""+String(temp)+"\"";
     data += ",\"temp_unit\":\"C\"";
     data += ",\"temp_adjust\": \""+String(temp_adjust)+"\"";
@@ -416,6 +421,7 @@ void startWebServer()
     data += ",\"device_ip\": \""+ WiFi.localIP().toString()+"\"";
     data += ",\"rssi\": "+String(WiFi.RSSI());
     data += ",\"mac\":\"" + String(WiFi.macAddress())+"\"";
+    data += getPins();
     data += "}";
     webServer.send(200, "application/json", data);
   });
@@ -550,7 +556,7 @@ void startWebServer()
     Serial.println(WiFi.localIP());
 
     webServer.on("/arduino/info", [](){
-      String data = "{\"BrewBench\": {\"board\": \""+String(ARDUINO_BOARD)+"\", \"version\": \"[VERSION]\", \"status\": \"restarting\"";
+      String data = "{\"BrewBench\": {\"board\": \""+String(ARDUINO_BOARD)+"\", \"version\": \"[VERSION]\"";
       data += ",\"RSSI\":"+String(WiFi.RSSI());
       data += ",\"IP\":\""+WiFi.localIP().toString()+"\"";
       data += "}}";
@@ -579,10 +585,11 @@ void startWebServer()
         s += "<div class='ui warning message'>Connect this device with the BrewBench Monitor App.</div>";      
       s += "<form method='get' action='edit' class='ui form' style='max-width: 400px;'>";
       s += "<h4 class='ui dividing header'>Settings</h4>";
-      s += "<p><a href='/reset' class='ui button' onclick=\"return confirm('Are you sure you want to reset WiFi and all settings?');\">Reset All Settings</a></p>";
+      s += "<p><a href='/restart' class='ui button'>Restart Device</a>";
+      s += "&nbsp;<a href='/reset' class='ui button' onclick=\"return confirm('Are you sure you want to reset WiFi and all settings?');\">Reset All Settings</a></p>";      
       s += "<h4 class='ui dividing header'>Firmware Settings</h4>";
       s += "<div class='two fields'>";
-      s += "<div class='field'><label>Version</label> " + VERSION + "</div>";
+      s += "<div class='field'><label>Version</label> [VERSION]</div>";
       s += "</div><h4 class='ui dividing header'>BrewBench Settings</h4>";
       s += "<div class='ui info message'>Set alerts in the app</div>";
       s += "<div class='three fields'>";
@@ -604,7 +611,7 @@ void startWebServer()
       
       s += "</div></div><div class='content center aligned'><div class='ui tiny three statistics'>";
 
-      if (temp == DEVICE_DISCONNECTED_C || isnan(temp))
+      if (!temp || temp == NULL || isnan(temp))
         s += "<div class='blue statistic'><div class='value'>N/A</div><div class='label'>Temp</div></div>";
       else if (temp && temp != NULL && temp_unit == "F")
         s += "<div class='blue statistic'><div class='value'>" + String((temp * 9 / 5) + 32) + "&deg;F</div><div class='label'>Temp</div></div>";
@@ -625,6 +632,9 @@ void startWebServer()
       else
         s += "<div class='orange statistic'><div class='value'>N/A</div><div class='label'>Humidity</div></div>";
         
+      if (pressure && pressure != NULL)
+        s += "<div class='teal statistic' style='min-width: 100%;'><div class='value'>" + String(pressure) + " " + String(pressure_unit) + "</div><div class='label'>Pressure</div></div>";
+        
       s += "</div></div></div>";
       s += "<div class='field center aligned'><a class='ui button' href='/post'>Post Data</a> <input type='submit' value='Edit Settings' class='ui primary button'></div>";
       s += "</form>";
@@ -636,10 +646,17 @@ void startWebServer()
       webServer.send(200, "text/html", makePage("Reset Wi-Fi Settings", s));
       reset();
     });
+    webServer.on("/restart", []() {
+      String s = "<div class='ui positive message'><div class='header'>BrewBench Restart.</div>";
+      s += "<p>Device is rebooting...Wait 10 seconds then <a href='/'>return to main settings page.</a></p></div>";
+      webServer.send(200, "text/html", makePage("Restarting", s));
+      delay(3000);
+      ESP.restart();
+    });
     webServer.on("/edit", []() {
-      String s = "<h1 class='ui header'>BrewBnech Settings</h1>";
+      String s = "<h1 class='ui header'>Settings</h1>";
       s += "<div class='ui info message'>Connect this device with the BrewBench Monitor App. ";
-      s += "<a href='https://brewbench.co/app' target='_blank'>https://brewbench.co/app</a></div>";
+      s += "<a href='https://brewbench.co' target='_blank'>https://brewbench.co</a></div>";
       s += "<form method='get' action='update_settings' class='ui form' style='max-width: 400px;'>";
       s += "<div class='field'><label>API Key</label><input name='api_key' length=255 type='text' value='" + api_key + "'></div>";
       if(device_id.length() > 0 && device_id != "notset")
@@ -706,11 +723,7 @@ void startWebServer()
 void reset(){
   settingMode = true;
         
-  // reset the wifi config
-  preferences.begin("wifi-config", false);
-  preferences.remove("WIFI_SSID");
-  preferences.remove("WIFI_PASSWD");
-  preferences.end();  
+  // reset the config
   preferences.begin("brewbench", false);
   preferences.remove("WIFI_SSID");
   preferences.remove("WIFI_PASSWD");
@@ -766,7 +779,7 @@ String makePage(String title, String contents)
   }
   s += "</title></head><body style='padding: 10px;'>";
   s += contents;
-  s += "<div class='ui message'>Version: " + VERSION + " &copy; 2020 <a href='https://www.brewbench.co' target='_blank'>BrewBench</a></div>";
+  s += "<div class='ui message'>Version: [VERSION] &copy; 2020 <a href='https://www.brewbench.co' target='_blank'>BrewBench</a></div>";
   s += "</body></html>";
   return s;
 }
@@ -817,14 +830,13 @@ void setup()
 
   delay(10);
 
-  if (restoreConfig())
+  if (restoreConfig() && checkConnection())
   {
-    if (checkConnection())
-    {
-      settingMode = false;
-      startWebServer();
+    settingMode = false;
+    startWebServer();
+    return;  
       return;
-    }
+    return;  
   }
   settingMode = true;
   setupMode();
