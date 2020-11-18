@@ -30,6 +30,7 @@ float humidity = NULL;
 float moisture = NULL;
 float pressure = NULL;
 int LED = 10;
+int postResponse;
 // DHT DHT12 dht12;
 // DHT DHTesp dht22;
 
@@ -363,9 +364,8 @@ void createSensor(){
       data += ",\"rssi\": "+String(WiFi.RSSI());
       data += ",\"mac\":\"" + String(WiFi.macAddress())+"\"";
       data += "}";
- 
-      int responseCode = http.POST(data);
-      if(responseCode == 200){
+      postResponse = http.POST(data);
+      if(postResponse == 200){
         
         String body = http.getString();
         if(body.length() > 0 && body.indexOf("{") == -1)
@@ -402,12 +402,14 @@ void postData()
     else
       data += ",\"temp\": \"\"";
     data += ",\"temp_unit\":\"C\"";
-
+    data += ",\"temp_adjust\":" + String(temp_adjust);
+    
     // ambient
     if (ambient && !isnan(ambient) && ambient != NULL)
     {
       data += ",\"ambient\":" + String(ambient);
       data += ",\"ambient_unit\":\"C\"";
+      data += ",\"ambient_adjust\":" + String(ambient_adjust);
     }
     // humidity
     if (humidity && !isnan(humidity) && humidity != NULL)
@@ -435,12 +437,12 @@ void postData()
       http.addHeader("X-API-KEY", String(api_key));
       http.addHeader("User-Agent", "BrewBench-Stick/[VERSION]");
       http.addHeader("Content-Type", "application/json");
-      int responseCode = http.POST(data);
+      postResponse = http.POST(data);
       Serial.print("POST Response: ");
-      Serial.println(responseCode);
+      Serial.println(postResponse);
       http.end();
 
-      if (responseCode == -1)
+      if (postResponse == -1)
       {       
         WiFi.disconnect(true, true);
         ESP.restart();
@@ -591,6 +593,8 @@ void startWebServer()
     data += ",\"device_ip\": \""+ WiFi.localIP().toString()+"\"";
     data += ",\"rssi\": "+String(WiFi.RSSI());
     data += ",\"mac\":\"" + String(WiFi.macAddress())+"\"";
+    if(postResponse)
+      data += ",\"last_response_code\": \""+String(postResponse)+"\"";    
     data += getPins();
     data += "}";
     sendHeaders();

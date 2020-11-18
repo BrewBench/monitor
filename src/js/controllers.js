@@ -956,6 +956,10 @@ $scope.updateABV();
       // pascal to inches of mercury
       kettle.pressure = response.pressure / 3386.389;
     }
+    if( typeof response.co2_ppm != 'undefined'){
+      // pascal to inches of mercury
+      kettle.co2_ppm = response.co2_ppm;
+    }
 
     $scope.updateKnobCopy(kettle);
     $scope.updateArduinoStatus({kettle:kettle, sketch_version:response.sketch_version});
@@ -1320,7 +1324,11 @@ $scope.updateABV();
       currentSketch.actions.push('  actionsCommand(F("'+kettle.name.replace(/[^a-zA-Z0-9-.]/g, "")+'"),F("'+kettle.temp.pin+'"),F("'+kettleType+'"),'+adjust+');');
       currentSketch.actions.push('  delay(500);');
       // used for info endpoint
-      currentSketch.pins.push(' pins += "{\\"name\\":\\"" + String("'+kettle.name+'") + "\\",\\"pin\\":\\"" + String("'+kettle.temp.pin+'") + "\\",\\"type\\":\\"" + String("'+kettleType+'") + "\\",\\"adjust\\":\\"" + String("'+adjust+'") + "\\"}";');
+      if (currentSketch.pins.length) {
+        currentSketch.pins.push(' pins += ", {\\"name\\":\\"" + String("' + kettle.name + '") + "\\",\\"pin\\":\\"" + String("' + kettle.temp.pin + '") + "\\",\\"type\\":\\"" + String("' + kettleType + '") + "\\",\\"adjust\\":\\"" + String("' + adjust + '") + "\\"}";');        
+      } else {
+        currentSketch.pins.push(' pins += "{\\"name\\":\\"" + String("'+kettle.name+'") + "\\",\\"pin\\":\\"" + String("'+kettle.temp.pin+'") + "\\",\\"type\\":\\"" + String("'+kettleType+'") + "\\",\\"adjust\\":\\"" + String("'+adjust+'") + "\\"}";');        
+      }
       
       if ($scope.settings.sensors.DHT || kettle.temp.type.indexOf('DHT') !== -1 && kettle.percent) {
         currentSketch.actions.push('  actionsPercentCommand(F("'+kettle.name.replace(/[^a-zA-Z0-9-.]/g, "")+'-Humidity"),F("'+kettle.temp.pin+'"),F("'+kettleType+'"),'+adjust+');');

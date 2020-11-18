@@ -152,7 +152,7 @@
 
         <div class="row-new"></div>
         <div class="pb-3">
-          <h4>Arduinos
+          <h4>Arduino and BrewBench Stick
             <img src="/assets/img/arduino.svg" width="32" class="float-right">
             <a href="" ng-click="openSketches()" class="float-right" style="font-size: 18px;padding-right: 10px; margin-top: 8px;">Sketches</a>
           </h4>
@@ -172,7 +172,7 @@
             </div>
 
             <div class="float-right pb-2">
-              <button type="button" class="btn btn-primary" ng-click="arduinos.add()">Add Arduino</button>
+              <button type="button" class="btn btn-primary" ng-click="arduinos.add()">Add Sensor</button>
             </div>
             <div class="table-responsive">
             <table class="table table-striped">
@@ -193,7 +193,7 @@
                   <td>
                     <i class="fas fa-circle fa-lg" ng-class="{'orange':(!site.https && arduino.secure),'on':(!arduino.status.error && arduino.status.dt),'off':!!arduino.status.error}" aria-hidden="true"></i>
                   </td>
-                  <td class="text-left">
+                  <td class="text-left" style="min-width: 300px;">
                     <div class="input-group">
                       <span class="input-group-prepend">
                         <button type="button" class="btn btn-light" ng-show="!arduino.secure" ng-click="arduino.secure=true; arduinos.update(arduino)">http://</button>
@@ -220,13 +220,13 @@
                   </td>
                   <td>                    
                       <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                        <button type="button" class="btn" ng-class="{'btn-success':pkg.sketch_version==arduino.version, 'btn-warning':pkg.sketch_version!=arduino.version}" ng-click="openSketches()" data-toggle="tooltip" title="Open Sketches"> {{arduino.version}}</button>
+                        <button type="button" class="btn" ng-class="{'btn-success':pkg.sketch_version==arduino.version || arduino.board == 'M5Stick_C', 'btn-warning':pkg.sketch_version!=arduino.version && arduino.board != 'M5Stick_C'}" data-toggle="tooltip"> {{arduino.version}}</button>
                         <button type="button" ng-show="!arduino.version" class="btn" ng-class="{'btn-danger':!!arduino.status.error, 'btn-secondary': !arduino.status.error}" ng-click="arduinos.connect(arduino)" data-toggle="tooltip" title="Connect"> Connect</button>
                         <button type="button" ng-show="arduino.version" class="btn btn-secondary" ng-click="arduinos.connect(arduino)" ng-disabled="arduino.status.message=='Connecting...'"  data-toggle="tooltip" title="Connect Refresh"> <i class="fas fa-sync-alt"></i></button>                      
                         <button type="button" class="btn btn-info" ng-click="arduinos.info(arduino)" ng-disabled="arduino.status.message=='Getting Info...'" data-toggle="tooltip" title="More Info - Only available for BrewBench App Devices"><i class="fas fa-info"></i></button>                      
                         <button type="button" class="btn btn-danger" ng-click="arduinos.reboot(arduino)" data-toggle="tooltip" title="Reboot"><i class="fas fa-power-off"></i></button>
                       </div>
-                      <small ng-show="arduino.version && pkg.sketch_version!=arduino.version">
+                      <small ng-if="arduino.board != 'M5Stick_C'" ng-show="arduino.version && pkg.sketch_version!=arduino.version">
                         <br/><a href="" ng-click="openSketches()">{{ pkg.sketch_version }} is Available</a>
                       </small>      
                       <small ng-if="arduino.info" class="text-muted">     

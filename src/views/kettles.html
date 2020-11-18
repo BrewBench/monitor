@@ -369,14 +369,17 @@
           <div ng-if="kettle.temp.type.indexOf('DHT') === 0">
             Humidity {{ kettle.percent || 0}} % <br/>
           </div>
+          <span ng-if="kettle.co2_ppm">
+            CO2: {{ kettle.co2_ppm }} ppm
+          </span>          
           <div ng-if="kettle.temp.type.indexOf('BMP') === 0">
-            <span ng-if="settings.general.unit=='F'">
+            <span ng-if="kettle.altitude && settings.general.unit=='F'">
               Altitude {{ kettle.altitude * 3.28084 | number:0}} feet <br/>
             </span>
-            <span ng-if="settings.general.unit=='C'">
+            <span ng-if="kettle.altitude && settings.general.unit=='C'">
               Altitude {{ kettle.altitude | number:0}} meters <br/>
             </span>
-            Pressure {{ kettle.pressure | number:2}} in. <br/>
+            Pressure {{ kettle.pressure | number:2}} inHg. <br/>
           </div>
           <span class="badge badge-pill badge-prev badge-danger" ng-show="kettle.temp.previous && (kettle.temp.previous | round:0) > (kettle.temp.current | round:0)" title="Last {{ kettle.temp.previous }}">{{kettle.temp.previous}}
             {{ !!BrewService.sensorTypes(kettle.temp.type).percent ? '%' : '&deg;'+settings.general.unit }} &darr;

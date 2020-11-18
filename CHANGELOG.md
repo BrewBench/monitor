@@ -1,5 +1,10 @@
 # Change Log
 
+## 4.7.4 - 2020-11-17
+
+- Updated sketches to 4.6.4
+- Added support for BrewBench Stick
+
 ## 4.7.3 - 2020-11-14
 
 - Added info to app sketch with replace kettle functionality

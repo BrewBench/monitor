@@ -130,6 +130,8 @@ angular.module('brewbench-monitor')
         ,{name: 'SoilMoisture', analog: true, digital: false, vcc: true, percent: true, esp: true}
         ,{name: 'BMP180', analog: true, digital: false, esp: true}
         ,{name: 'BMP280', analog: true, digital: false, esp: true}
+        ,{name: 'SHT3X', analog: true, digital: false, esp: true }
+        ,{name: 'MH-Z16', analog: true, digital: false, esp: true }        
       ];
       if(name)
         return _.filter(sensors, {'name': name})[0];
@@ -171,14 +173,18 @@ angular.module('brewbench-monitor')
 
     isESP: function(arduino, return_version){
       if(return_version){
-        if(arduino.board.toLowerCase().indexOf('32') !== -1)
+        if(arduino.board.toLowerCase().indexOf('32') !== -1 || arduino.board.toLowerCase().indexOf('m5stick_c') !== -1)
           return '32';
         else if(arduino.board.toLowerCase().indexOf('8266') !== -1)
           return '8266';
         else
           return false;
       }
-      return Boolean(arduino && arduino.board && (arduino.board.toLowerCase().indexOf('esp') !== -1 || arduino.board.toLowerCase().indexOf('nodemcu') !== -1));
+      return Boolean(arduino && arduino.board && (
+          arduino.board.toLowerCase().indexOf('esp') !== -1 ||
+          arduino.board.toLowerCase().indexOf('nodemcu') !== -1 ||
+          arduino.board.toLowerCase().indexOf('m5stick_c') !== -1
+      ));
     },
   
     slack: function(webhook_url, msg, color, icon, kettle){
@@ -232,7 +238,7 @@ angular.module('brewbench-monitor')
       var q = $q.defer();
       var url = this.domain(kettle.arduino)+'/arduino/'+kettle.temp.type;
       if(this.isESP(kettle.arduino)){
-        if(kettle.temp.pin.indexOf('A') === 0)
+        if(kettle.temp.pin.indexOf('A') === 0 || kettle.temp.pin.indexOf('G') === 0)
           url += '?apin='+kettle.temp.pin;
         else
           url += '?dpin='+kettle.temp.pin;
