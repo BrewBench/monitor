@@ -171,7 +171,9 @@ angular.module('brewbench-monitor')
       return domain;
     },
 
-    isESP: function(arduino, return_version){
+    isESP: function (arduino, return_version) {
+      if (!arduino.board)
+        return false;
       if(return_version){
         if(arduino.board.toLowerCase().indexOf('32') !== -1 || arduino.board.toLowerCase().indexOf('m5stick_c') !== -1)
           return '32';

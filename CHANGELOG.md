@@ -1,5 +1,9 @@
 # Change Log
 
+## 4.7.5 - 2020-11-17
+
+- Bump asset version
+
 ## 4.7.4 - 2020-11-17
 
 - Updated sketches to 4.6.4
