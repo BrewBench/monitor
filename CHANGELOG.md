@@ -1,5 +1,9 @@
 # Change Log
 
+## 4.7.6 - 2020-11-19
+
+- Added post data to version
+
 ## 4.7.5 - 2020-11-17
 
 - Bump asset version

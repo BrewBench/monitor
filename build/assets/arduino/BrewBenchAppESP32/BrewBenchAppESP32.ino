@@ -394,6 +394,7 @@ void postData()
     
     Serial.println("Posting Data");
     String data = "{\"device_name\":\"" + String(device_name) + "\"";
+    data += ",\"version\":\"[VERSION]\"";
     data += ",\"uid\":\"" + String(api_key) + "\"";
     data += ",\"sensorsId\":\"" + String(device_id) + "\"";
     // always send temp
