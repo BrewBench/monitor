@@ -78,7 +78,7 @@
                 <p>Control your brew session, setup a RIMS system or monitor your fermentation.  This is a basic sketch that lets you connect to all of the supported sensors.  We suggest using this to configure and test all kettles before uploading any of the other sketches.</p>
               </div>
               <div class="col-3">
-                <a class="btn btn-light float-right" href="" ng-click="compileSketch('Yun')" class="dropdown-item">Download Yun Sketch</a><br><br>
+                <a href="" class="btn btn-light float-right" ng-click="compileSketch('Yun')" class="dropdown-item">Download Yun Sketch</a><br/><br/>
                 <div class="dropdown float-right">
                   <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     Download ESP Sketch
@@ -135,8 +135,9 @@
               </div>
               <div class="row">
                 <div class="col-12" style="padding-left: 10px;">
-                  <a href="https://apps.apple.com/us/app/id1527603859" target="_blank"><img alt='Download on the App Store' src='/assets/img/ios/Download_on_the_App_Store_Badge_US-UK_RGB_blk_092917.svg' width="120"/></a>
+                  <a href="https://apps.apple.com/us/app/id1527603859" target="_blank"><img alt='Download on the App Store' src='/assets/img/ios/Download_on_the_App_Store_Badge_US-UK_RGB_blk_092917.svg' width="120" style="padding-right: 12px;"/></a>
                   <a href="https://play.google.com/store/apps/details?id=co.brewbench.monitor&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1" target="_blank"><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png' width="150"/></a>
+                  <a href="https://www.amazon.com/dp/B08P92GCDV" target="_blank"><img alt='Download on the App Store' src='/assets/img/aws/appstore-250.png' width="150"/></a>
                 </div>
               </div>
               <div class="row pb-2">
@@ -147,6 +148,7 @@
                 <div class="col-6">
                   <label class="adjust">API Key</label>
                   <input class="form-control" type="text" ng-model="settings.app.api_key" placeholder="API Key">
+                  <span style="color: #777; padding-left: 5px;">(Found in the App under Settings)</span>
                 </div>
               </div>
               <div class="row">

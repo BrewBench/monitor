@@ -4,7 +4,6 @@
 #include <WebServer.h>
 #include <HTTPClient.h>
 #include <ESPmDNS.h>
-#include <WiFiClient.h>
 #include <Preferences.h>
 // [HEADERS]
 
@@ -12,7 +11,7 @@ const IPAddress apIP(192, 168, 4, 1);
 const char *apSSID = "BrewBench_SETUP";
 uint32_t FREQUENCY_SECONDS = 900;
 uint32_t secondCounter = 0;
-boolean settingMode = false;;
+boolean settingMode = false;
 boolean offlineMode = false;
 String ssidList;
 String wifi_ssid;
@@ -29,7 +28,6 @@ float ambient_adjust = 0.00;
 float humidity = NULL;
 float moisture = NULL;
 float pressure = NULL;
-int LED = 10;
 int postResponse;
 // DHT DHT12 dht12;
 // DHT DHTesp dht22;
@@ -392,7 +390,6 @@ void postData()
       delay(10);
     }
     
-    Serial.println("Posting Data");
     String data = "{\"device_name\":\"" + String(device_name) + "\"";
     data += ",\"version\":\"[VERSION]\"";
     data += ",\"uid\":\"" + String(api_key) + "\"";
@@ -1029,9 +1026,6 @@ String urlDecode(String input)
 void setup()
 {
 
-  pinMode(LED, OUTPUT);
-  digitalWrite(LED, HIGH);
-
   Serial.begin(115200);
 
   delay(10);
@@ -1040,8 +1034,6 @@ void setup()
   {
     settingMode = false;
     startWebServer();
-    return;  
-      return;
     return;  
   }
   settingMode = true;

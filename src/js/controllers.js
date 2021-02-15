@@ -234,7 +234,7 @@ $scope.updateABV();
         url: 'arduino.local',
         board: '',
         RSSI: false,
-        analog: 5,
+        analog: 11,
         digital: 13,
         adc: 0,
         secure: false,
