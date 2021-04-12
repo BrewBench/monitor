@@ -4,6 +4,7 @@
 #include <WebServer.h>
 #include <HTTPClient.h>
 #include <ESPmDNS.h>
+#include <WiFiClient.h>
 #include <Preferences.h>
 // [HEADERS]
 

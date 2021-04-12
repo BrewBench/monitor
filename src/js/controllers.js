@@ -1253,7 +1253,7 @@ $scope.updateABV();
     if(!$scope.settings.sensors)
       $scope.settings.sensors = {};
     // append esp type
-    if(sketchName.indexOf('ESP') !== -1 && !sketchName.indexOf('ESP32') === -1)
+    if(sketchName.indexOf('ESP') !== -1)
       sketchName += $scope.esp.type;
     var sketches = [];
     var arduinoName = '';
