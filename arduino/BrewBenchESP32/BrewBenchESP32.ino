@@ -103,7 +103,7 @@ void processRest(const String command) {
   String apin = "";
   String dpin = "";
   int16_t value = -1;
-  int16_t index = -1;
+  uint8_t index = 0;
   for (uint8_t i = 0; i < server.args(); i++) {
     if( server.argName(i) == "dpin" )
       dpin = server.arg(i);
@@ -182,7 +182,7 @@ String adCommand(const String dpin, const String apin, int16_t value, const Stri
   return data;
 }
 
-String sensorCommand(const String dpin, const String apin, const int16_t index, const String type) {
+String sensorCommand(const String dpin, const String apin, const uint8_t index, const String type) {
   uint8_t pin;
   if( dpin != "" )
     pin = dpin.substring(1).toInt();

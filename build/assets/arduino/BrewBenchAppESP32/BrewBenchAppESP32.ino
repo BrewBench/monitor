@@ -99,13 +99,16 @@ void actionsCommand(const String sensor_name, const String spin, const String ty
         temp = temp + temp_offset;
     }
   }
-  // DS18B20 else if (type == "DS18B20")
+  // DS18B20 else if (type.substring(0,7) == "DS18B20")
   // DS18B20 {
   // DS18B20   OneWire oneWire(pin);
+  // DS18B20   int8_t index = 0;
+  // DS18B20   if( type.length() > 7 )
+  // DS18B20     index = type.substring(8).toInt();
   // DS18B20   DallasTemperature sensors(&oneWire);
   // DS18B20   sensors.begin();
   // DS18B20   sensors.requestTemperatures();
-  // DS18B20   temp = sensors.getTempCByIndex(0);
+  // DS18B20   temp = sensors.getTempCByIndex(index);
   // DS18B20   if (temp != DEVICE_DISCONNECTED_C && temp_adjust && !isnan(temp_adjust))
   // DS18B20     temp = temp + temp_adjust;
   // DS18B20   else if (temp != DEVICE_DISCONNECTED_C && temp_offset && !isnan(temp_offset))
@@ -217,7 +220,7 @@ String adCommand(const String dpin, const String apin, int16_t value, const Stri
   return data;
 }
 
-String sensorCommand(const String dpin, const String apin, const int16_t index, const String type) {
+String sensorCommand(const String dpin, const String apin, const uint8_t index, const String type) {
   uint8_t pin;
   if( dpin != "" )
     pin = dpin.substring(1).toInt();
@@ -514,7 +517,7 @@ void processRest(const String command) {
   String apin = "";
   String dpin = "";
   int16_t value = -1;
-  int16_t index = -1;
+  uint8_t index = 0;
   for (uint8_t i = 0; i < webServer.args(); i++) {
     if( webServer.argName(i) == "dpin" )
       dpin = webServer.arg(i);

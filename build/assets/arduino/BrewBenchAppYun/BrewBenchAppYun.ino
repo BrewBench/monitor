@@ -181,17 +181,14 @@ String sensorCommand(BridgeClient client, String type) {
     }    
   }  
   // DS18B20 else if(type.substring(0,7) == "DS18B20"){
-  // DS18B20   int16_t index = -1;
+  // DS18B20   int8_t index = 0;
   // DS18B20   if( type.length() > 7 )
   // DS18B20     index = type.substring(8).toInt();
   // DS18B20   OneWire oneWire(pin);
   // DS18B20   DallasTemperature sensors(&oneWire);
   // DS18B20   sensors.begin();
   // DS18B20   sensors.requestTemperatures();
-  // DS18B20   if( index > 0 )
-  // DS18B20     temp = sensors.getTempCByIndex(index);
-  // DS18B20   else
-  // DS18B20     temp = sensors.getTempCByIndex(0);
+  // DS18B20   temp = sensors.getTempCByIndex(index);
   // DS18B20 }
   
   data += ",\"temp\":"+String(temp);
