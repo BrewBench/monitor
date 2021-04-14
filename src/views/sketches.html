@@ -128,9 +128,24 @@
                   <p>
                     Monitor your temps with the BrewBench Monitor App and a <a href="https://smile.amazon.com/s?k=Arduino+ESP32" target="_blank">ESP32</a>.  Download the basic ESP32 sketch to setup your sensors then download and install this one.
                   </p>
+                  <h6>Sensors that will be included in the sketch.  Remove any from the main senors page that you do not want.</h6>
+                  <div class="container">
+                    <div class="row">
+                      <div class="col" ng-repeat="kettle in kettles track by $index">    
+                        <span class="badge badge-pill badge-primary">{{$index+1}}</span>                
+                        <img ng-if="['air','seedling','cannabis'].indexOf(kettle.type) === -1" class="type" ng-src="/assets/img/{{kettle.type}}.svg" width="30" height="30"/>
+                        <i ng-if="kettle.type == 'air'" class="fas fa-thermometer-quarter fa-2x type"></i>
+                        <i ng-if="kettle.type == 'seedling'" class="fas fa-seedling fa-lg type"></i>
+                        <i ng-if="kettle.type == 'cannabis'" class="fas fa-cannabis fa-2x type"></i>
+                        &nbsp;
+                        <strong>{{kettle.name}}</strong><br/>
+                        {{kettle.temp.pin}} {{kettle.temp.type}}
+                      </div>
+                    </div>
+                  </div>
                 </div>
                 <div class="col-3">
-                  <a href="" class="btn btn-light float-right" ng-click="compileSketch('AppESP32')" ng-class="{'disabled':!app.connected()}">Download ESP32 Sketch</a>
+                  <a href="" class="btn btn-light float-right" ng-click="compileSketch('AppESP32')" ng-class="{'disabled':(!app.connected() || !kettles.length)}">Download ESP32 Sketch</a>
                 </div>
               </div>
               <div class="row">
