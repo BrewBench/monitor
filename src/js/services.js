@@ -185,6 +185,7 @@ angular.module('brewbench-monitor')
       return Boolean(arduino && arduino.board && (
           arduino.board.toLowerCase().indexOf('esp') !== -1 ||
           arduino.board.toLowerCase().indexOf('nodemcu') !== -1 ||
+          arduino.board.toLowerCase().indexOf('node32s') !== -1 ||
           arduino.board.toLowerCase().indexOf('m5stick_c') !== -1
       ));
     },
@@ -246,12 +247,12 @@ angular.module('brewbench-monitor')
           url += '?dpin='+kettle.temp.pin;
         if(Boolean(kettle.temp.vcc) && ['3V','5V'].indexOf(kettle.temp.vcc) === -1) //SoilMoisture logic
           url += '&dpin='+kettle.temp.vcc;
-        else if(Boolean(kettle.temp.index)) //DS18B20 logic
+        else if(kettle.temp.index && !isNaN(kettle.temp.index)) //DS18B20 logic
           url += '&index='+kettle.temp.index;
       } else {
         if(Boolean(kettle.temp.vcc) && ['3V','5V'].indexOf(kettle.temp.vcc) === -1) //SoilMoisture logic
           url += kettle.temp.vcc;
-        else if(Boolean(kettle.temp.index)) //DS18B20 logic
+        else if(kettle.temp.index && !isNaN(kettle.temp.index)) //DS18B20 logic
           url += '&index='+kettle.temp.index;
         url += '/'+kettle.temp.pin;
       }

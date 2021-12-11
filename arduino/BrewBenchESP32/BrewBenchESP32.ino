@@ -128,19 +128,17 @@ void processRest(const String command) {
 }
 
 void handleNotFound() {
-  String message = "File Not Found\n\n";
-  message += "URI: ";
-  message += server.uri();
-  message += "\nMethod: ";
+  String message = "{";
+  message += "\"uri\": \""+server.uri()+"\"";
+  message += ",\"method\": \"";
   message += (server.method() == HTTP_GET) ? "GET" : "POST";
-  message += "\nArguments: ";
-  message += server.args();
-  message += "\n";
-
+  message += "\",\"arguments\": {";
   for (uint8_t i = 0; i < server.args(); i++) {
-    message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
+    message += "\"" + server.argName(i) + "\":";
+    message += "\"" + server.arg(i) + "\"";
   }
-
+  message += "}}";
+  
   server.send(404, "text/plain", message);
 }
 

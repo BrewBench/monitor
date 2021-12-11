@@ -21,12 +21,12 @@ $scope.site = {https: Boolean(document.location.protocol=='https:')
   , https_url: `https://${document.location.host}`
 };
 $scope.esp = {
-  type: '',
+  type: '32',
   ssid: '',
   ssid_pass: '',
   hostname: 'bbesp',
   arduino_pass: 'bbadmin',
-  autoconnect: false
+  autoconnect: false  
 };
 $scope.modalInfo = {};
 $scope.hops;

@@ -1,5 +1,19 @@
 # Change Log
 
+## 4.7.8 - 2021-12-13
+
+- Updated sketches to 4.6.5
+- Updated BrewBench monitor app sketch for ESP32
+- Fixed sketch handleNotFound JSON response
+
+## 4.7.7 - 2021-04-14
+
+- Added BrewBench monitor app sketch for ESP32
+
+## 4.7.7 - 2021-02-15
+
+- ESP32 Sketch Updates
+
 ## 4.7.6 - 2020-11-19
 
 - Added post data to version

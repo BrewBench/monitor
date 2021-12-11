@@ -544,13 +544,14 @@ void processRest(const String command) {
 void handleNotFound() {
   String message = "{";
   message += "\"uri\": \""+webServer.uri()+"\"";
-  message += ",\"method: \"";
+  message += ",\"method\": \"";
   message += (webServer.method() == HTTP_GET) ? "GET" : "POST";
   message += "\",\"arguments\": {";
   for (uint8_t i = 0; i < webServer.args(); i++) {
-    message += "\"" + webServer.argName(i) + "\": \"" + webServer.arg(i) + "\"";
+    message += "\"" + webServer.argName(i) + "\":";
+    message += "\"" + webServer.arg(i) + "\"";
   }
-  message += "\"}}";
+  message += "}}";
 
   webServer.send(404, "text/plain", message);
 }
@@ -797,6 +798,8 @@ void startWebServer()
       s += "<h4 class='ui dividing header'>Firmware Settings</h4>";
       s += "<div class='two fields'>";
       s += "<div class='field'><label>Version</label> [VERSION]</div>";
+      s += "</div><h4 class='ui dividing header'>Device Info</h4>";
+      s += "<a href='/info'>View JSON Device Info</a>";
       s += "</div><h4 class='ui dividing header'>BrewBench Settings</h4>";
       s += "<div class='ui info message'>Set alerts in the app</div>";
       s += "<div class='three fields'>";
@@ -986,7 +989,7 @@ String makePage(String title, String contents)
   }
   s += "</title></head><body style='padding: 10px;'>";
   s += contents;
-  s += "<div class='ui message'>Version: [VERSION] &copy; 2020 <a href='https://www.brewbench.co' target='_blank'>BrewBench</a></div>";
+  s += "<div class='ui message'>Version: [VERSION] &copy; 2021 <a href='https://www.brewbench.co' target='_blank'>BrewBench</a></div>";
   s += "</body></html>";
   return s;
 }
