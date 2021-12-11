@@ -46,7 +46,7 @@ void setupRest() {
   });
 
   server.on("/arduino/info", [](){
-    String data = "{\"BrewBench\": {\"board\": \""+String(ARDUINO_BOARD)+"\", \"version\": \"[VERSION]\", \"status\": \"restarting\"";
+    String data = "{\"BrewBench\": {\"board\": \""+String(ARDUINO_BOARD)+"\", \"version\": \"[VERSION]\"";
     data += ",\"RSSI\":"+String(WiFi.RSSI());
     data += ",\"IP\":\""+WiFi.localIP().toString()+"\"";
     data += "}}";
