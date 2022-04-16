@@ -29,7 +29,7 @@ BrewBench Monitor can easily be used on fermenters with a thermowell.
 | Sensor | [SEN-13322](https://www.sparkfun.com/products/13322) | Moisture |
 | Controller | [Ranco](https://smile.amazon.com/RANCO-ETC-111000-Digital-Temperature-Control/dp/B0015NV5BE/) | Temperature |
 | Controller| [InkBird ITC-1000](https://smile.amazon.com/Inkbird-All-Purpose-Temperature-Controller-ITC-1000/dp/B00OXPE8U6/) | Temperature |
-| Board | [ESP32](https://smile.amazon.com/HiLetgo-ESP-WROOM-32-Development-Microcontroller-Integrated/dp/B0718T232Z/) | [Monitor](http://monitor.brewbench.co) or [App](https://www.sensoroverlord.com) |
+| Board | [ESP32](https://smile.amazon.com/HiLetgo-ESP-WROOM-32-Development-Microcontroller-Integrated/dp/B0718T232Z/) | [Monitor](http://monitor.brewbench.co) or [App](https://www.brewbench.co) |
 | Board | [ESP8266](https://smile.amazon.com/HiLetgo-Internet-Development-Wireless-Micropython/dp/B010O1G1ES/) | [Monitor](http://monitor.brewbench.co) |
 | Board | [Yun Rev 2](https://store.arduino.cc/usa/arduino-yun-rev-2) | [Monitor](http://monitor.brewbench.co) |
 

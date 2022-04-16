@@ -125,9 +125,6 @@ Open the serial monitor on `115200` baud to get the IP address after uploading t
   - SLC is D1 (GPIO5)
   - SLA is D2 (GPIO4)
 
-- ESP8285
-  - Coming Soon
-
 - ESP32
   - Disconnect any power pins (so blue led is off on the board), then you need to hold the button to the right of the micro usb input when you see connecting....
   - Libraries: Add https://dl.espressif.com/dl/package_esp32_index.json to Boards Manager URLs

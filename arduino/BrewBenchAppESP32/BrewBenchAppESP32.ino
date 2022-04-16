@@ -280,7 +280,7 @@ String sensorCommand(const String dpin, const String apin, const uint8_t index, 
     // ESP32 has 12bits of resolution instead of 10
     raw = map(raw, 0, 4095, 0, 880);
     percent = map(raw, 0, 880, 0, 100);
-    data += ",\"percent\":"+String(percent);
+    data += ",\"moisture\":"+String(percent);
   }
   // DS18B20 else if(type == "DS18B20"){
   // DS18B20   OneWire oneWire(pin);
