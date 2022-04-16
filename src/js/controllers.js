@@ -948,6 +948,9 @@ $scope.updateABV();
     if( typeof response.percent != 'undefined'){
       kettle.percent = $filter('round')(response.percent,0);
     }
+    if( typeof response.moisture != 'undefined'){
+      kettle.percent = $filter('round')(response.moisture,0);
+    }
     // BMP sensors have altitude and pressure
     if( typeof response.altitude != 'undefined'){
       kettle.altitude = response.altitude;
