@@ -226,9 +226,10 @@ String sensorCommand(const String dpin, const String apin, const uint8_t index, 
     pin = dpin.substring(1).toInt();
   else
     pin = apin.substring(1).toInt();
-  float temp = 0.00;
+  float _temp = 0.00;
+  float _percent = 0.00;
+  float _moisture = 0.00;
   float raw = 0.00;
-  float percent = 0.00;
   float volts = 0.00;
   float resistance = 0.0;
 
@@ -260,11 +261,11 @@ String sensorCommand(const String dpin, const String apin, const uint8_t index, 
     }
     resistance /= NUMSAMPLES;
     raw = resistance;
-    temp = Thermistor(resistance);
+    _temp = Thermistor(resistance);
   }
   else if(type == "PT100"){
     if (raw>409){
-      temp = (150*map(raw,410,1023,0,614))/614;
+      _temp = (150*map(raw,410,1023,0,614))/614;
     }
   }
   else if(type == "SoilMoisture"){
@@ -279,8 +280,8 @@ String sensorCommand(const String dpin, const String apin, const uint8_t index, 
     }
     // ESP32 has 12bits of resolution instead of 10
     raw = map(raw, 0, 4095, 0, 880);
-    percent = map(raw, 0, 880, 0, 100);
-    data += ",\"moisture\":"+String(percent);
+    _moisture = map(raw, 0, 880, 0, 100);
+    data += ",\"moisture\":"+String(_moisture);
   }
   // DS18B20 else if(type == "DS18B20"){
   // DS18B20   OneWire oneWire(pin);
@@ -288,29 +289,29 @@ String sensorCommand(const String dpin, const String apin, const uint8_t index, 
   // DS18B20   sensors.begin();
   // DS18B20   sensors.requestTemperatures();
   // DS18B20   if( index > 0 )
-  // DS18B20     temp = sensors.getTempCByIndex(index);
+  // DS18B20     _temp = sensors.getTempCByIndex(index);
   // DS18B20   else
-  // DS18B20     temp = sensors.getTempCByIndex(0);
+  // DS18B20     _temp = sensors.getTempCByIndex(0);
   // DS18B20 }
   // DHT else if(type == "DHT11" || type == "DHT12"){
   // DHT   if(type == "DHT11"){
   // DHT     dht.setup(pin, DHTesp::DHT11);
   // DHT     delay(dht.getMinimumSamplingPeriod());
-  // DHT     temp = dht.getTemperature();
-  // DHT     percent = dht.getHumidity();
+  // DHT     _temp = dht.getTemperature();
+  // DHT     _percent = dht.getHumidity();
   // DHT   } else if(type == "DHT22"){
   // DHT     dht.setup(pin, DHTesp::DHT22);
   // DHT     delay(dht.getMinimumSamplingPeriod());
-  // DHT     temp = dht.getTemperature();
-  // DHT     percent = dht.getHumidity();
+  // DHT     _temp = dht.getTemperature();
+  // DHT     _percent = dht.getHumidity();
   // DHT   }
-  // DHT   if(isnan(temp)) temp = 0;
-  // DHT   if(isnan(percent)) percent = 0;
-  // DHT   data += ",\"percent\":"+String(percent);
+  // DHT   if(isnan(_temp)) temp = 0;
+  // DHT   if(isnan(_percent)) percent = 0;
+  // DHT   data += ",\"percent\":"+String(_percent);
   // DHT }
   // BMP180 else if(type == "BMP180"){
   // BMP180   if (bmp.begin()) {
-  // BMP180     temp = bmp.readTemperature();
+  // BMP180     _temp = bmp.readTemperature();
   // BMP180     data += ",\"altitude\":"+String(bmp.readAltitude());
   // BMP180     data += ",\"pressure\":"+String(bmp.readPressure());
   // BMP180   } else {
@@ -319,7 +320,7 @@ String sensorCommand(const String dpin, const String apin, const uint8_t index, 
   // BMP180   }
   // BMP180 }
 
-  data += ",\"temp\":"+String(temp);
+  data += ",\"temp\":"+String(_temp);
   data += ",\"raw\":"+String(raw);
   data += ",\"volts\":"+String(volts);
   data += "}";
@@ -345,7 +346,7 @@ void createSensor(){
     if (http.begin(F("https://sensor.brewbench.co/sensors_from_device")))
     {
       http.addHeader("X-API-KEY", String(api_key));
-      http.addHeader("User-Agent", "BrewBench-Stick/[VERSION]");
+      http.addHeader("User-Agent", "BrewBench-OpenSource/[VERSION]");
       http.addHeader("Content-Type", "application/json");
       String data = "{\"device_name\":\"" + String(device_name) + "\"";
       data += ",\"uid\":\"" + String(api_key) + "\"";            
@@ -437,7 +438,7 @@ void postData()
     if (http.begin(F("https://sensor.brewbench.co/readings")))
     {
       http.addHeader("X-API-KEY", String(api_key));
-      http.addHeader("User-Agent", "BrewBench-Stick/[VERSION]");
+      http.addHeader("User-Agent", "BrewBench-OpenSource/[VERSION]");
       http.addHeader("Content-Type", "application/json");
       postResponse = http.POST(data);
       Serial.print("POST Response: ");
@@ -834,13 +835,12 @@ void startWebServer()
         s += "<div class='purple statistic'><div class='value'>" + String((ambient * 9 / 5) + 32) + "&deg;F</div><div class='label'>Ambient</div></div>";
       else if (ambient && ambient != NULL)
         s += "<div class='purple statistic'><div class='value'>" + String(ambient) + "&deg;C</div><div class='label'>Ambient</div></div>";
-      else
-        s += "<div class='purple statistic'><div class='value'>N/A</div><div class='label'>Ambient</div></div>";
-
+      
       if (humidity && humidity != NULL)
         s += "<div class='orange statistic'><div class='value'>" + String(humidity) + "%</div><div class='label'>Humidity</div></div>";
-      else
-        s += "<div class='orange statistic'><div class='value'>N/A</div><div class='label'>Humidity</div></div>";
+      
+      if (moisture && moisture != NULL)
+        s += "<div class='brown statistic'><div class='value'>" + String(moisture) + "%</div><div class='label'>Moisture</div></div>";
         
       if (pressure && pressure != NULL)
         s += "<div class='teal statistic' style='min-width: 100%;'><div class='value'>" + String(pressure) + " " + String(pressure_unit) + "</div><div class='label'>Pressure</div></div>";

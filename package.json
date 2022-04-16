@@ -1,7 +1,7 @@
 {
   "name": "brewbench-monitor",
   "version": "4.7.8",
-  "sketch_version": "4.6.5",
+  "sketch_version": "4.6.6",
   "description": "Is an Arduino Yun brew monitor for the home brewer enthusiast that uses the Arduino REST API to interface with thermistors connected to the analog ports.",
   "main": "build/app.js",
   "scripts": {
