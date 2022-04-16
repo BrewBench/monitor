@@ -154,7 +154,6 @@ angular.module('brewbench-monitor')
     },
 
     domain: function(arduino){
-      var settings = this.settings('settings');
       var domain = 'http://arduino.local';
 
       if(arduino && arduino.url){

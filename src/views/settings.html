@@ -201,8 +201,8 @@
                       </span>
                       <input class="form-control" type="text" ng-model="arduino.url" ng-change="arduinos.update(arduino)" placeholder="URL" style="min-width: 200px;">
                     </div>
-                    <small class="text-muted" ng-show="(arduino.board)">&nbsp;Board: {{arduino.board}}
-                      <span ng-show="BrewService.isESP(arduino)" class="badge badge-pill badge-info">ESP</span>
+                    <small class="text-muted">&nbsp;Board: {{arduino.board}}
+                      <a href="" ng-class="{'badge-dark': !BrewService.isESP(arduino), 'badge-info':  BrewService.isESP(arduino)}" class="badge badge-pill" style="color: #FFF;" ng-click='arduino.board != "ESP" ? arduino.board = "ESP" : arduino.board = ""'>ESP</a>
                     </small>
                     <small class="text-muted" ng-if="arduino.RSSI">
                       <br/>&nbsp;Wifi:
