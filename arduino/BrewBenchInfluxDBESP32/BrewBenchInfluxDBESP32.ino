@@ -64,6 +64,10 @@ void setupRest() {
     ESP.restart();
   });
 
+  server.on("/arduino/digital", [](){
+      sendHeaders();
+      processRest("digital");
+  });
   server.on("/arduino/Thermistor", [](){
     sendHeaders();
     processRest("Thermistor");
